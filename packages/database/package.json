@@ -1,0 +1,40 @@
+{
+  "name": "@rsm/database",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Database schemas and connection management (PostgreSQL + Drizzle ORM)",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./master": {
+      "types": "./dist/master/index.d.ts",
+      "import": "./dist/master/index.js"
+    },
+    "./tenant": {
+      "types": "./dist/tenant/index.d.ts",
+      "import": "./dist/tenant/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "dev": "tsc --watch",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.5",
+    "postgres": "^3.4.4",
+    "@rsm/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "recording-studio-manager-hybrid",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Recording Studio Manager - Version Hybride (Architecture Claude + Stack Manus)",
+  "author": "Your Name",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter client dev & pnpm --filter server dev",
+    "build": "pnpm --filter shared build && pnpm --filter database build && pnpm --filter client build && pnpm --filter server build",
+    "start": "pnpm --filter server start",
+    "check": "pnpm -r check",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "db:generate": "pnpm --filter database db:generate",
+    "db:migrate": "pnpm --filter database db:migrate",
+    "db:studio": "pnpm --filter database db:studio"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.4"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.14.4"
+}
