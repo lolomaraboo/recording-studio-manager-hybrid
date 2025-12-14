@@ -1,8 +1,8 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 1 COMPLÉTÉE ✅**
-> **Phase actuelle**: Phase 1 - Infrastructure & Base (100% COMPLÉTÉ ✅)
-> **Dernière mise à jour**: 2025-12-13 (Session: Frontend React + shadcn/ui + Bug fix tRPC)
+> **🚀 STACK HYBRIDE - Phase 2 EN COURS 🔵**
+> **Phase actuelle**: Phase 2 - Features Critiques (Semaine 7-9)
+> **Dernière mise à jour**: 2025-12-13 (Session: Synchronisation docs + Démarrage Phase 2)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 ---
@@ -12,7 +12,7 @@
 | Phase | Durée | Budget | Status |
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| Phase 2: Features Critiques | 6-8 sem | ~$25k | 🔵 READY TO START |
+| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (0%) |
 | Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
@@ -138,24 +138,84 @@ Monitoring: Prometheus + Grafana
 
 ---
 
-## ⏸️ PHASE 2: Features Critiques (6-8 semaines)
+## 🔵 PHASE 2: Features Critiques (6-8 semaines) - EN COURS
 
-> **Status:** PENDING - Démarrage après Phase 1
+> **Status:** EN COURS - Démarré le 2025-12-13
 
-### Semaine 7-9: Portail Client Self-Service
-- Backend: clientAuth + clientPortal routers
-- Frontend: Dashboard client, auto-réservation, paiement Stripe
-- Tests: E2E avec Playwright
+### ✅ Pré-requis Phase 2 (COMPLÉTÉ)
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Connecter pages aux endpoints tRPC | ✅ DONE | Commit 53fc2da - Dashboard, Sessions, Clients, Invoices |
+| 🔴 HAUTE | Stats calculées depuis vraies données | ✅ DONE | Sessions count, revenue, clients actifs |
+| 🔴 HAUTE | Mapping clientId → name | ✅ DONE | Lookup client dans sessions/invoices |
 
-### Semaine 10-12: Gestion Projets Musicaux
-- Schéma DB: projects, projectCredits, musicians
-- Frontend: Kanban board, upload fichiers S3
-- Tests: Unitaires + intégration
+### 🔵 Semaine 7-9: Authentification & Formulaires (EN COURS)
 
-### Semaine 13-14: Devis & Contrats
-- Backend: quotes router, génération PDF
-- Intégration: DocuSign e-signature
-- Tests: Génération PDF + signature flow
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Authentification JWT (backend) | ✅ DONE | JWT + refresh tokens + bcrypt |
+| 🔴 HAUTE | Login/Logout pages | ✅ DONE | UI avec shadcn/ui, toast notifications |
+| 🔴 HAUTE | Protected routes React Router | ✅ DONE | ProtectedRoute component + redirect |
+| 🔴 HAUTE | Session management | ✅ DONE | AuthProvider + localStorage + cookies |
+| 🔴 HAUTE | react-hook-form setup | ⏸️ TODO | Form library |
+| 🔴 HAUTE | zod validation schemas | ⏸️ TODO | Type-safe validation |
+| 🔴 HAUTE | FormField composant réutilisable | ⏸️ TODO | Input + label + error |
+| 🟡 MOYENNE | DataTable composant | ⏸️ TODO | Tri, filtrage, pagination |
+| 🟡 MOYENNE | LoadingSkeleton composant | ⏸️ TODO | Loading states |
+| 🟡 MOYENNE | ErrorBoundary composant | ⏸️ TODO | Error handling UI |
+| 🟡 MOYENNE | ConfirmDialog composant | ⏸️ TODO | Delete confirmations |
+
+**Accomplissements Session 2025-12-13 (Auth):**
+- ✅ Module JWT complet: access tokens (15min) + refresh tokens (7j)
+- ✅ Bcrypt password hashing (12 rounds)
+- ✅ Auth router: login, logout, me, refresh, register, switchOrganization
+- ✅ AuthProvider React context avec useAuth hook
+- ✅ ProtectedRoute component avec loading state
+- ✅ Page Login avec UI shadcn/ui
+- ✅ Header avec user menu et logout
+- ✅ CORS configuré avec credentials
+- ✅ Build réussi: 479KB JS + 31KB CSS
+
+### ⏸️ Semaine 10-12: Portail Client Self-Service
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Backend: clientAuth router | ⏸️ TODO | Login client avec token |
+| 🔴 HAUTE | Backend: clientPortal router | ⏸️ TODO | Self-service API |
+| 🔴 HAUTE | Frontend: Dashboard client | ⏸️ TODO | Vue client séparée |
+| 🔴 HAUTE | Auto-réservation sessions | ⏸️ TODO | Interface booking |
+| 🔴 HAUTE | Intégration Stripe | ⏸️ TODO | Paiement en ligne |
+| 🟡 MOYENNE | Partage fichiers audio | ⏸️ TODO | Upload/download |
+
+### ⏸️ Semaine 13-14: Gestion Projets Musicaux
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Schéma DB: projects, musicians, credits | ⏸️ TODO | Drizzle migrations |
+| 🔴 HAUTE | Backend: projects router | ⏸️ TODO | CRUD projets |
+| 🔴 HAUTE | Frontend: Kanban board | ⏸️ TODO | Drag & drop étapes |
+| 🔴 HAUTE | Upload audio S3 | ⏸️ TODO | Versioning fichiers |
+| 🟡 MOYENNE | Crédits musiciens | ⏸️ TODO | Producteur, ingé, etc. |
+
+### ⏸️ Semaine 15-16: Devis & Contrats
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Backend: quotes router | ⏸️ TODO | CRUD devis |
+| 🔴 HAUTE | Génération PDF devis | ⏸️ TODO | Template professionnel |
+| 🔴 HAUTE | Conversion devis → facture | ⏸️ TODO | Automatique |
+| 🔴 HAUTE | Intégration DocuSign | ⏸️ TODO | E-signature contrats |
+| 🟡 MOYENNE | Templates contrats | ⏸️ TODO | Contrats types |
+
+### ⏸️ Tests E2E Phase 2
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Setup Playwright | ⏸️ TODO | Config + fixtures |
+| 🔴 HAUTE | Tests auth flow | ⏸️ TODO | Login/logout/protected |
+| 🔴 HAUTE | Tests CRUD clients | ⏸️ TODO | Create/read/update/delete |
+| 🔴 HAUTE | Tests booking sessions | ⏸️ TODO | Réservation flow |
+| 🟡 MOYENNE | Tests paiement Stripe | ⏸️ TODO | Mock Stripe |
 
 ---
 
@@ -228,17 +288,18 @@ Monitoring: Prometheus + Grafana
 11. ✅ ~~Bug fix tRPC client port~~ (DONE - 3000 → 3001, commit 7494b5e)
 12. ✅ ~~Tests end-to-end~~ (DONE - backend + frontend opérationnels)
 
-### 🔵 PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (PROCHAINE ÉTAPE)
-1. ⏸️ Connecter pages aux endpoints tRPC (fetch real data)
-2. ⏸️ Implémenter authentification (remplacer mock)
-3. ⏸️ Ajouter formulaires avec react-hook-form + zod
-4. ⏸️ Créer composants réutilisables (FormField, DataTable, etc.)
-5. ⏸️ Tests Vitest pour composants React
-6. ⏸️ Backend: clientAuth router (portail client)
-7. ⏸️ Frontend: Dashboard client self-service
-8. ⏸️ Intégration Stripe pour paiements
-9. ⏸️ Tests E2E avec Playwright
-10. ⏸️ Auto-réservation sessions pour clients
+### 🔵 PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (EN COURS)
+1. ✅ ~~Connecter pages aux endpoints tRPC (fetch real data)~~ (DONE - commit 53fc2da)
+2. ✅ ~~Implémenter authentification JWT (remplacer mock)~~ (DONE - JWT + bcrypt + refresh tokens)
+3. ✅ ~~Login/Logout pages + Protected routes~~ (DONE - AuthProvider + ProtectedRoute)
+4. 🔵 Ajouter formulaires avec react-hook-form + zod ← **PROCHAINE TÂCHE**
+5. ⏸️ Créer composants réutilisables (FormField, DataTable, etc.)
+6. ⏸️ Tests Vitest pour composants React
+7. ⏸️ Backend: clientAuth router (portail client)
+8. ⏸️ Frontend: Dashboard client self-service
+9. ⏸️ Intégration Stripe pour paiements
+10. ⏸️ Tests E2E avec Playwright
+11. ⏸️ Auto-réservation sessions pour clients
 
 ---
 
@@ -317,6 +378,7 @@ Monitoring: Prometheus + Grafana
 ---
 
 **Créé le:** 2025-12-13
-**Par:** Claude Sonnet 4.5
+**Par:** Claude Opus 4
 **Repo:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Commit actuel:** 7d6afc5 (20 fichiers, 1,016 lignes, 304KB)
+**Commit actuel:** En cours - Auth JWT implémenté
+**Phase actuelle:** Phase 2 - Authentification ✅ / Formulaires ⏸️

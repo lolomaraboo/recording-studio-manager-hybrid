@@ -83,14 +83,14 @@ export async function getTenantDb(organizationId: number): Promise<TenantDb> {
       .where(eq(masterSchema.tenantDatabases.organizationId, organizationId))
       .limit(1);
 
-    if (!result || result.length === 0) {
+    const tenantInfo = result[0];
+    if (!tenantInfo) {
       throw new Error(
         `No tenant database found for organization ${organizationId}. ` +
         `Please run createTenantDatabase() first.`
       );
     }
 
-    const tenantInfo = result[0];
     const databaseName = tenantInfo.databaseName;
 
     // 3. Build tenant DB URL

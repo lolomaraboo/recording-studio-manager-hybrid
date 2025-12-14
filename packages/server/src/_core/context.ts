@@ -3,6 +3,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type * as masterSchema from '@rsm/database/master';
 import type * as tenantSchema from '@rsm/database/tenant';
 import { getTenantDb } from '@rsm/database/connection';
+import { extractBearerToken, verifyAccessToken } from './auth';
 
 /**
  * Type for Master DB
@@ -15,13 +16,13 @@ export type MasterDb = PostgresJsDatabase<typeof masterSchema>;
 export type TenantDb = PostgresJsDatabase<typeof tenantSchema>;
 
 /**
- * User type (simplified for now - will be replaced by auth SDK later)
+ * User type for context (from JWT token)
  */
 export interface User {
   id: number;
   email: string;
   name: string;
-  role: 'admin' | 'user' | 'client';
+  role: 'admin' | 'member' | 'client';
 }
 
 /**
@@ -39,10 +40,11 @@ export type TrpcContext = {
 /**
  * Create tRPC context for each request
  *
- * Pattern from Manus but adapted for Hybride:
- * - Authenticate user (TODO: integrate auth SDK)
- * - Resolve organizationId from user
- * - Load tenant DB lazily via getTenantDb()
+ * Authentication flow:
+ * 1. Extract Bearer token from Authorization header
+ * 2. Verify JWT and decode payload
+ * 3. Set user and organizationId in context
+ * 4. Load tenant DB if organizationId is present
  *
  * DIFFERENCE vs Manus: tenantDb is ACTIVE (not commented)
  */
@@ -54,27 +56,44 @@ export async function createContext(
   let tenantDb: TenantDb | null = null;
 
   try {
-    // TODO: Replace with real auth SDK
-    // For now, check for test header
-    const testUserId = opts.req.headers['x-test-user-id'];
-    const testOrgId = opts.req.headers['x-test-org-id'];
+    // 1. Try JWT authentication
+    const token = extractBearerToken(opts.req);
+    if (token) {
+      const decoded = verifyAccessToken(token);
+      if (decoded) {
+        user = {
+          id: decoded.userId,
+          email: decoded.email,
+          name: decoded.email.split('@')[0] || 'User', // Will be replaced with DB lookup
+          role: decoded.role === 'admin' ? 'admin' : decoded.role === 'client' ? 'client' : 'member',
+        };
+        organizationId = decoded.organizationId;
+      }
+    }
 
-    if (testUserId && testOrgId) {
-      // Mock user for testing
-      user = {
-        id: parseInt(testUserId as string),
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'user',
-      };
-      organizationId = parseInt(testOrgId as string);
+    // 2. Fallback: Test headers for development/testing
+    if (!user) {
+      const testUserId = opts.req.headers['x-test-user-id'];
+      const testOrgId = opts.req.headers['x-test-org-id'];
 
-      // ACTIVE: Load tenant DB immediately (vs Manus commented)
+      if (testUserId && testOrgId) {
+        user = {
+          id: parseInt(testUserId as string),
+          email: 'test@example.com',
+          name: 'Test User',
+          role: 'member',
+        };
+        organizationId = parseInt(testOrgId as string);
+      }
+    }
+
+    // 3. Load tenant DB if we have an organization
+    if (organizationId) {
       tenantDb = await getTenantDb(organizationId);
     }
   } catch (error) {
     // Auth is optional for publicProcedure
-    console.error('Auth error:', error);
+    console.error('Context creation error:', error);
     user = null;
     organizationId = null;
     tenantDb = null;

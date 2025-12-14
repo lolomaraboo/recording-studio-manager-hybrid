@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { httpBatchLink } from '@trpc/client'
 import { trpc } from './lib/trpc'
+import { getStoredAccessToken } from './lib/auth'
 import App from './App'
 import './index.css'
 
@@ -19,9 +20,16 @@ const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: 'http://localhost:3001/api/trpc',
+      // Include credentials for cookies (refresh token)
+      fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          credentials: 'include',
+        })
+      },
       headers() {
-        // TODO: Add auth headers here
-        return {}
+        const token = getStoredAccessToken()
+        return token ? { Authorization: `Bearer ${token}` } : {}
       },
     }),
   ],

@@ -1,13 +1,30 @@
 import { z } from 'zod';
+import { TRPCError } from '@trpc/server';
+import { eq, and } from 'drizzle-orm';
 import { router, publicProcedure, protectedProcedure } from '../_core/trpc';
+import { getMasterDb } from '@rsm/database/connection';
+import { users, organizationMembers, organizations } from '@rsm/database/master';
+import {
+  hashPassword,
+  verifyPassword,
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+  setRefreshTokenCookie,
+  clearRefreshTokenCookie,
+  getRefreshTokenFromCookie,
+  type TokenPayload,
+} from '../_core/auth';
 
 /**
  * Auth Router
  *
  * Endpoints:
- * - login: Authenticate user (TODO: real auth)
- * - logout: Clear session
- * - me: Get current user
+ * - login: Authenticate user with email/password, returns JWT
+ * - logout: Clear refresh token cookie
+ * - me: Get current authenticated user
+ * - refresh: Get new access token using refresh token
+ * - register: Create new user account
  */
 export const authRouter = router({
   /**
@@ -28,8 +45,9 @@ export const authRouter = router({
   }),
 
   /**
-   * Login (mock implementation)
-   * TODO: Replace with real auth SDK
+   * Login with email and password
+   * Returns access token in response body
+   * Sets refresh token in httpOnly cookie
    */
   login: publicProcedure
     .input(
@@ -38,25 +56,280 @@ export const authRouter = router({
         password: z.string().min(8),
       })
     )
-    .mutation(async ({ input }) => {
-      // TODO: Real authentication
-      // For now, return mock success
+    .mutation(async ({ input, ctx }) => {
+      const masterDb = await getMasterDb();
+
+      // 1. Find user by email
+      const [user] = await masterDb
+        .select()
+        .from(users)
+        .where(eq(users.email, input.email.toLowerCase()))
+        .limit(1);
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid email or password',
+        });
+      }
+
+      // 2. Check if user is active
+      if (!user.isActive) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Your account has been deactivated',
+        });
+      }
+
+      // 3. Verify password
+      if (!user.passwordHash) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid email or password',
+        });
+      }
+
+      const isValidPassword = await verifyPassword(input.password, user.passwordHash);
+      if (!isValidPassword) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid email or password',
+        });
+      }
+
+      // 4. Get user's organization (first one they belong to)
+      const [membership] = await masterDb
+        .select({
+          organizationId: organizationMembers.organizationId,
+          role: organizationMembers.role,
+        })
+        .from(organizationMembers)
+        .where(eq(organizationMembers.userId, user.id))
+        .limit(1);
+
+      const organizationId = membership?.organizationId || null;
+
+      // 5. Generate tokens
+      const tokenPayload: TokenPayload = {
+        userId: user.id,
+        email: user.email,
+        role: user.role === 'admin' ? 'admin' : 'member',
+        organizationId,
+      };
+
+      const accessToken = generateAccessToken(tokenPayload);
+      const refreshToken = generateRefreshToken(tokenPayload);
+
+      // 6. Set refresh token cookie
+      setRefreshTokenCookie(ctx.res, refreshToken);
+
       return {
-        success: true,
+        accessToken,
+        expiresIn: 15 * 60, // 15 minutes in seconds
         user: {
-          id: 1,
-          email: input.email,
-          name: 'Mock User',
-          role: 'user' as const,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          organizationId,
         },
       };
     }),
 
   /**
-   * Logout
+   * Logout - clear refresh token cookie
    */
-  logout: protectedProcedure.mutation(async ({ ctx: _ctx }) => {
-    // TODO: Clear session/cookies
+  logout: protectedProcedure.mutation(async ({ ctx }) => {
+    clearRefreshTokenCookie(ctx.res);
     return { success: true };
   }),
+
+  /**
+   * Refresh access token using refresh token cookie
+   */
+  refresh: publicProcedure.mutation(async ({ ctx }) => {
+    const refreshToken = getRefreshTokenFromCookie(ctx.req);
+
+    if (!refreshToken) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'No refresh token provided',
+      });
+    }
+
+    // 1. Verify refresh token
+    const decoded = verifyRefreshToken(refreshToken);
+    if (!decoded) {
+      clearRefreshTokenCookie(ctx.res);
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Invalid or expired refresh token',
+      });
+    }
+
+    // 2. Verify user still exists and is active
+    const masterDb = await getMasterDb();
+    const [user] = await masterDb
+      .select()
+      .from(users)
+      .where(eq(users.id, decoded.userId))
+      .limit(1);
+
+    if (!user || !user.isActive) {
+      clearRefreshTokenCookie(ctx.res);
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'User not found or deactivated',
+      });
+    }
+
+    // 3. Generate new access token
+    const tokenPayload: TokenPayload = {
+      userId: user.id,
+      email: user.email,
+      role: user.role === 'admin' ? 'admin' : 'member',
+      organizationId: decoded.organizationId,
+    };
+
+    const accessToken = generateAccessToken(tokenPayload);
+
+    // 4. Optionally rotate refresh token (security best practice)
+    const newRefreshToken = generateRefreshToken(tokenPayload);
+    setRefreshTokenCookie(ctx.res, newRefreshToken);
+
+    return {
+      accessToken,
+      expiresIn: 15 * 60,
+    };
+  }),
+
+  /**
+   * Register new user
+   */
+  register: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string().min(8),
+        name: z.string().min(2).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const masterDb = await getMasterDb();
+
+      // 1. Check if email already exists
+      const [existingUser] = await masterDb
+        .select()
+        .from(users)
+        .where(eq(users.email, input.email.toLowerCase()))
+        .limit(1);
+
+      if (existingUser) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'An account with this email already exists',
+        });
+      }
+
+      // 2. Hash password
+      const passwordHash = await hashPassword(input.password);
+
+      // 3. Create user
+      const result = await masterDb
+        .insert(users)
+        .values({
+          email: input.email.toLowerCase(),
+          name: input.name || null,
+          passwordHash,
+          role: 'member',
+          isActive: true,
+        })
+        .returning();
+
+      const newUser = result[0];
+      if (!newUser) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to create user',
+        });
+      }
+
+      return {
+        success: true,
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+        },
+      };
+    }),
+
+  /**
+   * Switch organization context
+   * Used when user belongs to multiple organizations
+   */
+  switchOrganization: protectedProcedure
+    .input(
+      z.object({
+        organizationId: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const masterDb = await getMasterDb();
+
+      // 1. Verify user is member of this organization
+      const [membership] = await masterDb
+        .select()
+        .from(organizationMembers)
+        .where(
+          and(
+            eq(organizationMembers.userId, ctx.user.id),
+            eq(organizationMembers.organizationId, input.organizationId)
+          )
+        )
+        .limit(1);
+
+      if (!membership) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'You are not a member of this organization',
+        });
+      }
+
+      // 2. Get organization details
+      const [org] = await masterDb
+        .select()
+        .from(organizations)
+        .where(eq(organizations.id, input.organizationId))
+        .limit(1);
+
+      if (!org || !org.isActive) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Organization not found or inactive',
+        });
+      }
+
+      // 3. Generate new tokens with new organizationId
+      const tokenPayload: TokenPayload = {
+        userId: ctx.user.id,
+        email: ctx.user.email,
+        role: ctx.user.role,
+        organizationId: input.organizationId,
+      };
+
+      const accessToken = generateAccessToken(tokenPayload);
+      const refreshToken = generateRefreshToken(tokenPayload);
+      setRefreshTokenCookie(ctx.res, refreshToken);
+
+      return {
+        accessToken,
+        expiresIn: 15 * 60,
+        organization: {
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+        },
+      };
+    }),
 });

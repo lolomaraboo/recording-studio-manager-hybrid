@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index';
 import { createContext } from './_core/context';
@@ -21,8 +22,12 @@ async function main() {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:5174',
+    credentials: true, // Allow cookies
+  }));
   app.use(express.json());
+  app.use(cookieParser());
 
   // Health check
   app.get('/health', (_req, res) => {
