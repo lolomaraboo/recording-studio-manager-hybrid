@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: 'http://localhost:3000/api/trpc',
+      url: 'http://localhost:3001/api/trpc',
       headers() {
         // TODO: Add auth headers here
         return {}
