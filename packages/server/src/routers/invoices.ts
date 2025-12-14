@@ -74,7 +74,8 @@ export const invoicesRouter = router({
         invoiceNumber: z.string(),
         issueDate: z.string(), // ISO date string
         dueDate: z.string().optional(),
-        totalAmount: z.string(), // Decimal as string
+        subtotal: z.string(), // Decimal as string
+        taxRate: z.string().optional(),
         status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).default('draft'),
         notes: z.string().optional(),
       })
@@ -82,9 +83,26 @@ export const invoicesRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
+      // Calculate tax and total
+      const subtotal = parseFloat(input.subtotal);
+      const taxRate = input.taxRate ? parseFloat(input.taxRate) : 20.0;
+      const taxAmount = (subtotal * taxRate) / 100;
+      const total = subtotal + taxAmount;
+
       const [invoice] = await tenantDb
         .insert(invoices)
-        .values(input)
+        .values({
+          clientId: input.clientId,
+          invoiceNumber: input.invoiceNumber,
+          issueDate: new Date(input.issueDate),
+          dueDate: input.dueDate ? new Date(input.dueDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          subtotal: input.subtotal,
+          taxRate: input.taxRate || '20.00',
+          taxAmount: taxAmount.toFixed(2),
+          total: total.toFixed(2),
+          status: input.status,
+          notes: input.notes,
+        })
         .returning();
 
       return invoice;
@@ -102,7 +120,7 @@ export const invoicesRouter = router({
           invoiceNumber: z.string().optional(),
           issueDate: z.string().optional(),
           dueDate: z.string().optional(),
-          totalAmount: z.string().optional(),
+          subtotal: z.string().optional(),
           status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).optional(),
           notes: z.string().optional(),
         }),
@@ -111,9 +129,18 @@ export const invoicesRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
+      // Convert dates if provided
+      const updateData: any = { ...input.data };
+      if (input.data.issueDate) {
+        updateData.issueDate = new Date(input.data.issueDate);
+      }
+      if (input.data.dueDate) {
+        updateData.dueDate = new Date(input.data.dueDate);
+      }
+
       const [updated] = await tenantDb
         .update(invoices)
-        .set(input.data)
+        .set(updateData)
         .where(eq(invoices.id, input.id))
         .returning();
 

@@ -82,24 +82,30 @@ export const organizationsRouter = router({
         currency: z.string().default('USD'),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx: _ctx }) => {
       const db = await getMasterDb();
 
-      // TODO: Generate proper database name
-      const dbName = `tenant_${Date.now()}`;
+      // Generate slug and subdomain from name
+      const slug = input.name.toLowerCase().replace(/\s+/g, '-');
+      const subdomain = slug + '-' + Date.now();
+
+      // TODO: Use real user ID from ctx.user.id when auth is implemented
+      const ownerId = 1; // Mock owner ID
 
       const [org] = await db
         .insert(organizations)
         .values({
           name: input.name,
+          slug,
+          subdomain,
+          ownerId,
           phone: input.phone,
           timezone: input.timezone,
           currency: input.currency,
-          databaseName: dbName,
         })
         .returning();
 
-      // TODO: Create actual tenant database and run migrations
+      // TODO: Create entry in tenantDatabases and create actual tenant database
 
       return org;
     }),

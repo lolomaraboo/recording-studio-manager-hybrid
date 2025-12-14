@@ -100,29 +100,33 @@ Monitoring: Prometheus + Grafana
 
 ---
 
-### ⏸️ Semaine 5-6: Frontend Core
+### 🔵 Semaine 5-6: Frontend Core (EN COURS - 50% COMPLÉTÉ)
 
 | Priorité | Tâche | Status | Notes |
 |----------|-------|--------|-------|
-| 🔴 HAUTE | Setup React 19 + Vite | ❌ TODO | Port 5173 |
-| 🔴 HAUTE | Créer package @rsm/client | ❌ TODO | Vite + React setup |
-| 🔴 HAUTE | Configurer TailwindCSS 4 | ❌ TODO | tailwind.config.ts |
-| 🔴 HAUTE | Installer shadcn/ui | ❌ TODO | components/ avec CLI |
-| 🔴 HAUTE | Configurer tRPC client | ❌ TODO | Type safety bout-en-bout |
-| 🔴 HAUTE | Layout avec Sidebar | ❌ TODO | Navigation intelligente (copier Manus) |
-| 🔴 HAUTE | Header avec Cmd+K | ❌ TODO | Recherche globale |
-| 🔴 HAUTE | Page Dashboard | ❌ TODO | Widgets personnalisables |
-| 🔴 HAUTE | Page Sessions | ❌ TODO | Calendrier + liste |
-| 🔴 HAUTE | Page Clients | ❌ TODO | Liste + formulaire |
-| 🔴 HAUTE | Page Invoices | ❌ TODO | Liste + génération |
-| 🟡 MOYENNE | Toast notifications | ❌ TODO | shadcn/ui Toaster |
-| 🟡 MOYENNE | Navigation favoris | ❌ TODO | Sidebar drag & drop |
+| 🔴 HAUTE | Setup React 19 + Vite | ✅ DONE | Port 5173, build 303KB JS + 9KB CSS |
+| 🔴 HAUTE | Créer package @rsm/client | ✅ DONE | Structure complète, 13 fichiers |
+| 🔴 HAUTE | Configurer TailwindCSS 4 | ✅ DONE | @tailwindcss/postcss, nouvelle syntaxe @import + @theme |
+| 🔴 HAUTE | Installer shadcn/ui | ✅ DONE | components.json configuré |
+| 🔴 HAUTE | Configurer tRPC client | ✅ DONE | AppRouter import depuis @rsm/server, type safety OK |
+| 🔴 HAUTE | Corriger routers backend | ✅ DONE | auth, orgs, invoices, sessions fixés |
+| 🔴 HAUTE | Layout avec Sidebar | ⏸️ TODO | Navigation intelligente (copier Manus) |
+| 🔴 HAUTE | Header avec Cmd+K | ⏸️ TODO | Recherche globale |
+| 🔴 HAUTE | Page Dashboard | ⏸️ TODO | Widgets personnalisables |
+| 🔴 HAUTE | Page Sessions | ⏸️ TODO | Calendrier + liste |
+| 🔴 HAUTE | Page Clients | ⏸️ TODO | Liste + formulaire |
+| 🔴 HAUTE | Page Invoices | ⏸️ TODO | Liste + génération |
+| 🟡 MOYENNE | Toast notifications | ⏸️ TODO | shadcn/ui Toaster |
+| 🟡 MOYENNE | Navigation favoris | ⏸️ TODO | Sidebar drag & drop |
 
 **Livrables Semaine 5-6:**
-- ⏸️ Frontend React opérationnel
-- ⏸️ Type safety client ↔ serveur
+- ✅ Package @rsm/client créé avec React 19 + Vite + TypeScript
+- ✅ TailwindCSS v4 configuré (nouvelle syntaxe)
+- ✅ tRPC client avec type safety bout-en-bout
+- ✅ Build Vite réussi (303KB JS, 9KB CSS, <4s)
+- ✅ Corrections backend: 4 routers fixés (auth, orgs, invoices, sessions)
 - ⏸️ 4 pages core fonctionnelles
-- ⏸️ Composants UI shadcn/ui
+- ⏸️ Composants UI shadcn/ui installés
 - ⏸️ Recherche globale Cmd+K
 
 ---
@@ -197,11 +201,23 @@ Monitoring: Prometheus + Grafana
 8. ✅ ~~Créer tests unitaires getTenantDb() avec Vitest (>80% coverage)~~ (DONE - 92.63%)
 
 ### ✅ PRIORITÉ 2 - SEMAINE 3-4 (COMPLÉTÉE)
-1. ✅ Créer package @rsm/server (Express + tRPC)
-2. ✅ Implémenter middleware createTRPCContext
-3. ✅ Créer procédures protectedProcedure + adminProcedure
-4. ✅ Créer 5 routers core (auth, orgs, sessions, clients, invoices)
-5. ✅ Créer tests API avec Vitest (8 tests, tous passent)
+1. ✅ ~~Créer package @rsm/server (Express + tRPC)~~ (DONE)
+2. ✅ ~~Implémenter middleware createTRPCContext~~ (DONE)
+3. ✅ ~~Créer procédures protectedProcedure + adminProcedure~~ (DONE)
+4. ✅ ~~Créer 5 routers core (auth, orgs, sessions, clients, invoices)~~ (DONE)
+5. ✅ ~~Créer tests API avec Vitest (8 tests, tous passent)~~ (DONE)
+
+### 🔵 PRIORITÉ 3 - SEMAINE 5-6 (EN COURS - 50%)
+1. ✅ ~~Setup React 19 + Vite~~ (DONE - build 303KB JS + 9KB CSS)
+2. ✅ ~~Créer package @rsm/client~~ (DONE - 13 fichiers)
+3. ✅ ~~Configurer TailwindCSS 4~~ (DONE - @tailwindcss/postcss)
+4. ✅ ~~Installer shadcn/ui~~ (DONE - components.json)
+5. ✅ ~~Configurer tRPC client~~ (DONE - type safety OK)
+6. ✅ ~~Corriger routers backend~~ (DONE - auth, orgs, invoices, sessions)
+7. ⏸️ Installer composants shadcn/ui (Button, Card, Input, etc.)
+8. ⏸️ Créer Layout avec Sidebar
+9. ⏸️ Créer 4 pages core (Dashboard, Sessions, Clients, Invoices)
+10. ⏸️ Implémenter navigation React Router
 
 ---
 

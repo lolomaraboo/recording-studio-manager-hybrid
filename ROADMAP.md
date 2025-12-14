@@ -2,7 +2,7 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-13
-**Status actuel:** ✅ Phase 1 Infrastructure 65% COMPLÉTÉE (Semaine 1-4 done) - 🔵 Semaine 5-6 Frontend à démarrer
+**Status actuel:** ✅ Phase 1 Infrastructure 75% COMPLÉTÉE (Semaine 1-4 done) - 🔵 Semaine 5-6 Frontend EN COURS (50%)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -61,12 +61,12 @@ Monitoring: Prometheus + Grafana
 
 ## 📅 Plan de Migration 4 Phases
 
-### 🔵 Phase 1: Infrastructure & Base (4-6 semaines) - 65% EN COURS
+### 🔵 Phase 1: Infrastructure & Base (4-6 semaines) - 75% EN COURS
 
 **Timeline:** Semaine 1-6
 **Budget:** ~$15,000
-**Status:** 🔵 EN COURS (65% complété)
-**Progrès:** Semaine 1-2 ✅ COMPLÉTÉ | Semaine 3-4 ✅ COMPLÉTÉ | Semaine 5-6 ⏸️ À démarrer
+**Status:** 🔵 EN COURS (75% complété)
+**Progrès:** Semaine 1-2 ✅ COMPLÉTÉ | Semaine 3-4 ✅ COMPLÉTÉ | Semaine 5-6 🔵 EN COURS (50%)
 
 #### ✅ Semaine 1-2: Setup Projet & Database (COMPLÉTÉ)
 
@@ -126,25 +126,38 @@ Monitoring: Prometheus + Grafana
 - ✅ API testée (health + tRPC endpoints)
 - ✅ Commit d34757f pushé sur GitHub
 
-#### ⏸️ Semaine 5-6: Frontend Core
+#### 🔵 Semaine 5-6: Frontend Core (EN COURS - 50%)
 
 | Milestone | Livrables | Status |
 |-----------|-----------|--------|
-| React Setup | React 19 + Vite + TailwindCSS 4 | ⏸️ TODO |
-| Package @rsm/client | Frontend app structure | ⏸️ TODO |
-| shadcn/ui | Composants UI professionnels | ⏸️ TODO |
+| React Setup | React 19 + Vite + TailwindCSS 4 | ✅ DONE |
+| Package @rsm/client | Frontend app structure (13 fichiers) | ✅ DONE |
+| TailwindCSS v4 | @tailwindcss/postcss, nouvelle syntaxe | ✅ DONE |
+| shadcn/ui | components.json configuré | ✅ DONE |
+| tRPC Client | Type safety bout-en-bout | ✅ DONE |
+| Backend Fixes | 4 routers corrigés (auth, orgs, invoices, sessions) | ✅ DONE |
 | Core Pages | 4 pages: Dashboard, Sessions, Clients, Invoices | ⏸️ TODO |
+| Layout | Sidebar + Header + Navigation | ⏸️ TODO |
 | Recherche | Cmd+K global search | ⏸️ TODO |
 
-**Tech Stack Cible:**
-- React 19 avec TypeScript strict
-- TailwindCSS 4 + shadcn/ui
-- tRPC React Query hooks
-- Vite pour build
+**Tech Stack Implémenté:**
+- ✅ React 19 avec TypeScript strict
+- ✅ TailwindCSS v4 (@tailwindcss/postcss)
+- ✅ shadcn/ui ready (components.json)
+- ✅ tRPC React Query hooks
+- ✅ Vite build (303KB JS + 9KB CSS, <4s)
+
+**Accomplissements Session 2025-12-13:**
+- ✅ Package @rsm/client créé complètement
+- ✅ Build Vite réussi: 303KB JS + 9KB CSS
+- ✅ TailwindCSS v4 migration (nouvelle syntaxe @import + @theme)
+- ✅ tRPC client configuré avec AppRouter import
+- ✅ Backend routers fixés (dates, champs manquants)
+- ✅ Documentation Obsidian créée (3 décisions techniques)
 
 **Objectifs:**
-- ⏸️ Frontend React opérationnel
-- ⏸️ Type safety client ↔ serveur
+- ✅ Frontend React opérationnel (build OK)
+- ✅ Type safety client ↔ serveur (AppRouter export OK)
 - ⏸️ 4 pages core fonctionnelles
 - ⏸️ Recherche globale Cmd+K
 

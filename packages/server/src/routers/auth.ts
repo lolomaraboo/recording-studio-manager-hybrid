@@ -55,7 +55,7 @@ export const authRouter = router({
   /**
    * Logout
    */
-  logout: protectedProcedure.mutation(async ({ ctx }) => {
+  logout: protectedProcedure.mutation(async ({ ctx: _ctx }) => {
     // TODO: Clear session/cookies
     return { success: true };
   }),

@@ -59,3 +59,6 @@ main().catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);
 });
+
+// Export types for client usage
+export type { AppRouter } from './routers/index';

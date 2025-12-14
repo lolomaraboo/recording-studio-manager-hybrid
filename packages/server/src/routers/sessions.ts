@@ -72,11 +72,12 @@ export const sessionsRouter = router({
       z.object({
         clientId: z.number(),
         roomId: z.number(),
-        scheduledDate: z.string(), // ISO date string
-        startTime: z.string().optional(),
-        endTime: z.string().optional(),
+        title: z.string(),
+        description: z.string().optional(),
+        startTime: z.string(), // ISO date string
+        endTime: z.string(), // ISO date string
         status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled']).default('scheduled'),
-        sessionType: z.string().optional(),
+        totalAmount: z.string().optional(),
         notes: z.string().optional(),
       })
     )
@@ -85,7 +86,17 @@ export const sessionsRouter = router({
 
       const [session] = await tenantDb
         .insert(sessions)
-        .values(input)
+        .values({
+          clientId: input.clientId,
+          roomId: input.roomId,
+          title: input.title,
+          description: input.description,
+          startTime: new Date(input.startTime),
+          endTime: new Date(input.endTime),
+          status: input.status,
+          totalAmount: input.totalAmount,
+          notes: input.notes,
+        })
         .returning();
 
       return session;
@@ -101,11 +112,12 @@ export const sessionsRouter = router({
         data: z.object({
           clientId: z.number().optional(),
           roomId: z.number().optional(),
-          scheduledDate: z.string().optional(),
+          title: z.string().optional(),
+          description: z.string().optional(),
           startTime: z.string().optional(),
           endTime: z.string().optional(),
           status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled']).optional(),
-          sessionType: z.string().optional(),
+          totalAmount: z.string().optional(),
           notes: z.string().optional(),
         }),
       })
@@ -113,9 +125,18 @@ export const sessionsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
+      // Convert dates if provided
+      const updateData: any = { ...input.data };
+      if (input.data.startTime) {
+        updateData.startTime = new Date(input.data.startTime);
+      }
+      if (input.data.endTime) {
+        updateData.endTime = new Date(input.data.endTime);
+      }
+
       const [updated] = await tenantDb
         .update(sessions)
-        .set(input.data)
+        .set(updateData)
         .where(eq(sessions.id, input.id))
         .returning();
 
