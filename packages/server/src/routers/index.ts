@@ -11,6 +11,7 @@ import { stripeRouter } from './stripe';
 import { bookingsRouter } from './bookings';
 import { projectsRouter } from './projects';
 import { filesRouter } from './files';
+import { quotesRouter } from './quotes';
 
 /**
  * Main App Router
@@ -28,10 +29,11 @@ import { filesRouter } from './files';
  * - bookings: Client self-service booking (Client Portal)
  * - projects: Music projects with tracks, musicians, credits
  * - files: File uploads (S3) with versioning
+ * - quotes: Quotes/estimates with PDF generation & DocuSign e-signature
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
- * - shares, ai, calendar, notifications, quotes
+ * - shares, ai, calendar, notifications
  */
 export const appRouter = router({
   auth: authRouter,
@@ -41,6 +43,7 @@ export const appRouter = router({
   bookings: bookingsRouter,
   projects: projectsRouter,
   files: filesRouter,
+  quotes: quotesRouter,
   organizations: organizationsRouter,
   sessions: sessionsRouter,
   clients: clientsRouter,

@@ -7,6 +7,7 @@ import {
   Settings,
   Music,
   FolderOpen,
+  ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +16,7 @@ const navigation = [
   { name: 'Sessions', href: '/sessions', icon: Mic },
   { name: 'Projects', href: '/projects', icon: FolderOpen },
   { name: 'Clients', href: '/clients', icon: Users },
+  { name: 'Quotes', href: '/quotes', icon: ClipboardList },
   { name: 'Invoices', href: '/invoices', icon: FileText },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];

@@ -11,6 +11,7 @@ import { Clients } from './pages/Clients';
 import { Invoices } from './pages/Invoices';
 import { Projects } from './pages/Projects';
 import { ProjectDetail } from './pages/ProjectDetail';
+import { Quotes } from './pages/Quotes';
 import {
   PortalLogin,
   PortalDashboard,
@@ -42,6 +43,7 @@ function App() {
               <Route path="sessions" element={<Sessions />} />
               <Route path="clients" element={<Clients />} />
               <Route path="invoices" element={<Invoices />} />
+              <Route path="quotes" element={<Quotes />} />
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:id" element={<ProjectDetail />} />
             </Route>

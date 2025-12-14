@@ -256,3 +256,86 @@ export const projectFiles = pgTable("project_files", {
 
 export type ProjectFile = typeof projectFiles.$inferSelect;
 export type InsertProjectFile = typeof projectFiles.$inferInsert;
+
+/**
+ * Quotes table (Tenant DB)
+ *
+ * Quotes/estimates that can be converted to invoices
+ */
+export const quotes = pgTable("quotes", {
+  id: serial("id").primaryKey(),
+  quoteNumber: varchar("quote_number", { length: 100 }).notNull().unique(),
+  clientId: integer("client_id").notNull().references(() => clients.id),
+  projectId: integer("project_id").references(() => projects.id), // Optional link to project
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  issueDate: timestamp("issue_date").notNull().defaultNow(),
+  validUntil: timestamp("valid_until").notNull(), // Quote expiration date
+  status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted"
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  convertedInvoiceId: integer("converted_invoice_id").references(() => invoices.id), // If converted to invoice
+  notes: text("notes"),
+  terms: text("terms"), // Terms & conditions
+  // DocuSign integration
+  docusignEnvelopeId: varchar("docusign_envelope_id", { length: 255 }),
+  docusignStatus: varchar("docusign_status", { length: 50 }), // "sent" | "delivered" | "completed" | "declined" | "voided"
+  signedAt: timestamp("signed_at"),
+  signedByName: varchar("signed_by_name", { length: 255 }),
+  signedByEmail: varchar("signed_by_email", { length: 255 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Quote = typeof quotes.$inferSelect;
+export type InsertQuote = typeof quotes.$inferInsert;
+
+/**
+ * Quote Items table (Tenant DB)
+ */
+export const quoteItems = pgTable("quote_items", {
+  id: serial("id").primaryKey(),
+  quoteId: integer("quote_id").notNull().references(() => quotes.id),
+  description: varchar("description", { length: 500 }).notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type QuoteItem = typeof quoteItems.$inferSelect;
+export type InsertQuoteItem = typeof quoteItems.$inferInsert;
+
+/**
+ * Contracts table (Tenant DB)
+ *
+ * Contracts for projects or sessions, with e-signature support
+ */
+export const contracts = pgTable("contracts", {
+  id: serial("id").primaryKey(),
+  contractNumber: varchar("contract_number", { length: 100 }).notNull().unique(),
+  clientId: integer("client_id").notNull().references(() => clients.id),
+  projectId: integer("project_id").references(() => projects.id),
+  quoteId: integer("quote_id").references(() => quotes.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  contractType: varchar("contract_type", { length: 50 }).notNull().default("project"), // "project" | "session" | "license" | "nda" | "other"
+  content: text("content").notNull(), // Full contract text (HTML/Markdown)
+  status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "pending_signature" | "signed" | "cancelled" | "expired"
+  effectiveDate: timestamp("effective_date"),
+  expirationDate: timestamp("expiration_date"),
+  // DocuSign integration
+  docusignEnvelopeId: varchar("docusign_envelope_id", { length: 255 }),
+  docusignStatus: varchar("docusign_status", { length: 50 }),
+  signedAt: timestamp("signed_at"),
+  signedByName: varchar("signed_by_name", { length: 255 }),
+  signedByEmail: varchar("signed_by_email", { length: 255 }),
+  pdfPath: varchar("pdf_path", { length: 1000 }), // Path to generated PDF
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Contract = typeof contracts.$inferSelect;
+export type InsertContract = typeof contracts.$inferInsert;

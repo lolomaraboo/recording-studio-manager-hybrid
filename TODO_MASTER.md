@@ -12,7 +12,7 @@
 | Phase | Durée | Budget | Status |
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (90%) |
+| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
 | Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
@@ -261,15 +261,26 @@ Monitoring: Prometheus + Grafana
 - ✅ ProjectDetail page avec Tabs (Tracks, Files, Credits, Details)
 - ✅ Navigation projet: page liste → page détail avec Eye icon
 
-### ⏸️ Semaine 15-16: Devis & Contrats
+### ✅ Semaine 15-16: Devis & Contrats (COMPLÉTÉ)
 
 | Priorité | Tâche | Status | Notes |
 |----------|-------|--------|-------|
-| 🔴 HAUTE | Backend: quotes router | ⏸️ TODO | CRUD devis |
-| 🔴 HAUTE | Génération PDF devis | ⏸️ TODO | Template professionnel |
-| 🔴 HAUTE | Conversion devis → facture | ⏸️ TODO | Automatique |
-| 🔴 HAUTE | Intégration DocuSign | ⏸️ TODO | E-signature contrats |
-| 🟡 MOYENNE | Templates contrats | ⏸️ TODO | Contrats types |
+| 🔴 HAUTE | Backend: quotes router | ✅ DONE | CRUD devis + stats |
+| 🔴 HAUTE | Génération PDF devis | ✅ DONE | pdfkit template pro |
+| 🔴 HAUTE | Conversion devis → facture | ✅ DONE | Auto avec items |
+| 🔴 HAUTE | Intégration DocuSign | ✅ DONE | Module e-signature |
+| 🔴 HAUTE | Schéma DB quotes/contracts | ✅ DONE | quotes, quoteItems, contracts |
+| 🔴 HAUTE | Frontend: Quotes page | ✅ DONE | Liste + stats + PDF download |
+| 🟡 MOYENNE | Templates contrats | ⏸️ Phase 3 | Contrats types |
+
+**Accomplissements Session 2025-12-14 (Devis & Contrats):**
+- ✅ Schéma tenant: quotes, quoteItems, contracts tables
+- ✅ quotes router: list, get, create, update, delete, stats
+- ✅ PDF generation: pdfkit avec template professionnel
+- ✅ Quote → Invoice conversion avec copie des items
+- ✅ DocuSign integration: createEnvelope, getStatus, voidEnvelope
+- ✅ Frontend Quotes page avec stats cards et liste
+- ✅ Download PDF bouton fonctionnel
 
 ### ✅ Tests E2E Phase 2 (COMPLÉTÉ)
 
