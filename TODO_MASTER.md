@@ -1,8 +1,8 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 3 COMPLÉTÉ ✅**
-> **Phase actuelle**: Phase 3 - Enterprise TERMINÉ (100%)
-> **Dernière mise à jour**: 2025-12-14 (Session: 2FA, i18n, Audit, Currency, White-Label, SSO)
+> **🚀 STACK HYBRIDE - Phase 4 EN COURS 🔄**
+> **Phase actuelle**: Phase 4 - Multi-Région (50%)
+> **Dernière mise à jour**: 2025-12-14 (Session: Multi-Region, Monitoring, Deploy Config)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 ---
@@ -14,7 +14,7 @@
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
 | **Phase 2: Features Critiques** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
 | **Phase 3: Enterprise** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
-| Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
+| **Phase 4: Multi-Région** | 4-6 sem | ~$15k | 🔄 EN COURS (50%) |
 
 **Total:** 5-6 mois | ~$80k développement
 
@@ -395,19 +395,69 @@ Monitoring: Prometheus + Grafana
 
 ---
 
-## ⏸️ PHASE 4: Multi-Région & Polish (4-6 semaines)
+## 🔄 PHASE 4: Multi-Région & Polish (4-6 semaines) - EN COURS (50%)
 
-> **Status:** PENDING - Démarrage après Phase 3
+> **Status:** EN COURS - 2025-12-14
+> **Prochain:** Tests load, Prometheus/Grafana, Documentation
 
-### Semaine 23-25: Déploiement Multi-Région
-- Régions: us-east-1 (primary), eu-west-1, ap-southeast-1
-- PostgreSQL: Streaming replication
-- CDN: CloudFront geo-routing
+### ✅ Semaine 23-25: Déploiement Multi-Région (COMPLÉTÉ)
 
-### Semaine 26-28: Tests, Monitoring & Documentation
-- Tests: E2E (Playwright), unitaires (Vitest >80%), load (k6)
-- Monitoring: Prometheus, Grafana, Sentry
-- Docs: User guide, API docs, runbooks
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Module multi-région backend | ✅ DONE | _core/region.ts avec 3 régions |
+| 🔴 HAUTE | Router region endpoints | ✅ DONE | routers/region.ts |
+| 🔴 HAUTE | Geo-routing par pays | ✅ DONE | 50+ pays mappés vers régions |
+| 🔴 HAUTE | Health checks régionaux | ✅ DONE | performHealthCheck() |
+| 🔴 HAUTE | Module monitoring | ✅ DONE | _core/monitoring.ts |
+| 🔴 HAUTE | Router monitoring | ✅ DONE | metrics, alerts, dashboard |
+| 🔴 HAUTE | Docker multi-région | ✅ DONE | docker-compose.multi-region.yml |
+| 🔴 HAUTE | Terraform AWS | ✅ DONE | Aurora Global, ECS, CloudFront |
+
+**Accomplissements Session 2025-12-14 (Multi-Region):**
+- ✅ _core/region.ts: 3 régions (us-east-1 primary, eu-west-1, ap-southeast-1)
+- ✅ Country-to-region mapping (US, CA, MX → us-east-1; EU → eu-west-1; APAC → ap-southeast-1)
+- ✅ Geo-detection depuis headers CloudFront/Cloudflare
+- ✅ Health monitoring avec cache en mémoire
+- ✅ Cross-region API calls + broadcasting
+- ✅ S3 bucket routing par région
+- ✅ CDN URL generation
+- ✅ routers/region.ts: 13 endpoints (getCurrent, getAll, getOptimal, healthCheck, etc.)
+- ✅ Commit 9dd1312 pushé
+
+**Accomplissements Session 2025-12-14 (Monitoring):**
+- ✅ _core/monitoring.ts: Metrics collection + alerting system
+- ✅ Request tracking (latency, errors, p95/p99)
+- ✅ Service health checks (DB, Redis, S3)
+- ✅ Alert thresholds (error rate, latency, memory)
+- ✅ Dashboard data aggregation
+- ✅ Express middleware metricsMiddleware()
+- ✅ routers/monitoring.ts: 10 endpoints
+
+**Accomplissements Session 2025-12-14 (Infrastructure):**
+- ✅ deploy/docker-compose.multi-region.yml: Local 3-region simulation
+  - PostgreSQL primary + Redis + MinIO (S3-compatible)
+  - 3 serveurs (us-east, eu-west, ap-southeast) sur ports 3001-3003
+  - 3 clients sur ports 5001-5003
+  - Traefik load balancer
+- ✅ deploy/terraform/main.tf: AWS multi-region infrastructure
+  - Aurora Global Database avec read replicas
+  - ElastiCache Global Datastore (Redis)
+  - ECS Fargate par région
+  - CloudFront distribution
+  - Route53 geo-routing + failover
+  - VPC module avec NAT gateways
+
+### ⏸️ Semaine 26-28: Tests, Monitoring & Documentation
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Tests load k6 | ⏸️ PENDING | Script k6 pour stress tests |
+| 🔴 HAUTE | Prometheus setup | ⏸️ PENDING | /metrics endpoint + scraping |
+| 🔴 HAUTE | Grafana dashboards | ⏸️ PENDING | Dashboards multi-region |
+| 🟡 MOYENNE | Sentry error tracking | ⏸️ PENDING | Client + Server |
+| 🟡 MOYENNE | User documentation | ⏸️ PENDING | User guide Markdown |
+| 🟡 MOYENNE | API documentation | ⏸️ PENDING | tRPC panel ou Swagger |
+| 🟢 BASSE | Runbooks ops | ⏸️ PENDING | Incident response guides |
 
 ---
 
