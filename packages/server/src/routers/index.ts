@@ -22,6 +22,8 @@ import { monitoringRouter } from './monitoring';
 import { aiRouter } from './ai';
 import { notificationsRouter } from './notifications';
 import { analyticsRouter } from './analytics';
+import { calendarRouter } from './calendar';
+import { integrationsRouter } from './integrations';
 
 /**
  * Main App Router
@@ -50,9 +52,11 @@ import { analyticsRouter } from './analytics';
  * - ai: AI-powered features (transcription, analysis, recommendations)
  * - notifications: Multi-channel notification system
  * - analytics: Dashboards, KPIs, reports, trends, forecasting
+ * - calendar: Google/Outlook calendar sync, iCal export
+ * - integrations: Slack, Discord, Zapier, webhooks
  *
  * Future routers to add:
- * - equipment, admin, shares, calendar
+ * - equipment, admin, shares
  */
 export const appRouter = router({
   auth: authRouter,
@@ -66,6 +70,8 @@ export const appRouter = router({
   ai: aiRouter,
   notifications: notificationsRouter,
   analytics: analyticsRouter,
+  calendar: calendarRouter,
+  integrations: integrationsRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
