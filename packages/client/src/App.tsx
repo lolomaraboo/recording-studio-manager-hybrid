@@ -9,6 +9,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Sessions } from './pages/Sessions';
 import { Clients } from './pages/Clients';
 import { Invoices } from './pages/Invoices';
+import { Projects } from './pages/Projects';
 import {
   PortalLogin,
   PortalDashboard,
@@ -40,6 +41,7 @@ function App() {
               <Route path="sessions" element={<Sessions />} />
               <Route path="clients" element={<Clients />} />
               <Route path="invoices" element={<Invoices />} />
+              <Route path="projects" element={<Projects />} />
             </Route>
 
             {/* Client Portal public routes */}

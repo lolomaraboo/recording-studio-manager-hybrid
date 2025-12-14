@@ -262,7 +262,8 @@ export const clientPortalRouter = router({
           description: projects.description,
           status: projects.status,
           startDate: projects.startDate,
-          endDate: projects.endDate,
+          targetEndDate: projects.targetEndDate,
+          actualEndDate: projects.actualEndDate,
           budget: projects.budget,
         })
         .from(projects)

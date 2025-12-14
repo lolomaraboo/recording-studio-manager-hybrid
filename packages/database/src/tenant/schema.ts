@@ -145,20 +145,114 @@ export type InsertEquipment = typeof equipment.$inferInsert;
 
 /**
  * Projects table (Tenant DB)
+ *
+ * Represents a music production project (album, EP, single, etc.)
  */
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   clientId: integer("client_id").notNull().references(() => clients.id),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  status: varchar("status", { length: 50 }).notNull().default("active"), // "active" | "on_hold" | "completed" | "cancelled"
+  projectType: varchar("project_type", { length: 50 }).notNull().default("album"), // "album" | "ep" | "single" | "compilation" | "soundtrack" | "other"
+  genre: varchar("genre", { length: 100 }),
+  status: varchar("status", { length: 50 }).notNull().default("pre_production"), // "pre_production" | "recording" | "mixing" | "mastering" | "completed" | "on_hold" | "cancelled"
   startDate: timestamp("start_date"),
-  endDate: timestamp("end_date"),
+  targetEndDate: timestamp("target_end_date"),
+  actualEndDate: timestamp("actual_end_date"),
   budget: decimal("budget", { precision: 10, scale: 2 }),
+  spentAmount: decimal("spent_amount", { precision: 10, scale: 2 }).default("0.00"),
   notes: text("notes"),
+  isArchived: boolean("is_archived").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = typeof projects.$inferInsert;
+
+/**
+ * Project Tracks table (Tenant DB)
+ *
+ * Individual songs/tracks within a project
+ */
+export const projectTracks = pgTable("project_tracks", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  trackNumber: integer("track_number"),
+  duration: integer("duration"), // Duration in seconds
+  status: varchar("status", { length: 50 }).notNull().default("writing"), // "writing" | "pre_production" | "recording" | "editing" | "mixing" | "mastering" | "completed"
+  bpm: integer("bpm"),
+  key: varchar("key", { length: 20 }), // Musical key (e.g., "C major", "A minor")
+  isrc: varchar("isrc", { length: 20 }), // International Standard Recording Code
+  lyrics: text("lyrics"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type ProjectTrack = typeof projectTracks.$inferSelect;
+export type InsertProjectTrack = typeof projectTracks.$inferInsert;
+
+/**
+ * Musicians table (Tenant DB)
+ *
+ * Musicians who can be credited on projects
+ */
+export const musicians = pgTable("musicians", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  stageName: varchar("stage_name", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  instruments: text("instruments"), // Comma-separated list or JSON
+  bio: text("bio"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Musician = typeof musicians.$inferSelect;
+export type InsertMusician = typeof musicians.$inferInsert;
+
+/**
+ * Project Credits table (Tenant DB)
+ *
+ * Credits/contributions for musicians on tracks
+ */
+export const projectCredits = pgTable("project_credits", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  trackId: integer("track_id").references(() => projectTracks.id), // Optional: can be project-level or track-level
+  musicianId: integer("musician_id").notNull().references(() => musicians.id),
+  role: varchar("role", { length: 100 }).notNull(), // "producer" | "engineer" | "vocalist" | "guitarist" | "drummer" | "bassist" | "keyboardist" | "songwriter" | "mixer" | "mastering" | etc.
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type ProjectCredit = typeof projectCredits.$inferSelect;
+export type InsertProjectCredit = typeof projectCredits.$inferInsert;
+
+/**
+ * Project Files table (Tenant DB)
+ *
+ * Files associated with projects (audio, documents, images)
+ */
+export const projectFiles = pgTable("project_files", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  trackId: integer("track_id").references(() => projectTracks.id), // Optional: can be project-level or track-level
+  fileName: varchar("file_name", { length: 500 }).notNull(),
+  fileType: varchar("file_type", { length: 50 }).notNull(), // "audio" | "document" | "image" | "video" | "other"
+  mimeType: varchar("mime_type", { length: 100 }),
+  fileSize: integer("file_size"), // Size in bytes
+  storagePath: varchar("storage_path", { length: 1000 }).notNull(), // S3 path or local path
+  version: integer("version").notNull().default(1),
+  isLatest: boolean("is_latest").notNull().default(true),
+  uploadedBy: varchar("uploaded_by", { length: 255 }), // User name or ID who uploaded
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type ProjectFile = typeof projectFiles.$inferSelect;
+export type InsertProjectFile = typeof projectFiles.$inferInsert;

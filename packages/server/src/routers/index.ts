@@ -9,6 +9,7 @@ import { clientAuthRouter } from './clientAuth';
 import { clientPortalRouter } from './clientPortal';
 import { stripeRouter } from './stripe';
 import { bookingsRouter } from './bookings';
+import { projectsRouter } from './projects';
 
 /**
  * Main App Router
@@ -24,10 +25,11 @@ import { bookingsRouter } from './bookings';
  * - invoices: Invoices CRUD (Tenant DB)
  * - rooms: Studio rooms CRUD (Tenant DB)
  * - bookings: Client self-service booking (Client Portal)
+ * - projects: Music projects with tracks, musicians, credits
  *
  * Future routers to add:
- * - equipment, projects, analytics, reports, admin,
- * - files, shares, ai, calendar, notifications, musicians, quotes
+ * - equipment, analytics, reports, admin,
+ * - files, shares, ai, calendar, notifications, quotes
  */
 export const appRouter = router({
   auth: authRouter,
@@ -35,6 +37,7 @@ export const appRouter = router({
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
   bookings: bookingsRouter,
+  projects: projectsRouter,
   organizations: organizationsRouter,
   sessions: sessionsRouter,
   clients: clientsRouter,

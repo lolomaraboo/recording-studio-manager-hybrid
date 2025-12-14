@@ -12,7 +12,7 @@
 | Phase | Durée | Budget | Status |
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (75%) |
+| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (80%) |
 | Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
@@ -235,15 +235,26 @@ Monitoring: Prometheus + Grafana
 - ✅ Dashboard client mis à jour avec bouton "Book Session"
 - ✅ Routes /portal/bookings ajoutées
 
-### ⏸️ Semaine 13-14: Gestion Projets Musicaux
+### ✅ Semaine 13-14: Gestion Projets Musicaux (COMPLÉTÉ)
 
 | Priorité | Tâche | Status | Notes |
 |----------|-------|--------|-------|
-| 🔴 HAUTE | Schéma DB: projects, musicians, credits | ⏸️ TODO | Drizzle migrations |
-| 🔴 HAUTE | Backend: projects router | ⏸️ TODO | CRUD projets |
-| 🔴 HAUTE | Frontend: Kanban board | ⏸️ TODO | Drag & drop étapes |
+| 🔴 HAUTE | Schéma DB: projects, musicians, credits | ✅ DONE | projectTracks, musicians, projectCredits, projectFiles |
+| 🔴 HAUTE | Backend: projects router | ✅ DONE | CRUD projets, tracks, musicians, credits, stats |
+| 🔴 HAUTE | Frontend: Projects page | ✅ DONE | Pipeline view + DataTable + Form dialog |
 | 🔴 HAUTE | Upload audio S3 | ⏸️ TODO | Versioning fichiers |
-| 🟡 MOYENNE | Crédits musiciens | ⏸️ TODO | Producteur, ingé, etc. |
+| 🟡 MOYENNE | Crédits musiciens backend | ✅ DONE | addCredit, removeCredit endpoints |
+
+**Accomplissements Session 2025-12-14 (Gestion Projets):**
+- ✅ Schéma enrichi: projectTracks, musicians, projectCredits, projectFiles
+- ✅ Projects table enrichi: projectType, genre, targetEndDate, actualEndDate, spentAmount, isArchived
+- ✅ Projects router complet: list, get, create, update, delete, addTrack, updateTrack, deleteTrack
+- ✅ Musicians CRUD: listMusicians, createMusician, updateMusician
+- ✅ Credits endpoints: addCredit, removeCredit
+- ✅ Stats endpoint: totalProjects, activeProjects, statusBreakdown, trackStatusBreakdown, totalBudget
+- ✅ Projects page: Kanban pipeline view par status
+- ✅ ProjectFormDialog: client selector, type, genre, status, dates, budget
+- ✅ Sidebar mise à jour avec lien Projects
 
 ### ⏸️ Semaine 15-16: Devis & Contrats
 
@@ -355,11 +366,13 @@ Monitoring: Prometheus + Grafana
 1. ✅ ~~Intégration Stripe pour paiements~~ (DONE - Checkout sessions, payment intents)
 2. ✅ ~~Auto-réservation sessions pour clients~~ (DONE - Bookings router + UI)
 
-### 🔵 PRIORITÉ 7 - PHASE 2 SEMAINE 15-16 (EN COURS)
+### ✅ PRIORITÉ 7 - PHASE 2 SEMAINE 15-16 (COMPLÉTÉ)
+1. ✅ ~~Gestion Projets Musicaux (schema + router + UI)~~ (DONE - Pipeline view + CRUD)
+
+### 🔵 PRIORITÉ 8 - PHASE 2 SEMAINE 17-18 (EN COURS)
 1. ⏸️ Tests E2E avec Playwright
-2. ⏸️ Gestion Projets Musicaux (Kanban, crédits)
-3. ⏸️ Upload fichiers audio S3
-4. ⏸️ Devis & Contrats
+2. ⏸️ Upload fichiers audio S3
+3. ⏸️ Devis & Contrats
 
 ---
 
