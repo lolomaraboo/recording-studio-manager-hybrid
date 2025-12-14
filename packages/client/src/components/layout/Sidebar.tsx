@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Mic,
@@ -8,21 +9,29 @@ import {
   Music,
   FolderOpen,
   ClipboardList,
+  type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Sessions', href: '/sessions', icon: Mic },
-  { name: 'Projects', href: '/projects', icon: FolderOpen },
-  { name: 'Clients', href: '/clients', icon: Users },
-  { name: 'Quotes', href: '/quotes', icon: ClipboardList },
-  { name: 'Invoices', href: '/invoices', icon: FileText },
-  { name: 'Settings', href: '/settings', icon: Settings },
+interface NavItem {
+  key: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+const navigation: NavItem[] = [
+  { key: 'dashboard', href: '/', icon: LayoutDashboard },
+  { key: 'sessions', href: '/sessions', icon: Mic },
+  { key: 'projects', href: '/projects', icon: FolderOpen },
+  { key: 'clients', href: '/clients', icon: Users },
+  { key: 'quotes', href: '/quotes', icon: ClipboardList },
+  { key: 'invoices', href: '/invoices', icon: FileText },
+  { key: 'settings', href: '/settings', icon: Settings },
 ];
 
 export function Sidebar() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   return (
     <div className="flex h-full w-64 flex-col bg-gray-900 text-white">
@@ -41,7 +50,7 @@ export function Sidebar() {
           const isActive = location.pathname === item.href;
           return (
             <Link
-              key={item.name}
+              key={item.key}
               to={item.href}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -51,7 +60,7 @@ export function Sidebar() {
               )}
             >
               <item.icon className="h-5 w-5" />
-              {item.name}
+              {t(`nav.${item.key}`)}
             </Link>
           );
         })}
