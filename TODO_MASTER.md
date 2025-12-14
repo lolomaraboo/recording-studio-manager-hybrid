@@ -12,7 +12,7 @@
 | Phase | Durée | Budget | Status |
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (0%) |
+| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (40%) |
 | Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
@@ -149,7 +149,7 @@ Monitoring: Prometheus + Grafana
 | 🔴 HAUTE | Stats calculées depuis vraies données | ✅ DONE | Sessions count, revenue, clients actifs |
 | 🔴 HAUTE | Mapping clientId → name | ✅ DONE | Lookup client dans sessions/invoices |
 
-### 🔵 Semaine 7-9: Authentification & Formulaires (EN COURS)
+### ✅ Semaine 7-9: Authentification & Formulaires (COMPLÉTÉ)
 
 | Priorité | Tâche | Status | Notes |
 |----------|-------|--------|-------|
@@ -157,13 +157,16 @@ Monitoring: Prometheus + Grafana
 | 🔴 HAUTE | Login/Logout pages | ✅ DONE | UI avec shadcn/ui, toast notifications |
 | 🔴 HAUTE | Protected routes React Router | ✅ DONE | ProtectedRoute component + redirect |
 | 🔴 HAUTE | Session management | ✅ DONE | AuthProvider + localStorage + cookies |
-| 🔴 HAUTE | react-hook-form setup | ⏸️ TODO | Form library |
-| 🔴 HAUTE | zod validation schemas | ⏸️ TODO | Type-safe validation |
-| 🔴 HAUTE | FormField composant réutilisable | ⏸️ TODO | Input + label + error |
-| 🟡 MOYENNE | DataTable composant | ⏸️ TODO | Tri, filtrage, pagination |
-| 🟡 MOYENNE | LoadingSkeleton composant | ⏸️ TODO | Loading states |
-| 🟡 MOYENNE | ErrorBoundary composant | ⏸️ TODO | Error handling UI |
-| 🟡 MOYENNE | ConfirmDialog composant | ⏸️ TODO | Delete confirmations |
+| 🔴 HAUTE | react-hook-form setup | ✅ DONE | @hookform/resolvers + zod v4 |
+| 🔴 HAUTE | zod validation schemas | ✅ DONE | Type-safe validation tous formulaires |
+| 🔴 HAUTE | FormField composant réutilisable | ✅ DONE | Form + FormField + FormMessage |
+| 🟡 MOYENNE | DataTable composant | ✅ DONE | Tri, filtrage, pagination, search |
+| 🟡 MOYENNE | LoadingSkeleton composant | ✅ DONE | Skeleton avec variantes |
+| 🟡 MOYENNE | Textarea composant | ✅ DONE | shadcn/ui textarea |
+| 🟡 MOYENNE | ConfirmDialog composant | ✅ DONE | Delete confirmations avec variants |
+| 🔴 HAUTE | CRUD Clients | ✅ DONE | ClientFormDialog + page mise à jour |
+| 🔴 HAUTE | CRUD Sessions | ✅ DONE | SessionFormDialog + rooms router backend |
+| 🔴 HAUTE | CRUD Invoices | ✅ DONE | InvoiceFormDialog + auto-calcul taxes |
 
 **Accomplissements Session 2025-12-13 (Auth):**
 - ✅ Module JWT complet: access tokens (15min) + refresh tokens (7j)
@@ -175,6 +178,18 @@ Monitoring: Prometheus + Grafana
 - ✅ Header avec user menu et logout
 - ✅ CORS configuré avec credentials
 - ✅ Build réussi: 479KB JS + 31KB CSS
+
+**Accomplissements Session 2025-12-13 (Formulaires CRUD):**
+- ✅ react-hook-form + @hookform/resolvers + zod v4 installés
+- ✅ 6 composants UI créés: Form, DataTable, ConfirmDialog, Textarea, LoadingSkeleton
+- ✅ ClientFormDialog: create/edit avec validation zod
+- ✅ SessionFormDialog: create/edit avec sélecteurs client/room
+- ✅ InvoiceFormDialog: create/edit avec auto-calcul taxes/total
+- ✅ Backend rooms router ajouté pour sélection salles
+- ✅ Backend clients router mis à jour (artistName, city, country)
+- ✅ 3 pages CRUD complètes: Clients, Sessions, Invoices
+- ✅ Stats cards, DataTable avec search/sort/pagination
+- ✅ Commit 2b1e8de: 16 fichiers, +3001 lignes
 
 ### ⏸️ Semaine 10-12: Portail Client Self-Service
 
@@ -288,18 +303,21 @@ Monitoring: Prometheus + Grafana
 11. ✅ ~~Bug fix tRPC client port~~ (DONE - 3000 → 3001, commit 7494b5e)
 12. ✅ ~~Tests end-to-end~~ (DONE - backend + frontend opérationnels)
 
-### 🔵 PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (EN COURS)
+### ✅ PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (COMPLÉTÉ)
 1. ✅ ~~Connecter pages aux endpoints tRPC (fetch real data)~~ (DONE - commit 53fc2da)
 2. ✅ ~~Implémenter authentification JWT (remplacer mock)~~ (DONE - JWT + bcrypt + refresh tokens)
 3. ✅ ~~Login/Logout pages + Protected routes~~ (DONE - AuthProvider + ProtectedRoute)
-4. 🔵 Ajouter formulaires avec react-hook-form + zod ← **PROCHAINE TÂCHE**
-5. ⏸️ Créer composants réutilisables (FormField, DataTable, etc.)
-6. ⏸️ Tests Vitest pour composants React
-7. ⏸️ Backend: clientAuth router (portail client)
-8. ⏸️ Frontend: Dashboard client self-service
-9. ⏸️ Intégration Stripe pour paiements
-10. ⏸️ Tests E2E avec Playwright
-11. ⏸️ Auto-réservation sessions pour clients
+4. ✅ ~~Ajouter formulaires avec react-hook-form + zod~~ (DONE - commit 2b1e8de)
+5. ✅ ~~Créer composants réutilisables (FormField, DataTable, etc.)~~ (DONE - 6 composants)
+6. ✅ ~~CRUD Clients, Sessions, Invoices~~ (DONE - 3 pages complètes)
+
+### 🔵 PRIORITÉ 5 - PHASE 2 SEMAINE 10-12 (EN COURS)
+1. 🔵 Tests Vitest pour composants React ← **PROCHAINE TÂCHE**
+2. ⏸️ Backend: clientAuth router (portail client)
+3. ⏸️ Frontend: Dashboard client self-service
+4. ⏸️ Intégration Stripe pour paiements
+5. ⏸️ Tests E2E avec Playwright
+6. ⏸️ Auto-réservation sessions pour clients
 
 ---
 
