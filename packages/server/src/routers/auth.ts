@@ -15,6 +15,7 @@ import {
   getRefreshTokenFromCookie,
   type TokenPayload,
 } from '../_core/auth';
+import { logAuth, AuditActions } from '../_core/audit';
 
 /**
  * Auth Router
@@ -67,6 +68,12 @@ export const authRouter = router({
         .limit(1);
 
       if (!user) {
+        // Log failed login attempt
+        await logAuth(AuditActions.AUTH_LOGIN_FAILED, ctx, {
+          userEmail: input.email,
+          status: 'failure',
+          errorMessage: 'User not found',
+        });
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: 'Invalid email or password',
@@ -75,6 +82,12 @@ export const authRouter = router({
 
       // 2. Check if user is active
       if (!user.isActive) {
+        await logAuth(AuditActions.AUTH_LOGIN_FAILED, ctx, {
+          userId: user.id,
+          userEmail: user.email,
+          status: 'failure',
+          errorMessage: 'Account deactivated',
+        });
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Your account has been deactivated',
@@ -91,6 +104,12 @@ export const authRouter = router({
 
       const isValidPassword = await verifyPassword(input.password, user.passwordHash);
       if (!isValidPassword) {
+        await logAuth(AuditActions.AUTH_LOGIN_FAILED, ctx, {
+          userId: user.id,
+          userEmail: user.email,
+          status: 'failure',
+          errorMessage: 'Invalid password',
+        });
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: 'Invalid email or password',
@@ -138,6 +157,14 @@ export const authRouter = router({
       // 7. Set refresh token cookie
       setRefreshTokenCookie(ctx.res, refreshToken);
 
+      // 8. Log successful login
+      await logAuth(AuditActions.AUTH_LOGIN, ctx, {
+        userId: user.id,
+        userEmail: user.email,
+        organizationId: organizationId ?? undefined,
+        description: 'User logged in successfully',
+      });
+
       return {
         requiresTwoFactor: false,
         accessToken,
@@ -157,6 +184,12 @@ export const authRouter = router({
    */
   logout: protectedProcedure.mutation(async ({ ctx }) => {
     clearRefreshTokenCookie(ctx.res);
+
+    // Log logout
+    await logAuth(AuditActions.AUTH_LOGOUT, ctx, {
+      description: 'User logged out',
+    });
+
     return { success: true };
   }),
 

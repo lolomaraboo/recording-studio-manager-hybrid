@@ -10,7 +10,7 @@
  * - subscription_plans: Subscription tiers
  */
 
-import { pgTable, serial, varchar, text, timestamp, integer, boolean, unique } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean, unique, jsonb, index } from "drizzle-orm/pg-core";
 
 /**
  * Users table (Master DB only)
@@ -129,3 +129,54 @@ export const subscriptionPlans = pgTable("subscription_plans", {
 
 export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+
+/**
+ * Audit Logs table (Master DB only)
+ * SOC2 compliant audit trail for all sensitive operations
+ *
+ * Categories:
+ * - auth: Login, logout, 2FA, password changes
+ * - data: CRUD operations on sensitive data
+ * - admin: User management, role changes
+ * - billing: Payment, subscription changes
+ * - security: Security-related events
+ */
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  // Who performed the action
+  userId: integer("user_id").references(() => users.id),
+  userEmail: varchar("user_email", { length: 255 }), // Denormalized for queries when user deleted
+  // Which organization context
+  organizationId: integer("organization_id").references(() => organizations.id),
+  // What happened
+  action: varchar("action", { length: 100 }).notNull(), // e.g., "user.login", "client.create", "invoice.delete"
+  category: varchar("category", { length: 50 }).notNull(), // "auth" | "data" | "admin" | "billing" | "security"
+  // Details
+  resourceType: varchar("resource_type", { length: 50 }), // e.g., "client", "invoice", "session"
+  resourceId: varchar("resource_id", { length: 100 }), // ID of affected resource
+  description: text("description"), // Human-readable description
+  // Before/after for data changes
+  previousData: jsonb("previous_data"), // State before change
+  newData: jsonb("new_data"), // State after change
+  // Request context
+  ipAddress: varchar("ip_address", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("user_agent"),
+  requestId: varchar("request_id", { length: 100 }), // For correlating related logs
+  // Metadata
+  severity: varchar("severity", { length: 20 }).notNull().default("info"), // "info" | "warning" | "error" | "critical"
+  status: varchar("status", { length: 20 }).notNull().default("success"), // "success" | "failure"
+  errorMessage: text("error_message"), // If status is failure
+  // Timestamps
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  // Indexes for common queries
+  userIdIdx: index("audit_logs_user_id_idx").on(table.userId),
+  orgIdIdx: index("audit_logs_org_id_idx").on(table.organizationId),
+  actionIdx: index("audit_logs_action_idx").on(table.action),
+  categoryIdx: index("audit_logs_category_idx").on(table.category),
+  createdAtIdx: index("audit_logs_created_at_idx").on(table.createdAt),
+  resourceIdx: index("audit_logs_resource_idx").on(table.resourceType, table.resourceId),
+}));
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
