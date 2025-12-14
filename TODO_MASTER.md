@@ -1,8 +1,8 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 4 COMPLÉTÉ ✅**
-> **Phase actuelle**: Phase 4 - Multi-Région TERMINÉ (100%)
-> **Dernière mise à jour**: 2025-12-14 (Session: Docs, Sentry, k6, Prometheus, Grafana)
+> **🚀 STACK HYBRIDE - Phase 5 EN COURS 🔄**
+> **Phase actuelle**: Phase 5 - AI & Advanced Features (0%)
+> **Dernière mise à jour**: 2025-12-14 (Session: Démarrage Phase 5)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 ---
@@ -15,8 +15,9 @@
 | **Phase 2: Features Critiques** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
 | **Phase 3: Enterprise** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
 | **Phase 4: Multi-Région** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
+| **Phase 5: AI & Advanced** | 4-6 sem | ~$20k | 🔄 EN COURS (0%) |
 
-**Total:** 5-6 mois | ~$80k développement
+**Total:** 6-7 mois | ~$100k développement
 
 ---
 
@@ -507,6 +508,56 @@ Monitoring: Prometheus + Grafana
   - Client portal
   - Troubleshooting
 - ✅ Commit ce5b6fe pushé
+
+---
+
+## 🔄 PHASE 5: AI & Advanced Features (4-6 semaines) - EN COURS (0%)
+
+> **Status:** EN COURS - 2025-12-14
+> **Objectif:** Ajouter fonctionnalités avancées: AI, Real-time, Analytics
+
+### ⏸️ Semaine 29-31: AI & Machine Learning
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Module AI/ML backend | ⏸️ PENDING | OpenAI/Whisper integration |
+| 🔴 HAUTE | Transcription audio automatique | ⏸️ PENDING | Whisper API pour sessions |
+| 🔴 HAUTE | Analyse sentiment lyrics | ⏸️ PENDING | GPT-4 pour analyse texte |
+| 🟡 MOYENNE | Recommandations musiciens | ⏸️ PENDING | ML matching basé sur genre |
+| 🟡 MOYENNE | Génération descriptions | ⏸️ PENDING | Auto-génération metadata |
+| 🟢 BASSE | Détection tempo/key automatique | ⏸️ PENDING | Audio analysis |
+
+### ⏸️ Semaine 32-33: Real-time & WebSockets
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Socket.IO server setup | ⏸️ PENDING | WebSocket server |
+| 🔴 HAUTE | Real-time session updates | ⏸️ PENDING | Live session status |
+| 🔴 HAUTE | Notifications push | ⏸️ PENDING | Browser + mobile push |
+| 🟡 MOYENNE | Presence indicators | ⏸️ PENDING | Qui est en ligne |
+| 🟡 MOYENNE | Live chat support | ⏸️ PENDING | In-app chat |
+| 🟢 BASSE | Collaborative editing | ⏸️ PENDING | Multi-user session notes |
+
+### ⏸️ Semaine 34-35: Analytics & Reports
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Analytics module backend | ⏸️ PENDING | Aggregation queries |
+| 🔴 HAUTE | Revenue analytics | ⏸️ PENDING | Charts, trends, forecasts |
+| 🔴 HAUTE | Client analytics | ⏸️ PENDING | Retention, LTV, segments |
+| 🟡 MOYENNE | Room utilization reports | ⏸️ PENDING | Heatmaps, peak hours |
+| 🟡 MOYENNE | Export reports PDF/Excel | ⏸️ PENDING | Scheduled reports |
+| 🟢 BASSE | Custom dashboards | ⏸️ PENDING | Drag-drop widgets |
+
+### ⏸️ Semaine 36: Calendar & Integrations
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Google Calendar sync | ⏸️ PENDING | 2-way sync sessions |
+| 🔴 HAUTE | iCal export | ⏸️ PENDING | Subscribe calendars |
+| 🟡 MOYENNE | Zapier integration | ⏸️ PENDING | Webhook automation |
+| 🟡 MOYENNE | Slack notifications | ⏸️ PENDING | Channel alerts |
+| 🟢 BASSE | Email automation | ⏸️ PENDING | Drip campaigns |
 
 ---
 

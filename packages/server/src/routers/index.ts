@@ -19,6 +19,8 @@ import { brandingRouter } from './branding';
 import { ssoRouter } from './sso';
 import { regionRouter } from './region';
 import { monitoringRouter } from './monitoring';
+import { aiRouter } from './ai';
+import { notificationsRouter } from './notifications';
 
 /**
  * Main App Router
@@ -44,10 +46,12 @@ import { monitoringRouter } from './monitoring';
  * - sso: Single Sign-On (SAML 2.0, OpenID Connect)
  * - region: Multi-region deployment (geo-routing, health checks, replication)
  * - monitoring: System monitoring, metrics, alerts, health checks
+ * - ai: AI-powered features (transcription, analysis, recommendations)
+ * - notifications: Multi-channel notification system
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
- * - shares, ai, calendar, notifications
+ * - shares, calendar
  */
 export const appRouter = router({
   auth: authRouter,
@@ -58,6 +62,8 @@ export const appRouter = router({
   sso: ssoRouter,
   region: regionRouter,
   monitoring: monitoringRouter,
+  ai: aiRouter,
+  notifications: notificationsRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
