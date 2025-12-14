@@ -91,6 +91,9 @@ export const invoices = pgTable("invoices", {
   issueDate: timestamp("issue_date").notNull().defaultNow(),
   dueDate: timestamp("due_date").notNull(),
   status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "sent" | "paid" | "overdue" | "cancelled"
+  // Multi-currency support
+  currency: varchar("currency", { length: 3 }).notNull().default("EUR"), // ISO 4217 currency code
+  exchangeRate: decimal("exchange_rate", { precision: 12, scale: 6 }).default("1.000000"), // Exchange rate at time of creation
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
@@ -272,6 +275,9 @@ export const quotes = pgTable("quotes", {
   issueDate: timestamp("issue_date").notNull().defaultNow(),
   validUntil: timestamp("valid_until").notNull(), // Quote expiration date
   status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted"
+  // Multi-currency support
+  currency: varchar("currency", { length: 3 }).notNull().default("EUR"), // ISO 4217 currency code
+  exchangeRate: decimal("exchange_rate", { precision: 12, scale: 6 }).default("1.000000"), // Exchange rate at time of creation
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
@@ -339,3 +345,23 @@ export const contracts = pgTable("contracts", {
 
 export type Contract = typeof contracts.$inferSelect;
 export type InsertContract = typeof contracts.$inferInsert;
+
+/**
+ * Exchange Rates table (Tenant DB)
+ *
+ * Historical exchange rates for currency conversion
+ * Base currency is organization's default (usually EUR)
+ */
+export const exchangeRates = pgTable("exchange_rates", {
+  id: serial("id").primaryKey(),
+  baseCurrency: varchar("base_currency", { length: 3 }).notNull().default("EUR"), // ISO 4217
+  targetCurrency: varchar("target_currency", { length: 3 }).notNull(), // ISO 4217
+  rate: decimal("rate", { precision: 12, scale: 6 }).notNull(), // 1 base = X target
+  validFrom: timestamp("valid_from").notNull().defaultNow(),
+  validTo: timestamp("valid_to"), // null = current rate
+  source: varchar("source", { length: 100 }), // "manual" | "ecb" | "xe" | etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type ExchangeRate = typeof exchangeRates.$inferSelect;
+export type InsertExchangeRate = typeof exchangeRates.$inferInsert;

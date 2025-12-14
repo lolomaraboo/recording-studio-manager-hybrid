@@ -14,6 +14,7 @@ import { filesRouter } from './files';
 import { quotesRouter } from './quotes';
 import { twoFactorRouter } from './twoFactor';
 import { auditRouter } from './audit';
+import { currencyRouter } from './currency';
 
 /**
  * Main App Router
@@ -34,6 +35,7 @@ import { auditRouter } from './audit';
  * - quotes: Quotes/estimates with PDF generation & DocuSign e-signature
  * - twoFactor: 2FA TOTP authentication (QR code, backup codes)
  * - audit: SOC2 compliant audit logging (Master DB)
+ * - currency: Multi-currency support with exchange rates
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
@@ -43,6 +45,7 @@ export const appRouter = router({
   auth: authRouter,
   twoFactor: twoFactorRouter,
   audit: auditRouter,
+  currency: currencyRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
