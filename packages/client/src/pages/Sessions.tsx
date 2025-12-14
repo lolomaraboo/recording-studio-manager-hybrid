@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Calendar } from 'lucide-react';
@@ -10,26 +9,42 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { trpc } from '@/lib/trpc';
+import { useMemo } from 'react';
 
 export function Sessions() {
-  const [sessions] = useState([
-    {
-      id: '1',
-      title: 'Album Recording - Track 1',
-      client: 'John Smith',
-      date: '2025-12-15',
-      time: '14:00',
-      status: 'scheduled',
-    },
-    {
-      id: '2',
-      title: 'Mixing Session',
-      client: 'Jane Doe',
-      date: '2025-12-16',
-      time: '10:00',
-      status: 'scheduled',
-    },
-  ]);
+  const { data: sessions, isLoading } = trpc.sessions.list.useQuery({ limit: 100 });
+  const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
+
+  // Create a map of client IDs to client names for quick lookup
+  const clientMap = useMemo(() => {
+    return clients?.reduce((acc, client) => {
+      acc[client.id] = client.name;
+      return acc;
+    }, {} as Record<number, string>) || {};
+  }, [clients]);
+
+  // Sort sessions by start time (most recent first)
+  const sortedSessions = useMemo(() => {
+    return sessions?.slice().sort((a, b) =>
+      new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+    ) || [];
+  }, [sessions]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'scheduled':
+        return 'bg-blue-100 text-blue-800';
+      case 'in_progress':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -57,38 +72,47 @@ export function Sessions() {
           <CardTitle>All Sessions</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sessions.map((session) => (
-                <TableRow key={session.id}>
-                  <TableCell className="font-medium">{session.title}</TableCell>
-                  <TableCell>{session.client}</TableCell>
-                  <TableCell>{session.date}</TableCell>
-                  <TableCell>{session.time}</TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                      {session.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
+          {isLoading ? (
+            <p className="text-gray-500">Loading sessions...</p>
+          ) : sortedSessions.length === 0 ? (
+            <p className="text-gray-500">No sessions found. Create your first session!</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {sortedSessions.map((session) => {
+                  const startDate = new Date(session.startTime);
+                  return (
+                    <TableRow key={session.id}>
+                      <TableCell className="font-medium">{session.title}</TableCell>
+                      <TableCell>{clientMap[session.clientId] || 'Unknown Client'}</TableCell>
+                      <TableCell>{startDate.toLocaleDateString()}</TableCell>
+                      <TableCell>{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(session.status)}`}>
+                          {session.status.replace('_', ' ')}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm">
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
