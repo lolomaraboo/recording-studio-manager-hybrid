@@ -21,6 +21,7 @@ import { regionRouter } from './region';
 import { monitoringRouter } from './monitoring';
 import { aiRouter } from './ai';
 import { notificationsRouter } from './notifications';
+import { analyticsRouter } from './analytics';
 
 /**
  * Main App Router
@@ -48,10 +49,10 @@ import { notificationsRouter } from './notifications';
  * - monitoring: System monitoring, metrics, alerts, health checks
  * - ai: AI-powered features (transcription, analysis, recommendations)
  * - notifications: Multi-channel notification system
+ * - analytics: Dashboards, KPIs, reports, trends, forecasting
  *
  * Future routers to add:
- * - equipment, analytics, reports, admin,
- * - shares, calendar
+ * - equipment, admin, shares, calendar
  */
 export const appRouter = router({
   auth: authRouter,
@@ -64,6 +65,7 @@ export const appRouter = router({
   monitoring: monitoringRouter,
   ai: aiRouter,
   notifications: notificationsRouter,
+  analytics: analyticsRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
