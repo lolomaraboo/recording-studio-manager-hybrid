@@ -1,8 +1,8 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 2 EN COURS 🔵**
-> **Phase actuelle**: Phase 2 - Features Critiques (Semaine 7-9)
-> **Dernière mise à jour**: 2025-12-13 (Session: Synchronisation docs + Démarrage Phase 2)
+> **🚀 STACK HYBRIDE - Phase 3 EN COURS 🔵**
+> **Phase actuelle**: Phase 3 - Enterprise (Semaine 21-24)
+> **Dernière mise à jour**: 2025-12-14 (Session: 2FA, i18n, Audit, Currency, White-Label)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 ---
@@ -13,7 +13,7 @@
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
 | **Phase 2: Features Critiques** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
-| Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
+| **Phase 3: Enterprise** | 6-8 sem | ~$25k | 🔵 EN COURS (80%) |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
 **Total:** 5-6 mois | ~$80k développement
@@ -306,23 +306,81 @@ Monitoring: Prometheus + Grafana
 
 ---
 
-## ⏸️ PHASE 3: Enterprise (6-8 semaines)
+## 🔵 PHASE 3: Enterprise (6-8 semaines) - EN COURS
 
-> **Status:** PENDING - Démarrage après Phase 2
+> **Status:** EN COURS - Démarré le 2025-12-14
 
-### Semaine 15-17: SSO/SAML + Custom Domains
-- SSO: Okta, Auth0, Azure AD
-- 2FA: TOTP avec QR code + backup codes
-- Custom Domains: SSL automatique Let's Encrypt
+### ✅ Semaine 15-17: 2FA + i18n (COMPLÉTÉ)
 
-### Semaine 18-20: White-Label + Audit Logging
-- White-Label: Logo, couleurs, emails brandés
-- Audit: Logging SOC2, dashboard admin, exports CSV
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | 2FA TOTP Backend | ✅ DONE | speakeasy + QR code + backup codes |
+| 🔴 HAUTE | 2FA Frontend | ✅ DONE | TwoFactorSetup + TwoFactorVerify components |
+| 🔴 HAUTE | i18n Backend | ✅ DONE | i18next + 6 langues (EN, FR, ES, DE, IT, PT) |
+| 🔴 HAUTE | i18n Frontend | ✅ DONE | LanguageSwitcher component |
 
-### Semaine 21-22: i18n + Multi-Devises
-- i18n: EN, FR, ES, DE, IT, PT (i18next)
-- Devises: EUR, USD, GBP, CAD, JPY, AUD
-- API: exchangerate-api.com
+**Accomplissements Session 2025-12-14 (2FA):**
+- ✅ Schema users: twoFactorEnabled, twoFactorSecret, twoFactorBackupCodes, twoFactorVerifiedAt
+- ✅ twoFactor router: setup, verify, disable, getBackupCodes, regenerateBackupCodes, verifyLogin, verifyBackupCode
+- ✅ speakeasy TOTP avec QR code generation
+- ✅ Backup codes: 10 codes, bcrypt hashed, usage tracking
+- ✅ AuthProvider mis à jour pour flux 2FA
+- ✅ TwoFactorSetup component (Settings page)
+- ✅ TwoFactorVerify component (Login flow)
+
+**Accomplissements Session 2025-12-14 (i18n):**
+- ✅ i18next setup avec 6 langues
+- ✅ Fichiers de traduction: common.json, auth.json, dashboard.json, clients.json, sessions.json
+- ✅ LanguageSwitcher component dans Header
+- ✅ useTranslation hook dans toutes les pages
+
+### ✅ Semaine 18-20: Audit Logging + Multi-Devises (COMPLÉTÉ)
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Audit Logging SOC2 | ✅ DONE | auditLogs table + router + dashboard |
+| 🔴 HAUTE | Multi-Devises | ✅ DONE | 20 currencies + exchange rates |
+
+**Accomplissements Session 2025-12-14 (Audit Logging):**
+- ✅ Schema Master DB: auditLogs table avec indexes
+- ✅ audit module: logAuth, logDataChange, logAdmin, logBilling, logSecurity
+- ✅ audit router: list, stats, export endpoints
+- ✅ Intégration auth: login/logout audit events
+- ✅ Catégories: auth, data, admin, billing, security
+- ✅ Commit f130639 pushé
+
+**Accomplissements Session 2025-12-14 (Multi-Devises):**
+- ✅ Schema tenant: exchangeRates table
+- ✅ currency module: 20 devises supportées (EUR, USD, GBP, etc.)
+- ✅ currency router: getSupportedCurrencies, convert, getRates, setRate
+- ✅ Fonctions: formatCurrency, parseAmount, convertCurrency
+- ✅ Default exchange rates + initialization
+- ✅ Commit 13a1090 pushé
+
+### ✅ Semaine 21-22: White-Label Branding (COMPLÉTÉ)
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🔴 HAUTE | Branding fields schema | ✅ DONE | logoUrl, colors, customDomain |
+| 🔴 HAUTE | Branding backend | ✅ DONE | branding module + router |
+| 🔴 HAUTE | BrandingProvider frontend | ✅ DONE | CSS variables, favicon, theme |
+
+**Accomplissements Session 2025-12-14 (White-Label):**
+- ✅ Schema Master DB: logoUrl, faviconUrl, primaryColor, secondaryColor, accentColor, emailFromName, emailFooterText, customDomain
+- ✅ branding module: color utilities (hexToHsl, hslToHex), theme generation, email templates
+- ✅ branding router: get, getTheme, update, reset, setCustomDomain, verifyCustomDomain, validateColor, previewTheme
+- ✅ BrandingProvider: CSS variables dynamiques, favicon update, document title
+- ✅ Hooks: useBranding, useLogo, useOrganizationName, useThemeColors
+- ✅ Commits d3c081d + baf2558 pushés
+
+### ⏸️ Semaine 23-24: SSO/SAML (À FAIRE)
+
+| Priorité | Tâche | Status | Notes |
+|----------|-------|--------|-------|
+| 🟡 MOYENNE | SSO Okta integration | ⏸️ TODO | SAML 2.0 |
+| 🟡 MOYENNE | SSO Auth0 integration | ⏸️ TODO | OpenID Connect |
+| 🟡 MOYENNE | SSO Azure AD integration | ⏸️ TODO | Enterprise SSO |
+| 🟡 MOYENNE | Custom domains SSL | ⏸️ TODO | Let's Encrypt automation |
 
 ---
 
@@ -483,5 +541,5 @@ Monitoring: Prometheus + Grafana
 **Créé le:** 2025-12-13
 **Par:** Claude Opus 4
 **Repo:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Commit actuel:** (pending) - Tests E2E Playwright
-**Phase actuelle:** Phase 2 - Projects + S3 Upload + Tests E2E ✅ (90%)
+**Commit actuel:** baf2558 - BrandingProvider frontend
+**Phase actuelle:** Phase 3 - Enterprise ✅ (80% - SSO/SAML pending)
