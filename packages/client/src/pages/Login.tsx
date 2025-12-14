@@ -6,12 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { Shield, ArrowLeft, Loader2 } from 'lucide-react';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [useBackupCode, setUseBackupCode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, twoFactorPending, verifyTwoFactor, verifyBackupCode, cancelTwoFactor } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,9 +31,12 @@ export function Login() {
 
     setIsLoading(true);
     try {
-      await login(email, password);
-      toast.success('Welcome back!');
-      navigate(from, { replace: true });
+      const result = await login(email, password);
+      if (!result.requiresTwoFactor) {
+        toast.success('Welcome back!');
+        navigate(from, { replace: true });
+      }
+      // If 2FA required, the UI will show the 2FA form
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
       toast.error(message);
@@ -39,6 +45,125 @@ export function Login() {
     }
   }
 
+  async function handleTwoFactorSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!twoFactorCode) {
+      toast.error('Please enter your verification code');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (useBackupCode) {
+        await verifyBackupCode(twoFactorCode);
+      } else {
+        await verifyTwoFactor(twoFactorCode);
+      }
+      toast.success('Welcome back!');
+      navigate(from, { replace: true });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Invalid verification code';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function handleCancelTwoFactor() {
+    cancelTwoFactor();
+    setTwoFactorCode('');
+    setUseBackupCode(false);
+  }
+
+  // Show 2FA verification form
+  if (twoFactorPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-center mb-4">
+              <Shield className="h-12 w-12 text-purple-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">
+              Two-Factor Authentication
+            </CardTitle>
+            <CardDescription className="text-center">
+              {useBackupCode
+                ? 'Enter one of your backup codes'
+                : 'Enter the 6-digit code from your authenticator app'}
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleTwoFactorSubmit}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="twoFactorCode">
+                  {useBackupCode ? 'Backup Code' : 'Verification Code'}
+                </Label>
+                <Input
+                  id="twoFactorCode"
+                  type="text"
+                  placeholder={useBackupCode ? 'XXXX-XXXX' : '000000'}
+                  value={twoFactorCode}
+                  onChange={(e) => {
+                    if (useBackupCode) {
+                      setTwoFactorCode(e.target.value.toUpperCase());
+                    } else {
+                      setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                    }
+                  }}
+                  disabled={isLoading}
+                  className={useBackupCode ? '' : 'text-center text-2xl tracking-widest font-mono'}
+                  autoFocus
+                />
+              </div>
+              <p className="text-sm text-gray-500 text-center">
+                Signing in as {twoFactorPending.email}
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading || (!useBackupCode && twoFactorCode.length !== 6)}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  'Verify'
+                )}
+              </Button>
+              <div className="flex items-center justify-between w-full text-sm">
+                <button
+                  type="button"
+                  onClick={handleCancelTwoFactor}
+                  className="text-gray-500 hover:text-gray-700 flex items-center"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Back to login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUseBackupCode(!useBackupCode);
+                    setTwoFactorCode('');
+                  }}
+                  className="text-purple-600 hover:text-purple-800"
+                >
+                  {useBackupCode ? 'Use authenticator app' : 'Use backup code'}
+                </button>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show regular login form
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <Card className="w-full max-w-md">
@@ -84,10 +209,17 @@ export function Login() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
             </Button>
             <p className="text-sm text-gray-500 text-center">
-              Demo: Use any email with password 8+ chars
+              Demo: admin@studiopro.com / admin123
             </p>
           </CardFooter>
         </form>

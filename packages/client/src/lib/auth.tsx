@@ -13,6 +13,15 @@ interface User {
 }
 
 /**
+ * 2FA pending state
+ */
+interface TwoFactorPending {
+  userId: number;
+  organizationId: number | null;
+  email: string;
+}
+
+/**
  * Auth context value
  */
 interface AuthContextValue {
@@ -20,7 +29,11 @@ interface AuthContextValue {
   accessToken: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  twoFactorPending: TwoFactorPending | null;
+  login: (email: string, password: string) => Promise<{ requiresTwoFactor: boolean }>;
+  verifyTwoFactor: (token: string) => Promise<void>;
+  verifyBackupCode: (code: string) => Promise<void>;
+  cancelTwoFactor: () => void;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
 }
@@ -55,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(getStoredAccessToken());
   const [isLoading, setIsLoading] = useState(true);
+  const [twoFactorPending, setTwoFactorPending] = useState<TwoFactorPending | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -94,15 +108,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginMutation = trpc.auth.login.useMutation();
   const logoutMutation = trpc.auth.logout.useMutation();
   const refreshMutation = trpc.auth.refresh.useMutation();
+  const verifyTwoFactorMutation = trpc.twoFactor.verifyLogin.useMutation();
+  const verifyBackupCodeMutation = trpc.twoFactor.verifyBackupCode.useMutation();
 
   const login = useCallback(async (email: string, password: string) => {
     const data = await loginMutation.mutateAsync({ email, password });
+
+    if (data.requiresTwoFactor && 'userId' in data) {
+      // Store pending 2FA state
+      setTwoFactorPending({
+        userId: data.userId,
+        organizationId: data.organizationId,
+        email: data.user.email,
+      });
+      return { requiresTwoFactor: true };
+    }
+
+    // No 2FA required, complete login
+    if ('accessToken' in data && data.accessToken) {
+      setAccessToken(data.accessToken);
+      setStoredAccessToken(data.accessToken);
+      setUser(data.user as User);
+      // Invalidate all queries to refetch with new auth
+      utils.invalidate();
+    }
+    return { requiresTwoFactor: false };
+  }, [loginMutation, utils]);
+
+  const verifyTwoFactor = useCallback(async (token: string) => {
+    if (!twoFactorPending) {
+      throw new Error('No 2FA verification pending');
+    }
+
+    const data = await verifyTwoFactorMutation.mutateAsync({
+      userId: twoFactorPending.userId,
+      token,
+      organizationId: twoFactorPending.organizationId,
+    });
+
+    setTwoFactorPending(null);
     setAccessToken(data.accessToken);
     setStoredAccessToken(data.accessToken);
-    setUser(data.user);
-    // Invalidate all queries to refetch with new auth
+    setUser(data.user as User);
     utils.invalidate();
-  }, [loginMutation, utils]);
+  }, [twoFactorPending, verifyTwoFactorMutation, utils]);
+
+  const verifyBackupCode = useCallback(async (code: string) => {
+    if (!twoFactorPending) {
+      throw new Error('No 2FA verification pending');
+    }
+
+    const data = await verifyBackupCodeMutation.mutateAsync({
+      userId: twoFactorPending.userId,
+      code,
+      organizationId: twoFactorPending.organizationId,
+    });
+
+    setTwoFactorPending(null);
+    setAccessToken(data.accessToken);
+    setStoredAccessToken(data.accessToken);
+    setUser(data.user as User);
+    utils.invalidate();
+  }, [twoFactorPending, verifyBackupCodeMutation, utils]);
+
+  const cancelTwoFactor = useCallback(() => {
+    setTwoFactorPending(null);
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -136,7 +207,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     accessToken,
     isLoading: isLoading || meQuery.isLoading,
     isAuthenticated: !!user && !!accessToken,
+    twoFactorPending,
     login,
+    verifyTwoFactor,
+    verifyBackupCode,
+    cancelTwoFactor,
     logout,
     refreshToken: refreshTokenFn,
   };

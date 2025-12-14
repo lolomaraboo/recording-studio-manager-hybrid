@@ -12,6 +12,7 @@ import { bookingsRouter } from './bookings';
 import { projectsRouter } from './projects';
 import { filesRouter } from './files';
 import { quotesRouter } from './quotes';
+import { twoFactorRouter } from './twoFactor';
 
 /**
  * Main App Router
@@ -30,6 +31,7 @@ import { quotesRouter } from './quotes';
  * - projects: Music projects with tracks, musicians, credits
  * - files: File uploads (S3) with versioning
  * - quotes: Quotes/estimates with PDF generation & DocuSign e-signature
+ * - twoFactor: 2FA TOTP authentication (QR code, backup codes)
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
@@ -37,6 +39,7 @@ import { quotesRouter } from './quotes';
  */
 export const appRouter = router({
   auth: authRouter,
+  twoFactor: twoFactorRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,

@@ -22,6 +22,11 @@ export const users = pgTable("users", {
   passwordHash: varchar("password_hash", { length: 255 }),
   role: varchar("role", { length: 50 }).notNull().default("member"), // "admin" | "member"
   isActive: boolean("is_active").notNull().default(true),
+  // 2FA fields
+  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
+  twoFactorSecret: varchar("two_factor_secret", { length: 255 }), // encrypted TOTP secret
+  twoFactorBackupCodes: text("two_factor_backup_codes"), // JSON array of hashed codes
+  twoFactorVerifiedAt: timestamp("two_factor_verified_at"), // when 2FA was first verified
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

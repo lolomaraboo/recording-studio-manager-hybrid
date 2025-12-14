@@ -12,6 +12,7 @@ import { Invoices } from './pages/Invoices';
 import { Projects } from './pages/Projects';
 import { ProjectDetail } from './pages/ProjectDetail';
 import { Quotes } from './pages/Quotes';
+import { Settings } from './pages/Settings';
 import {
   PortalLogin,
   PortalDashboard,
@@ -46,6 +47,7 @@ function App() {
               <Route path="quotes" element={<Quotes />} />
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:id" element={<ProjectDetail />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Client Portal public routes */}

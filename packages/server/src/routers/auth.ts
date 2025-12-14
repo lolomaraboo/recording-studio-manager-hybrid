@@ -109,7 +109,22 @@ export const authRouter = router({
 
       const organizationId = membership?.organizationId || null;
 
-      // 5. Generate tokens
+      // 5. Check if 2FA is enabled
+      if (user.twoFactorEnabled) {
+        // Return partial response - client must call twoFactor.verifyLogin
+        return {
+          requiresTwoFactor: true,
+          userId: user.id,
+          organizationId,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+          },
+        };
+      }
+
+      // 6. Generate tokens (no 2FA required)
       const tokenPayload: TokenPayload = {
         userId: user.id,
         email: user.email,
@@ -120,10 +135,11 @@ export const authRouter = router({
       const accessToken = generateAccessToken(tokenPayload);
       const refreshToken = generateRefreshToken(tokenPayload);
 
-      // 6. Set refresh token cookie
+      // 7. Set refresh token cookie
       setRefreshTokenCookie(ctx.res, refreshToken);
 
       return {
+        requiresTwoFactor: false,
         accessToken,
         expiresIn: 15 * 60, // 15 minutes in seconds
         user: {
