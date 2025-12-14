@@ -271,15 +271,27 @@ Monitoring: Prometheus + Grafana
 | 🔴 HAUTE | Intégration DocuSign | ⏸️ TODO | E-signature contrats |
 | 🟡 MOYENNE | Templates contrats | ⏸️ TODO | Contrats types |
 
-### ⏸️ Tests E2E Phase 2
+### ✅ Tests E2E Phase 2 (COMPLÉTÉ)
 
 | Priorité | Tâche | Status | Notes |
 |----------|-------|--------|-------|
-| 🔴 HAUTE | Setup Playwright | ⏸️ TODO | Config + fixtures |
-| 🔴 HAUTE | Tests auth flow | ⏸️ TODO | Login/logout/protected |
-| 🔴 HAUTE | Tests CRUD clients | ⏸️ TODO | Create/read/update/delete |
-| 🔴 HAUTE | Tests booking sessions | ⏸️ TODO | Réservation flow |
-| 🟡 MOYENNE | Tests paiement Stripe | ⏸️ TODO | Mock Stripe |
+| 🔴 HAUTE | Setup Playwright | ✅ DONE | playwright.config.ts + chromium |
+| 🔴 HAUTE | Tests auth flow | ✅ DONE | auth.spec.ts - login/logout/protected |
+| 🔴 HAUTE | Tests CRUD clients | ✅ DONE | clients.spec.ts - create/edit/search |
+| 🔴 HAUTE | Tests sessions | ✅ DONE | sessions.spec.ts - create/list |
+| 🔴 HAUTE | Tests projets | ✅ DONE | projects.spec.ts - pipeline/detail/create |
+| 🔴 HAUTE | Tests portail client | ✅ DONE | portal.spec.ts - login/routes |
+| 🟡 MOYENNE | Tests paiement Stripe | ⏸️ TODO | Mock Stripe (Phase 3) |
+
+**Accomplissements Session 2025-12-14 (Tests E2E):**
+- ✅ Playwright installé et configuré
+- ✅ 4 fichiers de tests E2E créés (auth, clients, sessions, projects, portal)
+- ✅ Tests auth: login, logout, protected routes, portal auth
+- ✅ Tests CRUD: clients list, create, edit, search
+- ✅ Tests sessions: list, create dialog, stats
+- ✅ Tests projets: pipeline view, detail page, tabs navigation
+- ✅ Tests portail: client login, protected routes
+- ✅ Scripts npm: test:e2e, test:e2e:ui, test:e2e:headed
 
 ---
 
@@ -374,10 +386,12 @@ Monitoring: Prometheus + Grafana
 ### ✅ PRIORITÉ 7 - PHASE 2 SEMAINE 15-16 (COMPLÉTÉ)
 1. ✅ ~~Gestion Projets Musicaux (schema + router + UI)~~ (DONE - Pipeline view + CRUD)
 
-### 🔵 PRIORITÉ 8 - PHASE 2 SEMAINE 17-18 (EN COURS)
-1. ⏸️ Tests E2E avec Playwright
-2. ⏸️ Upload fichiers audio S3
-3. ⏸️ Devis & Contrats
+### ✅ PRIORITÉ 8 - PHASE 2 SEMAINE 17-18 (COMPLÉTÉ)
+1. ✅ Tests E2E avec Playwright (DONE - 5 fichiers de tests)
+2. ✅ Upload fichiers audio S3 (DONE - presigned URLs + versioning)
+
+### 🔵 PRIORITÉ 9 - PHASE 2 SEMAINE 19-20 (EN COURS)
+1. ⏸️ Devis & Contrats (quotes router, PDF, DocuSign)
 
 ---
 
@@ -458,5 +472,5 @@ Monitoring: Prometheus + Grafana
 **Créé le:** 2025-12-13
 **Par:** Claude Opus 4
 **Repo:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Commit actuel:** (pending) - Stripe + Auto-réservation
-**Phase actuelle:** Phase 2 - Tests + Auth + CRUD + Portail Client + Stripe + Bookings ✅ (75%)
+**Commit actuel:** (pending) - Tests E2E Playwright
+**Phase actuelle:** Phase 2 - Projects + S3 Upload + Tests E2E ✅ (90%)
