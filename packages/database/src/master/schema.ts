@@ -53,6 +53,17 @@ export const organizations = pgTable("organizations", {
   subscriptionTier: varchar("subscription_tier", { length: 50 }).notNull().default("trial"), // "trial" | "starter" | "pro" | "enterprise"
   trialEndsAt: timestamp("trial_ends_at"),
   isActive: boolean("is_active").notNull().default(true),
+  // White-label branding fields
+  logoUrl: varchar("logo_url", { length: 500 }), // S3 URL for custom logo
+  faviconUrl: varchar("favicon_url", { length: 500 }), // S3 URL for favicon
+  primaryColor: varchar("primary_color", { length: 7 }).default("#7c3aed"), // Hex color (e.g., #7c3aed)
+  secondaryColor: varchar("secondary_color", { length: 7 }).default("#a855f7"), // Hex color
+  accentColor: varchar("accent_color", { length: 7 }).default("#6366f1"), // Hex color
+  emailFromName: varchar("email_from_name", { length: 100 }), // Custom sender name for emails
+  emailFooterText: text("email_footer_text"), // Custom email footer
+  customDomain: varchar("custom_domain", { length: 255 }), // e.g., "studio.example.com"
+  customDomainVerified: boolean("custom_domain_verified").default(false),
+  customDomainSslStatus: varchar("custom_domain_ssl_status", { length: 50 }), // "pending" | "active" | "failed"
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -15,6 +15,7 @@ import { quotesRouter } from './quotes';
 import { twoFactorRouter } from './twoFactor';
 import { auditRouter } from './audit';
 import { currencyRouter } from './currency';
+import { brandingRouter } from './branding';
 
 /**
  * Main App Router
@@ -36,6 +37,7 @@ import { currencyRouter } from './currency';
  * - twoFactor: 2FA TOTP authentication (QR code, backup codes)
  * - audit: SOC2 compliant audit logging (Master DB)
  * - currency: Multi-currency support with exchange rates
+ * - branding: White-label branding (logo, colors, custom domain)
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
@@ -46,6 +48,7 @@ export const appRouter = router({
   twoFactor: twoFactorRouter,
   audit: auditRouter,
   currency: currencyRouter,
+  branding: brandingRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
