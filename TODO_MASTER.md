@@ -12,7 +12,7 @@
 | Phase | Durée | Budget | Status |
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (80%) |
+| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (90%) |
 | Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
@@ -242,10 +242,10 @@ Monitoring: Prometheus + Grafana
 | 🔴 HAUTE | Schéma DB: projects, musicians, credits | ✅ DONE | projectTracks, musicians, projectCredits, projectFiles |
 | 🔴 HAUTE | Backend: projects router | ✅ DONE | CRUD projets, tracks, musicians, credits, stats |
 | 🔴 HAUTE | Frontend: Projects page | ✅ DONE | Pipeline view + DataTable + Form dialog |
-| 🔴 HAUTE | Upload audio S3 | ⏸️ TODO | Versioning fichiers |
+| 🔴 HAUTE | Upload audio S3 | ✅ DONE | S3 presigned URLs, files router, versioning |
 | 🟡 MOYENNE | Crédits musiciens backend | ✅ DONE | addCredit, removeCredit endpoints |
 
-**Accomplissements Session 2025-12-14 (Gestion Projets):**
+**Accomplissements Session 2025-12-14 (Gestion Projets + Upload S3):**
 - ✅ Schéma enrichi: projectTracks, musicians, projectCredits, projectFiles
 - ✅ Projects table enrichi: projectType, genre, targetEndDate, actualEndDate, spentAmount, isArchived
 - ✅ Projects router complet: list, get, create, update, delete, addTrack, updateTrack, deleteTrack
@@ -255,6 +255,11 @@ Monitoring: Prometheus + Grafana
 - ✅ Projects page: Kanban pipeline view par status
 - ✅ ProjectFormDialog: client selector, type, genre, status, dates, budget
 - ✅ Sidebar mise à jour avec lien Projects
+- ✅ AWS S3 module (_core/s3.ts): presigned URLs, upload/download, versioning
+- ✅ Files router: requestUpload, confirmUpload, getDownloadUrl, list, versions, delete, stats
+- ✅ FileUpload component: drag & drop, progress bar, file list with icons
+- ✅ ProjectDetail page avec Tabs (Tracks, Files, Credits, Details)
+- ✅ Navigation projet: page liste → page détail avec Eye icon
 
 ### ⏸️ Semaine 15-16: Devis & Contrats
 

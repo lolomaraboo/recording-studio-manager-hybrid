@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,7 @@ import {
   FolderOpen,
   Clock,
   Archive,
+  Eye,
 } from 'lucide-react';
 import { DataTable, type Column } from '@/components/ui/data-table';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -71,6 +73,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export function Projects() {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
@@ -207,7 +210,18 @@ export function Projects() {
       key: 'actions',
       header: '',
       cell: (row) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/projects/${row.id}`);
+            }}
+            title="View details"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -215,6 +229,7 @@ export function Projects() {
               e.stopPropagation();
               handleEdit(row);
             }}
+            title="Edit"
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -226,12 +241,13 @@ export function Projects() {
               e.stopPropagation();
               setDeletingProject(row);
             }}
+            title="Archive"
           >
             <Archive className="h-4 w-4" />
           </Button>
         </div>
       ),
-      className: 'w-24',
+      className: 'w-32',
     },
   ];
 
@@ -423,7 +439,7 @@ export function Projects() {
             pageSize={10}
             isLoading={isLoading}
             emptyMessage="No projects found. Create your first project!"
-            onRowClick={handleEdit}
+            onRowClick={(project) => navigate(`/projects/${project.id}`)}
           />
         </CardContent>
       </Card>
