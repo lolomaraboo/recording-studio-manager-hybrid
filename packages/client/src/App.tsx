@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './lib/auth';
 import { ClientAuthProvider } from './lib/clientAuth';
+import { BrandingProvider } from './lib/branding';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ProtectedClientRoute } from './components/ProtectedClientRoute';
 import { Layout } from './components/layout/Layout';
@@ -26,72 +27,74 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ClientAuthProvider>
-          <Routes>
-            {/* Staff public routes */}
-            <Route path="/login" element={<Login />} />
+        <BrandingProvider>
+          <ClientAuthProvider>
+            <Routes>
+              {/* Staff public routes */}
+              <Route path="/login" element={<Login />} />
 
-            {/* Staff protected routes */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
-              <Route path="sessions" element={<Sessions />} />
-              <Route path="clients" element={<Clients />} />
-              <Route path="invoices" element={<Invoices />} />
-              <Route path="quotes" element={<Quotes />} />
-              <Route path="projects" element={<Projects />} />
-              <Route path="projects/:id" element={<ProjectDetail />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
+              {/* Staff protected routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="sessions" element={<Sessions />} />
+                <Route path="clients" element={<Clients />} />
+                <Route path="invoices" element={<Invoices />} />
+                <Route path="quotes" element={<Quotes />} />
+                <Route path="projects" element={<Projects />} />
+                <Route path="projects/:id" element={<ProjectDetail />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
 
-            {/* Client Portal public routes */}
-            <Route path="/portal/login" element={<PortalLogin />} />
+              {/* Client Portal public routes */}
+              <Route path="/portal/login" element={<PortalLogin />} />
 
-            {/* Client Portal protected routes */}
-            <Route
-              path="/portal"
-              element={
-                <ProtectedClientRoute>
-                  <PortalDashboard />
-                </ProtectedClientRoute>
-              }
-            />
-            <Route
-              path="/portal/sessions"
-              element={
-                <ProtectedClientRoute>
-                  <PortalSessions />
-                </ProtectedClientRoute>
-              }
-            />
-            <Route
-              path="/portal/invoices"
-              element={
-                <ProtectedClientRoute>
-                  <PortalInvoices />
-                </ProtectedClientRoute>
-              }
-            />
-            <Route
-              path="/portal/bookings"
-              element={
-                <ProtectedClientRoute>
-                  <PortalBookings />
-                </ProtectedClientRoute>
-              }
-            />
+              {/* Client Portal protected routes */}
+              <Route
+                path="/portal"
+                element={
+                  <ProtectedClientRoute>
+                    <PortalDashboard />
+                  </ProtectedClientRoute>
+                }
+              />
+              <Route
+                path="/portal/sessions"
+                element={
+                  <ProtectedClientRoute>
+                    <PortalSessions />
+                  </ProtectedClientRoute>
+                }
+              />
+              <Route
+                path="/portal/invoices"
+                element={
+                  <ProtectedClientRoute>
+                    <PortalInvoices />
+                  </ProtectedClientRoute>
+                }
+              />
+              <Route
+                path="/portal/bookings"
+                element={
+                  <ProtectedClientRoute>
+                    <PortalBookings />
+                  </ProtectedClientRoute>
+                }
+              />
 
-            {/* Catch-all redirect */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          <Toaster />
-        </ClientAuthProvider>
+              {/* Catch-all redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            <Toaster />
+          </ClientAuthProvider>
+        </BrandingProvider>
       </AuthProvider>
     </BrowserRouter>
   );
