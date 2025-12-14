@@ -64,6 +64,28 @@ export const organizations = pgTable("organizations", {
   customDomain: varchar("custom_domain", { length: 255 }), // e.g., "studio.example.com"
   customDomainVerified: boolean("custom_domain_verified").default(false),
   customDomainSslStatus: varchar("custom_domain_ssl_status", { length: 50 }), // "pending" | "active" | "failed"
+  // SSO (Single Sign-On) configuration
+  ssoEnabled: boolean("sso_enabled").default(false),
+  ssoProviderType: varchar("sso_provider_type", { length: 20 }), // "saml" | "oidc"
+  ssoProvider: varchar("sso_provider", { length: 50 }), // "okta" | "azure_ad" | "auth0" | "google" | "onelogin" | "custom"
+  // SAML configuration
+  ssoSamlEntityId: varchar("sso_saml_entity_id", { length: 500 }),
+  ssoSamlSsoUrl: varchar("sso_saml_sso_url", { length: 500 }),
+  ssoSamlCertificate: text("sso_saml_certificate"), // X.509 certificate (PEM format)
+  ssoSamlSignatureAlgorithm: varchar("sso_saml_signature_algorithm", { length: 20 }).default("sha256"), // "sha256" | "sha512"
+  // OIDC configuration
+  ssoOidcClientId: varchar("sso_oidc_client_id", { length: 255 }),
+  ssoOidcClientSecret: varchar("sso_oidc_client_secret", { length: 500 }), // encrypted
+  ssoOidcIssuer: varchar("sso_oidc_issuer", { length: 500 }),
+  ssoOidcAuthorizationUrl: varchar("sso_oidc_authorization_url", { length: 500 }),
+  ssoOidcTokenUrl: varchar("sso_oidc_token_url", { length: 500 }),
+  ssoOidcUserInfoUrl: varchar("sso_oidc_userinfo_url", { length: 500 }),
+  ssoOidcScopes: text("sso_oidc_scopes"), // JSON array of scopes
+  // SSO common settings
+  ssoAllowedDomains: text("sso_allowed_domains"), // JSON array of allowed email domains
+  ssoAutoProvision: boolean("sso_auto_provision").default(true), // Auto-create users on first login
+  ssoDefaultRole: varchar("sso_default_role", { length: 50 }).default("member"),
+  ssoAttributeMapping: text("sso_attribute_mapping"), // JSON mapping of IdP attributes
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

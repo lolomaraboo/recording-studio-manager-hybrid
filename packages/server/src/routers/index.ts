@@ -16,6 +16,7 @@ import { twoFactorRouter } from './twoFactor';
 import { auditRouter } from './audit';
 import { currencyRouter } from './currency';
 import { brandingRouter } from './branding';
+import { ssoRouter } from './sso';
 
 /**
  * Main App Router
@@ -38,6 +39,7 @@ import { brandingRouter } from './branding';
  * - audit: SOC2 compliant audit logging (Master DB)
  * - currency: Multi-currency support with exchange rates
  * - branding: White-label branding (logo, colors, custom domain)
+ * - sso: Single Sign-On (SAML 2.0, OpenID Connect)
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
@@ -49,6 +51,7 @@ export const appRouter = router({
   audit: auditRouter,
   currency: currencyRouter,
   branding: brandingRouter,
+  sso: ssoRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
