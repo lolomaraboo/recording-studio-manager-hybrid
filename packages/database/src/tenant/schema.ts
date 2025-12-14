@@ -14,6 +14,9 @@ import { pgTable, serial, varchar, text, timestamp, integer, boolean, decimal } 
 
 /**
  * Clients table (Tenant DB)
+ *
+ * Clients can optionally have portal access for self-service features.
+ * When portalAccess is true, the client can log in using their email + password.
  */
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
@@ -29,7 +32,10 @@ export const clients = pgTable("clients", {
   notes: text("notes"),
   isVip: boolean("is_vip").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
+  // Portal access fields
   portalAccess: boolean("portal_access").notNull().default(false),
+  passwordHash: varchar("password_hash", { length: 255 }), // For client portal login
+  portalLastLogin: timestamp("portal_last_login"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
