@@ -17,6 +17,8 @@ import { auditRouter } from './audit';
 import { currencyRouter } from './currency';
 import { brandingRouter } from './branding';
 import { ssoRouter } from './sso';
+import { regionRouter } from './region';
+import { monitoringRouter } from './monitoring';
 
 /**
  * Main App Router
@@ -40,6 +42,8 @@ import { ssoRouter } from './sso';
  * - currency: Multi-currency support with exchange rates
  * - branding: White-label branding (logo, colors, custom domain)
  * - sso: Single Sign-On (SAML 2.0, OpenID Connect)
+ * - region: Multi-region deployment (geo-routing, health checks, replication)
+ * - monitoring: System monitoring, metrics, alerts, health checks
  *
  * Future routers to add:
  * - equipment, analytics, reports, admin,
@@ -52,6 +56,8 @@ export const appRouter = router({
   currency: currencyRouter,
   branding: brandingRouter,
   sso: ssoRouter,
+  region: regionRouter,
+  monitoring: monitoringRouter,
   clientAuth: clientAuthRouter,
   clientPortal: clientPortalRouter,
   stripe: stripeRouter,
