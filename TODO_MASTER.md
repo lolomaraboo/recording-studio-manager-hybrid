@@ -14,7 +14,7 @@
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
 | **Phase 2: Features Critiques** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
 | **Phase 3: Enterprise** | 6-8 sem | ~$25k | ✅ COMPLÉTÉ (100%) |
-| **Phase 4: Multi-Région** | 4-6 sem | ~$15k | 🔄 EN COURS (50%) |
+| **Phase 4: Multi-Région** | 4-6 sem | ~$15k | 🔄 EN COURS (85%) |
 
 **Total:** 5-6 mois | ~$80k développement
 
@@ -395,10 +395,10 @@ Monitoring: Prometheus + Grafana
 
 ---
 
-## 🔄 PHASE 4: Multi-Région & Polish (4-6 semaines) - EN COURS (50%)
+## 🔄 PHASE 4: Multi-Région & Polish (4-6 semaines) - EN COURS (85%)
 
 > **Status:** EN COURS - 2025-12-14
-> **Prochain:** Tests load, Prometheus/Grafana, Documentation
+> **Prochain:** Documentation utilisateur, Sentry
 
 ### ✅ Semaine 23-25: Déploiement Multi-Région (COMPLÉTÉ)
 
@@ -447,17 +447,44 @@ Monitoring: Prometheus + Grafana
   - Route53 geo-routing + failover
   - VPC module avec NAT gateways
 
-### ⏸️ Semaine 26-28: Tests, Monitoring & Documentation
+### ✅ Semaine 26-28: Tests, Monitoring & Documentation (EN COURS)
 
 | Priorité | Tâche | Status | Notes |
 |----------|-------|--------|-------|
-| 🔴 HAUTE | Tests load k6 | ⏸️ PENDING | Script k6 pour stress tests |
-| 🔴 HAUTE | Prometheus setup | ⏸️ PENDING | /metrics endpoint + scraping |
-| 🔴 HAUTE | Grafana dashboards | ⏸️ PENDING | Dashboards multi-region |
+| 🔴 HAUTE | Tests load k6 | ✅ DONE | Smoke, Load, Stress, Spike tests |
+| 🔴 HAUTE | Prometheus setup | ✅ DONE | _core/prometheus.ts + /metrics endpoint |
+| 🔴 HAUTE | Grafana dashboards | ✅ DONE | Multi-region overview dashboard |
 | 🟡 MOYENNE | Sentry error tracking | ⏸️ PENDING | Client + Server |
 | 🟡 MOYENNE | User documentation | ⏸️ PENDING | User guide Markdown |
 | 🟡 MOYENNE | API documentation | ⏸️ PENDING | tRPC panel ou Swagger |
 | 🟢 BASSE | Runbooks ops | ⏸️ PENDING | Incident response guides |
+
+**Accomplissements Session 2025-12-14 (Tests & Monitoring):**
+- ✅ tests/load/k6-config.js: Suite complète de tests de charge
+  - Smoke test: 30s avec 1 VU
+  - Load test: 16min avec rampe 0→50 VUs
+  - Stress test: 15min avec rampe 0→200 VUs
+  - Spike test: 3min avec pic à 200 VUs
+  - Thresholds: <1% erreurs, P95<500ms
+- ✅ _core/prometheus.ts: Module métriques Prometheus
+  - HTTP request counters/histograms par région
+  - DB query duration tracking
+  - Memory et connection pool gauges
+  - Business metrics (invoices, payments, sessions)
+  - Express middleware metricsMiddleware()
+  - Endpoint /metrics en format Prometheus
+- ✅ deploy/grafana/dashboards/multi-region-overview.json
+  - Global overview (RPS, Error Rate, P95 Latency)
+  - Per-region metrics breakdown
+  - Database connection pool monitoring
+  - Business metrics panels
+- ✅ deploy/docker-compose.monitoring.yml
+  - Prometheus + Grafana + Alertmanager
+  - Exporters: PostgreSQL, Redis, Node
+  - Loki + Promtail pour logs
+- ✅ deploy/prometheus/prometheus.yml: Config scrape
+- ✅ deploy/grafana/provisioning: Auto-config datasources + dashboards
+- ✅ Commit e2c2adf pushé
 
 ---
 
