@@ -71,11 +71,16 @@ export const clientsRouter = router({
     .input(
       z.object({
         name: z.string().min(2).max(200),
+        artistName: z.string().optional(),
         email: z.string().email().optional(),
         phone: z.string().optional(),
-        company: z.string().optional(),
+        type: z.enum(['individual', 'company']).default('individual'),
         address: z.string().optional(),
+        city: z.string().optional(),
+        country: z.string().optional(),
         notes: z.string().optional(),
+        isVip: z.boolean().default(false),
+        portalAccess: z.boolean().default(false),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -98,11 +103,17 @@ export const clientsRouter = router({
         id: z.number(),
         data: z.object({
           name: z.string().min(2).max(200).optional(),
+          artistName: z.string().optional(),
           email: z.string().email().optional(),
           phone: z.string().optional(),
-          company: z.string().optional(),
+          type: z.enum(['individual', 'company']).optional(),
           address: z.string().optional(),
+          city: z.string().optional(),
+          country: z.string().optional(),
           notes: z.string().optional(),
+          isVip: z.boolean().optional(),
+          isActive: z.boolean().optional(),
+          portalAccess: z.boolean().optional(),
         }),
       })
     )
@@ -111,7 +122,7 @@ export const clientsRouter = router({
 
       const [updated] = await tenantDb
         .update(clients)
-        .set(input.data)
+        .set({ ...input.data, updatedAt: new Date() })
         .where(eq(clients.id, input.id))
         .returning();
 

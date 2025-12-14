@@ -4,6 +4,7 @@ import { organizationsRouter } from './organizations';
 import { sessionsRouter } from './sessions';
 import { clientsRouter } from './clients';
 import { invoicesRouter } from './invoices';
+import { roomsRouter } from './rooms';
 
 /**
  * Main App Router
@@ -14,9 +15,10 @@ import { invoicesRouter } from './invoices';
  * - sessions: Recording sessions CRUD (Tenant DB)
  * - clients: Clients CRUD (Tenant DB)
  * - invoices: Invoices CRUD (Tenant DB)
+ * - rooms: Studio rooms CRUD (Tenant DB)
  *
  * Future routers to add (from Manus):
- * - rooms, equipment, projects, analytics, reports, admin,
+ * - equipment, projects, analytics, reports, admin,
  * - stripe, files, shares, bookings, ai, calendar,
  * - notifications, musicians, clientAuth, clientPortal,
  * - sidebar, quotes
@@ -27,6 +29,7 @@ export const appRouter = router({
   sessions: sessionsRouter,
   clients: clientsRouter,
   invoices: invoicesRouter,
+  rooms: roomsRouter,
 });
 
 /**
