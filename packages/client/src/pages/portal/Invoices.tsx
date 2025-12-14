@@ -1,11 +1,14 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useClientAuth } from '@/lib/clientAuth';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PayInvoiceButton } from '@/components/stripe';
 import { format } from 'date-fns';
 import { ArrowLeft, FileText, Calendar, DollarSign, LogOut } from 'lucide-react';
+import { toast } from 'sonner';
 
 /**
  * Client Portal Invoices Page
@@ -14,7 +17,26 @@ import { ArrowLeft, FileText, Calendar, DollarSign, LogOut } from 'lucide-react'
  */
 export function PortalInvoices() {
   const { client, logout } = useClientAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const utils = trpc.useUtils();
   const { data: invoices, isLoading } = trpc.clientPortal.invoices.useQuery({ limit: 50 });
+
+  // Handle payment success/cancel from Stripe redirect
+  useEffect(() => {
+    const payment = searchParams.get('payment');
+    const invoiceNumber = searchParams.get('invoice');
+
+    if (payment === 'success') {
+      toast.success(`Payment successful for invoice ${invoiceNumber}!`);
+      // Refresh invoices to get updated status
+      utils.clientPortal.invoices.invalidate();
+      // Clear URL params
+      setSearchParams({});
+    } else if (payment === 'cancelled') {
+      toast.info('Payment was cancelled');
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, utils]);
 
   const handleLogout = async () => {
     await logout();
@@ -190,6 +212,14 @@ export function PortalInvoices() {
                           ${invoice.total}
                         </p>
                       </div>
+                      {/* Payment button for unpaid invoices */}
+                      <PayInvoiceButton
+                        invoiceId={invoice.id}
+                        invoiceNumber={invoice.invoiceNumber}
+                        total={invoice.total}
+                        status={invoice.status}
+                        onPaymentSuccess={() => utils.clientPortal.invoices.invalidate()}
+                      />
                     </div>
                   </div>
                   {invoice.notes && (
