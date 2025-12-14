@@ -12,7 +12,7 @@
 | Phase | Durée | Budget | Status |
 |-------|-------|--------|--------|
 | **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (60%) |
+| **Phase 2: Features Critiques** | 6-8 sem | ~$25k | 🔵 EN COURS (75%) |
 | Phase 3: Enterprise | 6-8 sem | ~$25k | ⏸️ PENDING |
 | Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
 
@@ -202,9 +202,9 @@ Monitoring: Prometheus + Grafana
 | 🔴 HAUTE | Frontend: Pages client | ✅ DONE | Portal Login, Sessions, Invoices pages |
 | 🔴 HAUTE | ClientAuthProvider | ✅ DONE | Authentification client séparée |
 | 🔴 HAUTE | ProtectedClientRoute | ✅ DONE | Routes /portal/* protégées |
-| 🔴 HAUTE | Auto-réservation sessions | ⏸️ TODO | Interface booking |
-| 🔴 HAUTE | Intégration Stripe | ⏸️ TODO | Paiement en ligne |
-| 🟡 MOYENNE | Partage fichiers audio | ⏸️ TODO | Upload/download |
+| 🔴 HAUTE | Intégration Stripe | ✅ DONE | Checkout sessions, payment intents |
+| 🔴 HAUTE | Auto-réservation sessions | ✅ DONE | Bookings router + UI interface |
+| 🟡 MOYENNE | Partage fichiers audio | ⏸️ TODO | Upload/download S3 |
 
 **Accomplissements Session 2025-12-13 (Tests + Portail Client):**
 - ✅ Vitest configuré avec jsdom + React Testing Library
@@ -220,6 +220,20 @@ Monitoring: Prometheus + Grafana
 - ✅ Badge component ajouté (shadcn/ui)
 - ✅ Routes /portal/* intégrées dans App.tsx
 - ✅ Commits: e44922e (tests) + c0f5988 (backend) + f4a4f99 (frontend)
+
+**Accomplissements Session 2025-12-13 (Stripe + Auto-réservation):**
+- ✅ Stripe module (_core/stripe.ts): Checkout sessions, payment intents, refunds, webhooks
+- ✅ Stripe router: config, createCheckoutSession, createPaymentIntent, verifyPayment
+- ✅ PayInvoiceButton component avec redirection Stripe Checkout
+- ✅ Portal Invoices page avec boutons de paiement intégrés
+- ✅ Gestion retour Stripe (success/cancel) avec toast notifications
+- ✅ Bookings router: rooms, availability, create, myBookings, cancel, reschedule
+- ✅ Génération time slots automatique (9h-22h, créneaux 1h)
+- ✅ Détection conflits horaires pour éviter double-booking
+- ✅ Politique d'annulation 24h à l'avance
+- ✅ Portal Bookings page: sélection salle, calendrier, dialog réservation
+- ✅ Dashboard client mis à jour avec bouton "Book Session"
+- ✅ Routes /portal/bookings ajoutées
 
 ### ⏸️ Semaine 13-14: Gestion Projets Musicaux
 
@@ -337,12 +351,15 @@ Monitoring: Prometheus + Grafana
 4. ✅ ~~Frontend: Dashboard client self-service~~ (DONE)
 5. ✅ ~~Frontend: Pages client (Sessions, Invoices)~~ (DONE)
 
-### 🔵 PRIORITÉ 6 - PHASE 2 SEMAINE 13-14 (EN COURS)
-1. ⏸️ Intégration Stripe pour paiements
-2. ⏸️ Auto-réservation sessions pour clients
-3. ⏸️ Tests E2E avec Playwright
-4. ⏸️ Gestion Projets Musicaux (Kanban, crédits)
-5. ⏸️ Upload fichiers audio S3
+### ✅ PRIORITÉ 6 - PHASE 2 SEMAINE 13-14 (COMPLÉTÉ)
+1. ✅ ~~Intégration Stripe pour paiements~~ (DONE - Checkout sessions, payment intents)
+2. ✅ ~~Auto-réservation sessions pour clients~~ (DONE - Bookings router + UI)
+
+### 🔵 PRIORITÉ 7 - PHASE 2 SEMAINE 15-16 (EN COURS)
+1. ⏸️ Tests E2E avec Playwright
+2. ⏸️ Gestion Projets Musicaux (Kanban, crédits)
+3. ⏸️ Upload fichiers audio S3
+4. ⏸️ Devis & Contrats
 
 ---
 
@@ -423,5 +440,5 @@ Monitoring: Prometheus + Grafana
 **Créé le:** 2025-12-13
 **Par:** Claude Opus 4
 **Repo:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Commit actuel:** f4a4f99 - Client portal frontend
-**Phase actuelle:** Phase 2 - Tests + Auth + CRUD + Portail Client ✅ (60%)
+**Commit actuel:** (pending) - Stripe + Auto-réservation
+**Phase actuelle:** Phase 2 - Tests + Auth + CRUD + Portail Client + Stripe + Bookings ✅ (75%)

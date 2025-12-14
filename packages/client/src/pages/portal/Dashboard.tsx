@@ -14,6 +14,7 @@ import {
   ChevronRight,
   LogOut,
   User,
+  Plus,
 } from 'lucide-react';
 
 /**
@@ -231,7 +232,15 @@ export function PortalDashboard() {
         {/* Quick Actions */}
         <div className="mt-8">
           <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <Link to="/portal/bookings">
+              <Card className="hover:border-green-500 border-green-200 bg-green-50 dark:bg-green-900/20 transition-colors cursor-pointer">
+                <CardContent className="pt-6 text-center">
+                  <Plus className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                  <p className="font-medium text-green-700 dark:text-green-300">Book Session</p>
+                </CardContent>
+              </Card>
+            </Link>
             <Link to="/portal/sessions">
               <Card className="hover:border-purple-500 transition-colors cursor-pointer">
                 <CardContent className="pt-6 text-center">

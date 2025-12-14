@@ -14,6 +14,7 @@ import {
   PortalDashboard,
   PortalSessions,
   PortalInvoices,
+  PortalBookings,
 } from './pages/portal';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -66,6 +67,14 @@ function App() {
               element={
                 <ProtectedClientRoute>
                   <PortalInvoices />
+                </ProtectedClientRoute>
+              }
+            />
+            <Route
+              path="/portal/bookings"
+              element={
+                <ProtectedClientRoute>
+                  <PortalBookings />
                 </ProtectedClientRoute>
               }
             />
