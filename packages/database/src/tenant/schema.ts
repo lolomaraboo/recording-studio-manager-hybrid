@@ -365,3 +365,176 @@ export const exchangeRates = pgTable("exchange_rates", {
 
 export type ExchangeRate = typeof exchangeRates.$inferSelect;
 export type InsertExchangeRate = typeof exchangeRates.$inferInsert;
+
+/**
+ * Team Members table (Tenant DB)
+ *
+ * Staff members within an organization (engineers, producers, admins)
+ */
+export const teamMembers = pgTable("team_members", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id"), // Optional link to Master DB user
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  role: varchar("role", { length: 50 }).notNull().default("engineer"), // "admin" | "manager" | "engineer" | "producer" | "assistant" | "intern"
+  title: varchar("title", { length: 255 }), // Job title
+  department: varchar("department", { length: 100 }), // "Engineering" | "Production" | "Administration" | etc.
+  bio: text("bio"),
+  avatarUrl: varchar("avatar_url", { length: 1000 }),
+  skills: text("skills"), // JSON array or comma-separated
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").notNull().default(true),
+  hiredAt: timestamp("hired_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type TeamMember = typeof teamMembers.$inferSelect;
+export type InsertTeamMember = typeof teamMembers.$inferInsert;
+
+/**
+ * Team Invitations table (Tenant DB)
+ *
+ * Pending invitations to join the organization
+ */
+export const teamInvitations = pgTable("team_invitations", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).notNull().default("engineer"),
+  invitedBy: varchar("invited_by", { length: 255 }).notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // "pending" | "accepted" | "expired" | "cancelled"
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type TeamInvitation = typeof teamInvitations.$inferSelect;
+export type InsertTeamInvitation = typeof teamInvitations.$inferInsert;
+
+/**
+ * File Shares table (Tenant DB)
+ *
+ * Shared file links for external access
+ */
+export const fileShares = pgTable("file_shares", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => projects.id),
+  fileId: integer("file_id").references(() => projectFiles.id),
+  shareToken: varchar("share_token", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(), // Share link name/description
+  accessType: varchar("access_type", { length: 50 }).notNull().default("view"), // "view" | "download" | "comment" | "edit"
+  password: varchar("password", { length: 255 }), // Optional password protection (hashed)
+  expiresAt: timestamp("expires_at"), // Optional expiration
+  maxDownloads: integer("max_downloads"), // Optional download limit
+  downloadCount: integer("download_count").notNull().default(0),
+  allowedEmails: text("allowed_emails"), // JSON array of allowed emails
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: varchar("created_by", { length: 255 }).notNull(),
+  lastAccessedAt: timestamp("last_accessed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type FileShare = typeof fileShares.$inferSelect;
+export type InsertFileShare = typeof fileShares.$inferInsert;
+
+/**
+ * Share Access Logs table (Tenant DB)
+ *
+ * Track who accessed shared files
+ */
+export const shareAccessLogs = pgTable("share_access_logs", {
+  id: serial("id").primaryKey(),
+  shareId: integer("share_id").notNull().references(() => fileShares.id),
+  accessedAt: timestamp("accessed_at").notNull().defaultNow(),
+  accessType: varchar("access_type", { length: 50 }).notNull(), // "view" | "download"
+  ipAddress: varchar("ip_address", { length: 50 }),
+  userAgent: text("user_agent"),
+  email: varchar("email", { length: 255 }), // If authenticated
+  country: varchar("country", { length: 100 }), // Geo-detected
+});
+
+export type ShareAccessLog = typeof shareAccessLogs.$inferSelect;
+export type InsertShareAccessLog = typeof shareAccessLogs.$inferInsert;
+
+/**
+ * Bookings table (Tenant DB)
+ *
+ * Room booking requests from client portal
+ */
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id").notNull().references(() => clients.id),
+  roomId: integer("room_id").notNull().references(() => rooms.id),
+  sessionId: integer("session_id").references(() => sessions.id), // Link to session once confirmed
+  requestedDate: timestamp("requested_date").notNull(),
+  startTime: varchar("start_time", { length: 10 }).notNull(), // "HH:MM" format
+  endTime: varchar("end_time", { length: 10 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // "pending" | "confirmed" | "rejected" | "cancelled"
+  notes: text("notes"),
+  rejectionReason: text("rejection_reason"),
+  confirmedBy: varchar("confirmed_by", { length: 255 }),
+  confirmedAt: timestamp("confirmed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = typeof bookings.$inferInsert;
+
+/**
+ * Audio Files table (Tenant DB)
+ *
+ * Audio files stored in S3 with metadata
+ */
+export const audioFiles = pgTable("audio_files", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => projects.id),
+  trackId: integer("track_id").references(() => projectTracks.id),
+  sessionId: integer("session_id").references(() => sessions.id),
+
+  // File identification
+  filename: varchar("filename", { length: 500 }).notNull(),
+  originalFilename: varchar("original_filename", { length: 500 }).notNull(),
+  path: varchar("path", { length: 1000 }).notNull().default(""), // Storage path (S3 or local)
+
+  // Format & metadata
+  format: varchar("format", { length: 20 }).notNull().default("wav"), // wav, mp3, flac, etc.
+  category: varchar("category", { length: 50 }), // recording, mix, master, stem, etc.
+  sizeBytes: varchar("size_bytes", { length: 50 }), // File size in bytes
+  durationMs: integer("duration_ms"), // Duration in milliseconds
+  sampleRate: integer("sample_rate"), // Hz (44100, 48000, 96000, etc.)
+  bitDepth: integer("bit_depth"), // 16, 24, 32 bits
+  channels: integer("channels"), // 1 = mono, 2 = stereo
+
+  // Waveform visualization
+  waveformData: text("waveform_data"), // Base64 or URL to waveform image
+  waveformPeaks: text("waveform_peaks"), // JSON array of peak values
+
+  // Version control
+  version: integer("version").notNull().default(1),
+
+  // Status & notes
+  status: varchar("status", { length: 20 }).notNull().default("ready"), // uploading, processing, ready, error, archived
+  notes: text("notes"),
+  metadata: text("metadata"), // Additional JSON metadata
+
+  // Transcription (AI-generated)
+  transcription: text("transcription"),
+
+  // Tags & categorization
+  tags: text("tags"), // JSON array
+
+  // Access control
+  uploadedBy: integer("uploaded_by"),
+  isPublic: boolean("is_public").notNull().default(false),
+
+  // Timestamps
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type AudioFile = typeof audioFiles.$inferSelect;
+export type InsertAudioFile = typeof audioFiles.$inferInsert;

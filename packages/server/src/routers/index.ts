@@ -24,6 +24,13 @@ import { notificationsRouter } from './notifications';
 import { analyticsRouter } from './analytics';
 import { calendarRouter } from './calendar';
 import { integrationsRouter } from './integrations';
+// New routers for Manus frontend compatibility
+import { adminRouter } from './admin';
+import { teamRouter } from './team';
+import { equipmentRouter } from './equipment';
+import { sharesRouter } from './shares';
+import { musiciansRouter } from './musicians';
+import { audioFilesRouter } from './audioFiles';
 
 /**
  * Main App Router
@@ -55,35 +62,57 @@ import { integrationsRouter } from './integrations';
  * - calendar: Google/Outlook calendar sync, iCal export
  * - integrations: Slack, Discord, Zapier, webhooks
  *
- * Future routers to add:
- * - equipment, admin, shares
+ * All routers now implemented for Manus frontend compatibility.
  */
 export const appRouter = router({
+  // Core authentication
   auth: authRouter,
   twoFactor: twoFactorRouter,
+  clientAuth: clientAuthRouter,
+  clientPortal: clientPortalRouter,
+
+  // Platform management
+  admin: adminRouter,
   audit: auditRouter,
+  monitoring: monitoringRouter,
+
+  // Organization & team
+  organizations: organizationsRouter,
+  team: teamRouter,
+
+  // Studio management
+  sessions: sessionsRouter,
+  rooms: roomsRouter,
+  equipment: equipmentRouter,
+  bookings: bookingsRouter,
+
+  // Clients & projects
+  clients: clientsRouter,
+  projects: projectsRouter,
+  musicians: musiciansRouter,
+
+  // Files & sharing
+  files: filesRouter,
+  audioFiles: audioFilesRouter,
+  shares: sharesRouter,
+
+  // Billing & finance
+  invoices: invoicesRouter,
+  quotes: quotesRouter,
+  stripe: stripeRouter,
   currency: currencyRouter,
+
+  // Settings & branding
   branding: brandingRouter,
   sso: ssoRouter,
   region: regionRouter,
-  monitoring: monitoringRouter,
+
+  // Features
   ai: aiRouter,
   notifications: notificationsRouter,
   analytics: analyticsRouter,
   calendar: calendarRouter,
   integrations: integrationsRouter,
-  clientAuth: clientAuthRouter,
-  clientPortal: clientPortalRouter,
-  stripe: stripeRouter,
-  bookings: bookingsRouter,
-  projects: projectsRouter,
-  files: filesRouter,
-  quotes: quotesRouter,
-  organizations: organizationsRouter,
-  sessions: sessionsRouter,
-  clients: clientsRouter,
-  invoices: invoicesRouter,
-  rooms: roomsRouter,
 });
 
 /**
