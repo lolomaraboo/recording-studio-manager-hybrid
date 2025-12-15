@@ -4,7 +4,6 @@ import { AIAssistant } from "./AIAssistant";
 import { CommandPalette } from "./CommandPalette";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useChatbot } from "@/contexts/ChatbotContext";
-import { cn } from "@/lib/utils";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,7 +11,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   // Activer les notifications WebSocket en temps réel
-  const { isConnected } = useWebSocket();
+  useWebSocket();
   const { getChatbotWidth } = useChatbot();
   const chatbotWidth = getChatbotWidth();
   

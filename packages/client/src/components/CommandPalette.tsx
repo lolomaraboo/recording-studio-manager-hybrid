@@ -160,7 +160,6 @@ export function CommandPalette() {
             <CommandItem
               key={command.label}
               onSelect={command.action}
-              keywords={command.keywords}
             >
               {command.icon}
               <span>{command.label}</span>
@@ -173,7 +172,6 @@ export function CommandPalette() {
             <CommandItem
               key={command.label}
               onSelect={command.action}
-              keywords={command.keywords}
             >
               {command.icon}
               <span>{command.label}</span>

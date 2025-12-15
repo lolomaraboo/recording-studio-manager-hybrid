@@ -23,10 +23,9 @@ export function Header() {
     }
   }, []);
 
-  const { data: organization } = trpc.organizations.get.useQuery(
-    { id: selectedOrgId! },
-    { enabled: selectedOrgId !== null }
-  );
+  // Get organization info from the list and filter by ID
+  const { data: organizations } = trpc.organizations.list.useQuery();
+  const organization = organizations?.find(org => org.id === selectedOrgId);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">

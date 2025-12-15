@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface KeyboardShortcut {
   key: string;
@@ -21,7 +21,7 @@ const shortcuts: KeyboardShortcut[] = [
 ];
 
 export function useKeyboardShortcuts() {
-  const navigate = useNavigate().pathname;
+  const navigate = useNavigate();
 
   useEffect(() => {
     let pressedKeys: string[] = [];
@@ -70,7 +70,7 @@ export function useKeyboardShortcuts() {
       window.removeEventListener("keydown", handleKeyDown);
       clearTimeout(timeout);
     };
-  }, [setLocation]);
+  }, [navigate]);
 
   return shortcuts;
 }

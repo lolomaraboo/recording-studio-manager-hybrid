@@ -59,7 +59,7 @@ i18n
     supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
 
     // Debug mode (disable in production)
-    debug: import.meta.env.DEV,
+    debug: (import.meta as unknown as { env: { DEV: boolean } }).env.DEV,
 
     // Namespace configuration
     ns: ['translation'],

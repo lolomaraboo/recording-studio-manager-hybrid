@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, BarChart3, CreditCard, FileText, Settings } from "lucide-react";
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminOrganizations } from "@/components/admin/AdminOrganizations";

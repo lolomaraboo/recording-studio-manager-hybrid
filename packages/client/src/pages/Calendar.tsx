@@ -228,7 +228,7 @@ export default function Calendar() {
                   <div className="h-[600px] calendar-container">
                     <DnDCalendar
                       localizer={localizer}
-                      events={events as unknown[]}
+                      events={events as object[]}
                       startAccessor={(event: unknown) => (event as CalendarEvent).start}
                       endAccessor={(event: unknown) => (event as CalendarEvent).end}
                       view={view}

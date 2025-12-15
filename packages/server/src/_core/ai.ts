@@ -208,7 +208,9 @@ export async function transcribeAudio(
 
   // Create form data
   const formData = new FormData();
-  formData.append("file", new Blob([audioBuffer]), filename);
+  // Use Uint8Array which is compatible with BlobPart
+  const uint8Array = new Uint8Array(audioBuffer);
+  formData.append("file", new Blob([uint8Array]), filename);
   formData.append("model", config.whisperModel);
   formData.append("response_format", "verbose_json");
 

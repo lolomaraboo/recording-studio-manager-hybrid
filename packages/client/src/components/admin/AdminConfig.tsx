@@ -32,7 +32,7 @@ export function AdminConfig() {
     onSuccess: () => {
       toast.success("Configuration mise à jour avec succès");
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast.error(`Erreur: ${error.message}`);
     },
   });

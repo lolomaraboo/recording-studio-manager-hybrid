@@ -46,7 +46,7 @@ export function ClientPortalLayout({ children }: ClientPortalLayoutProps) {
               <h1 className="text-lg font-bold">Portail Client</h1>
               {dashboardData?.stats && (
                 <p className="text-xs text-muted-foreground">
-                  {dashboardData.stats.upcomingSessions} sessions a venir
+                  {dashboardData.stats.upcomingSessionsCount} sessions a venir
                 </p>
               )}
             </div>

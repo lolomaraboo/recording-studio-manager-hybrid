@@ -105,19 +105,17 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     const searchResults: SearchResult[] = [];
 
     // Search clients
-    if (clientsData?.clients) {
-      for (const client of clientsData.clients) {
+    if (clientsData) {
+      for (const client of clientsData) {
         const name = client.name?.toLowerCase() || "";
         const email = client.email?.toLowerCase() || "";
-        const company = client.companyName?.toLowerCase() || "";
 
-        if (name.includes(searchTerm) || email.includes(searchTerm) || company.includes(searchTerm)) {
+        if (name.includes(searchTerm) || email.includes(searchTerm)) {
           searchResults.push({
             id: client.id,
             type: "client",
             title: client.name || "Client",
             subtitle: client.email || "",
-            description: client.companyName || undefined,
             url: `/clients/${client.id}`,
           });
         }
@@ -125,8 +123,8 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     }
 
     // Search sessions
-    if (sessionsData?.sessions) {
-      for (const session of sessionsData.sessions) {
+    if (sessionsData) {
+      for (const session of sessionsData) {
         const title = session.title?.toLowerCase() || "";
         const notes = session.notes?.toLowerCase() || "";
 
@@ -143,20 +141,23 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       }
     }
 
-    // Search equipment
-    if (equipmentData?.equipment) {
-      for (const item of equipmentData.equipment) {
+    // Search equipment - handle object with equipment property
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const equipmentList = (equipmentData as any)?.equipment || [];
+
+    if (Array.isArray(equipmentList)) {
+      for (const item of equipmentList) {
         const name = item.name?.toLowerCase() || "";
-        const description = item.description?.toLowerCase() || "";
+        const notes = item.notes?.toLowerCase() || "";
         const category = item.category?.toLowerCase() || "";
 
-        if (name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+        if (name.includes(searchTerm) || notes.includes(searchTerm) || category.includes(searchTerm)) {
           searchResults.push({
             id: item.id,
             type: "equipment",
             title: item.name || "Equipment",
             subtitle: item.category || "",
-            description: item.description || undefined,
+            description: item.notes || undefined,
             url: `/equipment/${item.id}`,
           });
         }

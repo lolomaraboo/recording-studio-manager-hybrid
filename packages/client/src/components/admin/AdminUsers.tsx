@@ -51,7 +51,7 @@ export function AdminUsers() {
       utils.admin.listUsers.invalidate();
       toast.success("Utilisateur mis à jour avec succès");
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast.error(`Erreur: ${error.message}`);
     },
   });
@@ -62,7 +62,7 @@ export function AdminUsers() {
       toast.success("Utilisateur supprimé avec succès");
       setUserToDelete(null);
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast.error(`Erreur: ${error.message}`);
     },
   });

@@ -35,7 +35,7 @@ function exportToCSV<T extends Record<string, unknown>>(
   // Create data rows
   const rows = data.map((row) =>
     columns.map((col) => {
-      let value = row[col.key];
+      let value: unknown = row[col.key];
       if (col.format) {
         value = col.format(value);
       }

@@ -53,24 +53,24 @@ export function AnalyticsCharts() {
     );
   }
 
-  // Prepare revenue trend data
+  // Prepare revenue trend data - handle both timestamp and date fields
   const revenueTrend = dashboardData?.trends?.revenue || [];
-  const revenueLabels = revenueTrend.map((d: { date: string }) => d.date);
-  const revenueData = revenueTrend.map((d: { value: number }) => d.value);
+  const revenueLabels = revenueTrend.map((d) => (d as { timestamp?: string; date?: string }).timestamp || (d as { date?: string }).date || "");
+  const revenueData = revenueTrend.map((d) => (d as { value: number }).value);
 
-  // Prepare room data
-  const roomLabels = roomMetrics?.rooms?.map((r: { name: string }) => r.name) || [];
-  const roomSessionCounts = roomMetrics?.rooms?.map((r: { sessionCount: number }) => r.sessionCount) || [];
+  // Prepare room data - handle roomName vs name
+  const rooms = roomMetrics?.rooms || [];
+  const roomLabels = rooms.map((r) => (r as { roomName?: string; name?: string }).roomName || (r as { name?: string }).name || "");
+  const roomSessionCounts = rooms.map((r) => (r as { sessionCount: number }).sessionCount);
 
-  // Prepare session type distribution (from dashboard)
-  const sessionsByType = dashboardData?.sessionsByType || [];
-  const typeLabels = sessionsByType.map((s: { type: string }) => s.type);
-  const typeData = sessionsByType.map((s: { count: number }) => s.count);
+  // Session type distribution - not available in dashboard, skip for now
+  const typeLabels: string[] = [];
+  const typeData: number[] = [];
 
-  // Prepare top clients data
+  // Prepare top clients data - handle clientName vs name, totalSpent vs revenue
   const topClients = clientMetrics?.topClients || [];
-  const clientLabels = topClients.map((c: { name: string }) => c.name);
-  const clientRevenueData = topClients.map((c: { revenue: number }) => c.revenue);
+  const clientLabels = topClients.map((c: { clientName?: string; name?: string }) => c.clientName || c.name || "");
+  const clientRevenueData = topClients.map((c: { totalSpent?: number; revenue?: number }) => c.totalSpent || c.revenue || 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
