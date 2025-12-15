@@ -14,9 +14,17 @@
       "types": "./dist/master/index.d.ts",
       "import": "./dist/master/index.js"
     },
+    "./master/schema": {
+      "types": "./dist/master/schema.d.ts",
+      "import": "./dist/master/schema.js"
+    },
     "./tenant": {
       "types": "./dist/tenant/index.d.ts",
       "import": "./dist/tenant/index.js"
+    },
+    "./tenant/schema": {
+      "types": "./dist/tenant/schema.d.ts",
+      "import": "./dist/tenant/schema.js"
     },
     "./connection": {
       "types": "./dist/connection.d.ts",
