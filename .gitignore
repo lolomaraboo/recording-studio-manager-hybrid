@@ -53,5 +53,8 @@ temp/
 *.sqlite3
 
 # Drizzle
-drizzle/migrations/*
-!drizzle/migrations/.gitkeep
+# Ignore all migrations except master and tenant (for production deployment)
+packages/database/drizzle/migrations/*
+!packages/database/drizzle/migrations/master/
+!packages/database/drizzle/migrations/tenant/
+!packages/database/drizzle/migrations/.gitkeep
