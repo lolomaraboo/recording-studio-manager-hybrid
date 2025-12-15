@@ -228,6 +228,51 @@ Monitoring: Prometheus + Grafana
 11. ✅ ~~Bug fix tRPC client port~~ (DONE - 3000 → 3001, commit 7494b5e)
 12. ✅ ~~Tests end-to-end~~ (DONE - backend + frontend opérationnels)
 
+### ✅ PRIORITÉ 3.5 - TESTS PLAYWRIGHT & BUG FIXES (2025-12-15) (COMPLÉTÉE)
+1. ✅ ~~Tests Playwright end-to-end complets~~ (DONE - navigation, auth, data loading)
+2. ✅ ~~Bug fix: Configuration port backend~~ (DONE - port 3001 uniformisé)
+3. ✅ ~~Bug fix: Cache Vite persistant~~ (DONE - multiples instances tuées + cache vidé)
+4. ✅ ~~Bug fix: DATABASE_URL non accessible~~ (DONE - passée en variable d'environnement)
+5. ✅ ~~Bug fix: Headers auth manquants~~ (DONE - x-test-user-id/x-test-org-id ajoutés)
+6. ✅ ~~Validation app fonctionnelle avec données réelles~~ (DONE - 2 sessions de test chargées)
+7. ✅ ~~Documentation bugs résolus dans mem0~~ (DONE - cause racine 401 documentée)
+8. ✅ ~~Screenshots app fonctionnelle~~ (DONE - 5 screenshots capturés)
+
+**Livrables Session 2025-12-15:**
+- ✅ App fonctionnelle end-to-end (frontend + backend + DB)
+- ✅ Authentification mock opérationnelle (headers de test)
+- ✅ Base de données PostgreSQL connectée (rsm_master sur localhost:5432)
+- ✅ Données réelles chargées et affichées (2 sessions de test)
+- ✅ 5 bugs critiques résolus (port, cache, DATABASE_URL, auth headers, multiples instances)
+- ✅ Tests Playwright validés avec screenshots
+- ✅ Documentation mem0 + screenshots capturés
+
+**Phase 1 Session 2025-12-15: 100% VALIDÉE ✅**
+
+### ✅ PRIORITÉ 3.6 - SCHEMAS & ROUTERS COMPLETS (2025-12-15) (COMPLÉTÉE)
+1. ✅ ~~Enrichir schémas existants (Rooms, Equipment, Projects)~~ (DONE - features complètes Claude + Manus)
+2. ✅ ~~Ajouter Tracks, Musicians, TrackCredits~~ (DONE - gestion musicale complète)
+3. ✅ ~~Ajouter Quotes + QuoteItems~~ (DONE - devis avant factures)
+4. ✅ ~~Ajouter Contracts~~ (DONE - contrats légaux avec e-signature)
+5. ✅ ~~Ajouter Expenses~~ (DONE - charges business)
+6. ✅ ~~Ajouter Payments~~ (DONE - paiements avec Stripe)
+7. ✅ ~~Créer router tRPC rooms~~ (DONE - CRUD complet)
+8. ✅ ~~Créer router tRPC equipment~~ (DONE - CRUD complet)
+9. ✅ ~~Créer router tRPC projects~~ (DONE - CRUD + sub-router tracks)
+10. ✅ ~~Créer router tRPC quotes~~ (DONE - CRUD + sub-router items)
+11. ✅ ~~Créer router tRPC contracts~~ (DONE - CRUD complet)
+12. ✅ ~~Créer router tRPC expenses~~ (DONE - CRUD complet)
+13. ✅ ~~Fixer exports package.json database~~ (DONE - tenant/schema + master/schema)
+
+**Livrables Session 2025-12-15 (Partie 2):**
+- ✅ 15 tables tenant DB (était 7, +8 nouvelles: tracks, musicians, trackCredits, quotes, quoteItems, contracts, expenses, payments)
+- ✅ Schémas enrichis: Rooms (17 champs → 31), Equipment (13 → 28), Projects (9 → 29)
+- ✅ 6 nouveaux routers tRPC opérationnels (rooms, equipment, projects, quotes, contracts, expenses)
+- ✅ 11 routers tRPC au total (était 5, +6)
+- ✅ Exports package database corrigés
+- ✅ Serveur backend fonctionnel avec tous les routers
+- ✅ ~1000 lignes de code backend ajoutées
+
 ### 🔵 PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (PROCHAINE ÉTAPE)
 1. ⏸️ Connecter pages aux endpoints tRPC (fetch real data)
 2. ⏸️ Implémenter authentification (remplacer mock)

@@ -20,8 +20,11 @@ const trpcClient = trpc.createClient({
     httpBatchLink({
       url: 'http://localhost:3001/api/trpc',
       headers() {
-        // TODO: Add auth headers here
-        return {}
+        // Mock auth headers for development
+        return {
+          'x-test-user-id': '1',
+          'x-test-org-id': '1',
+        }
       },
     }),
   ],

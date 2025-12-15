@@ -79,18 +79,54 @@ pnpm seed
 
 ## Développement
 
-```bash
-# Dev mode (client + server en parallèle)
-pnpm dev
+### Démarrage Rapide
 
-# Build
+**⚠️ IMPORTANT:** Le serveur backend nécessite `DATABASE_URL` en variable d'environnement.
+
+```bash
+# Option 1: Script de démarrage (recommandé)
+./start.sh
+
+# Option 2: Démarrage manuel avec DATABASE_URL
+DATABASE_URL="postgresql://postgres:password@localhost:5432/rsm_master" pnpm dev
+
+# Option 3: Client et serveur séparés (pour debug)
+# Terminal 1 - Backend
+DATABASE_URL="postgresql://postgres:password@localhost:5432/rsm_master" pnpm --filter server dev
+
+# Terminal 2 - Frontend
+pnpm --filter client dev
+```
+
+### URLs Dev
+
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:3001
+- **tRPC Endpoint:** http://localhost:3001/api/trpc
+- **Health Check:** http://localhost:3001/health
+
+### Authentification Dev
+
+En mode développement, l'authentification utilise des **headers de test** :
+- `x-test-user-id: 1`
+- `x-test-org-id: 1`
+
+Ces headers sont automatiquement ajoutés par le client tRPC (voir `packages/client/src/main.tsx`).
+
+### Autres Commandes
+
+```bash
+# Build production
 pnpm build
 
 # Type check (0 erreur obligatoire)
 pnpm check
 
-# Tests
+# Tests unitaires
 pnpm test
+
+# Tests avec coverage
+pnpm --filter database test:coverage
 ```
 
 ---
