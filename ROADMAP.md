@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-13
-**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE - 🔵 Phase 2 Features Critiques READY TO START
+**Dernière mise à jour:** 2025-12-15
+**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + Backend Enrichi (11 routers tRPC, 15 tables tenant) - 🔵 Phase 2 Features Critiques READY TO START
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -10,6 +10,7 @@
 > Phase 1 Semaine 1-2: PostgreSQL + Tests (92.63% coverage) ✅
 > Phase 1 Semaine 3-4: Backend tRPC + 5 routers + Tests ✅
 > Phase 1 Semaine 5-6: Frontend React + shadcn/ui + Bug fix tRPC ✅
+> Phase 1 Session 2025-12-15: Migrations + 6 routers additionnels ✅
 > Phase 2 Semaine 7-9: Portail Client Self-Service (PROCHAINE ÉTAPE)
 
 ---
@@ -168,6 +169,46 @@ Monitoring: Prometheus + Grafana
 - ✅ Documentation Obsidian créée (4 fichiers)
 
 **Phase 1 Semaine 5-6: 100% COMPLÉTÉ ✅**
+
+#### ✅ Session 2025-12-15: Database-per-Tenant Migrations + Backend Enrichi (COMPLÉTÉ)
+
+| Milestone | Livrables | Status |
+|-----------|-----------|--------|
+| Drizzle Configs | drizzle.config.master.ts + drizzle.config.tenant.ts | ✅ DONE |
+| Migration Script | scripts/add-new-tenant-tables.sql | ✅ DONE |
+| Schema Enrichi | Tenant schema: 7 → 15 tables (+8 nouvelles) | ✅ DONE |
+| New Tables | contracts, expenses, musicians, payments | ✅ DONE |
+| New Tables | quotes, quote_items, tracks, track_credits | ✅ DONE |
+| Enhanced Tables | rooms (17→31 fields), equipment (13→28), projects (9→29) | ✅ DONE |
+| New Routers | 6 routers tRPC: rooms, equipment, projects | ✅ DONE |
+| New Routers | quotes, contracts, expenses | ✅ DONE |
+| Dev Tools | start.sh script (auto PostgreSQL check + cleanup) | ✅ DONE |
+| Documentation | README.md + TODO_MASTER.md updated | ✅ DONE |
+
+**Tech Stack Implémenté:**
+- ✅ Drizzle migrations Database-per-Tenant (configs séparées)
+- ✅ SQL migration script pour tenant schema updates
+- ✅ tRPC routers avec sub-routers (projects.tracks, quotes.items)
+- ✅ Zod validation complète pour nouveaux endpoints
+- ✅ Mock auth headers pour dev (x-test-user-id, x-test-org-id)
+
+**Accomplissements Session 2025-12-15:**
+- ✅ Database-per-Tenant migrations configurées (master + tenant)
+- ✅ 8 nouvelles tables tenant créées
+- ✅ 3 tables existantes enrichies (~30 colonnes ajoutées)
+- ✅ 6 nouveaux routers tRPC (~1000 lignes backend)
+- ✅ Architecture finale: 6 tables Master + 15 tables Tenant
+- ✅ Backend total: 11 routers tRPC opérationnels
+- ✅ Script démarrage automatique (./start.sh)
+- ✅ 2 commits: f1be07e (migrations) + 1b6f598 (docs)
+- ✅ Documentation mem0 + Obsidian synchronisée
+
+**Résultat:**
+- **Master DB:** users, organizations, tenant_databases, organization_members, invitations, subscription_plans
+- **Tenant DB:** clients, rooms, sessions, equipment, projects, tracks, musicians, track_credits, invoices, invoice_items, quotes, quote_items, contracts, expenses, payments
+- **tRPC Routers:** auth, organizations, clients, sessions, invoices, rooms, equipment, projects, quotes, contracts, expenses
+
+**Session 2025-12-15: 100% COMPLÉTÉ ✅**
 
 ---
 
