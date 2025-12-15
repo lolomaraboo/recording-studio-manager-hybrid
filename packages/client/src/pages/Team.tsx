@@ -46,6 +46,11 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 // Types
 type TeamRole = "admin" | "manager" | "engineer" | "producer" | "assistant" | "intern";
@@ -595,20 +600,100 @@ export default function Team() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                By Role
+                Roles
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-1">
-                {statsData?.byRole && Object.entries(statsData.byRole).map(([role, count]) => (
-                  <Badge key={role} variant="outline" className="text-xs">
-                    {ROLES.find((r) => r.id === role)?.name || role}: {count}
-                  </Badge>
-                ))}
+              <div className="text-2xl font-bold">
+                {statsData?.byRole ? Object.keys(statsData.byRole).length : 0}
               </div>
+              <p className="text-xs text-muted-foreground">different roles</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Role Distribution Chart */}
+        {statsData?.byRole && Object.keys(statsData.byRole).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Team by Role
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="h-64 w-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={Object.entries(statsData.byRole)
+                          .filter(([, count]) => count > 0)
+                          .map(([role, count]) => {
+                            const roleInfo = ROLES.find(r => r.id === role);
+                            return {
+                              name: roleInfo?.name || role,
+                              value: count,
+                              role,
+                            };
+                          })}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {Object.entries(statsData.byRole)
+                          .filter(([, count]) => count > 0)
+                          .map(([role]) => {
+                            const roleInfo = ROLES.find(r => r.id === role);
+                            const colorMap: Record<string, string> = {
+                              "bg-purple-500": "#a855f7",
+                              "bg-blue-500": "#3b82f6",
+                              "bg-green-500": "#22c55e",
+                              "bg-orange-500": "#f97316",
+                              "bg-yellow-500": "#eab308",
+                              "bg-gray-500": "#6b7280",
+                            };
+                            return (
+                              <Cell
+                                key={role}
+                                fill={roleInfo ? colorMap[roleInfo.color] || "#6b7280" : "#6b7280"}
+                              />
+                            );
+                          })}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                {/* Legend */}
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {ROLES.map((role) => {
+                    const count = statsData.byRole[role.id] || 0;
+                    if (count === 0) return null;
+                    const colorMap: Record<string, string> = {
+                      "bg-purple-500": "bg-purple-500",
+                      "bg-blue-500": "bg-blue-500",
+                      "bg-green-500": "bg-green-500",
+                      "bg-orange-500": "bg-orange-500",
+                      "bg-yellow-500": "bg-yellow-500",
+                      "bg-gray-500": "bg-gray-500",
+                    };
+                    return (
+                      <div key={role.id} className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${colorMap[role.color] || 'bg-gray-500'}`} />
+                        <span className="text-sm">{role.name}</span>
+                        <Badge variant="secondary">{count}</Badge>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">

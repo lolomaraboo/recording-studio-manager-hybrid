@@ -34,6 +34,11 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts";
 
 // Types
 interface Room {
@@ -352,6 +357,56 @@ export default function Rooms() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Hourly Rates Chart */}
+        {rooms.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Room Hourly Rates Comparison
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={rooms.map((room) => ({
+                      name: room.name,
+                      rate: parseFloat(room.hourlyRate),
+                      capacity: room.capacity || 0,
+                      isActive: room.isActive,
+                    }))}
+                    margin={{ left: 20, right: 20, bottom: 60 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis
+                      dataKey="name"
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis
+                      tickFormatter={(value) => `$${value}`}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <ChartTooltip
+                      content={<ChartTooltipContent />}
+                      formatter={(value: number) => [`$${value}/hr`, "Hourly Rate"]}
+                    />
+                    <Bar
+                      dataKey="rate"
+                      fill="hsl(var(--chart-1))"
+                      radius={[4, 4, 0, 0]}
+                      name="Hourly Rate"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Room Cards Grid */}
         {rooms.length > 0 && (

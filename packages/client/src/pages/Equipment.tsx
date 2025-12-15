@@ -42,6 +42,11 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 // Equipment types
 type EquipmentCategory =
@@ -464,32 +469,131 @@ export default function Equipment() {
           </Card>
         </div>
 
-        {/* Condition Summary */}
-        {statsData?.byCondition && Object.keys(statsData.byCondition).length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="h-5 w-5" />
-                Condition Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-4">
-                {CONDITIONS.map((condition) => {
-                  const count = statsData.byCondition[condition.id] || 0;
-                  if (count === 0) return null;
-                  return (
-                    <div key={condition.id} className="flex items-center gap-2">
-                      <Badge className={`${condition.color} text-white`}>
-                        {condition.name}
-                      </Badge>
-                      <span className="font-medium">{count}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Charts Section */}
+        {statsData && (statsData.byCategory && Object.keys(statsData.byCategory).length > 0 || statsData.byCondition && Object.keys(statsData.byCondition).length > 0) && (
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Category Distribution Chart */}
+            {statsData.byCategory && Object.keys(statsData.byCategory).length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Equipment by Category
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={Object.entries(statsData.byCategory)
+                            .filter(([, count]) => count > 0)
+                            .map(([category, count]) => ({
+                              name: CATEGORIES.find(c => c.id === category)?.name || category,
+                              value: count,
+                              category,
+                            }))}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={40}
+                          outerRadius={80}
+                          paddingAngle={2}
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}`}
+                          labelLine={false}
+                        >
+                          {Object.entries(statsData.byCategory)
+                            .filter(([, count]) => count > 0)
+                            .map(([category], index) => (
+                              <Cell
+                                key={category}
+                                fill={[
+                                  "hsl(var(--chart-1))",
+                                  "hsl(var(--chart-2))",
+                                  "hsl(var(--chart-3))",
+                                  "hsl(var(--chart-4))",
+                                  "hsl(var(--chart-5))",
+                                  "#8b5cf6",
+                                  "#06b6d4",
+                                  "#f59e0b",
+                                  "#ef4444",
+                                  "#10b981",
+                                ][index % 10]}
+                              />
+                            ))}
+                        </Pie>
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Condition Distribution Chart */}
+            {statsData.byCondition && Object.keys(statsData.byCondition).length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wrench className="h-5 w-5" />
+                    Equipment by Condition
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={CONDITIONS.map((condition) => ({
+                          name: condition.name,
+                          count: statsData.byCondition[condition.id] || 0,
+                          fill: condition.color.replace("bg-", ""),
+                        })).filter(d => d.count > 0)}
+                        layout="vertical"
+                        margin={{ left: 80, right: 20 }}
+                      >
+                        <XAxis type="number" />
+                        <YAxis type="category" dataKey="name" width={80} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar dataKey="count" radius={4}>
+                          {CONDITIONS.map((condition) => {
+                            const colorMap: Record<string, string> = {
+                              "bg-green-500": "#22c55e",
+                              "bg-blue-500": "#3b82f6",
+                              "bg-yellow-500": "#eab308",
+                              "bg-orange-500": "#f97316",
+                              "bg-red-500": "#ef4444",
+                              "bg-gray-500": "#6b7280",
+                            };
+                            return (
+                              <Cell
+                                key={condition.id}
+                                fill={colorMap[condition.color] || "#6b7280"}
+                              />
+                            );
+                          })}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* Legend */}
+                  <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                    {CONDITIONS.map((condition) => {
+                      const count = statsData.byCondition[condition.id] || 0;
+                      if (count === 0) return null;
+                      return (
+                        <div key={condition.id} className="flex items-center gap-2">
+                          <Badge className={`${condition.color} text-white`}>
+                            {condition.name}
+                          </Badge>
+                          <span className="font-medium">{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
 
         {/* Equipment Table */}

@@ -37,6 +37,11 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts";
 
 // Types
 interface Musician {
@@ -387,26 +392,81 @@ export default function Musicians() {
           </Card>
         </div>
 
-        {/* Instruments Overview */}
-        {statsData?.instruments && statsData.instruments.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Guitar className="h-5 w-5" />
-                Instruments in Your Network
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {statsData.instruments.map((instrument) => (
-                  <Badge key={instrument} variant="outline">
-                    {instrument}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Instruments Chart */}
+        {musiciansList.length > 0 && (() => {
+          // Calculate instrument distribution from musicians list
+          const instrumentCounts: Record<string, number> = {};
+          musiciansList.forEach((musician) => {
+            if (musician.instruments) {
+              musician.instruments.split(',').forEach((instrument) => {
+                const trimmed = instrument.trim();
+                if (trimmed) {
+                  instrumentCounts[trimmed] = (instrumentCounts[trimmed] || 0) + 1;
+                }
+              });
+            }
+          });
+
+          const chartData = Object.entries(instrumentCounts)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10); // Top 10 instruments
+
+          if (chartData.length === 0) return null;
+
+          return (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Guitar className="h-5 w-5" />
+                  Musicians by Instrument
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-8">
+                  <div className="flex-1 h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={chartData}
+                        layout="vertical"
+                        margin={{ left: 80, right: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+                        <XAxis type="number" />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          width={75}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar
+                          dataKey="count"
+                          fill="hsl(var(--chart-2))"
+                          radius={[0, 4, 4, 0]}
+                          name="Musicians"
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* All instruments badges */}
+                  <div className="md:w-64">
+                    <h4 className="text-sm font-medium text-muted-foreground mb-3">All Instruments</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(instrumentCounts)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([instrument, count]) => (
+                          <Badge key={instrument} variant="outline" className="text-xs">
+                            {instrument} ({count})
+                          </Badge>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* Musicians Grid */}
         {musiciansList.length > 0 && (
