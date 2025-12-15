@@ -217,6 +217,87 @@ Monitoring: Prometheus + Grafana
 
 ---
 
+### 🎨 DÉCISION CRITIQUE: UI/UX Identique à Manus
+
+**Date:** 2025-12-15
+**Décideur:** Product Owner
+**Impact:** 🔴 CRITIQUE - Toutes les pages frontend
+
+**Objectif:** La version Hybride doit avoir une interface **100% IDENTIQUE** à la version Manus.
+
+#### Composants à Copier 1:1
+
+| Composant | Source Manus | Destination Hybride | Status |
+|-----------|--------------|---------------------|--------|
+| **Header** | `client/src/components/Header.tsx` | `packages/client/src/components/Header.tsx` | ⏸️ TODO |
+| **Sidebar** | `client/src/components/Sidebar.tsx` | `packages/client/src/components/Sidebar.tsx` | ⏸️ TODO |
+| **Layout Global** | `client/src/components/Layout.tsx` | `packages/client/src/components/Layout.tsx` | ⏸️ TODO |
+| **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | ⏸️ TODO |
+| **Rooms** | `client/src/pages/Rooms.tsx` | `packages/client/src/pages/Rooms.tsx` | ⏸️ TODO |
+| **Equipment** | `client/src/pages/Equipment.tsx` | `packages/client/src/pages/Equipment.tsx` | ⏸️ TODO |
+| **Musicians** | `client/src/pages/Musicians.tsx` | `packages/client/src/pages/Musicians.tsx` | ⏸️ TODO |
+| **Projects** | `client/src/pages/Projects.tsx` | `packages/client/src/pages/Projects.tsx` | ⏸️ TODO |
+
+#### Système de Couleurs Manus (À Conserver)
+
+```css
+/* Palette Principale */
+--primary: #3B82F6 (Blue)
+--secondary: #10B981 (Green)
+--accent: #F59E0B (Amber)
+
+/* Grays */
+--gray-50: #F9FAFB
+--gray-100: #F3F4F6
+--gray-200: #E5E7EB
+--gray-300: #D1D5DB
+--gray-400: #9CA3AF
+--gray-500: #6B7280
+--gray-600: #4B5563
+--gray-700: #374151
+--gray-800: #1F2937
+--gray-900: #111827
+
+/* Typography */
+--font-family: 'Inter', system-ui, sans-serif
+```
+
+#### Principe de Migration UI
+
+**⚠️ NE PAS CRÉER DE NOUVEAUX DESIGNS**
+
+Toute page portée de Manus vers Hybride doit :
+1. ✅ Copier le JSX 1:1 (structure exacte)
+2. ✅ Garder les mêmes classes Tailwind
+3. ✅ Conserver les mêmes couleurs/espacements
+4. ✅ Adapter uniquement les imports tRPC (hooks)
+5. ✅ Garder les mêmes animations/transitions
+
+**Exemple:**
+```tsx
+// ❌ MAUVAIS: Créer un nouveau design
+<div className="bg-blue-500 p-8 rounded-xl">
+
+// ✅ BON: Copier exactement Manus
+<div className="bg-primary p-6 rounded-lg shadow-sm">
+```
+
+#### Raison
+
+**Version Hybride = Architecture Claude + Interface Manus**
+
+L'utilisateur veut :
+- ✅ La sécurité/scalabilité de Claude (Database-per-Tenant)
+- ✅ L'UX/UI moderne de Manus (React 19, shadcn/ui)
+- ❌ PAS une nouvelle interface, mais l'interface Manus exacte
+
+**Impact Phase 2+:**
+- Toutes les pages nouvelles = copie Manus
+- Priorité UI: Identité visuelle > Nouvelles features
+- Tests visuels: Compare avec Manus (screenshots)
+
+---
+
 ### 🔵 Phase 2: Features Critiques (6-8 semaines)
 
 **Timeline:** Semaine 7-14
