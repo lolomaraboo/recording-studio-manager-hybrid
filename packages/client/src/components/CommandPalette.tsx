@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import {
   CommandDialog,
   CommandEmpty,
@@ -31,7 +31,7 @@ interface Command {
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -50,7 +50,7 @@ export function CommandPalette() {
       label: "Dashboard",
       icon: <Home className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/dashboard");
+        navigate("/dashboard");
         setOpen(false);
       },
       keywords: ["accueil", "home"],
@@ -59,7 +59,7 @@ export function CommandPalette() {
       label: "Sessions",
       icon: <Music className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/sessions");
+        navigate("/sessions");
         setOpen(false);
       },
       keywords: ["enregistrement", "recording"],
@@ -68,7 +68,7 @@ export function CommandPalette() {
       label: "Calendrier",
       icon: <Calendar className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/calendar");
+        navigate("/calendar");
         setOpen(false);
       },
       keywords: ["planning", "schedule"],
@@ -77,7 +77,7 @@ export function CommandPalette() {
       label: "Clients",
       icon: <Users className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/clients");
+        navigate("/clients");
         setOpen(false);
       },
       keywords: ["customers"],
@@ -86,7 +86,7 @@ export function CommandPalette() {
       label: "Équipe",
       icon: <Users className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/team");
+        navigate("/team");
         setOpen(false);
       },
       keywords: ["team", "membres", "members"],
@@ -95,7 +95,7 @@ export function CommandPalette() {
       label: "Équipement",
       icon: <Package className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/equipment");
+        navigate("/equipment");
         setOpen(false);
       },
       keywords: ["materiel", "gear"],
@@ -104,7 +104,7 @@ export function CommandPalette() {
       label: "Factures",
       icon: <FileText className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/invoices");
+        navigate("/invoices");
         setOpen(false);
       },
       keywords: ["invoices", "billing"],
@@ -113,7 +113,7 @@ export function CommandPalette() {
       label: "Analytics",
       icon: <BarChart3 className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/analytics");
+        navigate("/analytics");
         setOpen(false);
       },
       keywords: ["statistiques", "rapports", "reports"],
@@ -122,7 +122,7 @@ export function CommandPalette() {
       label: "Paramètres",
       icon: <Settings className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/settings");
+        navigate("/settings");
         setOpen(false);
       },
       keywords: ["settings", "configuration"],
@@ -134,7 +134,7 @@ export function CommandPalette() {
       label: "Nouvelle session",
       icon: <Plus className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/sessions/new");
+        navigate("/sessions/new");
         setOpen(false);
       },
       keywords: ["create", "add", "nouveau"],
@@ -143,7 +143,7 @@ export function CommandPalette() {
       label: "Nouveau client",
       icon: <UserPlus className="mr-2 h-4 w-4" />,
       action: () => {
-        setLocation("/clients/new");
+        navigate("/clients/new");
         setOpen(false);
       },
       keywords: ["create", "add", "nouveau"],

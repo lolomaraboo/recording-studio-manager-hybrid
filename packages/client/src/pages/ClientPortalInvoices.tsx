@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Download, ArrowLeft, Calendar, CreditCard, AlertCircle, CheckCircle } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -91,7 +91,7 @@ export default function ClientPortalInvoices() {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <Link href="/client-portal">
+          <Link to="/client-portal">
             <Button variant="ghost" size="sm" className="mb-2">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au portail

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { FileText, Download, Calendar, TrendingUp, Users, DollarSign, Loader2 } 
 import { toast } from "sonner";
 
 export default function Reports() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [periodType, setPeriodType] = useState<"monthly" | "quarterly" | "yearly">("monthly");
 
@@ -18,9 +18,9 @@ export default function Reports() {
     if (storedOrgId) {
       setSelectedOrgId(parseInt(storedOrgId));
     } else {
-      setLocation("/select-organization");
+      navigate("/select-organization");
     }
-  }, [setLocation]);
+  }, [navigate]);
 
   const { data: organization } = trpc.organizations.get.useQuery(
     { id: selectedOrgId! },

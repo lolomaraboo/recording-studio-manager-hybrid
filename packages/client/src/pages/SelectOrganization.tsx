@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { Music2, Plus, ArrowRight, Building2, Users } from "lucide-react";
 import { useEffect } from "react";
 
 export default function SelectOrganization() {
   const { user } = useAuth();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   const { data: organizations, isLoading } = trpc.organizations.list.useQuery();
 
@@ -21,14 +21,14 @@ export default function SelectOrganization() {
       if (allOrgs.length === 1 && allOrgs[0]) {
         // Stocker l'organisation sélectionnée dans le localStorage
         localStorage.setItem("selectedOrganizationId", allOrgs[0].id.toString());
-        setLocation("/dashboard");
+        navigate("/dashboard");
       }
     }
-  }, [organizations, setLocation]);
+  }, [organizations, navigate]);
 
   const handleSelectOrganization = (orgId: number) => {
     localStorage.setItem("selectedOrganizationId", orgId.toString());
-    setLocation("/dashboard");
+    navigate("/dashboard");
   };
 
   if (isLoading) {
@@ -188,7 +188,7 @@ export default function SelectOrganization() {
             </CardHeader>
             <CardFooter className="justify-center">
               <Button asChild>
-                <Link href="/onboarding">
+                <Link to="/onboarding">
                   Créer un studio
                   <Plus className="ml-2 h-4 w-4" />
                 </Link>

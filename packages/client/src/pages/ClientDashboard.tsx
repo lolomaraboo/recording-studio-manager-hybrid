@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,25 +7,25 @@ import { trpc } from "@/lib/trpc";
 import { Calendar, FileAudio, FileText, LogOut, Music } from "lucide-react";
 
 export default function ClientDashboard() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [token, setToken] = useState("");
   const [clientName, setClientName] = useState("");
 
   useEffect(() => {
     const storedToken = localStorage.getItem("clientToken");
     const storedClient = localStorage.getItem("clientData");
-    
+
     if (!storedToken) {
-      setLocation("/client/login");
+      navigate("/client/login");
       return;
     }
-    
+
     setToken(storedToken);
     if (storedClient) {
       const client = JSON.parse(storedClient);
       setClientName(client.name);
     }
-  }, [setLocation]);
+  }, [navigate]);
 
   const orgId = parseInt(localStorage.getItem("selectedOrganizationId") || "1");
   
@@ -40,7 +40,7 @@ export default function ClientDashboard() {
   const handleLogout = () => {
     localStorage.removeItem("clientToken");
     localStorage.removeItem("clientData");
-    setLocation("/client/login");
+    navigate("/client/login");
   };
 
   if (isLoading) {
@@ -95,7 +95,7 @@ export default function ClientDashboard() {
 
         {/* Quick Links */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
-          <Link href="/client/sessions">
+          <Link to="/client/sessions">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export default function ClientDashboard() {
             </Card>
           </Link>
 
-          <Link href="/client/files">
+          <Link to="/client/files">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -123,7 +123,7 @@ export default function ClientDashboard() {
             </Card>
           </Link>
 
-          <Link href="/client/invoices">
+          <Link to="/client/invoices">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -210,7 +210,7 @@ export default function ClientDashboard() {
         {/* Quick Actions */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" asChild>
-            <Link href="/client/sessions">
+            <Link to="/client/sessions">
               <CardHeader>
                 <Calendar className="h-8 w-8 text-primary mb-2" />
                 <CardTitle>Mes Sessions</CardTitle>
@@ -222,7 +222,7 @@ export default function ClientDashboard() {
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" asChild>
-            <Link href="/client/files">
+            <Link to="/client/files">
               <CardHeader>
                 <FileAudio className="h-8 w-8 text-primary mb-2" />
                 <CardTitle>Mes Fichiers</CardTitle>
@@ -234,7 +234,7 @@ export default function ClientDashboard() {
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" asChild>
-            <Link href="/client/invoices">
+            <Link to="/client/invoices">
               <CardHeader>
                 <FileText className="h-8 w-8 text-primary mb-2" />
                 <CardTitle>Mes Factures</CardTitle>

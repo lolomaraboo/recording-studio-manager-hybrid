@@ -16,14 +16,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar as CalendarIcon, Clock, MapPin, ArrowLeft } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { format, addDays, startOfDay, endOfDay } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function ClientPortalBooking() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedRoom, setSelectedRoom] = useState<string>("");
   const [selectedStartTime, setSelectedStartTime] = useState<string>("");
@@ -43,7 +43,7 @@ export default function ClientPortalBooking() {
       toast.success("Demande de réservation envoyée", {
         description: "Le studio va examiner votre demande et vous confirmera rapidement.",
       });
-      setLocation("/client-portal");
+      navigate("/client-portal");
     },
     onError: (error) => {
       toast.error("Erreur lors de la réservation", {
@@ -124,7 +124,7 @@ export default function ClientPortalBooking() {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <Link href="/client-portal">
+          <Link to="/client-portal">
             <Button variant="ghost" size="sm" className="mb-2">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au portail

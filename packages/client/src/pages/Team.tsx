@@ -11,14 +11,14 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { Users, ArrowLeft, Plus, Mail, Check, X, Trash2, Clock, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function Team() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -36,9 +36,9 @@ export default function Team() {
     if (storedOrgId) {
       setSelectedOrgId(parseInt(storedOrgId));
     } else {
-      setLocation("/select-organization");
+      navigate("/select-organization");
     }
-  }, [setLocation]);
+  }, [navigate]);
 
   const { data: members, isLoading: loadingMembers, refetch: refetchMembers } = trpc.organizations.getMembers.useQuery(
     { organizationId: selectedOrgId! },
@@ -155,7 +155,7 @@ export default function Team() {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
-              <Link href="/dashboard">
+              <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>

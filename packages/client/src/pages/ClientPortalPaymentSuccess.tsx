@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation, Link } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { CheckCircle, Download, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ClientPortalPaymentSuccess() {
-  const [location] = useLocation();
+  const location = useLocation().pathname;
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function ClientPortalPaymentSuccess() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("session_id");
     setSessionId(id);
-  }, [location]);
+  }, location);
 
   const { data: paymentStatus, isLoading } = trpc.stripe.checkPaymentStatus.useQuery(
     { sessionId: sessionId || "" },
@@ -87,13 +87,13 @@ export default function ClientPortalPaymentSuccess() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Link href="/client-portal/invoices">
+            <Link to="/client-portal/invoices">
               <Button className="w-full">
                 <Download className="h-4 w-4 mr-2" />
                 Voir mes factures
               </Button>
             </Link>
-            <Link href="/client-portal">
+            <Link to="/client-portal">
               <Button variant="outline" className="w-full">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour au portail

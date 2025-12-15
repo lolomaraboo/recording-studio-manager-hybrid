@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation } from "react-router-dom";
 
 interface KeyboardShortcut {
   key: string;
@@ -21,7 +21,7 @@ const shortcuts: KeyboardShortcut[] = [
 ];
 
 export function useKeyboardShortcuts() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate().pathname;
 
   useEffect(() => {
     let pressedKeys: string[] = [];
@@ -53,7 +53,7 @@ export function useKeyboardShortcuts() {
 
       if (shortcut) {
         e.preventDefault();
-        setLocation(shortcut.path);
+        navigate(shortcut.path);
         pressedKeys = [];
       }
 

@@ -4,7 +4,7 @@
  * Affichée quand l'utilisateur annule le paiement Stripe
  */
 
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { XCircle, ArrowLeft, CreditCard } from "lucide-react";
@@ -31,13 +31,13 @@ export default function ClientPortalPaymentCancel() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Link href="/client-portal/invoices">
+            <Link to="/client-portal/invoices">
               <Button className="w-full">
                 <CreditCard className="h-4 w-4 mr-2" />
                 Retour aux factures
               </Button>
             </Link>
-            <Link href="/client-portal">
+            <Link to="/client-portal">
               <Button variant="outline" className="w-full">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour au portail

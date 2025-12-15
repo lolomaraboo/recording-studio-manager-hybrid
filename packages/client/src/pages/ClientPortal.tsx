@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, FileText, User, Clock, CheckCircle, AlertCircle } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -66,7 +66,7 @@ export default function ClientPortal() {
             <h1 className="text-2xl font-bold">Portail Client</h1>
             <p className="text-sm text-muted-foreground">Bienvenue, {profile.name}</p>
           </div>
-          <Link href="/client-portal/profile">
+          <Link to="/client-portal/profile">
             <Button variant="outline" size="sm">
               <User className="h-4 w-4 mr-2" />
               Mon Profil
@@ -181,7 +181,7 @@ export default function ClientPortal() {
                         </div>
                       </div>
                     ))}
-                    <Link href="/client-portal/sessions">
+                    <Link to="/client-portal/sessions">
                       <Button variant="outline" className="w-full">
                         Voir toutes mes sessions
                       </Button>
@@ -232,7 +232,7 @@ export default function ClientPortal() {
                         </div>
                       </div>
                     ))}
-                    <Link href="/client-portal/invoices">
+                    <Link to="/client-portal/invoices">
                       <Button variant="outline" className="w-full">
                         Voir toutes mes factures
                       </Button>
@@ -262,7 +262,7 @@ export default function ClientPortal() {
                 <p className="text-muted-foreground mb-4">
                   Accédez au calendrier de réservation pour voir les créneaux disponibles
                 </p>
-                <Link href="/client-portal/booking">
+                <Link to="/client-portal/booking">
                   <Button>
                     Accéder au calendrier
                   </Button>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,17 +10,17 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function ClientInvoices() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [token, setToken] = useState("");
 
   useEffect(() => {
     const storedToken = localStorage.getItem("clientToken");
     if (!storedToken) {
-      setLocation("/client/login");
+      navigate("/client/login");
       return;
     }
     setToken(storedToken);
-  }, [setLocation]);
+  }, [navigate]);
 
   const orgId = parseInt(localStorage.getItem("selectedOrganizationId") || "1");
   
@@ -51,7 +51,7 @@ export default function ClientInvoices() {
       <header className="border-b border-border bg-card/50">
         <div className="container flex h-16 items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/client/dashboard"><ArrowLeft className="h-5 w-5" /></Link>
+            <Link to="/client/dashboard"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <div>
             <h1 className="text-xl font-semibold">Mes Factures</h1>

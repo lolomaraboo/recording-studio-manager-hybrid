@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ const roomTypeLabels = {
 };
 
 export default function Rooms() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<number | null>(null);
@@ -92,9 +92,9 @@ export default function Rooms() {
     if (storedOrgId) {
       setSelectedOrgId(parseInt(storedOrgId));
     } else {
-      setLocation("/select-organization");
+      navigate("/select-organization");
     }
-  }, [setLocation]);
+  }, [navigate]);
 
   const utils = trpc.useUtils();
   const { data: rooms, isLoading } = trpc.rooms.getAll.useQuery(

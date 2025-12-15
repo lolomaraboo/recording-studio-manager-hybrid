@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { 
   Music2, Calendar, Users, FileText, BarChart3, 
   Check, ArrowRight, Sparkles, Shield, Zap 
@@ -29,7 +29,7 @@ export default function Home() {
               <>
                 <span className="text-sm text-muted-foreground">Bonjour, {user?.name}</span>
                 <Button asChild>
-                  <Link href="/dashboard">Accéder au Dashboard</Link>
+                  <Link to="/dashboard">Accéder au Dashboard</Link>
                 </Button>
               </>
             ) : (

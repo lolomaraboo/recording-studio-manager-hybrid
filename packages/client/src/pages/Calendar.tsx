@@ -102,8 +102,10 @@ export default function Calendar() {
     ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
       updateSessionMutation.mutate({
         id: event.id,
-        startTime: start.toISOString(),
-        endTime: end.toISOString(),
+        data: {
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+        },
       });
     },
     [updateSessionMutation]
@@ -113,8 +115,10 @@ export default function Calendar() {
     ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
       updateSessionMutation.mutate({
         id: event.id,
-        startTime: start.toISOString(),
-        endTime: end.toISOString(),
+        data: {
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+        },
       });
     },
     [updateSessionMutation]

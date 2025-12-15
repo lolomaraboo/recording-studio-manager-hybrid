@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Loader2, Music } from "lucide-react";
 
 
 export default function ClientLogin() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [token, setToken] = useState("");
 
 
@@ -21,7 +21,7 @@ export default function ClientLogin() {
       
       alert(`Connexion réussie ! Bienvenue ${data.client.name}`);
       
-      setLocation("/client/dashboard");
+      navigate("/client/dashboard");
     },
     onError: (error) => {
       alert(`Erreur de connexion : ${error.message}`);

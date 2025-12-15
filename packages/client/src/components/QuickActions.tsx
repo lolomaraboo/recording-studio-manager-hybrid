@@ -9,51 +9,51 @@ import {
   Clock,
   BarChart3,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 
 export function QuickActions() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   const actions = [
     {
       label: "Session",
       icon: <Calendar className="h-4 w-4" />,
-      onClick: () => setLocation("/sessions"),
+      onClick: () => navigate("/sessions"),
     },
     {
       label: "Client",
       icon: <Users className="h-4 w-4" />,
-      onClick: () => setLocation("/clients"),
+      onClick: () => navigate("/clients"),
     },
     {
       label: "Projet",
       icon: <FolderOpen className="h-4 w-4" />,
-      onClick: () => setLocation("/projects"),
+      onClick: () => navigate("/projects"),
     },
     {
       label: "Facture",
       icon: <FileText className="h-4 w-4" />,
-      onClick: () => setLocation("/invoices"),
+      onClick: () => navigate("/invoices"),
     },
     {
       label: "Devis",
       icon: <FileCheck className="h-4 w-4" />,
-      onClick: () => setLocation("/quotes"),
+      onClick: () => navigate("/quotes"),
     },
     {
       label: "Upload Audio",
       icon: <Upload className="h-4 w-4" />,
-      onClick: () => setLocation("/audio-files"),
+      onClick: () => navigate("/audio-files"),
     },
     {
       label: "Réservations",
       icon: <Clock className="h-4 w-4" />,
-      onClick: () => setLocation("/calendar"),
+      onClick: () => navigate("/calendar"),
     },
     {
       label: "Analytics",
       icon: <BarChart3 className="h-4 w-4" />,
-      onClick: () => setLocation("/analytics"),
+      onClick: () => navigate("/analytics"),
     },
   ];
 

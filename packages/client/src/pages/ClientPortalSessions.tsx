@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, MapPin, ArrowLeft, Music, Disc, Radio, Users } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -66,7 +66,7 @@ export default function ClientPortalSessions() {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <Link href="/client-portal">
+          <Link to="/client-portal">
             <Button variant="ghost" size="sm" className="mb-2">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au portail
@@ -183,7 +183,7 @@ export default function ClientPortalSessions() {
                     ? "Vous n'avez pas encore de sessions enregistrées."
                     : `Aucune session ${statusFilter === "upcoming" ? "à venir" : statusFilter === "completed" ? "terminée" : "annulée"}.`}
                 </p>
-                <Link href="/client-portal/booking">
+                <Link to="/client-portal/booking">
                   <Button>
                     <Calendar className="h-4 w-4 mr-2" />
                     Réserver une session
@@ -197,7 +197,7 @@ export default function ClientPortalSessions() {
         {/* Bouton de réservation flottant */}
         {sessions && sessions.length > 0 && (
           <div className="fixed bottom-8 right-8">
-            <Link href="/client-portal/booking">
+            <Link to="/client-portal/booking">
               <Button size="lg" className="shadow-lg">
                 <Calendar className="h-5 w-5 mr-2" />
                 Nouvelle réservation
