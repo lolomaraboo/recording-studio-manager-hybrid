@@ -1,4 +1,11 @@
+/**
+ * Notification Center Component
+ *
+ * Provides real-time notification functionality with SSE support.
+ */
+
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
 import { Bell, Check, CheckCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,33 +17,32 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useLocation } from "wouter";
 
 interface Notification {
-  id: number;
+  id: string;
   type: string;
   title: string;
-  message: string;
-  actionUrl: string | null;
-  isRead: boolean;
-  createdAt: Date;
+  body: string;
+  data?: Record<string, unknown>;
+  read: boolean;
+  createdAt: string;
 }
 
 export function NotificationCenter() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [localNotifications, setLocalNotifications] = useState<Notification[]>([]);
 
-  // Récupérer les notifications
-  const { data: notificationsList } = trpc.notifications.list.useQuery(
+  // Get notifications from server
+  const { data: notificationsData } = trpc.notifications.list.useQuery(
     { limit: 50 },
-    { refetchInterval: 30000 } // Rafraîchir toutes les 30 secondes
+    { refetchInterval: 30000 } // Refresh every 30 seconds
   );
 
-  // Récupérer le nombre de notifications non lues
-  const { data: unreadNotifications } = trpc.notifications.unread.useQuery(
+  // Get unread count
+  const { data: unreadData } = trpc.notifications.getUnreadCount.useQuery(
     undefined,
-    { refetchInterval: 10000 } // Rafraîchir toutes les 10 secondes
+    { refetchInterval: 10000 } // Refresh every 10 seconds
   );
 
   const markAsReadMutation = trpc.notifications.markAsRead.useMutation();
@@ -45,107 +51,112 @@ export function NotificationCenter() {
 
   const utils = trpc.useUtils();
 
-  // Mettre à jour la liste locale quand les données arrivent
+  // Update local state when server data changes
   useEffect(() => {
-    if (notificationsList) {
-      setNotifications(notificationsList as Notification[]);
+    if (notificationsData?.notifications) {
+      setLocalNotifications(notificationsData.notifications);
     }
-  }, [notificationsList]);
+  }, [notificationsData]);
 
-  // Connexion SSE pour les notifications en temps réel
+  // SSE connection for real-time notifications (optional, graceful degradation)
   useEffect(() => {
-    const eventSource = new EventSource("/api/notifications/stream");
+    try {
+      const eventSource = new EventSource("/api/notifications/stream");
 
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      if (data.type === "notification") {
-        // Ajouter la nouvelle notification en haut de la liste
-        setNotifications((prev) => [data.data, ...prev]);
-        // Invalider les queries pour mettre à jour les compteurs
-        utils.notifications.unread.invalidate();
-      }
-    };
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
 
-    eventSource.onerror = () => {
-      console.error("[SSE] Connection error, retrying...");
-      eventSource.close();
-    };
+          if (data.type === "notification") {
+            // Add new notification to the top of the list
+            setLocalNotifications((prev) => [data.data, ...prev]);
+            // Invalidate queries to update counters
+            utils.notifications.getUnreadCount.invalidate();
+          }
+        } catch {
+          // Ignore parse errors
+        }
+      };
 
-    return () => {
-      eventSource.close();
-    };
+      eventSource.onerror = () => {
+        // Close on error - will fall back to polling
+        eventSource.close();
+      };
+
+      return () => {
+        eventSource.close();
+      };
+    } catch {
+      // SSE not supported or error - rely on polling
+    }
   }, [utils]);
 
-  const handleMarkAsRead = async (notificationId: number) => {
+  const handleMarkAsRead = async (notificationId: string) => {
     await markAsReadMutation.mutateAsync({ notificationId });
-    
-    // Mettre à jour localement
-    setNotifications((prev) =>
+
+    // Update locally
+    setLocalNotifications((prev) =>
       prev.map((n) =>
-        n.id === notificationId ? { ...n, isRead: true } : n
+        n.id === notificationId ? { ...n, read: true } : n
       )
     );
-    
-    // Invalider les queries
-    utils.notifications.unread.invalidate();
+
+    // Invalidate queries
+    utils.notifications.getUnreadCount.invalidate();
   };
 
   const handleMarkAllAsRead = async () => {
     await markAllAsReadMutation.mutateAsync();
-    
-    // Mettre à jour localement
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, isRead: true }))
+
+    // Update locally
+    setLocalNotifications((prev) =>
+      prev.map((n) => ({ ...n, read: true }))
     );
-    
-    // Invalider les queries
-    utils.notifications.unread.invalidate();
+
+    // Invalidate queries
+    utils.notifications.getUnreadCount.invalidate();
   };
 
-  const handleDelete = async (notificationId: number) => {
+  const handleDelete = async (notificationId: string) => {
     await deleteMutation.mutateAsync({ notificationId });
-    
-    // Retirer localement
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-    
-    // Invalider les queries
+
+    // Remove locally
+    setLocalNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+
+    // Invalidate queries
     utils.notifications.list.invalidate();
-    utils.notifications.unread.invalidate();
+    utils.notifications.getUnreadCount.invalidate();
   };
 
   const handleNotificationClick = (notification: Notification) => {
-    // Marquer comme lue
-    if (!notification.isRead) {
+    // Mark as read
+    if (!notification.read) {
       handleMarkAsRead(notification.id);
     }
-    
-    // Naviguer vers l'URL d'action si elle existe
-    if (notification.actionUrl) {
-      setLocation(notification.actionUrl);
+
+    // Navigate to action URL if exists in data
+    const actionUrl = notification.data?.actionUrl as string | undefined;
+    if (actionUrl) {
+      navigate(actionUrl);
       setOpen(false);
     }
   };
 
-  const unreadCount = unreadNotifications?.length || 0;
+  const unreadCount = unreadData?.unread || 0;
 
-  const getNotificationIcon = (type: string) => {
-    // Retourner une icône selon le type de notification
-    return <Bell className="h-4 w-4" />;
-  };
-
-  const formatDate = (date: Date) => {
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
     const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
+    const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return "À l'instant";
+    if (minutes < 1) return "A l'instant";
     if (minutes < 60) return `Il y a ${minutes} min`;
     if (hours < 24) return `Il y a ${hours}h`;
     if (days < 7) return `Il y a ${days}j`;
-    return new Date(date).toLocaleDateString("fr-FR");
+    return date.toLocaleDateString("fr-FR");
   };
 
   return (
@@ -180,7 +191,7 @@ export function NotificationCenter() {
         </div>
         <Separator />
         <ScrollArea className="h-[400px]">
-          {notifications.length === 0 ? (
+          {localNotifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-sm text-muted-foreground">
@@ -189,17 +200,17 @@ export function NotificationCenter() {
             </div>
           ) : (
             <div className="divide-y">
-              {notifications.map((notification) => (
+              {localNotifications.map((notification) => (
                 <div
                   key={notification.id}
                   className={`p-4 hover:bg-accent cursor-pointer transition-colors ${
-                    !notification.isRead ? "bg-accent/50" : ""
+                    !notification.read ? "bg-accent/50" : ""
                   }`}
                   onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-1">
-                      {getNotificationIcon(notification.type)}
+                      <Bell className="h-4 w-4" />
                     </div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-start justify-between gap-2">
@@ -219,13 +230,13 @@ export function NotificationCenter() {
                         </Button>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {notification.message}
+                        {notification.body}
                       </p>
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-muted-foreground">
                           {formatDate(notification.createdAt)}
                         </p>
-                        {!notification.isRead && (
+                        {!notification.read && (
                           <Button
                             variant="ghost"
                             size="sm"

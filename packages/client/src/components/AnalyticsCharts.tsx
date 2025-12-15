@@ -15,7 +15,7 @@ import {
 } from "chart.js";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 
-// Enregistrer les composants Chart.js
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -29,16 +29,21 @@ ChartJS.register(
 );
 
 export function AnalyticsCharts() {
-  const { data: monthlyRevenue, isLoading: loadingRevenue } =
-    trpc.analytics.getMonthlyRevenue.useQuery();
-  const { data: sessionsByRoom, isLoading: loadingRooms } =
-    trpc.analytics.getSessionsByRoom.useQuery();
-  const { data: sessionsByType, isLoading: loadingTypes } =
-    trpc.analytics.getSessionsByType.useQuery();
-  const { data: topClients, isLoading: loadingClients } =
-    trpc.analytics.getTopClients.useQuery();
+  // Get dashboard data with trends
+  const { data: dashboardData, isLoading: loadingDashboard } =
+    trpc.analytics.dashboard.useQuery({ period: "month" });
 
-  if (loadingRevenue || loadingRooms || loadingTypes || loadingClients) {
+  // Get room performance metrics
+  const { data: roomMetrics, isLoading: loadingRooms } =
+    trpc.analytics.rooms.useQuery();
+
+  // Get client metrics
+  const { data: clientMetrics, isLoading: loadingClients } =
+    trpc.analytics.clients.useQuery({ period: "month" });
+
+  const isLoading = loadingDashboard || loadingRooms || loadingClients;
+
+  if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2">
         {[...Array(4)].map((_, i) => (
@@ -48,22 +53,41 @@ export function AnalyticsCharts() {
     );
   }
 
+  // Prepare revenue trend data
+  const revenueTrend = dashboardData?.trends?.revenue || [];
+  const revenueLabels = revenueTrend.map((d: { date: string }) => d.date);
+  const revenueData = revenueTrend.map((d: { value: number }) => d.value);
+
+  // Prepare room data
+  const roomLabels = roomMetrics?.rooms?.map((r: { name: string }) => r.name) || [];
+  const roomSessionCounts = roomMetrics?.rooms?.map((r: { sessionCount: number }) => r.sessionCount) || [];
+
+  // Prepare session type distribution (from dashboard)
+  const sessionsByType = dashboardData?.sessionsByType || [];
+  const typeLabels = sessionsByType.map((s: { type: string }) => s.type);
+  const typeData = sessionsByType.map((s: { count: number }) => s.count);
+
+  // Prepare top clients data
+  const topClients = clientMetrics?.topClients || [];
+  const clientLabels = topClients.map((c: { name: string }) => c.name);
+  const clientRevenueData = topClients.map((c: { revenue: number }) => c.revenue);
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {/* Revenus Mensuels */}
+      {/* Monthly Revenue */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">€ Revenus Mensuels</CardTitle>
+          <CardTitle className="text-base">Revenus Mensuels</CardTitle>
         </CardHeader>
         <CardContent>
-          {monthlyRevenue && monthlyRevenue.data.length > 0 ? (
+          {revenueData.length > 0 ? (
             <Line
               data={{
-                labels: monthlyRevenue.labels,
+                labels: revenueLabels,
                 datasets: [
                   {
-                    label: "Revenus (€)",
-                    data: monthlyRevenue.data,
+                    label: "Revenus",
+                    data: revenueData,
                     borderColor: "rgb(59, 130, 246)",
                     backgroundColor: "rgba(59, 130, 246, 0.1)",
                     tension: 0.4,
@@ -83,7 +107,7 @@ export function AnalyticsCharts() {
                   y: {
                     beginAtZero: true,
                     ticks: {
-                      callback: (value) => `${value}€`,
+                      callback: (value) => `${value}`,
                     },
                   },
                 },
@@ -92,26 +116,26 @@ export function AnalyticsCharts() {
             />
           ) : (
             <div className="h-64 flex items-center justify-center text-muted-foreground">
-              Aucune donnée disponible
+              Aucune donnee disponible
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Sessions par Salle */}
+      {/* Sessions by Room */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">📊 Sessions par Salle (ce mois)</CardTitle>
+          <CardTitle className="text-base">Sessions par Salle (ce mois)</CardTitle>
         </CardHeader>
         <CardContent>
-          {sessionsByRoom && sessionsByRoom.data.length > 0 ? (
+          {roomSessionCounts.length > 0 ? (
             <Bar
               data={{
-                labels: sessionsByRoom.labels,
+                labels: roomLabels,
                 datasets: [
                   {
                     label: "Sessions",
-                    data: sessionsByRoom.data,
+                    data: roomSessionCounts,
                     backgroundColor: [
                       "rgba(16, 185, 129, 0.8)",
                       "rgba(59, 130, 246, 0.8)",
@@ -143,26 +167,26 @@ export function AnalyticsCharts() {
             />
           ) : (
             <div className="h-64 flex items-center justify-center text-muted-foreground">
-              Aucune donnée disponible
+              Aucune donnee disponible
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Répartition par Type */}
+      {/* Distribution by Type */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">📈 Répartition par Type</CardTitle>
+          <CardTitle className="text-base">Repartition par Type</CardTitle>
         </CardHeader>
         <CardContent>
-          {sessionsByType && sessionsByType.data.length > 0 ? (
+          {typeData.length > 0 ? (
             <div className="flex items-center justify-center">
               <Doughnut
                 data={{
-                  labels: sessionsByType.labels,
+                  labels: typeLabels,
                   datasets: [
                     {
-                      data: sessionsByType.data,
+                      data: typeData,
                       backgroundColor: [
                         "rgba(59, 130, 246, 0.8)",
                         "rgba(16, 185, 129, 0.8)",
@@ -188,7 +212,7 @@ export function AnalyticsCharts() {
             </div>
           ) : (
             <div className="h-64 flex items-center justify-center text-muted-foreground">
-              Aucune donnée disponible
+              Aucune donnee disponible
             </div>
           )}
         </CardContent>
@@ -197,17 +221,17 @@ export function AnalyticsCharts() {
       {/* Top 5 Clients */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">🏆 Top 5 Clients</CardTitle>
+          <CardTitle className="text-base">Top 5 Clients</CardTitle>
         </CardHeader>
         <CardContent>
-          {topClients && topClients.data.length > 0 ? (
+          {clientRevenueData.length > 0 ? (
             <Bar
               data={{
-                labels: topClients.labels,
+                labels: clientLabels,
                 datasets: [
                   {
-                    label: "Revenus (€)",
-                    data: topClients.data,
+                    label: "Revenus",
+                    data: clientRevenueData,
                     backgroundColor: "rgba(239, 68, 68, 0.8)",
                   },
                 ],
@@ -225,7 +249,7 @@ export function AnalyticsCharts() {
                   x: {
                     beginAtZero: true,
                     ticks: {
-                      callback: (value) => `${value}€`,
+                      callback: (value) => `${value}`,
                     },
                   },
                 },
@@ -234,7 +258,7 @@ export function AnalyticsCharts() {
             />
           ) : (
             <div className="h-64 flex items-center justify-center text-muted-foreground">
-              Aucune donnée disponible
+              Aucune donnee disponible
             </div>
           )}
         </CardContent>

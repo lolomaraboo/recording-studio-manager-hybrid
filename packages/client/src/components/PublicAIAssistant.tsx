@@ -1,3 +1,10 @@
+/**
+ * Public AI Assistant Component
+ *
+ * A floating chat assistant for the public landing page.
+ * Provides information about Recording Studio Manager.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +13,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Bot, Send, X, Minimize2, Maximize2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Streamdown } from "streamdown";
 
 interface Message {
   id: string;
@@ -22,7 +28,7 @@ export function PublicAIAssistant() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Bonjour ! Je suis l'assistant IA de Recording Studio Manager. Je peux vous aider à comprendre notre plateforme et ses fonctionnalités. Que souhaitez-vous savoir ?",
+      content: "Bonjour ! Je suis l'assistant IA de Recording Studio Manager. Je peux vous aider a comprendre notre plateforme et ses fonctionnalites. Que souhaitez-vous savoir ?",
       timestamp: new Date(),
     },
   ]);
@@ -71,35 +77,35 @@ export function PublicAIAssistant() {
   const getPublicAIResponse = (userInput: string): string => {
     const lowerInput = userInput.toLowerCase();
 
-    if (lowerInput.includes("prix") || lowerInput.includes("tarif") || lowerInput.includes("coût") || lowerInput.includes("abonnement")) {
-      return "Recording Studio Manager propose **3 plans d'abonnement** :\n\n**Free** - Gratuit\n- 10 sessions/mois\n- 5 clients\n- 1 salle\n- Support communautaire\n\n**Pro** - 49€/mois\n- Sessions illimitées\n- 50 clients\n- 5 salles\n- Support prioritaire\n- Analytics avancés\n\n**Enterprise** - 199€/mois\n- Tout illimité\n- Multi-studios\n- API access\n- Support dédié\n\nCommencez gratuitement dès maintenant !";
+    if (lowerInput.includes("prix") || lowerInput.includes("tarif") || lowerInput.includes("cout") || lowerInput.includes("abonnement")) {
+      return "Recording Studio Manager propose 3 plans d'abonnement:\n\nFree - Gratuit\n- 10 sessions/mois\n- 5 clients\n- 1 salle\n- Support communautaire\n\nPro - 49EUR/mois\n- Sessions illimitees\n- 50 clients\n- 5 salles\n- Support prioritaire\n- Analytics avances\n\nEnterprise - 199EUR/mois\n- Tout illimite\n- Multi-studios\n- API access\n- Support dedie\n\nCommencez gratuitement des maintenant !";
     }
 
-    if (lowerInput.includes("fonctionnalit") || lowerInput.includes("feature") || lowerInput.includes("que fait") || lowerInput.includes("capacité")) {
-      return "Recording Studio Manager vous offre une **solution complète** pour gérer votre studio :\n\n🎵 **Gestion des sessions** - Planifiez et suivez vos enregistrements\n📅 **Calendrier interactif** - Visualisez votre planning en un coup d'œil\n👥 **Gestion clients** - Base de données centralisée\n💰 **Facturation automatique** - Générez des factures professionnelles\n📊 **Analytics** - Suivez vos revenus et performances\n🎛️ **Gestion équipement** - Inventaire et maintenance\n👨‍💼 **Gestion d'équipe** - Rôles et permissions\n\nTout ce dont vous avez besoin en une seule plateforme !";
+    if (lowerInput.includes("fonctionnalit") || lowerInput.includes("feature") || lowerInput.includes("que fait") || lowerInput.includes("capacite")) {
+      return "Recording Studio Manager vous offre une solution complete pour gerer votre studio:\n\nGestion des sessions - Planifiez et suivez vos enregistrements\nCalendrier interactif - Visualisez votre planning en un coup d'oeil\nGestion clients - Base de donnees centralisee\nFacturation automatique - Generez des factures professionnelles\nAnalytics - Suivez vos revenus et performances\nGestion equipement - Inventaire et maintenance\nGestion d'equipe - Roles et permissions\n\nTout ce dont vous avez besoin en une seule plateforme !";
     }
 
-    if (lowerInput.includes("commenc") || lowerInput.includes("démarr") || lowerInput.includes("inscr") || lowerInput.includes("créer")) {
-      return "Pour commencer avec Recording Studio Manager, c'est simple :\n\n1. **Cliquez sur \"Accéder au Dashboard\"** en haut à droite\n2. **Connectez-vous** avec votre compte Manus\n3. **Créez votre organisation** (nom de votre studio)\n4. **Choisissez votre plan** (commencez gratuitement !)\n5. **Configurez votre studio** (salles, équipement, équipe)\n\nVous serez opérationnel en **moins de 5 minutes** ! 🚀\n\nBesoin d'aide pour démarrer ?";
+    if (lowerInput.includes("commenc") || lowerInput.includes("demarr") || lowerInput.includes("inscr") || lowerInput.includes("creer")) {
+      return "Pour commencer avec Recording Studio Manager, c'est simple:\n\n1. Cliquez sur 'Acceder au Dashboard' en haut a droite\n2. Connectez-vous avec votre compte\n3. Creez votre organisation (nom de votre studio)\n4. Choisissez votre plan (commencez gratuitement !)\n5. Configurez votre studio (salles, equipement, equipe)\n\nVous serez operationnel en moins de 5 minutes !\n\nBesoin d'aide pour demarrer ?";
     }
 
     if (lowerInput.includes("multi-tenant") || lowerInput.includes("sous-domaine") || lowerInput.includes("plusieurs studios")) {
-      return "Oui ! Recording Studio Manager est une **plateforme SaaS multi-tenant** :\n\n✅ Chaque studio a son **propre sous-domaine** (ex: votrestudio.manus.space)\n✅ **Isolation complète des données** - vos données restent privées\n✅ **Gestion multi-studios** avec le plan Enterprise\n✅ **Personnalisation** par organisation\n\nParfait pour les chaînes de studios ou les gestionnaires multi-sites !";
+      return "Oui ! Recording Studio Manager est une plateforme SaaS multi-tenant:\n\nChaque studio a son propre sous-domaine (ex: votrestudio.rsm.app)\nIsolation complete des donnees - vos donnees restent privees\nGestion multi-studios avec le plan Enterprise\nPersonnalisation par organisation\n\nParfait pour les chaines de studios ou les gestionnaires multi-sites !";
     }
 
-    if (lowerInput.includes("sécurit") || lowerInput.includes("données") || lowerInput.includes("confidential")) {
-      return "La **sécurité** est notre priorité :\n\n🔒 **Isolation des données** - Chaque studio est isolé\n🔐 **Authentification OAuth** - Connexion sécurisée\n💾 **Backups automatiques** - Vos données sont protégées\n🛡️ **Chiffrement** - Communications sécurisées\n✅ **Conformité RGPD** - Respect de la vie privée\n\nVos données sont en sécurité avec nous !";
+    if (lowerInput.includes("securit") || lowerInput.includes("donnees") || lowerInput.includes("confidential")) {
+      return "La securite est notre priorite:\n\nIsolation des donnees - Chaque studio est isole\nAuthentification OAuth - Connexion securisee\nBackups automatiques - Vos donnees sont protegees\nChiffrement - Communications securisees\nConformite RGPD - Respect de la vie privee\n\nVos donnees sont en securite avec nous !";
     }
 
     if (lowerInput.includes("support") || lowerInput.includes("aide") || lowerInput.includes("assistance")) {
-      return "Nous sommes là pour vous aider !\n\n📧 **Support par email** - Tous les plans\n💬 **Chat en direct** - Plans Pro et Enterprise\n📚 **Documentation complète** - Guides et tutoriels\n🎥 **Vidéos de formation** - Apprenez à votre rythme\n👨‍💼 **Support dédié** - Plan Enterprise\n\nContactez-nous à support@recordingstudio.com";
+      return "Nous sommes la pour vous aider !\n\nSupport par email - Tous les plans\nChat en direct - Plans Pro et Enterprise\nDocumentation complete - Guides et tutoriels\nVideos de formation - Apprenez a votre rythme\nSupport dedie - Plan Enterprise\n\nContactez-nous a support@recordingstudio.com";
     }
 
-    if (lowerInput.includes("intégration") || lowerInput.includes("api") || lowerInput.includes("connecter")) {
-      return "Recording Studio Manager s'intègre avec vos outils favoris :\n\n💳 **Stripe** - Paiements en ligne\n📧 **SendGrid** - Envoi d'emails automatiques\n⚡ **Zapier** - Automatisation (bientôt)\n🔌 **API REST** - Plan Enterprise\n📊 **Export de données** - CSV, PDF\n\nConnectez votre écosystème facilement !";
+    if (lowerInput.includes("integration") || lowerInput.includes("api") || lowerInput.includes("connecter")) {
+      return "Recording Studio Manager s'integre avec vos outils favoris:\n\nStripe - Paiements en ligne\nSendGrid - Envoi d'emails automatiques\nZapier - Automatisation (bientot)\nAPI REST - Plan Enterprise\nExport de donnees - CSV, PDF\n\nConnectez votre ecosysteme facilement !";
     }
 
-    return "Je suis là pour répondre à vos questions sur **Recording Studio Manager** !\n\nVoici ce que je peux vous expliquer :\n- 💰 Les **tarifs et plans d'abonnement**\n- ⚡ Les **fonctionnalités** de la plateforme\n- 🚀 Comment **démarrer** rapidement\n- 🏢 Le système **multi-tenant**\n- 🔒 La **sécurité** de vos données\n- 🤝 Le **support** disponible\n- 🔌 Les **intégrations** possibles\n\nQue souhaitez-vous savoir ?";
+    return "Je suis la pour repondre a vos questions sur Recording Studio Manager !\n\nVoici ce que je peux vous expliquer:\n- Les tarifs et plans d'abonnement\n- Les fonctionnalites de la plateforme\n- Comment demarrer rapidement\n- Le systeme multi-tenant\n- La securite de vos donnees\n- Le support disponible\n- Les integrations possibles\n\nQue souhaitez-vous savoir ?";
   };
 
   if (!isOpen) {
@@ -192,11 +198,7 @@ export function PublicAIAssistant() {
                             : "bg-primary text-primary-foreground"
                         )}
                       >
-                        {message.role === "assistant" ? (
-                          <Streamdown>{message.content}</Streamdown>
-                        ) : (
-                          <p className="text-sm">{message.content}</p>
-                        )}
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                         <p
                           className={cn(
                             "mt-1 text-xs",
@@ -220,7 +222,7 @@ export function PublicAIAssistant() {
                       </div>
                       <div className="flex-1 rounded-lg bg-muted px-4 py-2">
                         <p className="text-sm text-muted-foreground">
-                          En train d'écrire...
+                          En train d'ecrire...
                         </p>
                       </div>
                     </div>

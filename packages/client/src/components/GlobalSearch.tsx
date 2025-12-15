@@ -1,5 +1,12 @@
+/**
+ * Global Search Component
+ *
+ * Provides global search functionality across the application.
+ * Searches clients, sessions, invoices, and equipment.
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react";
-import { trpc } from "@/lib/trpc";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,19 +17,17 @@ import {
   Music,
   FileText,
   Package,
-  MessageSquare,
   Loader2,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 interface SearchResult {
   id: number;
-  type: "client" | "session" | "invoice" | "equipment" | "message";
+  type: "client" | "session" | "invoice" | "equipment";
   title: string;
   subtitle: string;
   description?: string;
   url: string;
-  score: number;
 }
 
 const typeIcons = {
@@ -30,15 +35,13 @@ const typeIcons = {
   session: Music,
   invoice: FileText,
   equipment: Package,
-  message: MessageSquare,
 };
 
 const typeLabels = {
   client: "Client",
   session: "Session",
   invoice: "Facture",
-  equipment: "Équipement",
-  message: "Message",
+  equipment: "Equipement",
 };
 
 const typeColors = {
@@ -46,7 +49,6 @@ const typeColors = {
   session: "bg-purple-500/10 text-purple-500",
   invoice: "bg-green-500/10 text-green-500",
   equipment: "bg-orange-500/10 text-orange-500",
-  message: "bg-pink-500/10 text-pink-500",
 };
 
 interface GlobalSearchProps {
@@ -57,11 +59,31 @@ interface GlobalSearchProps {
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [, setLocation] = useLocation();
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Debounced search query
   const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  // Get clients for search
+  const { data: clientsData } = trpc.clients.list.useQuery(
+    { limit: 100 },
+    { enabled: debouncedQuery.length >= 2 }
+  );
+
+  // Get sessions for search
+  const { data: sessionsData } = trpc.sessions.list.useQuery(
+    { limit: 100 },
+    { enabled: debouncedQuery.length >= 2 }
+  );
+
+  // Get equipment for search
+  const { data: equipmentData } = trpc.equipment.list.useQuery(
+    { limit: 100 },
+    { enabled: debouncedQuery.length >= 2 }
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -71,26 +93,88 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Fetch search results
-  const { data: results, isLoading } = trpc.search.global.useQuery(
-    { query: debouncedQuery, limit: 50 },
-    {
-      enabled: debouncedQuery.length >= 2,
-      placeholderData: (previousData) => previousData,
+  // Perform local search when data changes
+  useEffect(() => {
+    if (debouncedQuery.length < 2) {
+      setResults([]);
+      return;
     }
-  );
+
+    setIsLoading(true);
+    const searchTerm = debouncedQuery.toLowerCase();
+    const searchResults: SearchResult[] = [];
+
+    // Search clients
+    if (clientsData?.clients) {
+      for (const client of clientsData.clients) {
+        const name = client.name?.toLowerCase() || "";
+        const email = client.email?.toLowerCase() || "";
+        const company = client.companyName?.toLowerCase() || "";
+
+        if (name.includes(searchTerm) || email.includes(searchTerm) || company.includes(searchTerm)) {
+          searchResults.push({
+            id: client.id,
+            type: "client",
+            title: client.name || "Client",
+            subtitle: client.email || "",
+            description: client.companyName || undefined,
+            url: `/clients/${client.id}`,
+          });
+        }
+      }
+    }
+
+    // Search sessions
+    if (sessionsData?.sessions) {
+      for (const session of sessionsData.sessions) {
+        const title = session.title?.toLowerCase() || "";
+        const notes = session.notes?.toLowerCase() || "";
+
+        if (title.includes(searchTerm) || notes.includes(searchTerm)) {
+          searchResults.push({
+            id: session.id,
+            type: "session",
+            title: session.title || "Session",
+            subtitle: new Date(session.startTime).toLocaleDateString("fr-FR"),
+            description: session.notes || undefined,
+            url: `/sessions/${session.id}`,
+          });
+        }
+      }
+    }
+
+    // Search equipment
+    if (equipmentData?.equipment) {
+      for (const item of equipmentData.equipment) {
+        const name = item.name?.toLowerCase() || "";
+        const description = item.description?.toLowerCase() || "";
+        const category = item.category?.toLowerCase() || "";
+
+        if (name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+          searchResults.push({
+            id: item.id,
+            type: "equipment",
+            title: item.name || "Equipment",
+            subtitle: item.category || "",
+            description: item.description || undefined,
+            url: `/equipment/${item.id}`,
+          });
+        }
+      }
+    }
+
+    setResults(searchResults.slice(0, 50)); // Limit to 50 results
+    setIsLoading(false);
+  }, [debouncedQuery, clientsData, sessionsData, equipmentData]);
 
   // Group results by type
-  const groupedResults = results?.reduce((acc, result) => {
+  const groupedResults = results.reduce((acc, result) => {
     if (!acc[result.type]) {
       acc[result.type] = [];
     }
     acc[result.type].push(result);
     return acc;
   }, {} as Record<string, SearchResult[]>);
-
-  // Flatten grouped results for keyboard navigation
-  const flatResults = results || [];
 
   // Reset selected index when results change
   useEffect(() => {
@@ -112,28 +196,28 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (!flatResults.length) return;
+      if (!results.length) return;
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % flatResults.length);
+        setSelectedIndex((prev) => (prev + 1) % results.length);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + flatResults.length) % flatResults.length);
+        setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
       } else if (e.key === "Enter") {
         e.preventDefault();
-        const selected = flatResults[selectedIndex];
+        const selected = results[selectedIndex];
         if (selected) {
-          setLocation(selected.url);
+          navigate(selected.url);
           onOpenChange(false);
         }
       }
     },
-    [flatResults, selectedIndex, setLocation, onOpenChange]
+    [results, selectedIndex, navigate, onOpenChange]
   );
 
   const handleResultClick = (url: string) => {
-    setLocation(url);
+    navigate(url);
     onOpenChange(false);
   };
 
@@ -147,7 +231,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Rechercher des clients, sessions, factures, équipements, messages..."
+            placeholder="Rechercher des clients, sessions, equipements..."
             className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-2" />}
@@ -157,22 +241,22 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
           {query.length < 2 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-sm">Tapez au moins 2 caractères pour rechercher</p>
+              <p className="text-sm">Tapez au moins 2 caracteres pour rechercher</p>
               <p className="text-xs mt-2">
-                Recherchez dans les clients, sessions, factures, équipements et messages
+                Recherchez dans les clients, sessions et equipements
               </p>
             </div>
-          ) : !results || results.length === 0 ? (
+          ) : results.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-sm">Aucun résultat trouvé</p>
+              <p className="text-sm">Aucun resultat trouve</p>
               <p className="text-xs mt-2">
-                Essayez avec d'autres mots-clés
+                Essayez avec d'autres mots-cles
               </p>
             </div>
           ) : (
             <div className="py-2">
-              {Object.entries(groupedResults || {}).map(([type, items]) => {
+              {Object.entries(groupedResults).map(([type, items]) => {
                 const Icon = typeIcons[type as keyof typeof typeIcons];
                 const label = typeLabels[type as keyof typeof typeLabels];
 
@@ -186,9 +270,10 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                       </Badge>
                     </div>
                     <div>
-                      {items.map((result, index) => {
-                        const globalIndex = flatResults.indexOf(result);
+                      {items.map((result) => {
+                        const globalIndex = results.indexOf(result);
                         const isSelected = globalIndex === selectedIndex;
+                        const TypeIcon = typeIcons[result.type];
 
                         return (
                           <button
@@ -202,10 +287,10 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                             <div className="flex items-start gap-3">
                               <div
                                 className={`p-2 rounded-lg ${
-                                  typeColors[result.type as keyof typeof typeColors]
+                                  typeColors[result.type]
                                 }`}
                               >
-                                <Icon className="h-4 w-4" />
+                                <TypeIcon className="h-4 w-4" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium truncate">{result.title}</div>
@@ -239,7 +324,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             </div>
             <div className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Enter</kbd>
-              <span className="ml-1">Sélectionner</span>
+              <span className="ml-1">Selectionner</span>
             </div>
             <div className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd>
@@ -247,7 +332,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             </div>
           </div>
           <div>
-            {results && results.length > 0 && `${results.length} résultat${results.length > 1 ? "s" : ""}`}
+            {results.length > 0 && `${results.length} resultat${results.length > 1 ? "s" : ""}`}
           </div>
         </div>
       </DialogContent>

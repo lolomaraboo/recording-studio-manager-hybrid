@@ -1,3 +1,10 @@
+/**
+ * Real-time Notifications Hook
+ *
+ * Provides real-time notification updates using SSE (Server-Sent Events).
+ * Falls back to polling if SSE is not available.
+ */
+
 import { useEffect, useState, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -9,7 +16,7 @@ interface BadgeCounts {
 }
 
 interface RealtimeNotification {
-  id: number;
+  id: string;
   type: string;
   title: string;
   message: string;
@@ -28,95 +35,91 @@ export function useRealtimeNotifications() {
 
   const utils = trpc.useUtils();
 
-  // Récupérer les compteurs initiaux
-  const { data: initialCounts } = trpc.sidebar.getBadgeCounts.useQuery(undefined, {
-    refetchInterval: false, // Désactiver le polling car on utilise SSE
+  // Get unread notification count using existing router
+  const { data: unreadData } = trpc.notifications.getUnreadCount.useQuery(undefined, {
+    refetchInterval: 30000, // Poll every 30 seconds as fallback
   });
 
+  // Update badge counts when unread data changes
   useEffect(() => {
-    if (initialCounts) {
-      setBadgeCounts(initialCounts);
+    if (unreadData) {
+      setBadgeCounts((prev) => ({
+        ...prev,
+        notifications: unreadData.unread,
+        communication: unreadData.unread,
+      }));
     }
-  }, [initialCounts]);
+  }, [unreadData]);
 
-  // Connexion SSE pour les notifications en temps réel
+  // SSE connection for real-time notifications
   useEffect(() => {
-    const eventSource = new EventSource("/api/sse");
+    let eventSource: EventSource | null = null;
 
-    eventSource.onopen = () => {
-      console.log("[SSE] Connected to realtime notifications");
-      setIsConnected(true);
-    };
+    try {
+      eventSource = new EventSource("/api/sse");
 
-    eventSource.addEventListener("notification", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("[SSE] New notification received:", data);
+      eventSource.onopen = () => {
+        setIsConnected(true);
+      };
 
-        // Mettre à jour la dernière notification
-        setLatestNotification({
-          id: data.id,
-          type: data.type,
-          title: data.title,
-          message: data.message,
-          createdAt: new Date(data.createdAt),
-        });
+      eventSource.addEventListener("notification", (event) => {
+        try {
+          const data = JSON.parse(event.data);
 
-        // Incrémenter le compteur de notifications
-        setBadgeCounts((prev) => ({
-          ...prev,
-          notifications: prev.notifications + 1,
-          communication: prev.communication + 1,
-        }));
+          // Update latest notification
+          setLatestNotification({
+            id: data.id,
+            type: data.type,
+            title: data.title,
+            message: data.message,
+            createdAt: new Date(data.createdAt),
+          });
 
-        // Invalider les requêtes pour rafraîchir les données
-        utils.sidebar.getBadgeCounts.invalidate();
-      } catch (error) {
-        console.error("[SSE] Error parsing notification:", error);
-      }
-    });
+          // Increment notification counter
+          setBadgeCounts((prev) => ({
+            ...prev,
+            notifications: prev.notifications + 1,
+            communication: prev.communication + 1,
+          }));
 
-    eventSource.addEventListener("message", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("[SSE] New message received:", data);
+          // Invalidate queries to refresh data
+          utils.notifications.getUnreadCount.invalidate();
+          utils.notifications.list.invalidate();
+        } catch {
+          // Ignore parse errors
+        }
+      });
 
-        // Incrémenter le compteur de messages
-        setBadgeCounts((prev) => ({
-          ...prev,
-          messages: prev.messages + 1,
-          communication: prev.communication + 1,
-        }));
+      eventSource.addEventListener("message", (event) => {
+        try {
+          JSON.parse(event.data);
 
-        // Invalider les requêtes pour rafraîchir les données
-        utils.sidebar.getBadgeCounts.invalidate();
-      } catch (error) {
-        console.error("[SSE] Error parsing message:", error);
-      }
-    });
+          // Increment message counter
+          setBadgeCounts((prev) => ({
+            ...prev,
+            messages: prev.messages + 1,
+            communication: prev.communication + 1,
+          }));
 
-    eventSource.addEventListener("invoice", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("[SSE] Invoice update received:", data);
+          // Invalidate queries
+          utils.notifications.getUnreadCount.invalidate();
+        } catch {
+          // Ignore parse errors
+        }
+      });
 
-        // Rafraîchir le compteur de factures
-        utils.sidebar.getBadgeCounts.invalidate();
-      } catch (error) {
-        console.error("[SSE] Error parsing invoice:", error);
-      }
-    });
-
-    eventSource.onerror = (error) => {
-      console.error("[SSE] Connection error:", error);
+      eventSource.onerror = () => {
+        setIsConnected(false);
+        eventSource?.close();
+      };
+    } catch {
+      // SSE not supported - will use polling
       setIsConnected(false);
-      eventSource.close();
-    };
+    }
 
-    // Cleanup à la déconnexion
+    // Cleanup on disconnect
     return () => {
-      console.log("[SSE] Disconnecting from realtime notifications");
-      eventSource.close();
+      eventSource?.close();
       setIsConnected(false);
     };
   }, [utils]);

@@ -1,34 +1,34 @@
 /**
  * CLIENT PORTAL LAYOUT
- * 
- * Layout dédié au portail client self-service.
- * Interface simplifiée et centrée sur l'expérience client.
+ *
+ * Layout for the client self-service portal.
+ * Simplified interface focused on client experience.
  */
 
-import { Link, useLocation } from "wouter";
-import { Calendar, FileText, Home, LogOut, Settings, User } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Calendar, FileText, Home, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
 
 interface ClientPortalLayoutProps {
   children: React.ReactNode;
 }
 
 export function ClientPortalLayout({ children }: ClientPortalLayoutProps) {
-  const [location] = useLocation();
-  const logoutMutation = trpc.auth.logout.useMutation();
-  const { data: profile } = trpc.clientPortal.getMyClientProfile.useQuery();
+  const location = useLocation();
+  const pathname = location.pathname;
+  const logoutMutation = trpc.clientAuth.logout.useMutation();
+  const { data: dashboardData } = trpc.clientPortal.dashboard.useQuery();
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
-    window.location.href = getLoginUrl();
+    window.location.href = "/client/login";
   };
 
   const navItems = [
     { href: "/client/dashboard", label: "Dashboard", icon: Home },
     { href: "/client/sessions", label: "Mes Sessions", icon: Calendar },
-    { href: "/client/book", label: "Réserver", icon: Calendar },
+    { href: "/client/book", label: "Reserver", icon: Calendar },
     { href: "/client/invoices", label: "Factures", icon: FileText },
     { href: "/client/profile", label: "Profil", icon: User },
   ];
@@ -44,15 +44,17 @@ export function ClientPortalLayout({ children }: ClientPortalLayoutProps) {
             </div>
             <div>
               <h1 className="text-lg font-bold">Portail Client</h1>
-              {profile && (
-                <p className="text-xs text-muted-foreground">{profile.name}</p>
+              {dashboardData?.stats && (
+                <p className="text-xs text-muted-foreground">
+                  {dashboardData.stats.upcomingSessions} sessions a venir
+                </p>
               )}
             </div>
           </div>
 
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
+            Deconnexion
           </Button>
         </div>
       </header>
@@ -63,20 +65,20 @@ export function ClientPortalLayout({ children }: ClientPortalLayoutProps) {
           <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location === item.href;
+              const isActive = pathname === item.href;
 
               return (
-                <Link key={item.href} href={item.href}>
-                  <a
-                    className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    {item.label}
-                  </a>
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.label}
                 </Link>
               );
             })}
@@ -84,9 +86,7 @@ export function ClientPortalLayout({ children }: ClientPortalLayoutProps) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

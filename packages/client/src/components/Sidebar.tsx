@@ -1,4 +1,10 @@
-import { Link, useLocation } from "wouter";
+/**
+ * Sidebar Component
+ *
+ * Main navigation sidebar with collapsible sections, favorites, and drag & drop reordering.
+ */
+
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, ChevronDown, Star, Plus } from "lucide-react";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -19,18 +25,14 @@ import {
   FolderOpen,
   Share2,
   UserPlus,
-  LayoutDashboard,
   Wrench,
   MessageCircle,
   DoorOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
 import { useEffect, useState } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import {
   DndContext,
   closestCenter,
@@ -60,7 +62,7 @@ interface NavSection {
   title: string;
   icon: React.ReactNode;
   items: NavItem[];
-  badgeKey?: "communication" | "finance"; // Clé pour récupérer le compteur de badge
+  badgeKey?: "communication" | "finance";
 }
 
 const navSections: NavSection[] = [
@@ -90,7 +92,7 @@ const navSections: NavSection[] = [
         icon: <Users className="h-5 w-5" />,
       },
       {
-        title: "Équipe",
+        title: "Equipe",
         href: "/team",
         icon: <UserPlus className="h-5 w-5" />,
       },
@@ -111,7 +113,7 @@ const navSections: NavSection[] = [
         icon: <DoorOpen className="h-5 w-5" />,
       },
       {
-        title: "Équipement",
+        title: "Equipement",
         href: "/equipment",
         icon: <Package className="h-5 w-5" />,
       },
@@ -195,11 +197,9 @@ const navSections: NavSection[] = [
   },
 ];
 
-// Composant pour une section sortable
+// Sortable section component
 function SortableSection({
   section,
-  sectionIndex,
-  totalSections,
   isExpanded,
   isCollapsed,
   location,
@@ -209,12 +209,10 @@ function SortableSection({
   toggleFavorite,
 }: {
   section: NavSection;
-  sectionIndex: number;
-  totalSections: number;
   isExpanded: boolean;
   isCollapsed: boolean;
   location: string;
-  badgeCounts: any;
+  badgeCounts: Record<string, number>;
   toggleSection: (title: string, event?: React.MouseEvent) => void;
   favorites: string[];
   toggleFavorite: (href: string, e: React.MouseEvent) => void;
@@ -234,7 +232,7 @@ function SortableSection({
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
-      {/* Titre de section cliquable avec triangle */}
+      {/* Section title clickable with triangle */}
       {!isCollapsed ? (
         <button
           onClick={(e) => toggleSection(section.title, e)}
@@ -244,8 +242,8 @@ function SortableSection({
           <div className="flex items-center gap-2">
             {section.icon}
             <span>{section.title}</span>
-            {/* Badge de notification */}
-            {section.badgeKey && badgeCounts && badgeCounts[section.badgeKey] > 0 && (
+            {/* Notification badge */}
+            {section.badgeKey && badgeCounts[section.badgeKey] > 0 && (
               <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 text-xs font-bold text-primary-foreground bg-primary rounded-full">
                 {badgeCounts[section.badgeKey]}
               </span>
@@ -273,14 +271,14 @@ function SortableSection({
         </button>
       )}
 
-      {/* Items de la section (affichés si la section est ouverte, même en mode réduit) */}
+      {/* Section items (displayed if section is expanded) */}
       {isExpanded && (
         <div className="space-y-1 mt-1">
           {section.items.map((item) => {
             const isActive = location === item.href;
             const isFavorite = favorites.includes(item.href);
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={item.href} to={item.href}>
                 <div
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors cursor-pointer group/item relative",
@@ -299,11 +297,10 @@ function SortableSection({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          // Rediriger vers la page avec paramètre ?action=create
                           window.location.href = `${item.href}?action=create`;
                         }}
                         className="hover:bg-accent/50 rounded p-0.5"
-                        title={`Créer ${item.title.toLowerCase()}`}
+                        title={`Creer ${item.title.toLowerCase()}`}
                       >
                         <Plus className="h-4 w-4 text-muted-foreground" />
                       </button>
@@ -327,14 +324,13 @@ function SortableSection({
           })}
         </div>
       )}
-
-      {/* Pas de séparateur entre sections pour un design plus épuré */}
     </div>
   );
 }
 
 export function Sidebar() {
-  const [location] = useLocation();
+  const location = useLocation();
+  const pathname = location.pathname;
   const [searchOpen, setSearchOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -342,55 +338,53 @@ export function Sidebar() {
   const [sectionsOrder, setSectionsOrder] = useState<NavSection[]>(navSections);
   const [favorites, setFavorites] = useState<string[]>([]);
   const logoutMutation = trpc.auth.logout.useMutation();
-  
-  // Configuration du drag & drop
+
+  // Drag & drop configuration
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-  
-  // Notifications en temps réel temporairement désactivées
-  // const { badgeCounts } = useRealtimeNotifications();
+
+  // Placeholder badge counts (real-time notifications disabled temporarily)
   const badgeCounts = { finance: 0, communication: 0 };
-  
-  // Activer les raccourcis clavier
+
+  // Enable keyboard shortcuts
   useKeyboardShortcuts();
 
-  // Charger l'état de la sidebar depuis localStorage
+  // Load sidebar state from localStorage
   useEffect(() => {
     const storedCollapsed = localStorage.getItem("sidebarCollapsed");
     if (storedCollapsed) {
       setIsCollapsed(storedCollapsed === "true");
     }
 
-    // Charger l'état des sections (par défaut toutes ouvertes)
+    // Load sections state (default all open)
     const storedSections = localStorage.getItem("sidebarExpandedSections");
     if (storedSections) {
       setExpandedSections(JSON.parse(storedSections));
     } else {
-      // Par défaut, toutes les sections sont ouvertes
       const defaultExpanded: Record<string, boolean> = {};
       navSections.forEach(section => {
         defaultExpanded[section.title] = true;
       });
       setExpandedSections(defaultExpanded);
     }
-    
-    // Charger les favoris depuis localStorage
+
+    // Load favorites from localStorage
     const storedFavorites = localStorage.getItem("sidebarFavorites");
     if (storedFavorites) {
       setFavorites(JSON.parse(storedFavorites));
     }
-    
-    // Charger l'état de la section Favoris
+
+    // Load favorites section state
     const storedFavoritesExpanded = localStorage.getItem("sidebarFavoritesExpanded");
     if (storedFavoritesExpanded !== null) {
       setFavoritesExpanded(storedFavoritesExpanded === "true");
     }
-    
-    // Charger l'ordre personnalisé des sections
+
+    // Load custom sections order
     const storedOrder = localStorage.getItem("sidebarSectionsOrder");
     if (storedOrder) {
       const orderTitles = JSON.parse(storedOrder);
@@ -401,18 +395,17 @@ export function Sidebar() {
     }
   }, []);
 
-  // Sauvegarder l'état de la sidebar dans localStorage
+  // Save sidebar state to localStorage
   const toggleSidebar = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem("sidebarCollapsed", String(newState));
   };
 
-  // Toggle une section (ouvrir/fermer)
-  // Alt+Clic : ouvrir/fermer toutes les sections
+  // Toggle a section (open/close)
   const toggleSection = (sectionTitle: string, event?: React.MouseEvent) => {
     if (event?.altKey) {
-      // Alt+Clic : ouvrir/fermer toutes les sections
+      // Alt+Click: open/close all sections
       const allExpanded = Object.values(expandedSections).every(v => v);
       const newExpandedSections: Record<string, boolean> = {};
       sectionsOrder.forEach(section => {
@@ -421,7 +414,7 @@ export function Sidebar() {
       setExpandedSections(newExpandedSections);
       localStorage.setItem("sidebarExpandedSections", JSON.stringify(newExpandedSections));
     } else {
-      // Clic normal : toggle une seule section
+      // Normal click: toggle single section
       const newExpandedSections = {
         ...expandedSections,
         [sectionTitle]: !expandedSections[sectionTitle],
@@ -430,8 +423,8 @@ export function Sidebar() {
       localStorage.setItem("sidebarExpandedSections", JSON.stringify(newExpandedSections));
     }
   };
-  
-  // Gérer le drag & drop
+
+  // Handle drag & drop
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -440,19 +433,19 @@ export function Sidebar() {
         const oldIndex = sections.findIndex((s) => s.title === active.id);
         const newIndex = sections.findIndex((s) => s.title === over.id);
         const newOrder = arrayMove(sections, oldIndex, newIndex);
-        
-        // Sauvegarder l'ordre dans localStorage
+
+        // Save order to localStorage
         localStorage.setItem(
           "sidebarSectionsOrder",
           JSON.stringify(newOrder.map((s) => s.title))
         );
-        
+
         return newOrder;
       });
     }
   };
 
-  // Raccourci clavier Cmd+K / Ctrl+K pour ouvrir la recherche
+  // Keyboard shortcut Cmd+K / Ctrl+K to open search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -470,8 +463,8 @@ export function Sidebar() {
     localStorage.removeItem("selectedOrganizationId");
     window.location.href = "/";
   };
-  
-  // Gérer les favoris
+
+  // Manage favorites
   const toggleFavorite = (href: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -481,8 +474,8 @@ export function Sidebar() {
     setFavorites(newFavorites);
     localStorage.setItem("sidebarFavorites", JSON.stringify(newFavorites));
   };
-  
-  // Récupérer tous les items de navigation
+
+  // Get all nav items
   const allNavItems = [
     { title: "Dashboard", href: "/dashboard", icon: <Home className="h-5 w-5" /> },
     ...sectionsOrder.flatMap(section => section.items)
@@ -495,7 +488,7 @@ export function Sidebar() {
         isCollapsed ? "w-16" : "w-64"
       )}
     >
-      {/* Titre de l'application et bouton de réduction sur la même ligne */}
+      {/* App title and collapse button on same line */}
       <div className={cn("px-4 py-4 flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
         {!isCollapsed && (
           <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -507,7 +500,7 @@ export function Sidebar() {
           size="icon"
           onClick={toggleSidebar}
           className="h-8 w-8"
-          title={isCollapsed ? "Agrandir la sidebar" : "Réduire la sidebar"}
+          title={isCollapsed ? "Agrandir la sidebar" : "Reduire la sidebar"}
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -517,49 +510,45 @@ export function Sidebar() {
         </Button>
       </div>
 
-      {/* Recherche globale */}
+      {/* Global search */}
       {!isCollapsed && (
-        <>
-          <div className="px-3 py-4">
-            <Button
-              variant="outline"
-              className="w-full justify-start text-muted-foreground"
-              onClick={() => setSearchOpen(true)}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Rechercher...
-              <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                <span className="text-xs">⌘</span>K
-              </kbd>
-            </Button>
-          </div>
-        </>
+        <div className="px-3 py-4">
+          <Button
+            variant="outline"
+            className="w-full justify-start text-muted-foreground"
+            onClick={() => setSearchOpen(true)}
+          >
+            <Search className="h-4 w-4 mr-2" />
+            Rechercher...
+            <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </Button>
+        </div>
       )}
 
       {isCollapsed && (
-        <>
-          <div className="px-3 py-4 flex justify-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSearchOpen(true)}
-              title="Rechercher (⌘K)"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-          </div>
-        </>
+        <div className="px-3 py-4 flex justify-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSearchOpen(true)}
+            title="Rechercher (⌘K)"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+        </div>
       )}
 
-      {/* Navigation avec sections pliables (accordéon) */}
+      {/* Navigation with collapsible sections (accordion) */}
       <div className="flex-1 px-3 py-4 overflow-y-auto">
         <nav className="space-y-2">
-          {/* Dashboard en premier, sans section */}
-          <Link href="/dashboard">
+          {/* Dashboard first, without section */}
+          <Link to="/dashboard">
             <div
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors cursor-pointer group/item relative",
-                location === "/dashboard"
+                pathname === "/dashboard"
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 isCollapsed && "justify-center"
@@ -584,8 +573,8 @@ export function Sidebar() {
               )}
             </div>
           </Link>
-          
-          {/* Section Favoris pliable */}
+
+          {/* Collapsible Favorites section */}
           {!isCollapsed && favorites.length > 0 && (
             <div className="mt-4">
               <button
@@ -613,9 +602,9 @@ export function Sidebar() {
                   {favorites.map((favHref) => {
                     const favItem = allNavItems.find(item => item.href === favHref);
                     if (!favItem) return null;
-                    const isActive = location === favItem.href;
+                    const isActive = pathname === favItem.href;
                     return (
-                      <Link key={favItem.href} href={favItem.href}>
+                      <Link key={favItem.href} to={favItem.href}>
                         <div
                           className={cn(
                             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors cursor-pointer group/item relative",
@@ -633,7 +622,7 @@ export function Sidebar() {
                               window.location.href = `${favItem.href}?action=create`;
                             }}
                             className="opacity-0 group-hover/item:opacity-100 transition-opacity"
-                            title="Créer un nouveau"
+                            title="Creer un nouveau"
                           >
                             <Plus className="h-4 w-4 text-muted-foreground" />
                           </button>
@@ -652,8 +641,8 @@ export function Sidebar() {
               )}
             </div>
           )}
-          
-          {/* Sections réorganisables par drag & drop */}
+
+          {/* Sortable sections with drag & drop */}
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -663,15 +652,13 @@ export function Sidebar() {
               items={sectionsOrder.map((s) => s.title)}
               strategy={verticalListSortingStrategy}
             >
-              {sectionsOrder.map((section, sectionIndex) => (
+              {sectionsOrder.map((section) => (
                 <SortableSection
                   key={section.title}
                   section={section}
-                  sectionIndex={sectionIndex}
-                  totalSections={sectionsOrder.length}
                   isExpanded={expandedSections[section.title] !== false}
                   isCollapsed={isCollapsed}
-                  location={location}
+                  location={pathname}
                   badgeCounts={badgeCounts}
                   toggleSection={toggleSection}
                   favorites={favorites}
@@ -683,31 +670,31 @@ export function Sidebar() {
         </nav>
       </div>
 
-      {/* Paramètres et Déconnexion en bas */}
+      {/* Settings and Logout at bottom */}
       <div className="p-4 space-y-2">
-        {/* Paramètres */}
-        <Link href="/settings">
+        {/* Settings */}
+        <Link to="/settings">
           {!isCollapsed ? (
             <Button
               variant="ghost"
               className="w-full justify-start gap-3 text-muted-foreground"
             >
               <Wrench className="h-5 w-5" />
-              <span>Paramètres</span>
+              <span>Parametres</span>
             </Button>
           ) : (
             <Button
               variant="ghost"
               size="icon"
               className="w-full text-muted-foreground"
-              title="Paramètres"
+              title="Parametres"
             >
               <Wrench className="h-5 w-5" />
             </Button>
           )}
         </Link>
-        
-        {/* Déconnexion */}
+
+        {/* Logout */}
         {!isCollapsed ? (
           <Button
             variant="ghost"
@@ -715,7 +702,7 @@ export function Sidebar() {
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
-            <span>Déconnexion</span>
+            <span>Deconnexion</span>
           </Button>
         ) : (
           <Button
@@ -723,14 +710,14 @@ export function Sidebar() {
             size="icon"
             className="w-full text-muted-foreground hover:text-destructive"
             onClick={handleLogout}
-            title="Déconnexion"
+            title="Deconnexion"
           >
             <LogOut className="h-5 w-5" />
           </Button>
         )}
       </div>
 
-      {/* Composant de recherche globale */}
+      {/* Global search component */}
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );

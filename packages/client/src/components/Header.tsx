@@ -1,4 +1,10 @@
-import { Link } from "wouter";
+/**
+ * Header Component
+ *
+ * Main application header with organization name, theme toggle, and notifications.
+ */
+
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -25,8 +31,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="flex h-16 items-center justify-between px-6">
-        {/* Logo et nom de l'organisation */}
-        <Link href="/dashboard">
+        {/* Logo and organization name */}
+        <Link to="/dashboard">
           <div className="flex items-center gap-2 cursor-pointer">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <Music className="h-6 w-6 text-primary-foreground" />
@@ -40,9 +46,9 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Contrôles (toujours visibles) */}
+        {/* Controls (always visible) */}
         <div className="flex items-center gap-2">
-          {/* Mode clair/sombre */}
+          {/* Dark/Light mode toggle */}
           <Button
             variant="ghost"
             size="icon"
