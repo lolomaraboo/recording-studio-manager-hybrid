@@ -229,7 +229,9 @@ Monitoring: Prometheus + Grafana
 
 | Composant | Source Manus | Destination Hybride | Status |
 |-----------|--------------|---------------------|--------|
-| **Header** | `client/src/components/Header.tsx` | `packages/client/src/components/Header.tsx` | ⏸️ TODO |
+| **Header** | `client/src/components/Header.tsx` | `packages/client/src/components/layout/Header.tsx` | ✅ DONE |
+| **NotificationCenter** | `client/src/components/NotificationCenter.tsx` | `packages/client/src/components/NotificationCenter.tsx` | ✅ DONE |
+| **ThemeContext** | `client/src/contexts/ThemeContext.tsx` | `packages/client/src/contexts/ThemeContext.tsx` | ✅ DONE |
 | **Sidebar** | `client/src/components/Sidebar.tsx` | `packages/client/src/components/Sidebar.tsx` | ⏸️ TODO |
 | **Layout Global** | `client/src/components/Layout.tsx` | `packages/client/src/components/Layout.tsx` | ⏸️ TODO |
 | **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | ⏸️ TODO |
@@ -295,6 +297,35 @@ L'utilisateur veut :
 - Toutes les pages nouvelles = copie Manus
 - Priorité UI: Identité visuelle > Nouvelles features
 - Tests visuels: Compare avec Manus (screenshots)
+
+#### 📦 Session 2025-12-15 (Portage UI - Header): ✅ COMPLÉTÉ
+
+**Commit:** ecbf956 | **Fichiers:** 13 modifiés | **Lignes:** +814
+
+**Frontend Porté:**
+- ✅ `ThemeContext.tsx` - Provider dark/light mode (62 lignes)
+- ✅ `NotificationCenter.tsx` - Notifications SSE real-time (254 lignes)
+- ✅ `Header.tsx` - Logo + Org name + Theme + Notifications (65 lignes)
+- ✅ 4 composants shadcn/ui: `popover`, `scroll-area`, `separator`, `badge`
+- ✅ Adaptations: `wouter` → `react-router-dom`
+- ✅ Integration: ThemeProvider dans `main.tsx`
+
+**Backend Créé:**
+- ✅ Schema `notifications` (Tenant DB, 15 champs)
+- ✅ Router `notifications` (5 endpoints: list, unread, markAsRead, markAllAsRead, delete)
+- ✅ Router intégré dans `appRouter`
+
+**Dépendances:**
+- ✅ Radix UI: `@radix-ui/react-{popover,scroll-area,separator}`
+
+**Tests:**
+- ✅ Compilation TypeScript: SUCCESS
+- ✅ Tous routers tRPC: FONCTIONNELS
+
+**Métriques:**
+- Temps: ~2h
+- Complexité: Moyenne (adaptations routing + types)
+- Qualité: Clone exact Manus ✅
 
 ---
 
