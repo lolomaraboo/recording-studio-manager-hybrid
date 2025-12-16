@@ -2,7 +2,7 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-15
-**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + Backend Enrichi (11 routers tRPC, 15 tables tenant) - 🔵 Phase 2 Features Critiques READY TO START
+**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + 🔶 Phase 2 Portage UI EN COURS (8/14 composants clés portés)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -11,7 +11,8 @@
 > Phase 1 Semaine 3-4: Backend tRPC + 5 routers + Tests ✅
 > Phase 1 Semaine 5-6: Frontend React + shadcn/ui + Bug fix tRPC ✅
 > Phase 1 Session 2025-12-15: Migrations + 6 routers additionnels ✅
-> Phase 2 Semaine 7-9: Portail Client Self-Service (PROCHAINE ÉTAPE)
+> **Phase 2 Portage UI (EN COURS):** 8/14 composants portés (Header, Sidebar, Layout, GlobalSearch, Notifications, Theme, CommandPalette, AIAssistant)
+> Phase 2 Prochaine: Dashboard complet + 5 pages (Rooms, Equipment, Talents, Projects, Tracks)
 
 ---
 
@@ -227,20 +228,22 @@ Monitoring: Prometheus + Grafana
 
 #### Composants à Copier 1:1
 
-| Composant | Source Manus | Destination Hybride | Status |
-|-----------|--------------|---------------------|--------|
-| **Header** | `client/src/components/Header.tsx` | `packages/client/src/components/layout/Header.tsx` | ✅ DONE |
-| **NotificationCenter** | `client/src/components/NotificationCenter.tsx` | `packages/client/src/components/NotificationCenter.tsx` | ✅ DONE |
-| **ThemeContext** | `client/src/contexts/ThemeContext.tsx` | `packages/client/src/contexts/ThemeContext.tsx` | ✅ DONE |
-| **Sidebar** | `client/src/components/Sidebar.tsx` | `packages/client/src/components/layout/Sidebar.tsx` | ✅ DONE |
-| **Layout Global** | `client/src/components/AppLayout.tsx` | `packages/client/src/components/layout/Layout.tsx` | ✅ DONE |
-| **CommandPalette** | `client/src/components/CommandPalette.tsx` | `packages/client/src/components/CommandPalette.tsx` | ✅ DONE |
-| **AIAssistant** | `client/src/components/AIAssistant.tsx` | `packages/client/src/components/AIAssistant.tsx` | ✅ DONE (simplifié) |
-| **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | ⏸️ TODO |
-| **Rooms** | `client/src/pages/Rooms.tsx` | `packages/client/src/pages/Rooms.tsx` | ⏸️ TODO |
-| **Equipment** | `client/src/pages/Equipment.tsx` | `packages/client/src/pages/Equipment.tsx` | ⏸️ TODO |
-| **Musicians** | `client/src/pages/Musicians.tsx` | `packages/client/src/pages/Musicians.tsx` | ⏸️ TODO |
-| **Projects** | `client/src/pages/Projects.tsx` | `packages/client/src/pages/Projects.tsx` | ⏸️ TODO |
+| Composant | Source Manus | Destination Hybride | Lignes | Status |
+|-----------|--------------|---------------------|--------|--------|
+| **Header** | `client/src/components/Header.tsx` | `packages/client/src/components/layout/Header.tsx` | 65 | ✅ DONE |
+| **NotificationCenter** | `client/src/components/NotificationCenter.tsx` | `packages/client/src/components/NotificationCenter.tsx` | 254 | ✅ DONE |
+| **ThemeContext** | `client/src/contexts/ThemeContext.tsx` | `packages/client/src/contexts/ThemeContext.tsx` | 62 | ✅ DONE |
+| **Sidebar** | `client/src/components/Sidebar.tsx` | `packages/client/src/components/layout/Sidebar.tsx` | 727 | ✅ DONE |
+| **GlobalSearch** | `client/src/components/GlobalSearch.tsx` | `packages/client/src/components/GlobalSearch.tsx` | 239 | ✅ DONE |
+| **Layout Global** | `client/src/components/AppLayout.tsx` | `packages/client/src/components/layout/Layout.tsx` | 41 | ✅ DONE |
+| **CommandPalette** | `client/src/components/CommandPalette.tsx` | `packages/client/src/components/CommandPalette.tsx` | ~150 | ✅ DONE |
+| **AIAssistant** | `client/src/components/AIAssistant.tsx` | `packages/client/src/components/AIAssistant.tsx` | ~100 | ✅ DONE (simplifié) |
+| **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | 172/621 | 🔶 EN COURS (stub basique) |
+| **Rooms** | `client/src/pages/Rooms.tsx` | `packages/client/src/pages/Rooms.tsx` | 0 | ⏸️ TODO |
+| **Equipment** | `client/src/pages/Equipment.tsx` | `packages/client/src/pages/Equipment.tsx` | 0 | ⏸️ TODO |
+| **Talents** | `client/src/pages/Musicians.tsx` | `packages/client/src/pages/Talents.tsx` | 0 | ⏸️ TODO (renommé Musicians → Talents) |
+| **Projects** | `client/src/pages/Projects.tsx` | `packages/client/src/pages/Projects.tsx` | 0 | ⏸️ TODO (+ onglet Tracks intégré) |
+| **Tracks** | N/A (nouvelle page) | `packages/client/src/pages/Tracks.tsx` | 0 | ⏸️ TODO (vue globale + endpoints tRPC) |
 
 #### Système de Couleurs Manus (À Conserver)
 
@@ -299,6 +302,129 @@ L'utilisateur veut :
 - Toutes les pages nouvelles = copie Manus
 - Priorité UI: Identité visuelle > Nouvelles features
 - Tests visuels: Compare avec Manus (screenshots)
+
+---
+
+### 🎭 DÉCISION ARCHITECTURE: Musicians → Talents (Multi-Catégories)
+
+**Date:** 2025-12-15
+**Décideur:** Product Owner
+**Impact:** 🟡 MODÉRÉ - Schéma DB + Router + UI
+
+**Contexte:**
+"Musicians" est trop restrictif. L'industrie créative nécessite de gérer plusieurs types de talents.
+
+**Nouveau Modèle:**
+```
+Talents (entité parent)
+├── Musicians (musiciens, artistes audio)
+├── Actors (comédiens, voice actors)
+└── [Futures catégories possibles]
+```
+
+**Changements Requis:**
+
+| Composant | Changement | Priorité |
+|-----------|------------|----------|
+| **DB Schema** | Ajouter champ `talentType` enum('musician', 'actor', ...) | 🔴 P1 |
+| **Table Name** | Considérer renommage `musicians` → `talents` | 🟡 P2 (optionnel) |
+| **tRPC Router** | `musicians.ts` → `talents.ts` avec filtres par type | 🔴 P1 |
+| **UI Page** | `Talents.tsx` avec dropdown/tabs par catégorie | 🔴 P1 |
+| **Formulaire** | Ajouter sélecteur "Type de talent" | 🔴 P1 |
+
+**Migration DB:**
+```sql
+-- Option 1: Ajouter colonne (backward compatible)
+ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician';
+
+-- Option 2: Renommer table (breaking change)
+ALTER TABLE musicians RENAME TO talents;
+```
+
+**Bénéfices:**
+- ✅ Flexibilité: support multi-industries (audio, vidéo, théâtre)
+- ✅ Scalabilité: ajout facile de nouvelles catégories
+- ✅ Réalité business: reflète mieux l'industrie créative
+
+**Timeline:**
+- Phase 2 (après portage UI) ou Phase 3
+- Estimation: 1-2 jours (migration + router + UI)
+
+---
+
+### 🎵 DÉCISION ARCHITECTURE: Tracks - Double Interface (Contextuel + Global)
+
+**Date:** 2025-12-15
+**Décideur:** Product Owner
+**Impact:** 🟡 MODÉRÉ - Backend endpoints + 2 interfaces UI
+**Contrainte:** Tracks OBLIGATOIREMENT rattachées à projet (`projectId NOT NULL`)
+
+**Problématique:**
+Comment gérer les tracks (pistes audio) : intégrées dans Projects ou page séparée ?
+
+**Solution Retenue: MIX des deux approches**
+
+#### Architecture Double Interface
+
+**1. Projects.tsx - Gestion Contextuelle**
+- Onglet "Tracks" dans détail projet
+- Liste tracks du projet actuel uniquement
+- Workflow: Créer projet → Ajouter tracks
+- Drag & drop pour réordonner trackNumber
+- Stats projet: total tracks, durée, distribution status
+
+**2. Tracks.tsx - Vue Globale**
+- Page dédiée dans Sidebar (section "Projet")
+- Liste TOUTES les tracks (cross-projet)
+- Colonne "Projet" visible et cliquable
+- Filtres: projet, status (recording/editing/mixing/mastering/completed), recherche
+- Stats globales: count par status, durée totale
+- Sélecteur projet OBLIGATOIRE pour création
+
+#### Composants Partagés
+
+| Composant | Réutilisé par | Paramètres |
+|-----------|---------------|------------|
+| `TracksTable.tsx` | Projects + Tracks | `showProjectColumn` (true/false) |
+| `TrackFormModal.tsx` | Projects + Tracks | `preselectedProjectId`, `showProjectSelector` |
+| `StatsHeader.tsx` | Tracks.tsx | Stats globales |
+
+#### Extensions Backend Requises
+
+```typescript
+// Nouveaux endpoints à ajouter
+projects.tracks.listAll({ projectId?, status? })  // Vue globale Tracks.tsx
+projects.tracks.getStats()                        // Stats header
+
+// Endpoints existants (réutilisés)
+projects.tracks.listByProject({ projectId })      // Projects.tsx onglet
+projects.tracks.create/update/delete              // Les deux interfaces
+```
+
+#### Bénéfices
+
+- ✅ **Flexibilité:** Gestion locale (Projects) + vue globale (Tracks)
+- ✅ **Workflow naturel:** Créer dans Projects, monitorer dans Tracks
+- ✅ **Production insights:** Vue d'ensemble (combien en mixing/mastering)
+- ✅ **Recherche:** Trouver track sans connaître projet parent
+- ✅ **Réutilisabilité:** Composants partagés DRY
+
+#### Implémentation
+
+**Checklist (13 tâches, ~4-5h):**
+- Backend: 2 endpoints + tests (1h)
+- Composants partagés: TracksTable, TrackFormModal, StatsHeader (1h)
+- Projects.tsx: Onglet Tracks avec drag & drop (1h)
+- Tracks.tsx: Page globale avec filtres (1.5h)
+- Navigation: Route + Sidebar item (0.5h)
+
+**Documentation:** `TRACKS_ARCHITECTURE.md` (350+ lignes, specs complètes)
+
+**Timeline:**
+- Phase 2 (avec portage Projects.tsx)
+- Estimation: 4-5h (développement) + 1h (tests)
+
+---
 
 #### 📦 Session 2025-12-15 Partie 4 (Portage UI - Header): ✅ COMPLÉTÉ
 
