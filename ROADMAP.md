@@ -360,6 +360,42 @@ ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician' NOT 
 
 **Durée Réelle:** ~1h30 (vs estimation 1-2 jours)
 
+**⚠️ Session 2025-12-16 - Tests + Bug Fix:**
+
+**Tests Playwright Automatisés:**
+- ✅ Création talent type "musician" (Jean Dupont) - SUCCÈS
+- ✅ Création talent type "actor" (Sophie Martin) - SUCCÈS
+- ✅ Onglet "Tous" affiche les 2 talents - SUCCÈS
+- ✅ Combobox "Type de talent" fonctionne - SUCCÈS
+- ❌ Filtres "Musicien" / "Comédien/Acteur" - ÉCHEC (tableau vide)
+
+**Bug Découvert:**
+- **Symptôme:** Filtres par catégorie retournent HTTP 500
+- **Cause 1:** Syntaxe z.enum() incorrecte dans musicians.ts
+  - Avant: `z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR])`
+  - Après: `z.enum(["musician", "actor"])`
+- **Cause 2:** Problème d'authentification "You must be logged in"
+  - `getStats` fonctionne ✅ (stats affichent Total: 2)
+  - `list` avec filtre échoue ❌ (erreur UNAUTHORIZED)
+
+**Fix Appliqué:**
+- ✅ Corrigé syntaxe z.enum() dans 3 endroits (lignes 20, 92, 126)
+- ✅ Fix imports: `@rsm/shared/types/talent` → `@rsm/shared`
+- ✅ Build package shared: `pnpm build`
+
+**Status:** 🟡 PARTIEL - Syntaxe corrigée, mais bug auth non résolu
+**Prochaine Action:** Investiguer pourquoi `list` avec input échoue en auth vs `getStats` sans input
+
+**Fichiers Modifiés:**
+- `packages/server/src/routers/musicians.ts` (3 fixes z.enum)
+- `packages/client/src/pages/Talents.tsx` (1 fix import)
+
+**Screenshots Capturés:**
+- `talents-page-initial.png`
+- `talents-musician-created.png`
+- `talents-both-created.png`
+- `talents-filter-issue.png`
+
 ---
 
 ### 🎵 DÉCISION ARCHITECTURE: Tracks - Double Interface (Contextuel + Global)
@@ -846,4 +882,7 @@ projects.tracks.create/update/delete              // Les deux interfaces
 **Phase 1:** ✅ COMPLÉTÉ (100%)
 **Phase 2 Portage UI:** ✅ COMPLÉTÉ (14/14 composants)
 **Phase 2.5 Migration Talents:** ✅ COMPLÉTÉ (talentType multi-catégories)
-**Prochaine étape:** Tests création talents + Phase 3 (24 pages restantes Manus)
+**Prochaines étapes (P0):**
+1. 🔴 **Bug Critique:** Investiguer erreur auth "You must be logged in" dans `musicians.list` avec filtre
+2. 🟡 **Tests:** Valider filtres talents après fix auth
+3. 🟡 **Phase 3:** Porter 24 pages Manus restantes (total 38 pages)

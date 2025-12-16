@@ -31,8 +31,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { Plus, Edit, Trash2, Music, Mail, Phone, Globe } from "lucide-react";
 import { toast } from "sonner";
-import { TALENT_TYPES, TALENT_TYPE_LABELS } from "@rsm/shared/types/talent";
-import type { TalentType } from "@rsm/shared/types/talent";
+import { TALENT_TYPES, TALENT_TYPE_LABELS, type TalentType } from "@rsm/shared";
 
 export default function Talents() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { musicians } from "@rsm/database/tenant/schema";
-import { TALENT_TYPES } from "@rsm/shared/types/talent";
+import { TALENT_TYPES } from "@rsm/shared";
 import { eq, sql, isNotNull } from "drizzle-orm";
 
 /**
@@ -17,7 +17,7 @@ export const musiciansRouter = router({
     .input(
       z
         .object({
-          talentType: z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR]).optional(),
+          talentType: z.enum(["musician", "actor"]).optional(),
         })
         .optional()
     )
@@ -89,7 +89,7 @@ export const musiciansRouter = router({
         email: z.string().email().max(255).optional(),
         phone: z.string().max(50).optional(),
         bio: z.string().optional(),
-        talentType: z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR]).default(TALENT_TYPES.MUSICIAN),
+        talentType: z.enum(["musician", "actor"]).default("musician"),
         website: z.string().url().max(500).optional(),
         spotifyUrl: z.string().url().max(500).optional(),
         instruments: z.string().optional(), // JSON string
@@ -123,7 +123,7 @@ export const musiciansRouter = router({
         email: z.string().email().max(255).optional(),
         phone: z.string().max(50).optional(),
         bio: z.string().optional(),
-        talentType: z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR]).optional(),
+        talentType: z.enum(["musician", "actor"]).optional(),
         website: z.string().url().max(500).optional(),
         spotifyUrl: z.string().url().max(500).optional(),
         instruments: z.string().optional(),
