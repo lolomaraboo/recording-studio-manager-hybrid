@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { musicians } from "@rsm/database/tenant/schema";
+import { TALENT_TYPES } from "@rsm/shared/types/talent";
 import { eq, sql, isNotNull } from "drizzle-orm";
 
 /**
@@ -10,15 +11,26 @@ import { eq, sql, isNotNull } from "drizzle-orm";
 export const musiciansRouter = router({
   /**
    * List all musicians for the organization
+   * Optional filter by talentType
    */
-  list: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.tenantDb) {
-      throw new Error("Tenant database not available");
-    }
+  list: protectedProcedure
+    .input(
+      z
+        .object({
+          talentType: z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR]).optional(),
+        })
+        .optional()
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.tenantDb) {
+        throw new Error("Tenant database not available");
+      }
 
-    const musiciansList = await ctx.tenantDb.select().from(musicians);
-    return musiciansList;
-  }),
+      const where = input?.talentType ? eq(musicians.talentType, input.talentType) : undefined;
+
+      const musiciansList = await ctx.tenantDb.select().from(musicians).where(where);
+      return musiciansList;
+    }),
 
   /**
    * Get a single musician by ID
@@ -77,6 +89,7 @@ export const musiciansRouter = router({
         email: z.string().email().max(255).optional(),
         phone: z.string().max(50).optional(),
         bio: z.string().optional(),
+        talentType: z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR]).default(TALENT_TYPES.MUSICIAN),
         website: z.string().url().max(500).optional(),
         spotifyUrl: z.string().url().max(500).optional(),
         instruments: z.string().optional(), // JSON string
@@ -110,6 +123,7 @@ export const musiciansRouter = router({
         email: z.string().email().max(255).optional(),
         phone: z.string().max(50).optional(),
         bio: z.string().optional(),
+        talentType: z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR]).optional(),
         website: z.string().url().max(500).optional(),
         spotifyUrl: z.string().url().max(500).optional(),
         instruments: z.string().optional(),
@@ -123,12 +137,24 @@ export const musiciansRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const { id, ...data } = input;
-
       const updatedMusician = await ctx.tenantDb
         .update(musicians)
-        .set({ ...data, updatedAt: new Date() })
-        .where(eq(musicians.id, id))
+        .set({
+          name: input.name,
+          stageName: input.stageName,
+          email: input.email,
+          phone: input.phone,
+          bio: input.bio,
+          talentType: input.talentType,
+          website: input.website,
+          spotifyUrl: input.spotifyUrl,
+          instruments: input.instruments,
+          genres: input.genres,
+          imageUrl: input.imageUrl,
+          notes: input.notes,
+          updatedAt: new Date(),
+        })
+        .where(eq(musicians.id, input.id))
         .returning();
 
       if (updatedMusician.length === 0) {

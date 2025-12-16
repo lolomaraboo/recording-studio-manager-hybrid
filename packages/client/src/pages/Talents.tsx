@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -23,14 +31,19 @@ import {
 import { trpc } from "@/lib/trpc";
 import { Plus, Edit, Trash2, Music, Mail, Phone, Globe } from "lucide-react";
 import { toast } from "sonner";
+import { TALENT_TYPES, TALENT_TYPE_LABELS } from "@rsm/shared/types/talent";
+import type { TalentType } from "@rsm/shared/types/talent";
 
 export default function Talents() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTalent, setSelectedTalent] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState<TalentType | "all">("all");
 
-  const { data: talents, refetch } = trpc.musicians.list.useQuery();
+  const { data: talents, refetch } = trpc.musicians.list.useQuery(
+    selectedType === "all" ? undefined : { talentType: selectedType }
+  );
 
   const { data: stats } = trpc.musicians.getStats.useQuery();
 
@@ -80,6 +93,23 @@ export default function Talents() {
           <Plus className="h-4 w-4 mr-2" />
           Nouveau talent
         </Button>
+      </div>
+
+      {/* Filtres par catégorie */}
+      <div className="mb-6">
+        <Tabs value={selectedType} onValueChange={(val) => setSelectedType(val as TalentType | "all")}>
+          <TabsList>
+            <TabsTrigger value="all">
+              Tous ({talents?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value={TALENT_TYPES.MUSICIAN}>
+              {TALENT_TYPE_LABELS[TALENT_TYPES.MUSICIAN]}
+            </TabsTrigger>
+            <TabsTrigger value={TALENT_TYPES.ACTOR}>
+              {TALENT_TYPE_LABELS[TALENT_TYPES.ACTOR]}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Statistiques */}
@@ -294,6 +324,7 @@ function TalentFormDialog({
   const [email, setEmail] = useState(talent?.email || "");
   const [phone, setPhone] = useState(talent?.phone || "");
   const [bio, setBio] = useState(talent?.bio || "");
+  const [talentType, setTalentType] = useState<TalentType>(talent?.talentType || TALENT_TYPES.MUSICIAN);
   const [website, setWebsite] = useState(talent?.website || "");
   const [spotifyUrl, setSpotifyUrl] = useState(talent?.spotifyUrl || "");
   const [instruments, setInstruments] = useState(() => {
@@ -356,6 +387,7 @@ function TalentFormDialog({
       email: email || undefined,
       phone: phone || undefined,
       bio: bio || undefined,
+      talentType,
       website: website || undefined,
       spotifyUrl: spotifyUrl || undefined,
       instruments: instrumentsArray.length > 0 ? JSON.stringify(instrumentsArray) : undefined,
@@ -454,6 +486,23 @@ function TalentFormDialog({
               rows={3}
               placeholder="Biographie du talent..."
             />
+          </div>
+
+          <div>
+            <Label>Type de talent *</Label>
+            <Select value={talentType} onValueChange={(val) => setTalentType(val as TalentType)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={TALENT_TYPES.MUSICIAN}>
+                  {TALENT_TYPE_LABELS[TALENT_TYPES.MUSICIAN]}
+                </SelectItem>
+                <SelectItem value={TALENT_TYPES.ACTOR}>
+                  {TALENT_TYPE_LABELS[TALENT_TYPES.ACTOR]}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

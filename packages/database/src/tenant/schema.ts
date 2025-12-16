@@ -296,6 +296,7 @@ export const musicians = pgTable("musicians", {
 
   // Professional
   bio: text("bio"),
+  talentType: varchar("talent_type", { length: 50 }).notNull().default("musician"), // "musician" | "actor"
   primaryInstrument: varchar("primary_instrument", { length: 100 }), // Legacy field
   website: varchar("website", { length: 500 }),
   spotifyUrl: varchar("spotify_url", { length: 500 }),
