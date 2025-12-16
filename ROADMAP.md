@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-15
-**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + ✅ Phase 2 Portage UI COMPLÉTÉ (14/14 composants clés portés)
+**Dernière mise à jour:** 2025-12-16
+**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + ✅ Phase 2 Portage UI COMPLÉTÉ (14/14) + ✅ Phase 2.5 Migration Talents COMPLÉTÉE
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -306,11 +306,13 @@ L'utilisateur veut :
 
 ---
 
-### 🎭 DÉCISION ARCHITECTURE: Musicians → Talents (Multi-Catégories)
+### ✅ DÉCISION ARCHITECTURE: Musicians → Talents (Multi-Catégories) - COMPLÉTÉ
 
-**Date:** 2025-12-15
+**Date décision:** 2025-12-15
+**Date implémentation:** 2025-12-16 (Phase 2.5)
 **Décideur:** Product Owner
 **Impact:** 🟡 MODÉRÉ - Schéma DB + Router + UI
+**Commit:** c370915 - feat: Add multi-category talents support (Phase 2.5)
 
 **Contexte:**
 "Musicians" est trop restrictif. L'industrie créative nécessite de gérer plusieurs types de talents.
@@ -320,36 +322,43 @@ L'utilisateur veut :
 Talents (entité parent)
 ├── Musicians (musiciens, artistes audio)
 ├── Actors (comédiens, voice actors)
-└── [Futures catégories possibles]
+└── [Futures catégories possibles: voice_actor, dancer, producer]
 ```
 
-**Changements Requis:**
+**✅ Changements Implémentés:**
 
-| Composant | Changement | Priorité |
-|-----------|------------|----------|
-| **DB Schema** | Ajouter champ `talentType` enum('musician', 'actor', ...) | 🔴 P1 |
-| **Table Name** | Considérer renommage `musicians` → `talents` | 🟡 P2 (optionnel) |
-| **tRPC Router** | `musicians.ts` → `talents.ts` avec filtres par type | 🔴 P1 |
-| **UI Page** | `Talents.tsx` avec dropdown/tabs par catégorie | 🔴 P1 |
-| **Formulaire** | Ajouter sélecteur "Type de talent" | 🔴 P1 |
+| Composant | Changement | Status |
+|-----------|------------|--------|
+| **DB Schema** | Colonne `talentType` VARCHAR(50) DEFAULT 'musician' | ✅ DONE |
+| **Types Shared** | TALENT_TYPES enum + TALENT_TYPE_LABELS | ✅ DONE |
+| **Migration Drizzle** | 0001_woozy_kinsey_walden.sql générée | ✅ DONE |
+| **Table Name** | Gardé `musicians` (backward compatible) | ✅ DONE |
+| **tRPC Router** | `musicians.list` avec filtre talentType optionnel | ✅ DONE |
+| **Router Create/Update** | Champ talentType inclus | ✅ DONE |
+| **UI Tabs** | Filtres Tous/Musiciens/Acteurs | ✅ DONE |
+| **Formulaire** | Select "Type de talent" ajouté | ✅ DONE |
 
-**Migration DB:**
+**Migration DB Retenue:**
 ```sql
--- Option 1: Ajouter colonne (backward compatible)
-ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician';
-
--- Option 2: Renommer table (breaking change)
-ALTER TABLE musicians RENAME TO talents;
+-- Option 1 choisie: Backward compatible
+ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician' NOT NULL;
 ```
 
-**Bénéfices:**
+**Fichiers Modifiés (9 fichiers, +97 lignes net):**
+- `packages/database/src/tenant/schema.ts`
+- `packages/shared/src/types/talent.ts` (nouveau)
+- `packages/shared/src/types/index.ts` (nouveau)
+- `packages/server/src/routers/musicians.ts`
+- `packages/client/src/pages/Talents.tsx`
+- `packages/database/drizzle/migrations/tenant/0001_woozy_kinsey_walden.sql` (nouveau)
+
+**Bénéfices Réalisés:**
 - ✅ Flexibilité: support multi-industries (audio, vidéo, théâtre)
 - ✅ Scalabilité: ajout facile de nouvelles catégories
 - ✅ Réalité business: reflète mieux l'industrie créative
+- ✅ Backward compatible: data existante garde 'musician' par défaut
 
-**Timeline:**
-- Phase 2 (après portage UI) ou Phase 3
-- Estimation: 1-2 jours (migration + router + UI)
+**Durée Réelle:** ~1h30 (vs estimation 1-2 jours)
 
 ---
 
@@ -831,8 +840,10 @@ projects.tracks.create/update/delete              // Les deux interfaces
 ---
 
 **Créé le:** 2025-12-13
-**Dernière MAJ:** 2025-12-15
+**Dernière MAJ:** 2025-12-16
 **Par:** Claude Sonnet 4.5
-**Commit actuel:** 169a267 (66 fichiers, ~5100 lignes)
-**Phase 1:** ✅ COMPLÉTÉ (100%) + Portage UI Layout ✅
-**Prochaine étape:** Phase 2 Portail Client Self-Service (Semaine 7-9)
+**Commit actuel:** c370915 (75 fichiers, ~5200 lignes)
+**Phase 1:** ✅ COMPLÉTÉ (100%)
+**Phase 2 Portage UI:** ✅ COMPLÉTÉ (14/14 composants)
+**Phase 2.5 Migration Talents:** ✅ COMPLÉTÉ (talentType multi-catégories)
+**Prochaine étape:** Tests création talents + Phase 3 (24 pages restantes Manus)
