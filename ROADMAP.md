@@ -2,7 +2,7 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-16
-**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + ✅ Phase 2 Portage UI COMPLÉTÉ (14/14) + ✅ Phase 2.5 Migration Talents COMPLÉTÉE
+**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + ✅ Phase 2 Portage UI COMPLÉTÉ (14/14) + ✅ Phase 2.5 Migration Talents COMPLÉTÉE + ✅ Bug Auth DATABASE_URL RÉSOLU
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -360,35 +360,50 @@ ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician' NOT 
 
 **Durée Réelle:** ~1h30 (vs estimation 1-2 jours)
 
-**⚠️ Session 2025-12-16 - Tests + Bug Fix:**
+**✅ Session 2025-12-16 - Tests + Bug Fix RÉSOLU:**
 
 **Tests Playwright Automatisés:**
 - ✅ Création talent type "musician" (Jean Dupont) - SUCCÈS
 - ✅ Création talent type "actor" (Sophie Martin) - SUCCÈS
 - ✅ Onglet "Tous" affiche les 2 talents - SUCCÈS
 - ✅ Combobox "Type de talent" fonctionne - SUCCÈS
-- ❌ Filtres "Musicien" / "Comédien/Acteur" - ÉCHEC (tableau vide)
+- ⚠️  Filtres "Musicien" / "Comédien/Acteur" - ÉCHEC initial (résolu)
 
-**Bug Découvert:**
-- **Symptôme:** Filtres par catégorie retournent HTTP 500
-- **Cause 1:** Syntaxe z.enum() incorrecte dans musicians.ts
+**Bug Découvert & Résolu:**
+- **Symptôme:** Filtres par catégorie retournaient HTTP 500 + erreur auth
+- **Cause 1 (mineure):** Syntaxe z.enum() incorrecte dans musicians.ts ✅ CORRIGÉE
   - Avant: `z.enum([TALENT_TYPES.MUSICIAN, TALENT_TYPES.ACTOR])`
   - Après: `z.enum(["musician", "actor"])`
-- **Cause 2:** Problème d'authentification "You must be logged in"
-  - `getStats` fonctionne ✅ (stats affichent Total: 2)
-  - `list` avec filtre échoue ❌ (erreur UNAUTHORIZED)
+- **Cause 2 (RACINE):** DATABASE_URL non configuré ✅ RÉSOLU
+  - Le fichier `.env` manquait dans `packages/server/`
+  - `dotenv/config` cherche `.env` dans CWD = packages/server/ (pas root)
+  - getTenantDb() échouait → user=null → UNAUTHORIZED
+  - Observation: `getStats` (sans input) fonctionnait mais `list` (avec input) échouait
+
+**Investigation Complète:**
+1. ❌ Testé httpLink vs httpBatchLink (batching n'était PAS le problème)
+2. ❌ Vérifié middleware protectedProcedure (fonctionnait correctement)
+3. ✅ Logs backend révélaient: "DATABASE_URL not configured"
+4. ✅ Solution: créer `.env` dans packages/server/ + packages/database/
 
 **Fix Appliqué:**
 - ✅ Corrigé syntaxe z.enum() dans 3 endroits (lignes 20, 92, 126)
 - ✅ Fix imports: `@rsm/shared/types/talent` → `@rsm/shared`
 - ✅ Build package shared: `pnpm build`
+- ✅ Créé packages/server/.env avec DATABASE_URL
+- ✅ Lancé PostgreSQL container (rsm-postgres:5432)
+- ✅ Créé databases rsm_master + tenant_1
 
-**Status:** 🟡 PARTIEL - Syntaxe corrigée, mais bug auth non résolu
-**Prochaine Action:** Investiguer pourquoi `list` avec input échoue en auth vs `getStats` sans input
+**Status:** ✅ BUG RÉSOLU - Cause racine identifiée et corrigée
+**Travail Restant:** Appliquer migrations Drizzle (schemas vides)
 
 **Fichiers Modifiés:**
 - `packages/server/src/routers/musicians.ts` (3 fixes z.enum)
 - `packages/client/src/pages/Talents.tsx` (1 fix import)
+- `packages/server/.env` (créé)
+- `packages/database/.env` (créé)
+- `packages/database/scripts/init-tenant.ts` (créé)
+- `packages/database/drizzle.config.tenant.ts` (créé)
 
 **Screenshots Capturés:**
 - `talents-page-initial.png`

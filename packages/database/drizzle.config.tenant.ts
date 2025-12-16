@@ -5,8 +5,7 @@ export default defineConfig({
   schema: "./src/tenant/schema.ts",
   out: "./drizzle/migrations/tenant",
   dbCredentials: {
-    // This will be used as a template - actual tenant DB URLs set at runtime
-    url: process.env.TENANT_DATABASE_URL || "postgresql://localhost:5432/tenant_1",
+    url: process.env.DATABASE_URL_TENANT || "postgresql://postgres:password@localhost:5432/tenant_1",
   },
   verbose: true,
   strict: true,
