@@ -50,22 +50,24 @@ export default function Tracks() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // TODO: Implémenter ces endpoints dans le backend
-  // const { data: allTracks } = trpc.projects.tracks.listAll.useQuery();
-  // const { data: stats } = trpc.projects.tracks.getStats.useQuery();
+  // Queries tRPC (endpoints implémentés!)
+  const { data: allTracks } = trpc.projects.tracks.listAll.useQuery({});
+  const { data: statsData } = trpc.projects.tracks.getStats.useQuery();
 
-  // Fallback: Liste des projets pour le dropdown
+  // Liste des projets pour le dropdown
   const { data: projects } = trpc.projects.list.useQuery();
 
-  // Données mock pour démonstration
-  const allTracks: any[] = [];
-  const stats = {
+  // Stats avec valeurs par défaut
+  const stats = statsData || {
     total: 0,
-    recording: 0,
-    editing: 0,
-    mixing: 0,
-    mastering: 0,
-    completed: 0,
+    byStatus: {
+      recording: 0,
+      editing: 0,
+      mixing: 0,
+      mastering: 0,
+      completed: 0,
+    },
+    totalDuration: 0,
   };
 
   // Filtrage client-side
@@ -133,7 +135,7 @@ export default function Tracks() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.recording}</div>
+              <div className="text-2xl font-bold">{stats.byStatus.recording}</div>
             </CardContent>
           </Card>
 
@@ -144,7 +146,7 @@ export default function Tracks() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.mixing}</div>
+              <div className="text-2xl font-bold">{stats.byStatus.mixing}</div>
             </CardContent>
           </Card>
 
@@ -155,7 +157,7 @@ export default function Tracks() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.mastering}</div>
+              <div className="text-2xl font-bold">{stats.byStatus.mastering}</div>
             </CardContent>
           </Card>
 
@@ -166,7 +168,7 @@ export default function Tracks() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.completed}</div>
+              <div className="text-2xl font-bold">{stats.byStatus.completed}</div>
             </CardContent>
           </Card>
         </div>
@@ -230,13 +232,9 @@ export default function Tracks() {
               <div className="text-center py-12 space-y-4">
                 <Music className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
                 <div>
-                  <p className="font-semibold mb-1">Endpoints tRPC manquants</p>
+                  <p className="font-semibold mb-1">Aucune track enregistrée</p>
                   <p className="text-sm text-muted-foreground">
-                    Implémenter <code>projects.tracks.listAll</code> et{" "}
-                    <code>projects.tracks.getStats</code>
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    (cf. TRACKS_ARCHITECTURE.md lignes 266-320)
+                    Créez votre première track pour commencer
                   </p>
                 </div>
               </div>

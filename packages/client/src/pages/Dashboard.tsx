@@ -144,8 +144,10 @@ export function Dashboard() {
     if (storedOrgId) {
       setSelectedOrgId(parseInt(storedOrgId));
     } else {
-      // Redirection immédiate vers la sélection d'organisation
-      navigate("/select-organization");
+      // Dev: Use org ID 1 by default (matches mock headers in main.tsx)
+      const defaultOrgId = 1;
+      localStorage.setItem("selectedOrganizationId", defaultOrgId.toString());
+      setSelectedOrgId(defaultOrgId);
     }
   }, [navigate]);
 
