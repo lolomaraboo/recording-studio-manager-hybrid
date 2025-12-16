@@ -2,7 +2,7 @@
 
 > **🚀 STACK HYBRIDE - Phase 1 COMPLÉTÉE ✅**
 > **Phase actuelle**: Phase 1 - Infrastructure & Base (100% COMPLÉTÉ ✅)
-> **Dernière mise à jour**: 2025-12-13 (Session: Frontend React + shadcn/ui + Bug fix tRPC)
+> **Dernière mise à jour**: 2025-12-15 (Session: Portage UI Layout complet - CommandPalette + AIAssistant)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 ---
@@ -343,6 +343,57 @@ Monitoring: Prometheus + Grafana
 - Qualité: Clone exact Manus ✅
 
 **Phase 1 Session 2025-12-15 (Partie 4): 100% VALIDÉE ✅**
+
+### ✅ PRIORITÉ 3.8 - PORTAGE UI LAYOUT COMPLET (2025-12-15) (COMPLÉTÉE)
+1. ✅ ~~Vérifier Sidebar déjà porté~~ (DONE - react-router-dom OK, drag & drop OK)
+2. ✅ ~~Créer AssistantContext.tsx~~ (DONE - 38 lignes, localStorage state)
+3. ✅ ~~Créer ChatbotContext.tsx~~ (DONE - 51 lignes, width calculation)
+4. ✅ ~~Créer useWebSocket.ts hook~~ (DONE - 145 lignes, socket.io-client)
+5. ✅ ~~Porter CommandPalette.tsx~~ (DONE - 186 lignes, adapté react-router-dom)
+6. ✅ ~~Créer AIAssistant.tsx simplifié~~ (DONE - 85 lignes, version placeholder)
+7. ✅ ~~Mettre à jour Layout.tsx~~ (DONE - clone exact AppLayout Manus)
+8. ✅ ~~Ajouter providers dans main.tsx~~ (DONE - AssistantProvider, ChatbotProvider)
+9. ✅ ~~Installer socket.io-client~~ (DONE - ^4.8.1)
+10. ✅ ~~Tester compilation TypeScript~~ (DONE - SUCCESS, 0 erreur frontend)
+11. ✅ ~~Commit + Push GitHub~~ (DONE - commit 169a267)
+
+**Livrables Session 2025-12-15 (Partie 5 - Portage UI Layout):**
+- ✅ 5 nouveaux composants créés (~500 lignes)
+- ✅ Layout.tsx = clone exact AppLayout Manus
+- ✅ Structure UI complète:
+  * CommandPalette (Cmd+K) recherche globale
+  * Sidebar gauche (drag & drop, favoris, collapsible)
+  * Header fixe (logo, org, theme, notifications)
+  * AIAssistant panneau droit (minimisable, fermable)
+  * Main content avec marge dynamique (chatbot width)
+- ✅ Contextes opérationnels (AssistantProvider, ChatbotProvider)
+- ✅ useWebSocket pour notifications temps réel (SSE ready)
+- ✅ Adaptations routing: wouter → react-router-dom
+- ✅ socket.io-client installé et configuré
+- ✅ Compilation TypeScript: SUCCESS (0 erreur)
+- ✅ Git commit: 169a267 (9 fichiers, +630 lignes, -17 lignes)
+
+**Fichiers créés:**
+- `packages/client/src/contexts/AssistantContext.tsx` (38 lignes)
+- `packages/client/src/contexts/ChatbotContext.tsx` (51 lignes)
+- `packages/client/src/hooks/useWebSocket.ts` (145 lignes)
+- `packages/client/src/components/CommandPalette.tsx` (186 lignes)
+- `packages/client/src/components/AIAssistant.tsx` (85 lignes - version simplifiée)
+
+**Fichiers modifiés:**
+- `packages/client/src/components/layout/Layout.tsx` (clone exact AppLayout)
+- `packages/client/src/main.tsx` (providers ajoutés)
+- `packages/client/package.json` (+socket.io-client)
+- `pnpm-lock.yaml`
+
+**Métriques:**
+- Temps: ~3h (portage complet Layout)
+- Fichiers: 9 modifiés/créés
+- Lignes: +630 / -17 (net +613)
+- Complexité: Moyenne-haute (adaptations routing + contextes + WebSocket)
+- Qualité: Clone exact Manus ✅
+
+**Phase 1 Session 2025-12-15 (Partie 5): 100% VALIDÉE ✅**
 
 ### 🔵 PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (PROCHAINE ÉTAPE)
 1. ⏸️ Connecter pages aux endpoints tRPC (fetch real data)

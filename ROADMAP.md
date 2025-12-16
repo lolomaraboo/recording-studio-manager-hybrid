@@ -232,8 +232,10 @@ Monitoring: Prometheus + Grafana
 | **Header** | `client/src/components/Header.tsx` | `packages/client/src/components/layout/Header.tsx` | ✅ DONE |
 | **NotificationCenter** | `client/src/components/NotificationCenter.tsx` | `packages/client/src/components/NotificationCenter.tsx` | ✅ DONE |
 | **ThemeContext** | `client/src/contexts/ThemeContext.tsx` | `packages/client/src/contexts/ThemeContext.tsx` | ✅ DONE |
-| **Sidebar** | `client/src/components/Sidebar.tsx` | `packages/client/src/components/Sidebar.tsx` | ⏸️ TODO |
-| **Layout Global** | `client/src/components/Layout.tsx` | `packages/client/src/components/Layout.tsx` | ⏸️ TODO |
+| **Sidebar** | `client/src/components/Sidebar.tsx` | `packages/client/src/components/layout/Sidebar.tsx` | ✅ DONE |
+| **Layout Global** | `client/src/components/AppLayout.tsx` | `packages/client/src/components/layout/Layout.tsx` | ✅ DONE |
+| **CommandPalette** | `client/src/components/CommandPalette.tsx` | `packages/client/src/components/CommandPalette.tsx` | ✅ DONE |
+| **AIAssistant** | `client/src/components/AIAssistant.tsx` | `packages/client/src/components/AIAssistant.tsx` | ✅ DONE (simplifié) |
 | **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | ⏸️ TODO |
 | **Rooms** | `client/src/pages/Rooms.tsx` | `packages/client/src/pages/Rooms.tsx` | ⏸️ TODO |
 | **Equipment** | `client/src/pages/Equipment.tsx` | `packages/client/src/pages/Equipment.tsx` | ⏸️ TODO |
@@ -298,7 +300,7 @@ L'utilisateur veut :
 - Priorité UI: Identité visuelle > Nouvelles features
 - Tests visuels: Compare avec Manus (screenshots)
 
-#### 📦 Session 2025-12-15 (Portage UI - Header): ✅ COMPLÉTÉ
+#### 📦 Session 2025-12-15 Partie 4 (Portage UI - Header): ✅ COMPLÉTÉ
 
 **Commit:** ecbf956 | **Fichiers:** 13 modifiés | **Lignes:** +814
 
@@ -325,6 +327,64 @@ L'utilisateur veut :
 **Métriques:**
 - Temps: ~2h
 - Complexité: Moyenne (adaptations routing + types)
+- Qualité: Clone exact Manus ✅
+
+#### 📦 Session 2025-12-15 Partie 5 (Portage UI - Layout Complet): ✅ COMPLÉTÉ
+
+**Commit:** 169a267 | **Fichiers:** 9 modifiés/créés | **Lignes:** +630 / -17
+
+**Contextes & Hooks Créés:**
+- ✅ `contexts/AssistantContext.tsx` (38 lignes) - Gestion état assistant IA
+- ✅ `contexts/ChatbotContext.tsx` (51 lignes) - Largeur chatbot dynamique
+- ✅ `hooks/useWebSocket.ts` (145 lignes) - Notifications WebSocket temps réel
+
+**Composants Créés:**
+- ✅ `components/CommandPalette.tsx` (186 lignes) - Recherche globale Cmd+K
+- ✅ `components/AIAssistant.tsx` (85 lignes) - Chatbot panneau droit (version simplifiée)
+
+**Composants Modifiés:**
+- ✅ `components/layout/Layout.tsx` - Clone exact AppLayout Manus
+  * CommandPalette intégré
+  * AIAssistant panneau droit
+  * Marge droite dynamique (chatbot width)
+  * useWebSocket activé
+- ✅ `main.tsx` - Providers hiérarchie (AssistantProvider → ChatbotProvider)
+
+**Dépendances:**
+- ✅ socket.io-client ^4.8.1
+
+**Adaptations:**
+- ✅ wouter → react-router-dom dans CommandPalette
+- ✅ useLocation() adapté
+- ✅ navigate() au lieu de setLocation()
+
+**Structure UI Finale:**
+```
+┌────────────────────────────────────────────────┐
+│  CommandPalette (Cmd+K) - Recherche globale   │
+└────────────────────────────────────────────────┘
+
+┌─────────┬──────────────────────┬─────────────┐
+│         │  Header              │             │
+│ Sidebar ├──────────────────────┤ AIAssistant │
+│         │                      │  (panneau   │
+│  (drag  │  Main Content        │   droit,    │
+│   drop, │  <Outlet />          │  minimize,  │
+│ favoris,│                      │   close)    │
+│collapse)│                      │             │
+└─────────┴──────────────────────┴─────────────┘
+```
+
+**Tests:**
+- ✅ Compilation TypeScript: SUCCESS (0 erreur frontend)
+- ✅ Tous imports résolus
+- ✅ Providers hiérarchie OK
+
+**Métriques:**
+- Temps: ~3h
+- Fichiers: 9 modifiés/créés
+- Lignes: +630 / -17 (net +613)
+- Complexité: Moyenne-haute
 - Qualité: Clone exact Manus ✅
 
 ---
@@ -644,8 +704,8 @@ L'utilisateur veut :
 ---
 
 **Créé le:** 2025-12-13
-**Dernière MAJ:** 2025-12-13
+**Dernière MAJ:** 2025-12-15
 **Par:** Claude Sonnet 4.5
-**Commit actuel:** 7494b5e (57 fichiers, ~4500 lignes)
-**Phase 1:** ✅ COMPLÉTÉ (100%)
+**Commit actuel:** 169a267 (66 fichiers, ~5100 lignes)
+**Phase 1:** ✅ COMPLÉTÉ (100%) + Portage UI Layout ✅
 **Prochaine étape:** Phase 2 Portail Client Self-Service (Semaine 7-9)
