@@ -91,8 +91,8 @@ const navSections: NavSection[] = [
         icon: <UserPlus className="h-5 w-5" />,
       },
       {
-        title: "Musiciens",
-        href: "/musicians",
+        title: "Talents",
+        href: "/talents",
         icon: <Users className="h-5 w-5" />,
       },
     ],
