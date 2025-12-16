@@ -2,7 +2,7 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-15
-**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + 🔶 Phase 2 Portage UI EN COURS (8/14 composants clés portés)
+**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + 🔶 Phase 2 Portage UI EN COURS (9/14 composants clés portés)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -11,8 +11,8 @@
 > Phase 1 Semaine 3-4: Backend tRPC + 5 routers + Tests ✅
 > Phase 1 Semaine 5-6: Frontend React + shadcn/ui + Bug fix tRPC ✅
 > Phase 1 Session 2025-12-15: Migrations + 6 routers additionnels ✅
-> **Phase 2 Portage UI (EN COURS):** 8/14 composants portés (Header, Sidebar, Layout, GlobalSearch, Notifications, Theme, CommandPalette, AIAssistant)
-> Phase 2 Prochaine: Dashboard complet + 5 pages (Rooms, Equipment, Talents, Projects, Tracks)
+> **Phase 2 Portage UI (EN COURS):** 9/14 composants portés (Header, Sidebar, Layout, GlobalSearch, Notifications, Theme, CommandPalette, AIAssistant, Dashboard)
+> Phase 2 Prochaine: 5 pages (Rooms, Equipment, Talents, Projects, Tracks)
 
 ---
 
@@ -238,7 +238,7 @@ Monitoring: Prometheus + Grafana
 | **Layout Global** | `client/src/components/AppLayout.tsx` | `packages/client/src/components/layout/Layout.tsx` | 41 | ✅ DONE |
 | **CommandPalette** | `client/src/components/CommandPalette.tsx` | `packages/client/src/components/CommandPalette.tsx` | ~150 | ✅ DONE |
 | **AIAssistant** | `client/src/components/AIAssistant.tsx` | `packages/client/src/components/AIAssistant.tsx` | ~100 | ✅ DONE (simplifié) |
-| **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | 172/621 | 🔶 EN COURS (stub basique) |
+| **Dashboard** | `client/src/pages/Dashboard.tsx` | `packages/client/src/pages/Dashboard.tsx` | 620 | ✅ DONE (9 widgets drag&drop) |
 | **Rooms** | `client/src/pages/Rooms.tsx` | `packages/client/src/pages/Rooms.tsx` | 0 | ⏸️ TODO |
 | **Equipment** | `client/src/pages/Equipment.tsx` | `packages/client/src/pages/Equipment.tsx` | 0 | ⏸️ TODO |
 | **Talents** | `client/src/pages/Musicians.tsx` | `packages/client/src/pages/Talents.tsx` | 0 | ⏸️ TODO (renommé Musicians → Talents) |
