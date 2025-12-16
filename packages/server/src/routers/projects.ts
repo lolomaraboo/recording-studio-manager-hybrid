@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
-import { projects, tracks, musicians, trackCredits } from "@rsm/database/tenant/schema";
-import { eq } from "drizzle-orm";
+import { projects, tracks } from "@rsm/database/tenant/schema";
+import { eq, and } from "drizzle-orm";
 
 /**
  * Projects Router
@@ -166,6 +166,71 @@ export const projectsRouter = router({
 
         return tracksList;
       }),
+
+    /**
+     * List all tracks (cross-project) with optional filters
+     */
+    listAll: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().min(1).max(100).default(100),
+          offset: z.number().min(0).default(0),
+          projectId: z.number().optional(),
+          status: z.enum(["recording", "editing", "mixing", "mastering", "completed"]).optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        // Build where conditions
+        const conditions = [];
+        if (input.projectId) {
+          conditions.push(eq(tracks.projectId, input.projectId));
+        }
+        if (input.status) {
+          conditions.push(eq(tracks.status, input.status));
+        }
+
+        // Build and execute query
+        const whereCondition = conditions.length > 0 ? and(...conditions) : undefined;
+
+        const tracksList = await ctx.tenantDb
+          .select()
+          .from(tracks)
+          .where(whereCondition)
+          .orderBy(tracks.projectId, tracks.trackNumber)
+          .limit(input.limit)
+          .offset(input.offset);
+
+        return tracksList;
+      }),
+
+    /**
+     * Get global stats for all tracks
+     */
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.tenantDb) {
+        throw new Error("Tenant database not available");
+      }
+
+      const allTracks = await ctx.tenantDb.select().from(tracks);
+
+      const stats = {
+        total: allTracks.length,
+        byStatus: {
+          recording: allTracks.filter((t) => t.status === "recording").length,
+          editing: allTracks.filter((t) => t.status === "editing").length,
+          mixing: allTracks.filter((t) => t.status === "mixing").length,
+          mastering: allTracks.filter((t) => t.status === "mastering").length,
+          completed: allTracks.filter((t) => t.status === "completed").length,
+        },
+        totalDuration: allTracks.reduce((sum, t) => sum + (t.duration || 0), 0),
+      };
+
+      return stats;
+    }),
 
     /**
      * Create new track
