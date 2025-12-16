@@ -1,60 +1,53 @@
-import { Search, Bell, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { NotificationCenter } from "@/components/NotificationCenter";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Moon, Sun, Music } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 export function Header() {
+  const { theme, toggleTheme } = useTheme();
+
+  // Get current user's organization from context (no params needed)
+  const { data: organization } = trpc.organizations.get.useQuery();
+
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-      {/* Search */}
-      <div className="flex flex-1 items-center gap-4">
-        <div className="relative w-96">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search sessions, clients, invoices..."
-            className="pl-10"
-          />
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <div className="flex h-16 items-center justify-between px-6">
+        {/* Logo et nom de l'organisation */}
+        <Link to="/dashboard">
+          <div className="flex items-center gap-2 cursor-pointer">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+              <Music className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold">{organization?.name || "RSM"}</span>
+              <span className="text-xs text-muted-foreground">
+                Recording Studio Manager
+              </span>
+            </div>
+          </div>
+        </Link>
+
+        {/* Contrôles (toujours visibles) */}
+        <div className="flex items-center gap-2">
+          {/* Mode clair/sombre */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            title={theme === "dark" ? "Mode clair" : "Mode sombre"}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+
+          {/* Notifications */}
+          <NotificationCenter />
         </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-4">
-        {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
-        </Button>
-
-        {/* User Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium">John Doe</span>
-                <span className="text-xs text-gray-500">john@studiopro.com</span>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   );

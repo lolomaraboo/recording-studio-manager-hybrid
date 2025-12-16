@@ -537,3 +537,42 @@ export const payments = pgTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
+
+/**
+ * Notifications table (Tenant DB)
+ * User notifications for events, reminders, and updates
+ */
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+
+  // Type & Priority
+  type: varchar("type", { length: 50 }).notNull(), // "info" | "success" | "warning" | "error" | "reminder" | "system"
+  priority: varchar("priority", { length: 50 }).notNull().default("normal"), // "low" | "normal" | "high" | "urgent"
+
+  // Content
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+
+  // Action
+  actionUrl: varchar("action_url", { length: 500 }), // Optional URL to navigate to when clicked
+  actionLabel: varchar("action_label", { length: 100 }), // Optional label for action button
+
+  // Metadata
+  metadata: text("metadata"), // JSON object with additional data
+
+  // Status
+  isRead: boolean("is_read").notNull().default(false),
+  readAt: timestamp("read_at"),
+
+  // Optional links
+  clientId: integer("client_id").references(() => clients.id),
+  projectId: integer("project_id").references(() => projects.id),
+  sessionId: integer("session_id").references(() => sessions.id),
+  invoiceId: integer("invoice_id").references(() => invoices.id),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
