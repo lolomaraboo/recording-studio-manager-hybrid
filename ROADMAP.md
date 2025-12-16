@@ -2,7 +2,7 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-16
-**Status actuel:** ✅ Phase 1 Infrastructure 100% COMPLÉTÉE + ✅ Phase 2 Portage UI COMPLÉTÉ (14/14) + ✅ Phase 2.5 Migration Talents COMPLÉTÉE + ✅ Bug Auth DATABASE_URL RÉSOLU
+**Status actuel:** ✅ Phase 1 Infrastructure 100% + ✅ Phase 2 Portage UI (14/14) + ✅ Phase 2.5 Talents Multi-Catégories + ✅ Migrations P0 Appliquées + ✅ Auth Backend COMPLET (Frontend TODO)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
@@ -395,7 +395,7 @@ ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician' NOT 
 - ✅ Créé databases rsm_master + tenant_1
 
 **Status:** ✅ BUG RÉSOLU - Cause racine identifiée et corrigée
-**Travail Restant:** Appliquer migrations Drizzle (schemas vides)
+**Travail Restant:** ~~Appliquer migrations Drizzle~~ ✅ FAIT
 
 **Fichiers Modifiés:**
 - `packages/server/src/routers/musicians.ts` (3 fixes z.enum)
@@ -410,6 +410,78 @@ ALTER TABLE musicians ADD COLUMN talent_type VARCHAR(50) DEFAULT 'musician' NOT 
 - `talents-musician-created.png`
 - `talents-both-created.png`
 - `talents-filter-issue.png`
+
+**✅ Session 2025-12-16 PM - Migrations + Authentification:**
+
+**P0 Migrations Appliquées:**
+- ✅ Master DB (rsm_master): 6 tables créées (users, organizations, tenant_databases, invitations, organization_members, subscription_plans)
+- ✅ Tenant DB (tenant_1): 16 tables créées incluant musicians avec talent_type
+- ✅ Méthode: docker exec psql (deploy-*.sh non utilisable, psql non installé localement)
+- ✅ Migrations SQL: master/0000_massive_zodiak.sql, tenant/0000_early_charles_xavier.sql, tenant/0001_woozy_kinsey_walden.sql
+
+**P1 Tests - Bug Critique Découvert:**
+- ❌ Création talents échouait (HTTP 500, table vide malgré UI succès)
+- ❌ Filtres talentType échouaient (HTTP 500, aucun résultat)
+- ❌ UI affichait mocks (Jean Dupont, Sophie Martin) mais DB vide
+- 🔍 **Cause racine:** Context tRPC attendait headers `x-test-user-id`, `x-test-org-id` → client ne les envoyait pas → `tenantDb = null` → erreurs 500
+
+**Décision Architecture: Implémenter Auth Maintenant (vs Quick Fix):**
+
+Options évaluées:
+1. ❌ Fallback org=1 côté serveur (dangereux, cache problème)
+2. ⚠️ Headers automatiques client (code temporaire à jeter)
+3. ✅ **Auth complète maintenant** (solution pérenne)
+
+Justification:
+- Infrastructure déjà prête (tables users/orgs/tenants)
+- Inévitable pour production
+- Pas de dette technique
+- Test réel multi-tenant
+- Déjà bloqués, autant corriger proprement
+
+**✅ Authentification Backend COMPLÈTE (2h):**
+
+| Composant | Implémentation | Status |
+|-----------|----------------|--------|
+| **Router Auth** | register, login, logout, me (bcrypt + sessions) | ✅ DONE |
+| **Session Middleware** | express-session (7j, httpOnly, credentials) | ✅ DONE |
+| **Context tRPC** | Utilise req.session (userId, organizationId) | ✅ DONE |
+| **Test Data** | test@example.com / password123 → org 1 → tenant_1 | ✅ DONE |
+| **Documentation** | decisions/2025-12-16-authentication-implementation.md | ✅ DONE |
+
+**Dépendances Ajoutées:**
+- express-session + @types/express-session
+- bcryptjs + @types/bcryptjs
+
+**Fichiers Créés/Modifiés:**
+- `packages/server/src/routers/auth.ts` (créé, 234 lignes)
+- `packages/server/src/index.ts` (modifié, session + CORS)
+- `packages/server/src/_core/context.ts` (modifié, utilise session)
+
+**Flow Implémenté:**
+```
+Register: email/password → hash → create user+org+tenant_db → set session
+Login: email/password → verify → find org → set session
+Context: req.session → load tenantDb → ctx.user + ctx.tenantDb
+Protected: ctx.tenantDb null → error 500 (was the bug!)
+```
+
+**Sécurité:**
+- ✅ Passwords bcrypt (10 rounds)
+- ✅ Sessions httpOnly (XSS protection)
+- ✅ CORS credentials strict
+- ✅ Cookies secure en prod
+
+**TODO Frontend Auth (P0 next):**
+- [ ] Pages /login et /register
+- [ ] AuthContext + useAuth hook
+- [ ] Routes protégées (redirect si non-auth)
+- [ ] tRPC client credentials: 'include'
+- [ ] Retester P1 (création talents avec auth)
+
+**Documentation Obsidian:**
+- `decisions/2025-12-16-authentication-implementation.md` (complet)
+- `decisions/_INDEX.md` (mis à jour)
 
 ---
 

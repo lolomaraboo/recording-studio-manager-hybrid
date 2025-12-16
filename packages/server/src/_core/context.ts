@@ -54,22 +54,20 @@ export async function createContext(
   let tenantDb: TenantDb | null = null;
 
   try {
-    // TODO: Replace with real auth SDK
-    // For now, check for test header
-    const testUserId = opts.req.headers['x-test-user-id'];
-    const testOrgId = opts.req.headers['x-test-org-id'];
+    // Get user from session
+    const session = opts.req.session as any;
 
-    if (testUserId && testOrgId) {
-      // Mock user for testing
+    if (session.userId && session.organizationId) {
+      // User is authenticated via session
       user = {
-        id: parseInt(testUserId as string),
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'user',
+        id: session.userId,
+        email: session.email || 'user@example.com',
+        name: session.name || 'User',
+        role: session.role || 'user',
       };
-      organizationId = parseInt(testOrgId as string);
+      organizationId = session.organizationId;
 
-      // ACTIVE: Load tenant DB immediately (vs Manus commented)
+      // Load tenant DB
       tenantDb = await getTenantDb(organizationId);
     }
   } catch (error) {

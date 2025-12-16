@@ -17,19 +17,23 @@
     "@rsm/database": "workspace:*",
     "@rsm/shared": "workspace:*",
     "@trpc/server": "^11.0.0-rc.663",
-    "express": "^4.21.2",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/express-session": "^1.18.2",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
-    "zod": "^3.24.1",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.44.5"
+    "drizzle-orm": "^0.44.5",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
     "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8",
-    "@vitest/coverage-v8": "^2.1.8"
+    "vitest": "^2.1.8"
   }
 }

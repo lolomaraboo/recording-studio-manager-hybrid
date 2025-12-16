@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index';
 import { createContext } from './_core/context';
@@ -21,8 +22,25 @@ async function main() {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  app.use(
+    cors({
+      origin: 'http://localhost:5175',
+      credentials: true,
+    })
+  );
   app.use(express.json());
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      },
+    })
+  );
 
   // Health check
   app.get('/health', (_req, res) => {
