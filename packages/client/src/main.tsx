@@ -6,6 +6,7 @@ import { trpc } from './lib/trpc'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AssistantProvider } from './contexts/AssistantContext'
 import { ChatbotProvider } from './contexts/ChatbotContext'
+import { AuthProvider } from './contexts/AuthContext'
 import App from './App'
 import './index.css'
 
@@ -22,12 +23,12 @@ const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: 'http://localhost:3001/api/trpc',
-      headers() {
-        // Mock auth headers for development
-        return {
-          'x-test-user-id': '1',
-          'x-test-org-id': '1',
-        }
+      // Include credentials (cookies) in all requests
+      fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          credentials: 'include',
+        })
       },
     }),
   ],
@@ -36,15 +37,17 @@ const trpcClient = trpc.createClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider defaultTheme="light" switchable={true}>
-      <AssistantProvider>
-        <ChatbotProvider>
-          <trpc.Provider client={trpcClient} queryClient={queryClient}>
-            <QueryClientProvider client={queryClient}>
-              <App />
-            </QueryClientProvider>
-          </trpc.Provider>
-        </ChatbotProvider>
-      </AssistantProvider>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <AssistantProvider>
+              <ChatbotProvider>
+                <App />
+              </ChatbotProvider>
+            </AssistantProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </trpc.Provider>
     </ThemeProvider>
   </React.StrictMode>,
 )

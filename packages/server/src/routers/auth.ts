@@ -23,7 +23,7 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const masterDb = getMasterDb();
+      const masterDb = await getMasterDb();
 
       // Check if user exists
       const existingUser = await masterDb
@@ -108,7 +108,7 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const masterDb = getMasterDb();
+      const masterDb = await getMasterDb();
 
       // Find user
       const userList = await masterDb
@@ -174,7 +174,7 @@ export const authRouter = router({
       return null;
     }
 
-    const masterDb = getMasterDb();
+    const masterDb = await getMasterDb();
 
     // Get user
     const userList = await masterDb

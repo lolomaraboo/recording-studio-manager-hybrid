@@ -9,13 +9,28 @@ import Equipment from './pages/Equipment';
 import Projects from './pages/Projects';
 import Tracks from './pages/Tracks';
 import Talents from './pages/Talents';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { Toaster } from '@/components/ui/sonner';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="sessions" element={<Sessions />} />
           <Route path="clients" element={<Clients />} />

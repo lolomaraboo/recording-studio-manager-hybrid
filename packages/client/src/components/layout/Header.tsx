@@ -1,15 +1,29 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Moon, Sun, Music } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Moon, Sun, Music, LogOut } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
+  const { logout, organization: authOrg, user } = useAuth();
+  const navigate = useNavigate();
 
   // Get current user's organization from context (no params needed)
   const { data: organization } = trpc.organizations.get.useQuery();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Logout failed');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -31,6 +45,13 @@ export function Header() {
 
         {/* Contrôles (toujours visibles) */}
         <div className="flex items-center gap-2">
+          {/* User info */}
+          {user && (
+            <span className="text-sm text-muted-foreground mr-2">
+              {user.name}
+            </span>
+          )}
+
           {/* Mode clair/sombre */}
           <Button
             variant="ghost"
@@ -47,6 +68,16 @@ export function Header() {
 
           {/* Notifications */}
           <NotificationCenter />
+
+          {/* Logout */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            title="Logout"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </header>
