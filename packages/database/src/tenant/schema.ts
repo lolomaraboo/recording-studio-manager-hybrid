@@ -296,15 +296,21 @@ export const musicians = pgTable("musicians", {
 
   // Professional
   bio: text("bio"),
+  primaryInstrument: varchar("primary_instrument", { length: 100 }), // Legacy field
   website: varchar("website", { length: 500 }),
   spotifyUrl: varchar("spotify_url", { length: 500 }),
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }), // Legacy pricing
 
   // Details
   instruments: text("instruments"), // JSON array
   genres: text("genres"), // JSON array
 
   // Image
+  photoUrl: varchar("photo_url", { length: 500 }), // Legacy field
   imageUrl: varchar("image_url", { length: 500 }),
+
+  // Status
+  isActive: boolean("is_active").notNull().default(true), // Legacy status
 
   // Notes
   notes: text("notes"),
