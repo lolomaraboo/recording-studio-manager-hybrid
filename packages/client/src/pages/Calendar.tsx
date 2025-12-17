@@ -288,37 +288,40 @@ export default function Calendar() {
       <style>{`
         .calendar-container .rbc-calendar {
           font-family: inherit;
+          color: hsl(var(--foreground));
         }
 
         .calendar-container .rbc-header {
           padding: 12px 4px;
           font-weight: 600;
-          border-bottom: 1px solid rgb(255 255 255 / 0.1);
-          background: rgb(255 255 255 / 0.02);
+          color: hsl(var(--foreground));
+          border-bottom: 1px solid hsl(var(--border));
+          background: hsl(var(--muted) / 0.3);
         }
 
         .calendar-container .rbc-today {
-          background-color: rgb(220 38 38 / 0.1);
+          background-color: hsl(var(--primary) / 0.1);
         }
 
         .calendar-container .rbc-off-range-bg {
-          background-color: rgb(255 255 255 / 0.02);
+          background-color: hsl(var(--muted) / 0.2);
         }
 
         .calendar-container .rbc-time-slot {
-          border-top: 1px solid rgb(255 255 255 / 0.05);
+          border-top: 1px solid hsl(var(--border) / 0.5);
+          color: hsl(var(--muted-foreground));
         }
 
         .calendar-container .rbc-day-slot .rbc-time-slot {
-          border-top: 1px solid rgb(255 255 255 / 0.05);
+          border-top: 1px solid hsl(var(--border) / 0.5);
         }
 
         .calendar-container .rbc-timeslot-group {
-          border-left: 1px solid rgb(255 255 255 / 0.1);
+          border-left: 1px solid hsl(var(--border));
         }
 
         .calendar-container .rbc-time-content {
-          border-top: 1px solid rgb(255 255 255 / 0.1);
+          border-top: 1px solid hsl(var(--border));
         }
 
         .calendar-container .rbc-event {
@@ -332,26 +335,26 @@ export default function Calendar() {
         }
 
         .calendar-container .rbc-toolbar button {
-          color: rgb(255 255 255 / 0.7);
-          border: 1px solid rgb(255 255 255 / 0.1);
+          color: hsl(var(--foreground));
+          border: 1px solid hsl(var(--border));
           background: transparent;
           padding: 6px 12px;
           border-radius: 6px;
         }
 
         .calendar-container .rbc-toolbar button:hover {
-          background: rgb(255 255 255 / 0.05);
-          color: rgb(255 255 255 / 0.9);
+          background: hsl(var(--muted));
+          color: hsl(var(--foreground));
         }
 
         .calendar-container .rbc-toolbar button.rbc-active {
-          background: rgb(220 38 38);
-          color: white;
-          border-color: rgb(220 38 38);
+          background: hsl(var(--primary));
+          color: hsl(var(--primary-foreground));
+          border-color: hsl(var(--primary));
         }
 
         .calendar-container .rbc-toolbar button.rbc-active:hover {
-          background: rgb(185 28 28);
+          background: hsl(var(--primary) / 0.9);
         }
       `}</style>
     </div>
