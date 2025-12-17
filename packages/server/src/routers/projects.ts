@@ -233,6 +233,29 @@ export const projectsRouter = router({
     }),
 
     /**
+     * Get track by ID
+     */
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const track = await ctx.tenantDb
+          .select()
+          .from(tracks)
+          .where(eq(tracks.id, input.id))
+          .limit(1);
+
+        if (track.length === 0) {
+          throw new Error("Track not found");
+        }
+
+        return track[0];
+      }),
+
+    /**
      * Create new track
      */
     create: protectedProcedure

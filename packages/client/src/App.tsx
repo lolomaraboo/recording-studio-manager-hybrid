@@ -14,6 +14,7 @@ import EquipmentDetail from './pages/EquipmentDetail';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import Tracks from './pages/Tracks';
+import TrackDetail from './pages/TrackDetail';
 import Talents from './pages/Talents';
 import Calendar from './pages/Calendar';
 import AudioFiles from './pages/AudioFiles';
@@ -53,6 +54,7 @@ function App() {
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="tracks" element={<Tracks />} />
+          <Route path="tracks/:id" element={<TrackDetail />} />
           <Route path="talents" element={<Talents />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="audio-files" element={<AudioFiles />} />
