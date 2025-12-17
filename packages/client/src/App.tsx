@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Sessions } from './pages/Sessions';
+import SessionDetail from './pages/SessionDetail';
 import { Clients } from './pages/Clients';
 import { Invoices } from './pages/Invoices';
 import Rooms from './pages/Rooms';
@@ -35,6 +36,7 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="sessions" element={<Sessions />} />
+          <Route path="sessions/:id" element={<SessionDetail />} />
           <Route path="clients" element={<Clients />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="rooms" element={<Rooms />} />
