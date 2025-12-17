@@ -4,8 +4,10 @@ import { useAssistant } from "./AssistantContext";
 interface ChatbotContextType {
   isOpen: boolean;
   isMinimized: boolean;
+  isFloating: boolean;
   setIsOpen: (open: boolean) => void;
   setIsMinimized: (minimized: boolean) => void;
+  setIsFloating: (floating: boolean) => void;
   getChatbotWidth: () => number;
 }
 
@@ -15,6 +17,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
   const { isOpen: assistantIsOpen } = useAssistant();
   const [isOpen, setIsOpen] = useState(assistantIsOpen);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isFloating, setIsFloating] = useState(false);
 
   // Synchroniser avec AssistantContext
   useEffect(() => {
@@ -23,6 +26,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
 
   const getChatbotWidth = () => {
     if (!isOpen) return 0; // Fermé: 0px
+    if (isFloating) return 0; // Flottant: 0px (ne prend pas d'espace)
     if (isMinimized) return 64; // Mini: 64px (w-16)
     return 384; // Ouvert: 384px (w-96)
   };
@@ -32,8 +36,10 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
       value={{
         isOpen,
         isMinimized,
+        isFloating,
         setIsOpen,
         setIsMinimized,
+        setIsFloating,
         getChatbotWidth,
       }}
     >
