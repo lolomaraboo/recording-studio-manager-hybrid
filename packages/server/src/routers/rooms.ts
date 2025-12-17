@@ -23,7 +23,7 @@ export const roomsRouter = router({
   /**
    * Get a single room by ID
    */
-  getById: protectedProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.tenantDb) {
@@ -52,9 +52,9 @@ export const roomsRouter = router({
         name: z.string().min(1).max(255),
         description: z.string().optional(),
         type: z.enum(["recording", "mixing", "mastering", "rehearsal", "live"]).default("recording"),
-        hourlyRate: z.string(), // Decimal as string
-        halfDayRate: z.string().optional(),
-        fullDayRate: z.string().optional(),
+        hourlyRate: z.number().default(0),
+        halfDayRate: z.number().default(0),
+        fullDayRate: z.number().default(0),
         capacity: z.number().default(1),
         size: z.number().optional(),
         hasIsolationBooth: z.boolean().default(false),
@@ -87,9 +87,9 @@ export const roomsRouter = router({
         name: z.string().min(1).max(255).optional(),
         description: z.string().optional(),
         type: z.enum(["recording", "mixing", "mastering", "rehearsal", "live"]).optional(),
-        hourlyRate: z.string().optional(),
-        halfDayRate: z.string().optional(),
-        fullDayRate: z.string().optional(),
+        hourlyRate: z.number().optional(),
+        halfDayRate: z.number().optional(),
+        fullDayRate: z.number().optional(),
         capacity: z.number().optional(),
         size: z.number().optional(),
         hasIsolationBooth: z.boolean().optional(),
