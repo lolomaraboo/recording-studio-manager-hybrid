@@ -6,6 +6,7 @@ import SessionDetail from './pages/SessionDetail';
 import { Clients } from './pages/Clients';
 import ClientDetail from './pages/ClientDetail';
 import { Invoices } from './pages/Invoices';
+import InvoiceDetail from './pages/InvoiceDetail';
 import Rooms from './pages/Rooms';
 import Equipment from './pages/Equipment';
 import Projects from './pages/Projects';
@@ -41,6 +42,7 @@ function App() {
           <Route path="clients" element={<Clients />} />
           <Route path="clients/:id" element={<ClientDetail />} />
           <Route path="invoices" element={<Invoices />} />
+          <Route path="invoices/:id" element={<InvoiceDetail />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="equipment" element={<Equipment />} />
           <Route path="projects" element={<Projects />} />
