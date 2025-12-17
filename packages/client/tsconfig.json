@@ -28,6 +28,5 @@
       "@rsm/server": ["../server/src/index.ts"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "../shared/tsconfig.json" }]
+  "include": ["src"]
 }
