@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-16 PM
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + 🔵 Phase 2.5 Tests P2 READY (tenant_4✅, Docker✅) + 🔵 Phase 3 39 Pages READY
+**Dernière mise à jour:** 2025-12-17
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ (Tests E2E 100%) + 🔵 Phase 3 39 Pages READY
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Build fonctionnel (problème .d.ts résolu - composite removed from tsconfig)
 
@@ -516,8 +516,53 @@ Protected: ctx.tenantDb null → error 500 (was the bug!)
 - c63d879 (Backend auth)
 - 5deeec2 (Frontend auth)
 
+**✅ Session 2025-12-17 - Tests E2E Phase 2.5 (COMPLÉTÉS):**
+
+**Tests Fonctionnalités Multi-Catégories:**
+- ✅ Filtre tab "Tous" - Affiche 3 talents (2 musicians + 1 actor)
+- ✅ Filtre tab "Musicien" - Affiche 2 talents (Miles Davis, Ella Fitzgerald)
+- ✅ Filtre tab "Comédien/Acteur" - Affiche 1 talent (Meryl Streep)
+- ✅ Création talent type "actor" - Meryl Streep créé avec succès
+- ✅ Statistiques - Total: 3 talents affichés correctement
+
+**Bugs Identifiés et Résolus:**
+1. **CORS Configuration** (packages/server/src/index.ts:27)
+   - **Problème:** Port 5174 non autorisé (uniquement 5173)
+   - **Fix:** Ajouté array origins: `['http://localhost:5173', 'http://localhost:5174']`
+   - **Impact:** Frontend peut maintenant communiquer avec backend
+
+2. **Cache tRPC**
+   - **Problème:** Filtres ne s'actualisent pas immédiatement après création
+   - **Workaround:** Rafraîchissement de page nécessaire (non-bloquant)
+
+**Base de Données Validée:**
+```sql
+tenant_1.musicians:
+  id=1: Miles Davis (talent_type='musician')
+  id=2: Ella Fitzgerald (talent_type='musician')
+  id=34: Meryl Streep (talent_type='actor')
+```
+
+**Credentials Test:**
+- Email: test@example.com
+- Password: password123
+- Organization: Test Studio (org_id=1, tenant_1)
+
+**Fichiers Modifiés:**
+- packages/server/src/index.ts (CORS fix)
+
+**Métriques:**
+- Durée tests: ~2h (setup Docker + tests + debug)
+- Tests manuels: 5/5 passés (100%)
+- Bugs critiques: 1 CORS (résolu)
+
+**Screenshots Capturés:**
+- `talents-filters-test.png` - Vue d'ensemble filtres
+- `talents-actor-filter-success.png` - Filtre Comédien/Acteur avec Meryl Streep
+
 **TODO P2 - Production Ready:**
-- [ ] Retester création talents avec auth
+- [x] Retester création talents avec auth ✅ DONE (2025-12-17)
+- [x] Tester filtres talentType ✅ DONE (2025-12-17)
 - [ ] Rate limiting (login/register)
 - [ ] Email verification
 - [ ] Password reset flow
@@ -526,6 +571,7 @@ Protected: ctx.tenantDb null → error 500 (was the bug!)
 
 **Documentation Obsidian:**
 - `decisions/2025-12-16-authentication-implementation.md` (mis à jour complet)
+- `decisions/talents-migration-phase-2.5.md` (tests documentés)
 
 ---
 
@@ -1007,13 +1053,13 @@ projects.tracks.create/update/delete              // Les deux interfaces
 ---
 
 **Créé le:** 2025-12-13
-**Dernière MAJ:** 2025-12-16
+**Dernière MAJ:** 2025-12-17
 **Par:** Claude Sonnet 4.5
 **Commit actuel:** c370915 (75 fichiers, ~5200 lignes)
 **Phase 1:** ✅ COMPLÉTÉ (100%)
 **Phase 2 Portage UI:** ✅ COMPLÉTÉ (14/14 composants)
-**Phase 2.5 Migration Talents:** ✅ COMPLÉTÉ (talentType multi-catégories)
+**Phase 2.5 Migration Talents:** ✅ COMPLÉTÉ (talentType multi-catégories + Tests E2E 100%)
 **Prochaines étapes (P0):**
-1. 🔴 **Bug Critique:** Investiguer erreur auth "You must be logged in" dans `musicians.list` avec filtre
-2. 🟡 **Tests:** Valider filtres talents après fix auth
-3. 🟡 **Phase 3:** Porter 24 pages Manus restantes (total 38 pages)
+1. ✅ **Tests Phase 2.5:** Filtres talentType validés (2025-12-17)
+2. 🟡 **Phase 3:** Porter 39 pages Manus restantes (24 haute priorité)
+3. 🟡 **Infrastructure:** Scripts init-tenant automatique + health checks
