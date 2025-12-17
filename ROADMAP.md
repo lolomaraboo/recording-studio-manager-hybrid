@@ -2,7 +2,7 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-17
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements (Palette + Chatbot 4 modes) + 🚀 Phase 3 17/39 Pages (43.6%) - **P1 HAUTE 100% ✅** (8/8 pages détail)
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements (Palette + Chatbot 4 modes) + 🚀 Phase 3 17/39 Pages + **P1 HAUTE 100% ✅** (8 détail) + **P2 MOYEN 100% ✅** (10 Create)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Build fonctionnel (problème .d.ts résolu - composite removed from tsconfig)
 
@@ -1057,6 +1057,50 @@ projects.tracks.create/update/delete              // Les deux interfaces
 - ✅ Foundation solide pour P2 MOYEN (formulaires création)
 
 **Phase 3 P1 HAUTE: 100% COMPLÉTÉ ✅**
+
+---
+
+#### ✅ P2 MOYEN: Formulaires Create (10 pages) - Session 2025-12-17 PM
+
+**Objectif:** Créer tous les formulaires de création pour permettre l'ajout de nouvelles entités
+
+**Pages Créées (10/10):**
+1. ✅ SessionCreate.tsx (276 lignes) - Nouvelle session d'enregistrement
+2. ✅ ClientCreate.tsx (190 lignes) - Nouveau client
+3. ✅ InvoiceCreate.tsx (251 lignes) - Nouvelle facture
+4. ✅ RoomCreate.tsx (332 lignes) - Nouvelle salle studio
+5. ✅ EquipmentCreate.tsx (228 lignes) - Nouvel équipement
+6. ✅ ProjectCreate.tsx (332 lignes) - Nouveau projet musical
+7. ✅ TalentCreate.tsx (277 lignes) - Nouveau talent (musicien/acteur)
+8. ✅ QuoteCreate.tsx (332 lignes) - Nouveau devis avec calcul TVA auto
+9. ✅ ContractCreate.tsx (268 lignes) - Nouveau contrat
+10. ✅ ExpenseCreate.tsx (227 lignes) - Nouvelle dépense
+
+**Features Implémentées:**
+- ✅ Form validation avec toast messages French
+- ✅ tRPC create mutations type-safe
+- ✅ Navigation auto après création
+- ✅ Gestion erreurs avec feedback utilisateur
+- ✅ Loading states (isPending)
+- ✅ 10 routes /entity/new dans App.tsx
+
+**Pattern Établi:**
+- Formulaires cohérents avec validation
+- Type-safety avec @rsm/database schema
+- Navigation intelligente (détail ou liste)
+- French localization complète
+
+**Métriques:**
+- Lignes: +2,713 lignes React TypeScript
+- Commit: a4f10cf
+- Temps: ~2-3h (création batch)
+- Qualité: Type-safe, 0 erreur TS
+
+**Notes:**
+- Quotes, Contracts, Expenses: formulaires créés, listes manquantes (P3 BAS)
+- Checkboxes: input natif (shadcn/ui Checkbox pas dispo)
+
+**Phase 3 P2 MOYEN: 100% COMPLÉTÉ ✅**
 
 ---
 

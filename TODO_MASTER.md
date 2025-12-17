@@ -1,10 +1,10 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
 > **🚀 STACK HYBRIDE - Phase 3 EN COURS 🟢**
-> **Phase actuelle**: Phase 3 Portage UI Pages (17/39 pages - 43.6% complété)
-> **Dernière mise à jour**: 2025-12-17 (Phase 3 P1 HAUTE 100% - 8/8 pages détail)
+> **Phase actuelle**: Phase 3 Portage UI Pages (17/39 pages + 10 formulaires Create)
+> **Dernière mise à jour**: 2025-12-17 (Phase 3 P2 MOYEN 100% - 10/10 formulaires Create)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
-> **Milestone**: ✅ Tous les détails P1 HAUTE complétés (SessionDetail, ClientDetail, InvoiceDetail, RoomDetail, EquipmentDetail, ProjectDetail, TrackDetail, TalentDetail)
+> **Milestone**: ✅ P1 HAUTE (8 pages détail) + ✅ P2 MOYEN (10 formulaires Create) COMPLÉTÉS
 
 ---
 
@@ -487,6 +487,108 @@ Monitoring: Prometheus + Grafana
 - P1 HAUTE: 8/8 pages détail (100% ✅)
 
 **Phase 3 P1 HAUTE: 100% COMPLÉTÉ ✅**
+
+---
+
+### ✅ PRIORITÉ 6 - PHASE 3 P2 MOYEN - FORMULAIRES CREATE (2025-12-17) (COMPLÉTÉE)
+
+**Timeline:** 2025-12-17 après-midi
+**Objectif:** Créer tous les formulaires de création pour les entités principales
+**Status:** ✅ 100% COMPLÉTÉ (10/10 formulaires)
+
+**Formulaires Créés:**
+1. ✅ **SessionCreate.tsx** (276 lignes) - Nouvelle session d'enregistrement
+   - Champs: title, clientId, roomId, startTime, endTime, status, totalAmount, description, notes
+   - Validation: client, room, title, dates requis
+   - Navigation: → /sessions/:id après création
+
+2. ✅ **ClientCreate.tsx** (190 lignes) - Nouveau client
+   - Champs: name (requis), email, phone, company, address, notes
+   - Validation: name min 2 caractères
+   - Navigation: → /clients/:id après création
+
+3. ✅ **InvoiceCreate.tsx** (251 lignes) - Nouvelle facture
+   - Champs: clientId, invoiceNumber, issueDate, dueDate, subtotal, taxRate, status, notes
+   - Validation: client, invoiceNumber, issueDate, subtotal requis
+   - Navigation: → /invoices/:id après création
+
+4. ✅ **RoomCreate.tsx** (332 lignes) - Nouvelle salle
+   - Champs: name, type (enum), hourlyRate, halfDayRate, fullDayRate, capacity, size, description
+   - Checkboxes: hasIsolationBooth, hasLiveRoom, hasControlRoom
+   - Configuration: equipmentList (JSON), isActive, isAvailableForBooking
+   - Validation: name requis
+
+5. ✅ **EquipmentCreate.tsx** (228 lignes) - Nouvel équipement
+   - Champs: name, category (enum), brand, model, serialNumber, roomId, description
+   - Catégories: microphone, preamp, interface, outboard, instrument, monitoring, computer, cable, accessory, other
+   - Validation: name requis
+
+6. ✅ **ProjectCreate.tsx** (332 lignes) - Nouveau projet musical
+   - Champs: clientId, name, artistName, genre, type (enum), status (enum), budget, label, description, notes
+   - Types: album, ep, single, demo, soundtrack, podcast
+   - Status: pre_production, recording, editing, mixing, mastering, completed, delivered, archived
+   - Validation: clientId, name requis
+
+7. ✅ **TalentCreate.tsx** (277 lignes) - Nouveau talent
+   - Champs: name, stageName, email, phone, bio, talentType (musician/actor), website, spotifyUrl
+   - JSON fields: instruments, genres
+   - Validation: name requis
+
+8. ✅ **QuoteCreate.tsx** (332 lignes) - Nouveau devis
+   - Champs: quoteNumber, clientId, projectId, validUntil, title, description, subtotal, taxRate, terms, notes
+   - Calcul auto: taxAmount, total TTC
+   - Validation: quoteNumber, clientId, validUntil, subtotal requis
+   - Navigation: → /quotes (liste pas encore créée)
+
+9. ✅ **ContractCreate.tsx** (268 lignes) - Nouveau contrat
+   - Champs: contractNumber, clientId, projectId, type (enum), title, description, terms
+   - Types: recording, mixing, mastering, production, exclusivity, distribution, studio_rental, services, partnership, other
+   - Validation: contractNumber, clientId, title, terms requis
+   - Navigation: → /contracts (liste pas encore créée)
+
+10. ✅ **ExpenseCreate.tsx** (227 lignes) - Nouvelle dépense
+    - Champs: category (enum), description, vendor, amount, currency, taxAmount, expenseDate
+    - Catégories: rent, utilities, insurance, maintenance, salary, marketing, software, supplies, equipment, other
+    - Validation: category, description, amount, expenseDate requis
+    - Navigation: → /expenses (liste pas encore créée)
+
+**Routing Ajouté (App.tsx):**
+- ✅ /sessions/new → SessionCreate
+- ✅ /clients/new → ClientCreate
+- ✅ /invoices/new → InvoiceCreate
+- ✅ /rooms/new → RoomCreate
+- ✅ /equipment/new → EquipmentCreate
+- ✅ /projects/new → ProjectCreate
+- ✅ /talents/new → TalentCreate
+- ✅ /quotes/new → QuoteCreate (liste manquante)
+- ✅ /contracts/new → ContractCreate (liste manquante)
+- ✅ /expenses/new → ExpenseCreate (liste manquante)
+
+**Pattern Architecture Établi:**
+- Form validation avec toast messages French
+- tRPC create mutations type-safe
+- Navigation auto après création (vers détail ou liste)
+- Schema @rsm/database intégré
+- Gestion erreurs avec toast.error
+- Loading states (isPending)
+- Bouton Annuler retour à la liste
+
+**Métriques:**
+- **Formulaires:** 10 pages Create complétées
+- **Lignes:** +2,713 lignes React TypeScript
+- **Commit:** a4f10cf
+- **Routes:** 10 routes /entity/new ajoutées
+- **Temps:** ~2-3h (création batch)
+- **Qualité:** Type-safe, 0 erreur TS dans nouveaux fichiers
+
+**Notes:**
+- Quotes, Contracts, Expenses: formulaires créés mais pages de liste manquantes (P3 BAS)
+- Checkboxes: utilise input type="checkbox" natif (shadcn/ui Checkbox pas disponible)
+- JSON fields: instruments, genres, equipmentList (validation basique, parsing côté backend)
+
+**Prochaine Priorité:** Phase 3 P3 BAS - Améliorations listes (filtres avancés, exports CSV/PDF, bulk operations)
+
+**Phase 3 P2 MOYEN: 100% COMPLÉTÉ ✅**
 
 ---
 
