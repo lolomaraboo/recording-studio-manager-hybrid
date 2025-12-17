@@ -116,20 +116,20 @@ export default function Calendar() {
     let backgroundColor = "#dc2626"; // Rouge par défaut
 
     switch (event.resource.status) {
+      case "pending":
+        backgroundColor = "#3b82f6"; // Bleu (en attente)
+        break;
       case "confirmed":
-        backgroundColor = "#dc2626"; // Rouge
+        backgroundColor = "#dc2626"; // Rouge (confirmée)
         break;
       case "in_progress":
-        backgroundColor = "#ea580c"; // Orange-rouge
+        backgroundColor = "#ea580c"; // Orange-rouge (en cours)
         break;
       case "completed":
-        backgroundColor = "#525252"; // Gris
+        backgroundColor = "#16a34a"; // Vert (terminée)
         break;
       case "cancelled":
-        backgroundColor = "#404040"; // Gris foncé
-        break;
-      case "pending":
-        backgroundColor = "#737373"; // Gris moyen
+        backgroundColor = "#1f2937"; // Gris très foncé (annulée)
         break;
     }
 
@@ -181,7 +181,7 @@ export default function Calendar() {
             <CardContent>
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 rounded" style={{ backgroundColor: "#737373" }}></div>
+                  <div className="h-4 w-4 rounded" style={{ backgroundColor: "#3b82f6" }}></div>
                   <span className="text-sm">En attente</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -193,11 +193,11 @@ export default function Calendar() {
                   <span className="text-sm">En cours</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 rounded" style={{ backgroundColor: "#525252" }}></div>
+                  <div className="h-4 w-4 rounded" style={{ backgroundColor: "#16a34a" }}></div>
                   <span className="text-sm">Terminée</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 rounded" style={{ backgroundColor: "#404040" }}></div>
+                  <div className="h-4 w-4 rounded" style={{ backgroundColor: "#1f2937" }}></div>
                   <span className="text-sm">Annulée</span>
                 </div>
               </div>
