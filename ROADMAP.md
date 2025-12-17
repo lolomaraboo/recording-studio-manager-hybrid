@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-16
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements (Palette + Chatbot 4 modes) + 🔵 Phase 3 39 Pages READY
+**Dernière mise à jour:** 2025-12-16 23:10
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements (Palette + Chatbot 4 modes) + 🚀 Phase 3 9/39 Pages (23% - SessionDetail, ClientDetail, InvoiceDetail)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Build fonctionnel (problème .d.ts résolu - composite removed from tsconfig)
 
@@ -882,6 +882,102 @@ projects.tracks.create/update/delete              // Les deux interfaces
 - Lignes: +630 / -17 (net +613)
 - Complexité: Moyenne-haute
 - Qualité: Clone exact Manus ✅
+
+---
+
+### 🚀 Phase 3: Portage UI Pages (EN COURS - 23%)
+
+**Timeline:** Après Phase 2
+**Budget:** Inclus dans Phase 2
+**Status:** 🚀 EN COURS - 9/39 pages (23%)
+**Objectif:** Porter les 39 pages Manus restantes vers Hybrid
+
+#### Pages Complétées (9/39)
+
+**P0 CRITIQUE (2/2 - 100%):**
+- ✅ Calendar.tsx - Calendrier drag & drop sessions (359 lignes)
+- ✅ AudioFiles.tsx - Gestion fichiers S3 + upload (319 lignes)
+
+**P0 HAUTE (3/3 - 100%):**
+- ✅ Sessions.tsx - Liste avec filtres complets (289 lignes)
+- ✅ Clients.tsx - Liste + stats calculées (246 lignes)
+- ✅ Invoices.tsx - Liste + stats cards (318 lignes)
+
+**P1 HAUTE (3/8 - 38%):**
+- ✅ SessionDetail.tsx - CRUD session complet (560 lignes) - f41b0d0
+- ✅ ClientDetail.tsx - Profil + historique (765 lignes) - e119f0a
+- ✅ InvoiceDetail.tsx - Facture + paiement (710 lignes) - 08ad1bc
+- ⏸️ RoomDetail.tsx - Détail salle + équipements
+- ⏸️ EquipmentDetail.tsx - Détail équipement + maintenance
+- ⏸️ ProjectDetail.tsx - Projet musical + Kanban
+- ⏸️ TrackDetail.tsx - Track + crédits + waveform
+- ⏸️ TalentDetail.tsx - Profil talent + portfolio
+
+#### 📦 Session 2025-12-16 23:00 - Detail Pages P1 HAUTE (3 pages): ✅ COMPLÉTÉ
+
+**Commits:** f41b0d0, e119f0a, 08ad1bc | **Fichiers:** 6 créés/modifiés | **Lignes:** +2035
+
+**SessionDetail.tsx (560 lignes):**
+- ✅ Mode affichage + édition inline
+- ✅ CRUD complet (view/edit/delete)
+- ✅ Formulaire: title, description, client, room, dates, status, amount, notes
+- ✅ Status badges FR (Programmée/En cours/Terminée/Annulée)
+- ✅ Liens vers client/room pages
+- ✅ Dialog confirmation suppression
+- ✅ Layout 2 colonnes responsive
+
+**ClientDetail.tsx (765 lignes):**
+- ✅ Profil complet + édition
+- ✅ Stats cards (4): Sessions totales, Revenu total, Payé, En attente
+- ✅ Badge VIP automatique (revenue >10k€)
+- ✅ Historique tabs (2): Sessions (10 récentes), Factures (10 récentes)
+- ✅ Quick actions: Nouvelle session, Nouvelle facture, Email client
+- ✅ Form: name, email, phone, company, address, notes
+
+**InvoiceDetail.tsx (710 lignes):**
+- ✅ Détail facture + édition
+- ✅ Status badges FR (Brouillon/Envoyée/Payée/En retard/Annulée)
+- ✅ Détection retard automatique (sent + dueDate < now)
+- ✅ Payment tracking (paidAt timestamp)
+- ✅ Actions par statut: PDF, Email, Marquer payée
+- ✅ Totals breakdown: Subtotal HT, TVA (%), Total TTC
+- ✅ Client card dans sidebar
+
+**Routes ajoutées:**
+- `/sessions/:id` → SessionDetail
+- `/clients/:id` → ClientDetail
+- `/invoices/:id` → InvoiceDetail
+
+**Features communes:**
+- ✅ Mode affichage/édition toggle
+- ✅ Mutations tRPC (update/delete)
+- ✅ French localization (date-fns fr)
+- ✅ Skeleton loading states
+- ✅ Delete confirmation dialogs
+- ✅ Navigation breadcrumbs
+- ✅ Responsive layouts (2-3 columns)
+
+**Métriques:**
+- Temps: ~2h
+- Fichiers: 3 pages + 1 App.tsx
+- Lignes: +2035 (560+765+710)
+- Complexité: Moyenne-haute
+- Qualité: Production-ready ✅
+
+#### Prochaines Pages P1 HAUTE (5 restantes)
+
+**À faire:**
+1. RoomDetail.tsx - Détail salle + équipements fixes + disponibilités
+2. EquipmentDetail.tsx - Équipement + maintenance + historique
+3. ProjectDetail.tsx - Projet musical + Kanban + timeline
+4. TrackDetail.tsx - Track + crédits + waveform + lyrics
+5. TalentDetail.tsx - Profil talent + instruments + portfolio
+
+**Stratégie:**
+- Pattern identique: mode view/edit, stats, historique, actions
+- Routers existants: rooms, equipment, projects, tracks, musicians
+- Estimation: ~500-800 lignes par page
+- Total estimé: ~3000 lignes pour les 5 pages
 
 ---
 
