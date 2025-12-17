@@ -23,7 +23,7 @@ export const equipmentRouter = router({
   /**
    * Get equipment by ID
    */
-  getById: protectedProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.tenantDb) {
