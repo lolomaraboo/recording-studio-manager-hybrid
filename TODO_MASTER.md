@@ -1,8 +1,8 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 1 COMPLÉTÉE ✅**
-> **Phase actuelle**: Phase 1 - Infrastructure & Base (100% COMPLÉTÉ ✅)
-> **Dernière mise à jour**: 2025-12-15 (Session: Portage UI Layout complet - CommandPalette + AIAssistant)
+> **🚀 STACK HYBRIDE - Phase 2.5 Code Complet, Tests P2 À FAIRE ⚠️**
+> **Phase actuelle**: Phase 2.5 (Auth Code ✅, Tests P2 ⚠️) + Phase 3 Portage UI (39 pages READY)
+> **Dernière mise à jour**: 2025-12-16 (Inventaire pages: 39 pages identifiées)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
 
 ---
@@ -395,17 +395,126 @@ Monitoring: Prometheus + Grafana
 
 **Phase 1 Session 2025-12-15 (Partie 5): 100% VALIDÉE ✅**
 
-### 🔵 PRIORITÉ 4 - PHASE 2 SEMAINE 7-9 (PROCHAINE ÉTAPE)
-1. ⏸️ Connecter pages aux endpoints tRPC (fetch real data)
-2. ⏸️ Implémenter authentification (remplacer mock)
-3. ⏸️ Ajouter formulaires avec react-hook-form + zod
-4. ⏸️ Créer composants réutilisables (FormField, DataTable, etc.)
-5. ⏸️ Tests Vitest pour composants React
-6. ⏸️ Backend: clientAuth router (portail client)
-7. ⏸️ Frontend: Dashboard client self-service
-8. ⏸️ Intégration Stripe pour paiements
-9. ⏸️ Tests E2E avec Playwright
-10. ⏸️ Auto-réservation sessions pour clients
+### 🔴 PRIORITÉ 4 - PHASE 2.5 TESTS P2 (URGENT - BLOQUANT)
+
+**⚠️ AUDIT 2025-12-16 : Tests P2 NON VALIDÉS**
+
+**Problèmes identifiés :**
+- ❌ Base de données tenant_4 n'existe pas
+- ❌ Organisation john@example.com (id=4) n'existe pas
+- ❌ User john@example.com n'existe pas
+- ❌ 0 talents créés (Sarah Connor, Tom Hardy mentionnés dans resume mais absents de DB)
+- ❌ Filtres talentType non testés (pas de données pour tester)
+
+**Status réel Phase 2.5 :**
+- ✅ Backend Schema (colonne talent_type)
+- ✅ Backend Router (musicians.ts avec filtres)
+- ✅ Frontend UI (Talents.tsx avec tabs)
+- ✅ Bug Fix httpLink (commit c691078)
+- ✅ Auth Backend (express-session + bcrypt)
+- ✅ Auth Frontend (AuthContext + Login/Register)
+- ❌ Tests P2 end-to-end (NON FAIT)
+
+**TODO P2 RÉEL (Priorité CRITIQUE) :**
+1. 🔴 Créer database tenant_4 + appliquer migrations
+2. 🔴 Créer org "Smith Recording Studio" (id=4) + user john@example.com
+3. 🔴 Tests end-to-end : Register/Login john@example.com
+4. 🔴 Tests création talents : Sarah Connor (musician), Tom Hardy (actor)
+5. 🔴 Tests filtres talentType : Tous (2), Musicien, Acteur
+6. 🔴 Validation isolation tenant (données dans tenant_4 uniquement)
+7. 🟡 Tests production-ready : Rate limiting, email verification, password reset
+
+**Estimation :** 1-2 jours (setup DB + tests manuels + automatisation Playwright)
+
+---
+
+### 🔵 PRIORITÉ 5 - PHASE 2A PORTAGE UI (APRÈS P2)
+
+**39 pages UI à porter/compléter** (sur 38 Manus, 11 portées, 3 skeleton, 28 manquantes) :
+
+#### 🔴 CRITIQUE - Pages Core Manquantes (2 pages)
+1. ⏸️ **Calendar.tsx** - Calendrier drag & drop sessions (13KB Manus)
+2. ⏸️ **AudioFiles.tsx** - Gestion fichiers S3 + upload (11KB Manus)
+
+#### 🔴 HAUTE - Pages à Compléter (3 pages skeleton → version complète)
+3. ⏸️ **Sessions.tsx** - UPGRADE: skeleton → calendrier complet drag & drop
+4. ⏸️ **Clients.tsx** - UPGRADE: skeleton → CRUD + historique complet
+5. ⏸️ **Invoices.tsx** - UPGRADE: skeleton → génération PDF + Stripe
+
+#### 🔴 HAUTE - Pages Détail Core (8 pages)
+6. ⏸️ **SessionDetail.tsx** - Détail session + édition
+7. ⏸️ **ClientDetail.tsx** - Profil client + historique
+8. ⏸️ **InvoiceDetail.tsx** - Détail facture + paiement
+9. ⏸️ **RoomDetail.tsx** - Détail salle + disponibilités
+10. ⏸️ **EquipmentDetail.tsx** - Détail équipement + maintenance
+11. ⏸️ **ProjectDetail.tsx** - Détail projet + Kanban
+12. ⏸️ **TrackDetail.tsx** - Détail piste + versioning
+13. ⏸️ **TalentDetail.tsx** - Profil talent + portfolio
+
+#### 🔴 HAUTE - Portail Client (9 pages)
+14. ⏸️ **ClientPortal.tsx** - Dashboard client self-service (12KB)
+15. ⏸️ **ClientPortalBooking.tsx** - Auto-réservation sessions (15KB)
+16. ⏸️ **ClientPortalInvoices.tsx** - Factures client (13KB)
+17. ⏸️ **ClientPortalSessions.tsx** - Sessions client (9KB)
+18. ⏸️ **ClientPortalProfile.tsx** - Profil client éditable (13KB)
+19. ⏸️ **ClientFiles.tsx** - Fichiers partagés (3KB)
+20. ⏸️ **ClientLogin.tsx** - Auth client séparée (3KB)
+21. ⏸️ **ClientPortalPaymentSuccess.tsx** - Stripe success (4KB)
+22. ⏸️ **ClientPortalPaymentCancel.tsx** - Stripe cancel (2KB)
+
+#### 🟡 MOYENNE - Gestion Projets (2 pages)
+23. ⏸️ **Quotes.tsx** - Liste devis + templates (20KB)
+24. ⏸️ **QuoteDetail.tsx** - Détail devis + conversion facture
+
+#### 🟡 MOYENNE - Finance (5 pages)
+25. ⏸️ **Contracts.tsx** - Liste contrats
+26. ⏸️ **ContractDetail.tsx** - Détail contrat + DocuSign e-signature
+27. ⏸️ **Expenses.tsx** - Liste dépenses
+28. ⏸️ **FinancialReports.tsx** - Rapports financiers avancés (22KB)
+29. ⏸️ **Reports.tsx** - Rapports généraux (13KB)
+
+#### 🟡 MOYENNE - Admin & Settings (5 pages)
+30. ⏸️ **Settings.tsx** - Paramètres organisation (14KB)
+31. ⏸️ **Team.tsx** - Gestion équipe/utilisateurs (18KB)
+32. ⏸️ **Analytics.tsx** - Dashboard analytics (15KB)
+33. ⏸️ **Subscription.tsx** - Abonnement + facturation (15KB)
+34. ⏸️ **Admin.tsx** - Panel admin super-user (3KB)
+
+#### 🟢 BASSE - Features Additionnelles (5 pages)
+35. ⏸️ **Chat.tsx** - Messaging temps réel WebSocket (13KB)
+36. ⏸️ **Notifications.tsx** - Page notifications dédiée (11KB)
+37. ⏸️ **Shares.tsx** - Partage fichiers avancé (17KB)
+38. ⏸️ **Onboarding.tsx** - Onboarding nouveaux users (10KB)
+39. ⏸️ **Profile.tsx** - Profil utilisateur personnel
+
+**Estimation totale :** 6-8 semaines (1-2j par page, parallélisation possible)
+
+**Priorisation recommandée :**
+1. **Semaine 1-2:** Calendar + AudioFiles + 3 pages complètes (Sessions, Clients, Invoices)
+2. **Semaine 3-4:** 8 pages détail core
+3. **Semaine 5-6:** 9 pages Client Portal
+4. **Semaine 7-8:** Reste (finance, admin, features additionnelles)
+
+---
+
+### 🔵 PRIORITÉ 6 - PHASE 2B FEATURES CRITIQUES (APRÈS 2A)
+
+**Portail Client Self-Service (6-8 semaines) :**
+1. ⏸️ Backend: clientAuth router
+2. ⏸️ Frontend: Dashboard client self-service
+3. ⏸️ Auto-réservation sessions
+4. ⏸️ Intégration Stripe pour paiements
+5. ⏸️ Partage fichiers audio S3
+
+**Gestion Projets Musicaux (6-8 semaines) :**
+6. ⏸️ Kanban board drag & drop
+7. ⏸️ Upload fichiers audio S3 avec versioning
+8. ⏸️ Gestion crédits (producteur, ingénieur, musiciens)
+
+**Devis & Contrats (2-3 semaines) :**
+9. ⏸️ Génération PDF professionnelle
+10. ⏸️ Conversion devis → facture
+11. ⏸️ Intégration DocuSign e-signature
 
 ---
 
