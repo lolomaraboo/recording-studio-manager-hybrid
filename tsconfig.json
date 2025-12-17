@@ -9,6 +9,8 @@
     "checkJs": false,
     "outDir": "./dist",
     "rootDir": ".",
+    "declaration": true,
+    "declarationMap": true,
 
     // Strict Type-Checking Options
     "strict": true,

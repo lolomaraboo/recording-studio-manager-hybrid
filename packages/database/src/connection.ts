@@ -91,6 +91,9 @@ export async function getTenantDb(organizationId: number): Promise<TenantDb> {
     }
 
     const tenantInfo = result[0];
+    if (!tenantInfo) {
+      throw new Error(`Tenant info not found for organization ${organizationId}`);
+    }
     const databaseName = tenantInfo.databaseName;
 
     // 3. Build tenant DB URL
@@ -155,7 +158,7 @@ export async function createTenantDatabase(
     console.log(`[Database] Registered tenant database for org ${organizationId}`);
 
     // 3. Connect to new tenant DB and apply schema
-    const tenantDb = await getTenantDb(organizationId);
+    await getTenantDb(organizationId);
 
     console.log(`[Database] Tenant database ready for org ${organizationId}`);
   } catch (error) {

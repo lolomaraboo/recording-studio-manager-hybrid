@@ -1,9 +1,10 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 2.5 Code Complet, Tests P2 À FAIRE ⚠️**
-> **Phase actuelle**: Phase 2.5 (Auth Code ✅, Tests P2 ⚠️) + Phase 3 Portage UI (39 pages READY)
-> **Dernière mise à jour**: 2025-12-16 (Inventaire pages: 39 pages identifiées)
+> **🚀 STACK HYBRIDE - Phase 2.5 Tests P2 EN COURS 🔵**
+> **Phase actuelle**: Phase 2.5 Tests P2 (tenant_4 créé ✅, Docker bloqué ⚠️, local dev option)
+> **Dernière mise à jour**: 2025-12-16 PM (Docker infrastructure créée, build .d.ts bloqué)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
+> **Status Docker**: ⚠️ Dockerfiles créés mais build bloqué (tsc ne génère pas .d.ts, seulement .d.ts.map)
 
 ---
 

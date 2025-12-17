@@ -15,7 +15,6 @@
  *   - PostgreSQL user with CREATEDB permission
  */
 
-import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as masterSchema from "../master/schema";
 import * as tenantSchema from "../tenant/schema";
@@ -97,7 +96,6 @@ async function createMasterSchema(): Promise<void> {
   }
 
   const sql = postgres(databaseUrl);
-  const db = drizzle(sql, { schema: masterSchema });
 
   try {
     // Create tables (using Drizzle migrations would be better for production)
@@ -208,6 +206,10 @@ async function seedMasterData(): Promise<void> {
         })
         .returning();
 
+      if (!user) {
+        throw new Error(`Failed to create user ${orgData.ownerEmail}`);
+      }
+
       console.log(`  ✅ Created user: ${user.email} (ID: ${user.id})`);
 
       // 2. Create organization
@@ -225,6 +227,10 @@ async function seedMasterData(): Promise<void> {
           subscriptionTier: orgData.subscriptionTier,
         })
         .returning();
+
+      if (!organization) {
+        throw new Error(`Failed to create organization ${orgData.name}`);
+      }
 
       console.log(`  ✅ Created organization: ${organization.name} (ID: ${organization.id})`);
 
@@ -261,7 +267,6 @@ async function seedMasterData(): Promise<void> {
  * Create Tenant DB schema
  */
 async function createTenantSchema(organizationId: number): Promise<void> {
-  const tenantDb = await getTenantDb(organizationId);
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error("DATABASE_URL not set");
 
@@ -428,6 +433,10 @@ async function seedTenantData(organizationId: number, orgName: string): Promise<
     })
     .returning();
 
+  if (!client1) {
+    throw new Error("Failed to create client1");
+  }
+
   const [client2] = await tenantDb
     .insert(tenantSchema.clients)
     .values({
@@ -442,6 +451,10 @@ async function seedTenantData(organizationId: number, orgName: string): Promise<
     })
     .returning();
 
+  if (!client2) {
+    throw new Error("Failed to create client2");
+  }
+
   console.log(`    ✅ Created 2 clients`);
 
   // Seed Rooms
@@ -455,6 +468,10 @@ async function seedTenantData(organizationId: number, orgName: string): Promise<
     })
     .returning();
 
+  if (!room1) {
+    throw new Error("Failed to create room1");
+  }
+
   const [room2] = await tenantDb
     .insert(tenantSchema.rooms)
     .values({
@@ -464,6 +481,10 @@ async function seedTenantData(organizationId: number, orgName: string): Promise<
       capacity: 5,
     })
     .returning();
+
+  if (!room2) {
+    throw new Error("Failed to create room2");
+  }
 
   console.log(`    ✅ Created 2 rooms`);
 

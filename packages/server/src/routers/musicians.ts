@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { musicians } from "@rsm/database/tenant/schema";
-import { TALENT_TYPES } from "@rsm/shared";
-import { eq, sql, isNotNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 /**
  * Musicians Router

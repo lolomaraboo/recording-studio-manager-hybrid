@@ -1,9 +1,10 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-16
-**Status actuel:** ✅ Phase 1 Infrastructure 100% + ✅ Phase 2 Portage UI (14/14) + ✅ Phase 2.5 Auth Code Complet (⚠️ Tests P2 À FAIRE) + 🔵 Phase 3 Portage UI 39 Pages (READY)
+**Dernière mise à jour:** 2025-12-16 PM
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + 🔵 Phase 2.5 Tests P2 EN COURS (tenant_4✅, Docker⚠️) + 🔵 Phase 3 39 Pages READY
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
+**Blocker:** Docker build - tsc génère .d.ts.map mais PAS .d.ts (tsconfig conflict). **Option:** Skip Docker, run local dev.
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
 >

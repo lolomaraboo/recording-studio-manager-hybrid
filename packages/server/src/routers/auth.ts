@@ -155,11 +155,11 @@ export const authRouter = router({
           id: user.id,
           email: user.email,
           name: user.name || null,
-          role: user.role,
+          role: user.role!,
         },
         organization: {
-          id: org.id,
-          name: org.name,
+          id: org.id!,
+          name: org.name!,
         },
       };
     }),
@@ -207,11 +207,11 @@ export const authRouter = router({
         id: user.id,
         email: user.email,
         name: user.name || null,
-        role: user.role,
+        role: user.role!,
       },
       organization: {
-        id: org.id,
-        name: org.name,
+        id: org.id!,
+        name: org.name!,
       },
     };
   }),
