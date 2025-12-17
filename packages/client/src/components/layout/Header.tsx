@@ -1,29 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Moon, Sun, Music, LogOut } from "lucide-react";
+import { Moon, Sun, Music } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { toast } from "sonner";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
-  const { logout, organization: authOrg, user } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Get current user's organization from context (no params needed)
   const { data: organization } = trpc.organizations.get.useQuery();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logged out successfully');
-      navigate('/login');
-    } catch (error) {
-      toast.error('Logout failed');
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -34,12 +22,7 @@ export function Header() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <Music className="h-6 w-6 text-primary-foreground" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold">{organization?.name || "RSM"}</span>
-              <span className="text-xs text-muted-foreground">
-                Recording Studio Manager
-              </span>
-            </div>
+            <span className="text-lg font-bold">{organization?.name || "RSM"}</span>
           </div>
         </Link>
 
@@ -68,16 +51,6 @@ export function Header() {
 
           {/* Notifications */}
           <NotificationCenter />
-
-          {/* Logout */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            title="Logout"
-          >
-            <LogOut className="h-5 w-5" />
-          </Button>
         </div>
       </div>
     </header>
