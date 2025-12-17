@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-17
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ (Tests E2E 100%) + 🔵 Phase 3 39 Pages READY
+**Dernière mise à jour:** 2025-12-16
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements (Palette + Chatbot 4 modes) + 🔵 Phase 3 39 Pages READY
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Build fonctionnel (problème .d.ts résolu - composite removed from tsconfig)
 
@@ -572,6 +572,153 @@ tenant_1.musicians:
 **Documentation Obsidian:**
 - `decisions/2025-12-16-authentication-implementation.md` (mis à jour complet)
 - `decisions/talents-migration-phase-2.5.md` (tests documentés)
+
+---
+
+### ✅ Session 2025-12-16 PM - UI/UX Improvements (COMPLÉTÉ)
+
+**Commits:**
+- 81dfd83: Fix color palette (OKLCH rouge/noir/gris/blanc)
+- aa2d72d: Clean up Header component
+- 7270e83: Add 4 chatbot display modes with fullscreen
+
+**🎨 Palette de Couleurs Corrigée:**
+
+**Problème Identifié:**
+- Documentation Obsidian incorrecte (blue/green/amber au lieu de rouge/noir/gris/blanc)
+- Hybride utilisait les couleurs par défaut de shadcn/ui (HSL blue/gray)
+- Référence Manus utilisait OKLCH avec palette rouge/noir/gris/blanc
+
+**Solution Appliquée:**
+- Copié la palette exacte de Manus (OKLCH format)
+- Mis à jour `packages/client/src/index.css` avec les bonnes valeurs
+- Supprimé `@import "tw-animate-css"` (package non installé)
+
+**Palette OKLCH Finale:**
+```css
+/* Mode clair - Palette rouge/blanc/noir/gris */
+--primary: oklch(0.55 0.22 25); /* ROUGE */
+--primary-foreground: oklch(1 0 0); /* BLANC */
+--secondary: oklch(0.90 0 0); /* GRIS clair */
+--secondary-foreground: oklch(0.15 0 0); /* NOIR */
+--accent: oklch(0.55 0.22 25); /* ROUGE */
+--accent-foreground: oklch(1 0 0); /* BLANC */
+--background: oklch(1 0 0); /* BLANC */
+--foreground: oklch(0.15 0 0); /* NOIR */
+--card: oklch(0.98 0 0); /* BLANC cassé */
+--border: oklch(0.85 0 0); /* GRIS */
+```
+
+**Impact:**
+- ✅ Interface visuellement identique à Manus
+- ✅ Documentation Obsidian mise à jour (`decisions/2025-12-15-ui-ux-manus-clone.md`)
+- ✅ Tests visuels: Thème cohérent
+
+**🧹 Header Component Cleanup:**
+
+**Modifications:**
+1. Supprimé bouton Logout dupliqué (déjà présent en bas de sidebar)
+2. Supprimé sous-titre "Recording Studio Manager" du header
+3. Nettoyé imports inutilisés (useNavigate, toast, LogOut icon)
+4. Supprimé fonction handleLogout inutilisée
+
+**Structure Finale:**
+```tsx
+<Link to="/dashboard">
+  <Music icon /> + Organization name
+</Link>
+<Controls>
+  User info + Theme toggle + Notifications
+</Controls>
+```
+
+**Impact:**
+- ✅ Interface plus épurée
+- ✅ Pas de duplication UI
+- ✅ Code plus maintenable
+
+**🤖 Système Chatbot 4 Modes:**
+
+**Architecture Implémentée:**
+
+| Mode | Description | Largeur | Comportement |
+|------|-------------|---------|--------------|
+| **Docked Normal** | Ancré à droite (défaut) | w-96 (384px) | Main content réduit de 384px |
+| **Docked Minimized** | Ancré à droite réduit | w-16 (64px) | Main content réduit de 64px |
+| **Floating** | Fenêtre flottante | Custom (384x500 initial) | Main content pleine largeur |
+| **Floating Fullscreen** | Plein écran | 100vw × 100vh | Main content caché |
+
+**Fonctionnalités:**
+- ✅ **Mode Flottant:**
+  - Draggable (déplacer par header)
+  - Resizable (poignée coin bas-droit)
+  - Position personnalisable
+  - Taille personnalisable (min 300x300)
+- ✅ **Mode Fullscreen:**
+  - Couvre tout le viewport (inset-0)
+  - Drag & resize désactivés
+  - Poignée resize cachée
+  - Bouton dédié (icône Maximize)
+
+**Contrôles UI:**
+```
+Mode Docked:
+  - Bouton "Mode fenêtre flottante" (ExternalLink icon)
+  - Bouton "Réduire/Agrandir" (Minimize2/Maximize2 icons)
+
+Mode Floating:
+  - Bouton "Plein écran" (Maximize icon)
+  - Bouton "Ancrer à droite" (ExternalLink icon)
+
+Mode Fullscreen:
+  - Bouton "Quitter plein écran" (Maximize icon)
+  - Bouton "Ancrer à droite" (ExternalLink icon)
+```
+
+**Fichiers Modifiés:**
+
+**packages/client/src/contexts/ChatbotContext.tsx:**
+- Ajout état `isFloating` (boolean)
+- Ajout `setIsFloating` exposé publiquement
+- Mise à jour `getChatbotWidth()`:
+  ```typescript
+  if (!isOpen) return 0;
+  if (isFloating) return 0; // Main content expands!
+  if (isMinimized) return 64;
+  return 384;
+  ```
+
+**packages/client/src/components/AIAssistant.tsx:**
+- Ajout état local `isFullscreen` (boolean)
+- Ajout fonction `toggleFullscreen()`
+- Mise à jour handlers:
+  - `handleMouseDown`: Désactivé si fullscreen
+  - `handleResizeStart`: Désactivé si fullscreen
+- Conditional styling:
+  ```tsx
+  className={cn(
+    !isFloating && "fixed right-0 top-0 bottom-0",
+    isFloating && !isFullscreen && "fixed border rounded-lg shadow-2xl z-50",
+    isFloating && isFullscreen && "fixed inset-0 z-50 border-0 rounded-none"
+  )}
+  ```
+- Bouton fullscreen conditionnel (visible si `isFloating && !isMinimized`)
+- Poignée resize conditionnelle (visible si `isFloating && !isFullscreen`)
+
+**Métriques:**
+- Temps: ~2h (exploration UI + implémentation + tests)
+- Fichiers: 2 modifiés
+- Lignes: +203 / -33 (net +170)
+- Complexité: Moyenne
+- Tests manuels: 4/4 modes validés
+
+**Impact UX:**
+- ✅ Flexibilité maximale (4 modes adaptés aux workflows)
+- ✅ Main content s'adapte dynamiquement
+- ✅ Interface cohérente avec Manus
+- ✅ Expérience utilisateur fluide
+
+**Session 2025-12-16 PM: 100% COMPLÉTÉ ✅**
 
 ---
 
