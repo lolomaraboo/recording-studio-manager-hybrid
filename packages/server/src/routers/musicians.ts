@@ -34,7 +34,7 @@ export const musiciansRouter = router({
   /**
    * Get a single musician by ID
    */
-  getById: protectedProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.tenantDb) {

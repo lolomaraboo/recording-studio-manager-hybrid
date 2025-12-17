@@ -16,6 +16,7 @@ import ProjectDetail from './pages/ProjectDetail';
 import Tracks from './pages/Tracks';
 import TrackDetail from './pages/TrackDetail';
 import Talents from './pages/Talents';
+import TalentDetail from './pages/TalentDetail';
 import Calendar from './pages/Calendar';
 import AudioFiles from './pages/AudioFiles';
 import Login from './pages/Login';
@@ -56,6 +57,7 @@ function App() {
           <Route path="tracks" element={<Tracks />} />
           <Route path="tracks/:id" element={<TrackDetail />} />
           <Route path="talents" element={<Talents />} />
+          <Route path="talents/:id" element={<TalentDetail />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="audio-files" element={<AudioFiles />} />
           <Route path="*" element={<Navigate to="/" replace />} />
