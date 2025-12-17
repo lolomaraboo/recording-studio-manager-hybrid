@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
-import { musicians } from "@rsm/database/tenant/schema";
-import { eq } from "drizzle-orm";
+import { musicians, type InsertMusician } from "@rsm/database/tenant/schema";
+import { eq, sql } from "drizzle-orm";
 
 /**
  * Musicians Router
@@ -102,12 +102,29 @@ export const musiciansRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newMusician = await ctx.tenantDb
-        .insert(musicians)
-        .values(input as any)
-        .returning();
+      console.log("=== DEBUG musicians.create ===");
+      console.log("Raw input:", JSON.stringify(input, null, 2));
 
-      return newMusician[0];
+      try {
+        // Use raw SQL to insert only provided fields
+        const result = await ctx.tenantDb.execute(sql`
+          INSERT INTO musicians (name, talent_type)
+          VALUES (${input.name}, ${input.talentType})
+          RETURNING *
+        `);
+
+        console.log("=== INSERT SUCCESS ===");
+        console.log("Result:", JSON.stringify(result, null, 2));
+
+        // Result is an array directly, not an object with rows property
+        return result[0] as any;
+      } catch (error) {
+        console.error("=== INSERT ERROR ===");
+        console.error("Error:", error);
+        console.error("Error message:", error instanceof Error ? error.message : String(error));
+        console.error("Error stack:", error instanceof Error ? error.stack : "no stack");
+        throw error;
+      }
     }),
 
   /**
