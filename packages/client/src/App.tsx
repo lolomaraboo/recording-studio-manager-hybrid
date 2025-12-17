@@ -12,6 +12,7 @@ import RoomDetail from './pages/RoomDetail';
 import Equipment from './pages/Equipment';
 import EquipmentDetail from './pages/EquipmentDetail';
 import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
 import Tracks from './pages/Tracks';
 import Talents from './pages/Talents';
 import Calendar from './pages/Calendar';
@@ -50,6 +51,7 @@ function App() {
           <Route path="equipment" element={<Equipment />} />
           <Route path="equipment/:id" element={<EquipmentDetail />} />
           <Route path="projects" element={<Projects />} />
+          <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="tracks" element={<Tracks />} />
           <Route path="talents" element={<Talents />} />
           <Route path="calendar" element={<Calendar />} />
