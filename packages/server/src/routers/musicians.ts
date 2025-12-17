@@ -104,7 +104,7 @@ export const musiciansRouter = router({
 
       const newMusician = await ctx.tenantDb
         .insert(musicians)
-        .values(input)
+        .values(input as any)
         .returning();
 
       return newMusician[0];

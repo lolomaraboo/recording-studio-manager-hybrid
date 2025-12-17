@@ -87,7 +87,7 @@ export const equipmentRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newEquipment = await ctx.tenantDb.insert(equipment).values(input).returning();
+      const newEquipment = await ctx.tenantDb.insert(equipment).values(input as any).returning();
 
       return newEquipment[0];
     }),

@@ -80,7 +80,7 @@ export const projectsRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newProject = await ctx.tenantDb.insert(projects).values(input).returning();
+      const newProject = await ctx.tenantDb.insert(projects).values(input as any).returning();
 
       return newProject[0];
     }),
@@ -255,7 +255,7 @@ export const projectsRouter = router({
           throw new Error("Tenant database not available");
         }
 
-        const newTrack = await ctx.tenantDb.insert(tracks).values(input).returning();
+        const newTrack = await ctx.tenantDb.insert(tracks).values(input as any).returning();
 
         return newTrack[0];
       }),

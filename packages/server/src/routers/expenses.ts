@@ -76,7 +76,7 @@ export const expensesRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newExpense = await ctx.tenantDb.insert(expenses).values(input).returning();
+      const newExpense = await ctx.tenantDb.insert(expenses).values(input as any).returning();
 
       return newExpense[0];
     }),

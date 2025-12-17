@@ -69,7 +69,7 @@ export const quotesRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newQuote = await ctx.tenantDb.insert(quotes).values(input).returning();
+      const newQuote = await ctx.tenantDb.insert(quotes).values(input as any).returning();
 
       return newQuote[0];
     }),
@@ -148,7 +148,7 @@ export const quotesRouter = router({
           throw new Error("Tenant database not available");
         }
 
-        const newItem = await ctx.tenantDb.insert(quoteItems).values(input).returning();
+        const newItem = await ctx.tenantDb.insert(quoteItems).values(input as any).returning();
 
         return newItem[0];
       }),

@@ -2,9 +2,9 @@
 
 **Version cible:** 2.0.0 (Stack Hybride)
 **Dernière mise à jour:** 2025-12-16 PM
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + 🔵 Phase 2.5 Tests P2 EN COURS (tenant_4✅, Docker⚠️) + 🔵 Phase 3 39 Pages READY
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + 🔵 Phase 2.5 Tests P2 READY (tenant_4✅, Docker✅) + 🔵 Phase 3 39 Pages READY
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Blocker:** Docker build - tsc génère .d.ts.map mais PAS .d.ts (tsconfig conflict). **Option:** Skip Docker, run local dev.
+**Docker:** ✅ Build fonctionnel (problème .d.ts résolu - composite removed from tsconfig)
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
 >

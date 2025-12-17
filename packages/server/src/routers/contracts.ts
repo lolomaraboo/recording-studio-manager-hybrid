@@ -75,7 +75,7 @@ export const contractsRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newContract = await ctx.tenantDb.insert(contracts).values(input).returning();
+      const newContract = await ctx.tenantDb.insert(contracts).values(input as any).returning();
 
       return newContract[0];
     }),

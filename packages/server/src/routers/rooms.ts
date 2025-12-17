@@ -72,7 +72,7 @@ export const roomsRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const newRoom = await ctx.tenantDb.insert(rooms).values(input).returning();
+      const newRoom = await ctx.tenantDb.insert(rooms).values(input as any).returning();
 
       return newRoom[0];
     }),

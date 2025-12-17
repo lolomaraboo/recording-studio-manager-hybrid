@@ -83,7 +83,7 @@ export const clientsRouter = router({
 
       const [client] = await tenantDb
         .insert(clients)
-        .values(input)
+        .values(input as any)
         .returning();
 
       return client;
