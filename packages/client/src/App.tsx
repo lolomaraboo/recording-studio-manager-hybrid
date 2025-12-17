@@ -4,6 +4,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Sessions } from './pages/Sessions';
 import SessionDetail from './pages/SessionDetail';
 import { Clients } from './pages/Clients';
+import ClientDetail from './pages/ClientDetail';
 import { Invoices } from './pages/Invoices';
 import Rooms from './pages/Rooms';
 import Equipment from './pages/Equipment';
@@ -38,6 +39,7 @@ function App() {
           <Route path="sessions" element={<Sessions />} />
           <Route path="sessions/:id" element={<SessionDetail />} />
           <Route path="clients" element={<Clients />} />
+          <Route path="clients/:id" element={<ClientDetail />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="equipment" element={<Equipment />} />
