@@ -10,6 +10,7 @@ import Projects from './pages/Projects';
 import Tracks from './pages/Tracks';
 import Talents from './pages/Talents';
 import Calendar from './pages/Calendar';
+import AudioFiles from './pages/AudioFiles';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -42,6 +43,7 @@ function App() {
           <Route path="tracks" element={<Tracks />} />
           <Route path="talents" element={<Talents />} />
           <Route path="calendar" element={<Calendar />} />
+          <Route path="audio-files" element={<AudioFiles />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

@@ -12,6 +12,7 @@ import { quotesRouter } from './quotes';
 import { contractsRouter } from './contracts';
 import { expensesRouter } from './expenses';
 import { notificationsRouter } from './notifications';
+import { filesRouter } from './files';
 
 /**
  * Main App Router
@@ -51,6 +52,7 @@ export const appRouter = router({
   contracts: contractsRouter,
   expenses: expensesRouter,
   notifications: notificationsRouter,
+  files: filesRouter,
 });
 
 /**
