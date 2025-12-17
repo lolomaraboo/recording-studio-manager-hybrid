@@ -129,6 +129,16 @@ const navSections: NavSection[] = [
         icon: <FileText className="h-5 w-5" />,
       },
       {
+        title: "Contrats",
+        href: "/contracts",
+        icon: <FileText className="h-5 w-5" />,
+      },
+      {
+        title: "Dépenses",
+        href: "/expenses",
+        icon: <DollarSign className="h-5 w-5" />,
+      },
+      {
         title: "Rapports Financiers",
         href: "/financial-reports",
         icon: <DollarSign className="h-5 w-5" />,
