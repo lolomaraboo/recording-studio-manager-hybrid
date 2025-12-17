@@ -24,8 +24,11 @@ import TrackDetail from './pages/TrackDetail';
 import Talents from './pages/Talents';
 import TalentDetail from './pages/TalentDetail';
 import TalentCreate from './pages/TalentCreate';
+import { Quotes } from './pages/Quotes';
 import QuoteCreate from './pages/QuoteCreate';
+import { Contracts } from './pages/Contracts';
 import ContractCreate from './pages/ContractCreate';
+import { Expenses } from './pages/Expenses';
 import ExpenseCreate from './pages/ExpenseCreate';
 import Calendar from './pages/Calendar';
 import AudioFiles from './pages/AudioFiles';
@@ -75,8 +78,11 @@ function App() {
           <Route path="talents" element={<Talents />} />
           <Route path="talents/new" element={<TalentCreate />} />
           <Route path="talents/:id" element={<TalentDetail />} />
+          <Route path="quotes" element={<Quotes />} />
           <Route path="quotes/new" element={<QuoteCreate />} />
+          <Route path="contracts" element={<Contracts />} />
           <Route path="contracts/new" element={<ContractCreate />} />
+          <Route path="expenses" element={<Expenses />} />
           <Route path="expenses/new" element={<ExpenseCreate />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="audio-files" element={<AudioFiles />} />
