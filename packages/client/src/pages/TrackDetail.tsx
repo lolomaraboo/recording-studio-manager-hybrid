@@ -89,7 +89,7 @@ export default function TrackDetail() {
         title: track.title,
         trackNumber: track.trackNumber || 1,
         duration: track.duration || 0,
-        status: track.status,
+        status: track.status as "recording" | "editing" | "mixing" | "mastering" | "completed",
         bpm: track.bpm || undefined,
         key: track.key || "",
         lyrics: track.lyrics || "",

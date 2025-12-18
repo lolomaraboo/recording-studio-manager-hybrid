@@ -30,6 +30,10 @@ import { Contracts } from './pages/Contracts';
 import ContractCreate from './pages/ContractCreate';
 import { Expenses } from './pages/Expenses';
 import ExpenseCreate from './pages/ExpenseCreate';
+import ExpenseDetail from './pages/ExpenseDetail';
+import QuoteDetail from './pages/QuoteDetail';
+import ContractDetail from './pages/ContractDetail';
+import TrackCreate from './pages/TrackCreate';
 import Calendar from './pages/Calendar';
 import AudioFiles from './pages/AudioFiles';
 import Login from './pages/Login';
@@ -74,16 +78,20 @@ function App() {
           <Route path="projects/new" element={<ProjectCreate />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="tracks" element={<Tracks />} />
+          <Route path="tracks/new" element={<TrackCreate />} />
           <Route path="tracks/:id" element={<TrackDetail />} />
           <Route path="talents" element={<Talents />} />
           <Route path="talents/new" element={<TalentCreate />} />
           <Route path="talents/:id" element={<TalentDetail />} />
           <Route path="quotes" element={<Quotes />} />
           <Route path="quotes/new" element={<QuoteCreate />} />
+          <Route path="quotes/:id" element={<QuoteDetail />} />
           <Route path="contracts" element={<Contracts />} />
           <Route path="contracts/new" element={<ContractCreate />} />
+          <Route path="contracts/:id" element={<ContractDetail />} />
           <Route path="expenses" element={<Expenses />} />
           <Route path="expenses/new" element={<ExpenseCreate />} />
+          <Route path="expenses/:id" element={<ExpenseDetail />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="audio-files" element={<AudioFiles />} />
           <Route path="*" element={<Navigate to="/" replace />} />

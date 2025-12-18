@@ -582,13 +582,143 @@ Monitoring: Prometheus + Grafana
 - **Qualité:** Type-safe, 0 erreur TS dans nouveaux fichiers
 
 **Notes:**
-- Quotes, Contracts, Expenses: formulaires créés mais pages de liste manquantes (P3 BAS)
 - Checkboxes: utilise input type="checkbox" natif (shadcn/ui Checkbox pas disponible)
 - JSON fields: instruments, genres, equipmentList (validation basique, parsing côté backend)
 
-**Prochaine Priorité:** Phase 3 P3 BAS - Améliorations listes (filtres avancés, exports CSV/PDF, bulk operations)
-
 **Phase 3 P2 MOYEN: 100% COMPLÉTÉ ✅**
+
+---
+
+### ✅ PRIORITÉ 7 - PHASE 3 P3 BAS - LISTE PAGES (2025-12-17 PM) (COMPLÉTÉE)
+
+**Timeline:** 2025-12-17 après-midi/soir
+**Objectif:** Compléter toutes les pages de liste manquantes
+**Status:** ✅ 100% COMPLÉTÉ (8/8 listes)
+
+**Pages de Liste Complétées (8):**
+
+**Existantes (5 - déjà créées dans phases précédentes):**
+1. ✅ Rooms.tsx - Liste salles
+2. ✅ Equipment.tsx - Liste équipements
+3. ✅ Projects.tsx - Liste projets musicaux
+4. ✅ Tracks.tsx - Liste tracks
+5. ✅ Talents.tsx - Liste talents (musiciens/acteurs)
+
+**Nouvelles créées (3) - Session 2025-12-17 PM:**
+6. ✅ **Quotes.tsx** (319 lignes) - Liste devis
+   - Stats cards: Total, En attente, Acceptés
+   - Filtres: Search (title/quoteNumber), Status (all/pending/accepted/rejected)
+   - Table: quoteNumber, client, title, validUntil, total, status
+   - Empty state + navigation vers QuoteCreate
+   - Commit: 4e7a39c
+
+7. ✅ **Contracts.tsx** (326 lignes) - Liste contrats
+   - Stats cards: Total, Actifs, En attente
+   - Filtres: Search (title/contractNumber), Status (all/active/pending/expired/terminated)
+   - Table: contractNumber, client, type, title, startDate, endDate, status
+   - Empty state + navigation vers ContractCreate
+   - Commit: 4e7a39c
+
+8. ✅ **Expenses.tsx** (314 lignes) - Liste dépenses
+   - Stats cards: Total dépenses, Ce mois, Nombre total
+   - Filtres: Search (description/vendor), Category (all/rent/utilities/insurance/...)
+   - Table: date, category, description, vendor, amount, currency
+   - Empty state + navigation vers ExpenseCreate
+   - Commit: 4e7a39c
+
+**Navigation Sidebar:**
+- ✅ Ajout lien "Contrats" dans section Finance
+- ✅ Ajout lien "Dépenses" dans section Finance
+- Commit: db3fe8f
+
+**Routes Ajoutées (App.tsx):**
+- ✅ /quotes → Quotes.tsx
+- ✅ /contracts → Contracts.tsx
+- ✅ /expenses → Expenses.tsx
+
+**Pattern Architecture (cohérent avec Invoices.tsx):**
+- Stats cards en haut (3 métriques clés)
+- Search + Select filters (2 colonnes)
+- Table avec données complètes
+- Empty state avec bouton "Créer nouveau"
+- Navigation vers pages détail (au clic sur row)
+- Navigation vers formulaires Create (bouton header)
+- French localization (date-fns fr)
+- Loading states (Skeleton)
+- Type-safe avec tRPC
+
+**Métriques:**
+- **Pages:** 3 listes créées (Quotes, Contracts, Expenses)
+- **Lignes:** +969 lignes React TypeScript (959 pages + 10 sidebar)
+- **Commits:** 2 (4e7a39c features + db3fe8f sidebar)
+- **Temps:** ~45min (création rapide, pattern établi)
+- **Qualité:** Type-safe, 0 erreur TS, cohérent avec Invoices.tsx
+
+**Prochaine Priorité:** Phase 3 Pages Manquantes (QuoteDetail, ContractDetail, TrackCreate) puis Améliorations UI/UX
+
+**Phase 3 P3 BAS: 100% COMPLÉTÉ ✅**
+
+---
+
+### ✅ PRIORITÉ 8 - PHASE 3 PAGES MANQUANTES (2025-12-17) (COMPLÉTÉE)
+
+**Timeline:** 2025-12-17 PM
+**Objectif:** Compléter les 4 pages détail/formulaire manquantes
+**Status:** ✅ COMPLÉTÉ (100%)
+
+**Pages Créées (4 - Bonus: +ExpenseDetail):**
+1. ✅ **QuoteDetail.tsx** - Page détail devis (547 lignes)
+   - Pattern: InvoiceDetail.tsx (status badges, totals breakdown, client card)
+   - CRUD: view/edit/delete
+   - Actions: PDF export, Email, Convert to Invoice, Accept/Reject
+   - Features: Status workflow, validité, conversion facture
+
+2. ✅ **ContractDetail.tsx** - Page détail contrat (548 lignes)
+   - Pattern: SessionDetail.tsx (view/edit toggle, 2 colonnes)
+   - CRUD: view/edit/delete
+   - Fields: contractNumber, client, type, dates, terms, status, value, signature
+   - Features: 10 types contrats, signature électronique, statuts
+
+3. ✅ **ExpenseDetail.tsx** - Page détail dépense (562 lignes) **[BONUS]**
+   - Pattern: InvoiceDetail.tsx (view/edit, payment details)
+   - CRUD: view/edit/delete
+   - Fields: category, vendor, amount, currency, payment method, status
+   - Features: 10 catégories, méthodes paiement, récurrence
+
+4. ✅ **TrackCreate.tsx** - Formulaire création track (355 lignes)
+   - Pattern: ProjectCreate.tsx (Select project, form validation)
+   - Fields: projectId, title, trackNumber, duration, bpm, key, ISRC, lyrics, notes
+   - Validation: projectId, title requis
+   - Features: 5 statuts, détails musicaux, notes techniques
+
+**Routes Ajoutées (App.tsx):** ✅
+- /quotes/:id → QuoteDetail
+- /contracts/:id → ContractDetail
+- /expenses/:id → ExpenseDetail **[BONUS]**
+- /tracks/new → TrackCreate
+
+**Résultats:**
+- **Total lignes:** 2,012 lignes (4 pages)
+- **Temps création:** ~2h30
+- **Temps fix TypeScript:** ~1h30
+- **Total:** ~4h
+
+**✅ TypeScript Errors FIXED (2025-12-17 Soir):**
+1. ✅ **API Routers:** Changed `getById` → `get` (quotes, contracts, expenses)
+2. ✅ **Mutation Formats:** Removed `data` wrapper (7 mutations fixed)
+3. ✅ **Date Types:** Changed `.toISOString()` → `new Date()` (6 fields)
+4. ✅ **Immutable Fields:** Removed from update mutations (quoteNumber, contractNumber, currency)
+5. ✅ **TrackCreate:** Fixed `projects.list()`, removed `technicalNotes`, fixed `.items`
+6. ✅ **Client Arrays:** Fixed `.items.find()` → `.find()` (2 pages)
+7. ✅ **Unused Imports:** Removed CardDescription, Clock, Euro, DollarSign
+
+**Erreurs Corrigées:** 0 erreurs TypeScript dans les 4 nouvelles pages ✅
+
+**⚠️ TODO Restant:**
+- Tester les 4 pages avec données réelles
+- Créer commit + push GitHub
+
+**Prochaine Priorité:** Phase 2.5 Tests P2 (URGENT)
 
 ---
 

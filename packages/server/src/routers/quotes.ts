@@ -23,7 +23,7 @@ export const quotesRouter = router({
   /**
    * Get quote by ID with line items
    */
-  getById: protectedProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.tenantDb) {
