@@ -332,7 +332,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_invoice",
-    description: "Crée une nouvelle facture pour un client.",
+    description: "Crée une nouvelle facture pour un client avec calcul automatique des taxes.",
     input_schema: {
       type: "object",
       properties: {
@@ -340,19 +340,71 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du client",
         },
+        invoice_number: {
+          type: "string",
+          description: "Numéro de facture unique (ex: INV-2025-001)",
+        },
+        issue_date: {
+          type: "string",
+          description: "Date d'émission (ISO 8601: YYYY-MM-DD)",
+        },
+        due_date: {
+          type: "string",
+          description: "Date d'échéance (ISO 8601: YYYY-MM-DD)",
+        },
+        subtotal: {
+          type: "number",
+          description: "Montant HT en euros",
+        },
+        tax_rate: {
+          type: "number",
+          description: "Taux de TVA en pourcentage (défaut: 20.0)",
+        },
+        notes: {
+          type: "string",
+          description: "Notes optionnelles pour la facture",
+        },
+        items: {
+          type: "array",
+          description: "Lignes de facturation (optionnel)",
+          items: {
+            type: "object",
+            properties: {
+              description: { type: "string" },
+              quantity: { type: "number" },
+              unit_price: { type: "number" },
+            },
+          },
+        },
       },
-      required: ["client_id"],
+      required: ["client_id", "invoice_number", "issue_date", "due_date", "subtotal"],
     },
   },
   {
     name: "update_invoice",
-    description: "Met à jour une facture existante.",
+    description: "Met à jour une facture existante (statut, date d'échéance, paiement).",
     input_schema: {
       type: "object",
       properties: {
         invoice_id: {
           type: "number",
-          description: "ID de la facture",
+          description: "ID de la facture à modifier",
+        },
+        status: {
+          type: "string",
+          description: "Nouveau statut: draft, sent, paid, overdue, cancelled",
+        },
+        due_date: {
+          type: "string",
+          description: "Nouvelle date d'échéance (ISO 8601: YYYY-MM-DD)",
+        },
+        notes: {
+          type: "string",
+          description: "Notes à ajouter ou modifier",
+        },
+        paid_at: {
+          type: "string",
+          description: "Date de paiement (ISO 8601: YYYY-MM-DD) - marque comme payée",
         },
       },
       required: ["invoice_id"],
@@ -374,10 +426,15 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "get_invoice_summary",
-    description: "Résumé financier des factures (total, payé, en attente).",
+    description: "Résumé financier des factures avec statistiques détaillées (revenus, payées, impayées, en retard).",
     input_schema: {
       type: "object",
-      properties: {},
+      properties: {
+        period: {
+          type: "string",
+          description: "Période d'analyse: 'month' (dernier mois) ou 'year' (dernière année). Défaut: month",
+        },
+      },
     },
   },
 
@@ -403,7 +460,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_quote",
-    description: "Crée un nouveau devis.",
+    description: "Crée un nouveau devis avec calcul automatique des taxes et date de validité.",
     input_schema: {
       type: "object",
       properties: {
@@ -411,19 +468,63 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du client",
         },
+        quote_number: {
+          type: "string",
+          description: "Numéro de devis unique (ex: QT-2025-001)",
+        },
+        valid_until: {
+          type: "string",
+          description: "Date d'expiration du devis (ISO 8601: YYYY-MM-DD)",
+        },
+        subtotal: {
+          type: "number",
+          description: "Montant HT en euros",
+        },
+        tax_rate: {
+          type: "number",
+          description: "Taux de TVA en pourcentage (défaut: 20.0)",
+        },
+        title: {
+          type: "string",
+          description: "Titre du devis",
+        },
+        description: {
+          type: "string",
+          description: "Description détaillée du devis",
+        },
+        project_id: {
+          type: "number",
+          description: "ID du projet associé (optionnel)",
+        },
       },
-      required: ["client_id"],
+      required: ["client_id", "quote_number", "valid_until", "subtotal"],
     },
   },
   {
     name: "update_quote",
-    description: "Met à jour un devis.",
+    description: "Met à jour un devis existant (statut, date de validité, description).",
     input_schema: {
       type: "object",
       properties: {
         quote_id: {
           type: "number",
-          description: "ID du devis",
+          description: "ID du devis à modifier",
+        },
+        status: {
+          type: "string",
+          description: "Nouveau statut: draft, sent, accepted, rejected, expired, converted",
+        },
+        valid_until: {
+          type: "string",
+          description: "Nouvelle date d'expiration (ISO 8601: YYYY-MM-DD)",
+        },
+        title: {
+          type: "string",
+          description: "Nouveau titre",
+        },
+        description: {
+          type: "string",
+          description: "Nouvelle description",
         },
       },
       required: ["quote_id"],
@@ -471,27 +572,71 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_room",
-    description: "Crée une nouvelle salle.",
+    description: "Crée une nouvelle salle de studio avec tarifs horaires et capacité.",
     input_schema: {
       type: "object",
       properties: {
         name: {
           type: "string",
-          description: "Nom de la salle",
+          description: "Nom de la salle (ex: Studio A, Salle de Mixage)",
+        },
+        type: {
+          type: "string",
+          description: "Type de salle: recording, mixing, mastering, rehearsal, live. Défaut: recording",
+        },
+        hourly_rate: {
+          type: "number",
+          description: "Tarif horaire en euros (requis)",
+        },
+        half_day_rate: {
+          type: "number",
+          description: "Tarif demi-journée en euros (optionnel)",
+        },
+        full_day_rate: {
+          type: "number",
+          description: "Tarif journée complète en euros (optionnel)",
+        },
+        capacity: {
+          type: "number",
+          description: "Capacité d'accueil (nombre de personnes). Défaut: 1",
+        },
+        description: {
+          type: "string",
+          description: "Description de la salle et ses équipements",
         },
       },
-      required: ["name"],
+      required: ["name", "hourly_rate"],
     },
   },
   {
     name: "update_room",
-    description: "Met à jour une salle existante.",
+    description: "Met à jour une salle existante (tarifs, disponibilité, description).",
     input_schema: {
       type: "object",
       properties: {
         room_id: {
           type: "number",
-          description: "ID de la salle",
+          description: "ID de la salle à modifier",
+        },
+        name: {
+          type: "string",
+          description: "Nouveau nom de la salle",
+        },
+        hourly_rate: {
+          type: "number",
+          description: "Nouveau tarif horaire en euros",
+        },
+        is_active: {
+          type: "boolean",
+          description: "Activer/désactiver la salle",
+        },
+        is_available_for_booking: {
+          type: "boolean",
+          description: "Disponible pour réservation",
+        },
+        description: {
+          type: "string",
+          description: "Nouvelle description",
         },
       },
       required: ["room_id"],
@@ -511,27 +656,75 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_equipment",
-    description: "Ajoute un nouvel équipement.",
+    description: "Ajoute un nouvel équipement au studio (microphones, préamps, instruments, etc.).",
     input_schema: {
       type: "object",
       properties: {
         name: {
           type: "string",
-          description: "Nom de l'équipement",
+          description: "Nom de l'équipement (ex: Neumann U87, SSL G-Series Compressor)",
+        },
+        category: {
+          type: "string",
+          description: "Catégorie: microphone, preamp, interface, outboard, instrument, monitoring, computer, cable, accessory, other",
+        },
+        brand: {
+          type: "string",
+          description: "Marque (ex: Neumann, SSL, Shure)",
+        },
+        model: {
+          type: "string",
+          description: "Modèle (ex: U87 Ai, G-Series)",
+        },
+        room_id: {
+          type: "number",
+          description: "ID de la salle où est installé l'équipement (optionnel)",
+        },
+        status: {
+          type: "string",
+          description: "Statut: operational, maintenance, out_of_service, rented. Défaut: operational",
+        },
+        description: {
+          type: "string",
+          description: "Description et spécifications techniques",
         },
       },
-      required: ["name"],
+      required: ["name", "category"],
     },
   },
   {
     name: "update_equipment",
-    description: "Met à jour un équipement existant.",
+    description: "Met à jour un équipement existant (statut, condition, localisation).",
     input_schema: {
       type: "object",
       properties: {
         equipment_id: {
           type: "number",
-          description: "ID de l'équipement",
+          description: "ID de l'équipement à modifier",
+        },
+        name: {
+          type: "string",
+          description: "Nouveau nom",
+        },
+        status: {
+          type: "string",
+          description: "Nouveau statut: operational, maintenance, out_of_service, rented",
+        },
+        condition: {
+          type: "string",
+          description: "Condition: excellent, good, fair, poor",
+        },
+        is_available: {
+          type: "boolean",
+          description: "Disponible pour utilisation",
+        },
+        room_id: {
+          type: "number",
+          description: "Déplacer vers une autre salle",
+        },
+        description: {
+          type: "string",
+          description: "Nouvelle description",
         },
       },
       required: ["equipment_id"],
@@ -561,31 +754,71 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_project",
-    description: "Crée un nouveau projet musical.",
+    description: "Crée un nouveau projet musical (album, EP, single, demo, etc.).",
     input_schema: {
       type: "object",
       properties: {
-        name: {
-          type: "string",
-          description: "Nom du projet",
-        },
         client_id: {
           type: "number",
           description: "ID du client",
         },
+        name: {
+          type: "string",
+          description: "Nom du projet (ex: Mon Premier Album)",
+        },
+        artist_name: {
+          type: "string",
+          description: "Nom de l'artiste",
+        },
+        type: {
+          type: "string",
+          description: "Type: album, ep, single, demo, soundtrack, podcast. Défaut: album",
+        },
+        genre: {
+          type: "string",
+          description: "Genre musical (rock, pop, jazz, électro, etc.)",
+        },
+        budget: {
+          type: "number",
+          description: "Budget du projet en euros",
+        },
+        description: {
+          type: "string",
+          description: "Description du projet",
+        },
       },
-      required: ["name", "client_id"],
+      required: ["client_id", "name"],
     },
   },
   {
     name: "update_project",
-    description: "Met à jour un projet existant.",
+    description: "Met à jour un projet existant (statut, budget, coûts).",
     input_schema: {
       type: "object",
       properties: {
         project_id: {
           type: "number",
-          description: "ID du projet",
+          description: "ID du projet à modifier",
+        },
+        name: {
+          type: "string",
+          description: "Nouveau nom du projet",
+        },
+        status: {
+          type: "string",
+          description: "Nouveau statut: pre_production, recording, editing, mixing, mastering, completed, delivered, archived",
+        },
+        budget: {
+          type: "number",
+          description: "Nouveau budget en euros",
+        },
+        total_cost: {
+          type: "number",
+          description: "Coût total actuel en euros",
+        },
+        description: {
+          type: "string",
+          description: "Nouvelle description",
         },
       },
       required: ["project_id"],
@@ -593,7 +826,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_project_folder",
-    description: "Crée un dossier de stockage pour un projet.",
+    description: "Génère automatiquement un chemin de stockage pour un projet (ex: /projects/1-mon-album).",
     input_schema: {
       type: "object",
       properties: {
@@ -601,12 +834,12 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du projet",
         },
-        folder_path: {
+        folder_name: {
           type: "string",
-          description: "Chemin du dossier à créer",
+          description: "Nom personnalisé du dossier (optionnel, utilise le nom du projet par défaut)",
         },
       },
-      required: ["project_id", "folder_path"],
+      required: ["project_id"],
     },
   },
 
@@ -623,13 +856,47 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_musician",
-    description: "Ajoute un nouveau musicien/talent.",
+    description: "Ajoute un nouveau musicien/talent avec ses instruments et genres musicaux.",
     input_schema: {
       type: "object",
       properties: {
         name: {
           type: "string",
-          description: "Nom du musicien",
+          description: "Nom complet du musicien",
+        },
+        stage_name: {
+          type: "string",
+          description: "Nom de scène (optionnel)",
+        },
+        email: {
+          type: "string",
+          description: "Email de contact",
+        },
+        phone: {
+          type: "string",
+          description: "Numéro de téléphone",
+        },
+        talent_type: {
+          type: "string",
+          description: "Type de talent: musician, actor. Défaut: musician",
+        },
+        instruments: {
+          type: "array",
+          description: "Liste des instruments joués (ex: ['guitar', 'vocals', 'piano'])",
+          items: {
+            type: "string",
+          },
+        },
+        genres: {
+          type: "array",
+          description: "Genres musicaux (ex: ['rock', 'blues', 'jazz'])",
+          items: {
+            type: "string",
+          },
+        },
+        bio: {
+          type: "string",
+          description: "Biographie du musicien",
         },
       },
       required: ["name"],
