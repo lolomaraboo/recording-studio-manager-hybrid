@@ -1,9 +1,18 @@
 import { useAssistant } from "@/contexts/AssistantContext";
 import { useChatbot } from "@/contexts/ChatbotContext";
 import { Button } from "@/components/ui/button";
-import { Bot, Minimize2, Maximize2, ExternalLink, Maximize } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Bot, Minimize2, Maximize2, ExternalLink, Maximize, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
 export function AIAssistant() {
   const { isOpen: assistantOpen } = useAssistant();
@@ -16,6 +25,14 @@ export function AIAssistant() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const chatRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Chat state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const chatMutation = trpc.ai.chat.useMutation();
 
   // Handle mouse down on header (start dragging) - only in floating mode and not fullscreen
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -108,6 +125,61 @@ export function AIAssistant() {
   // Toggle fullscreen mode - only available when floating
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Handle send message
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const response = await chatMutation.mutateAsync({
+        message: userMessage.content,
+      });
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: response.response,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle Enter key
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   if (!assistantOpen || !isOpen) {
@@ -203,18 +275,91 @@ export function AIAssistant() {
       {/* Content */}
       {!isMinimized && (
         <>
-          <div className="flex-1 flex items-center justify-center p-8 text-center overflow-auto">
-            <div className="space-y-4">
-              <Bot className="h-16 w-16 mx-auto text-muted-foreground" />
-              <div>
-                <h3 className="text-lg font-semibold mb-2">AI Assistant</h3>
-                <p className="text-sm text-muted-foreground">
-                  Chatbot IA avec streaming, suggestions contextuelles, et stats du jour.
-                </p>
-                <p className="text-xs text-muted-foreground mt-4">
-                  En cours de développement...
-                </p>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+                <Bot className="h-16 w-16 text-muted-foreground" />
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">AI Assistant</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Posez-moi une question sur le studio ou demandez-moi d'effectuer une action.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Exemples: "Crée une facture", "Liste les clients", "Crée un projet"
+                  </p>
+                </div>
               </div>
+            ) : (
+              <>
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={cn(
+                      "flex gap-3",
+                      message.role === 'user' ? "justify-end" : "justify-start"
+                    )}
+                  >
+                    {message.role === 'assistant' && (
+                      <div className="flex-shrink-0">
+                        <Bot className="h-6 w-6 text-primary" />
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        "max-w-[80%] rounded-lg px-4 py-2",
+                        message.role === 'user'
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      )}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-xs opacity-50 mt-1">
+                        {message.timestamp.toLocaleTimeString('fr-FR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex gap-3 justify-start">
+                    <div className="flex-shrink-0">
+                      <Bot className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="bg-muted rounded-lg px-4 py-2">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </>
+            )}
+          </div>
+
+          {/* Input */}
+          <div className="border-t border-border p-4 shrink-0">
+            <div className="flex gap-2">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Tapez votre message..."
+                disabled={isLoading}
+                className="flex-1"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!input.trim() || isLoading}
+                size="icon"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 

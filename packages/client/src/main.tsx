@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
 const trpcClient = trpc.createClient({
   links: [
     httpLink({
-      url: 'http://localhost:3001/api/trpc',
+      url: import.meta.env.VITE_API_URL || 'http://localhost:3001/api/trpc',
       // Include credentials (cookies) in all requests
       fetch(url, options) {
         return fetch(url, {

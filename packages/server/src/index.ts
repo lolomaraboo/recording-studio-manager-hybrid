@@ -24,7 +24,12 @@ async function main() {
   // Middleware
   app.use(
     cors({
-      origin: ['http://localhost:5173', 'http://localhost:5174'],
+      origin: [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://192.168.8.50:5174',
+        'http://192.168.8.50:5173',
+      ],
       credentials: true,
     })
   );
