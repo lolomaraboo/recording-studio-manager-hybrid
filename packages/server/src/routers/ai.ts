@@ -220,7 +220,7 @@ export const aiRouter = router({
           // Create new
           await tenantDb.insert(aiConversations).values({
             sessionId,
-            userId: ctx.session.userId,
+            userId: ctx.user!.id,
             pageContext: context ? JSON.stringify(context) : null,
             messages: JSON.stringify(conversationHistory),
             totalMessages: conversationHistory.length,
