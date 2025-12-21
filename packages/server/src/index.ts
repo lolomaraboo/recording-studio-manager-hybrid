@@ -60,6 +60,31 @@ async function main() {
     })
   );
 
+  // SSE Streaming endpoint for AI chat (Phase 2.3)
+  app.post('/api/ai/stream', async (req, res) => {
+    try {
+      const { message, sessionId } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ error: 'Message is required' });
+      }
+
+      // TODO Phase 2.3: Implement full SSE streaming with auth
+      // For now, send a placeholder response
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      res.write(`data: ${JSON.stringify({ type: 'start', timestamp: new Date().toISOString() })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'chunk', data: { text: 'Streaming endpoint ready (Phase 2.3)' }, timestamp: new Date().toISOString() })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'complete', timestamp: new Date().toISOString() })}\n\n`);
+
+      res.end();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // 404 handler
   app.use((_req, res) => {
     res.status(404).json({ error: 'Not found' });

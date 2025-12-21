@@ -7,6 +7,7 @@ import { getLLMProvider } from "../lib/llmProvider";
 import { AIActionExecutor } from "../lib/aiActions";
 import { AI_TOOLS } from "../lib/aiTools";
 import { SYSTEM_PROMPT } from "../lib/aiSystemPrompt";
+import { HallucinationDetector } from "../lib/hallucinationDetector";
 
 /**
  * AI Chatbot Router
@@ -162,6 +163,30 @@ export const aiRouter = router({
             });
 
             finalResponse = followUpResponse.content;
+
+            // Hallucination detection (Phase 2.3)
+            const detector = new HallucinationDetector();
+            const hallucinationResult = await detector.detect(
+              finalResponse,
+              llmResponse.toolCalls,
+              toolResults
+            );
+
+            // Log hallucination detection results
+            if (hallucinationResult.hasHallucination) {
+              console.warn(
+                `[AI Router] Hallucination detected (confidence: ${hallucinationResult.confidence}%):`,
+                hallucinationResult.issues
+              );
+            }
+
+            // Add warnings to response if confidence is low
+            if (hallucinationResult.confidence < 80 && hallucinationResult.warnings.length > 0) {
+              console.warn(
+                `[AI Router] Low confidence (${hallucinationResult.confidence}%):`,
+                hallucinationResult.warnings
+              );
+            }
           }
         }
 
