@@ -241,6 +241,9 @@ importers:
       openai:
         specifier: ^6.15.0
         version: 6.15.0(zod@3.25.76)
+      postgres:
+        specifier: ^3.4.4
+        version: 3.4.7
       zod:
         specifier: ^3.24.1
         version: 3.25.76
