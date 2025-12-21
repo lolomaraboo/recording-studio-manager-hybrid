@@ -58,131 +58,131 @@ export class AIActionExecutor {
       switch (actionName) {
         // Sessions
         case "get_upcoming_sessions":
-          result = await this.get_upcoming_sessions(params);
+          result = await this.get_upcoming_sessions(params as any);
           break;
         case "get_session_details":
-          result = await this.get_session_details(params);
+          result = await this.get_session_details(params as any);
           break;
         case "create_session":
-          result = await this.create_session(params);
+          result = await this.create_session(params as any);
           break;
         case "update_session":
-          result = await this.update_session(params);
+          result = await this.update_session(params as any);
           break;
         case "delete_session":
-          result = await this.delete_session(params);
+          result = await this.delete_session(params as any);
           break;
 
         // Clients
         case "get_all_clients":
-          result = await this.get_all_clients(params);
+          result = await this.get_all_clients(params as any);
           break;
         case "get_client_info":
-          result = await this.get_client_info(params);
+          result = await this.get_client_info(params as any);
           break;
         case "create_client":
-          result = await this.create_client(params);
+          result = await this.create_client(params as any);
           break;
         case "update_client":
-          result = await this.update_client(params);
+          result = await this.update_client(params as any);
           break;
         case "delete_client":
-          result = await this.delete_client(params);
+          result = await this.delete_client(params as any);
           break;
 
         // Analytics
         case "get_studio_context":
-          result = await this.get_studio_context(params);
+          result = await this.get_studio_context(params as any);
           break;
         case "get_revenue_forecast":
-          result = await this.get_revenue_forecast(params);
+          result = await this.get_revenue_forecast(params as any);
           break;
         case "get_revenue_summary":
-          result = await this.get_revenue_summary(params);
+          result = await this.get_revenue_summary(params as any);
           break;
         case "get_client_360_view":
-          result = await this.get_client_360_view(params);
+          result = await this.get_client_360_view(params as any);
           break;
         case "create_session_checklist":
-          result = await this.create_session_checklist(params);
+          result = await this.create_session_checklist(params as any);
           break;
 
         // Invoices
         case "get_all_invoices":
-          result = await this.get_all_invoices(params);
+          result = await this.get_all_invoices(params as any);
           break;
         case "create_invoice":
-          result = await this.create_invoice(params);
+          result = await this.create_invoice(params as any);
           break;
         case "update_invoice":
-          result = await this.update_invoice(params);
+          result = await this.update_invoice(params as any);
           break;
         case "delete_invoice":
-          result = await this.delete_invoice(params);
+          result = await this.delete_invoice(params as any);
           break;
         case "get_invoice_summary":
-          result = await this.get_invoice_summary(params);
+          result = await this.get_invoice_summary(params as any);
           break;
 
         // Quotes
         case "get_all_quotes":
-          result = await this.get_all_quotes(params);
+          result = await this.get_all_quotes(params as any);
           break;
         case "create_quote":
-          result = await this.create_quote(params);
+          result = await this.create_quote(params as any);
           break;
         case "update_quote":
-          result = await this.update_quote(params);
+          result = await this.update_quote(params as any);
           break;
         case "delete_quote":
-          result = await this.delete_quote(params);
+          result = await this.delete_quote(params as any);
           break;
         case "convert_quote_to_invoice":
-          result = await this.convert_quote_to_invoice(params);
+          result = await this.convert_quote_to_invoice(params as any);
           break;
 
         // Rooms
         case "get_all_rooms":
-          result = await this.get_all_rooms(params);
+          result = await this.get_all_rooms(params as any);
           break;
         case "create_room":
-          result = await this.create_room(params);
+          result = await this.create_room(params as any);
           break;
         case "update_room":
-          result = await this.update_room(params);
+          result = await this.update_room(params as any);
           break;
 
         // Equipment
         case "get_all_equipment":
-          result = await this.get_all_equipment(params);
+          result = await this.get_all_equipment(params as any);
           break;
         case "create_equipment":
-          result = await this.create_equipment(params);
+          result = await this.create_equipment(params as any);
           break;
         case "update_equipment":
-          result = await this.update_equipment(params);
+          result = await this.update_equipment(params as any);
           break;
 
         // Projects
         case "get_all_projects":
-          result = await this.get_all_projects(params);
+          result = await this.get_all_projects(params as any);
           break;
         case "create_project":
-          result = await this.create_project(params);
+          result = await this.create_project(params as any);
           break;
         case "update_project":
-          result = await this.update_project(params);
+          result = await this.update_project(params as any);
           break;
         case "create_project_folder":
-          result = await this.create_project_folder(params);
+          result = await this.create_project_folder(params as any);
           break;
 
         // Musicians
         case "get_all_musicians":
-          result = await this.get_all_musicians(params);
+          result = await this.get_all_musicians(params as any);
           break;
         case "create_musician":
-          result = await this.create_musician(params);
+          result = await this.create_musician(params as any);
           break;
 
         default:
@@ -619,24 +619,131 @@ export class AIActionExecutor {
     };
   }
 
-  async create_invoice(params: any) {
-    // TODO: Implement invoice creation
-    return { message: "TODO: Implement create_invoice" };
+  async create_invoice(params: {
+    client_id: number;
+    invoice_number: string;
+    issue_date: string;
+    due_date: string;
+    subtotal: number;
+    tax_rate?: number;
+    notes?: string;
+    items?: Array<{ description: string; quantity: number; unit_price: number }>;
+  }) {
+    const {
+      client_id,
+      invoice_number,
+      issue_date,
+      due_date,
+      subtotal,
+      tax_rate = 20.0,
+      notes,
+      items = [],
+    } = params;
+
+    // Calculate tax and total
+    const taxAmount = (subtotal * tax_rate) / 100;
+    const total = subtotal + taxAmount;
+
+    // Create invoice
+    const [invoice] = await this.db
+      .insert(invoices)
+      .values({
+        clientId: client_id,
+        invoiceNumber: invoice_number,
+        issueDate: new Date(issue_date),
+        dueDate: new Date(due_date),
+        status: "draft",
+        subtotal: subtotal.toString(),
+        taxRate: tax_rate.toString(),
+        taxAmount: taxAmount.toString(),
+        total: total.toString(),
+        notes,
+      })
+      .returning();
+
+    return {
+      invoice,
+      message: `Facture ${invoice_number} créée avec succès`,
+    };
   }
 
-  async update_invoice(params: any) {
-    // TODO: Implement invoice update
-    return { message: "TODO: Implement update_invoice" };
+  async update_invoice(params: {
+    invoice_id: number;
+    status?: string;
+    due_date?: string;
+    notes?: string;
+    paid_at?: string;
+  }) {
+    const { invoice_id, status, due_date, notes, paid_at } = params;
+
+    const updateData: any = {};
+    if (status) updateData.status = status;
+    if (due_date) updateData.dueDate = new Date(due_date);
+    if (notes !== undefined) updateData.notes = notes;
+    if (paid_at) updateData.paidAt = new Date(paid_at);
+    updateData.updatedAt = new Date();
+
+    const [updated] = await this.db
+      .update(invoices)
+      .set(updateData)
+      .where(eq(invoices.id, invoice_id))
+      .returning();
+
+    return {
+      invoice: updated,
+      message: `Facture #${invoice_id} mise à jour`,
+    };
   }
 
-  async delete_invoice(params: any) {
-    // TODO: Implement invoice deletion
-    return { message: "TODO: Implement delete_invoice" };
+  async delete_invoice(params: { invoice_id: number }) {
+    const { invoice_id } = params;
+
+    await this.db.delete(invoices).where(eq(invoices.id, invoice_id));
+
+    return {
+      message: `Facture #${invoice_id} supprimée`,
+      invoice_id,
+    };
   }
 
-  async get_invoice_summary(params: any) {
-    // TODO: Implement invoice summary
-    return { message: "TODO: Implement get_invoice_summary" };
+  async get_invoice_summary(params: { period?: string } = {}) {
+    const { period = "month" } = params;
+
+    // Calculate date range
+    const now = new Date();
+    let startDate = new Date();
+    if (period === "month") {
+      startDate.setMonth(now.getMonth() - 1);
+    } else if (period === "year") {
+      startDate.setFullYear(now.getFullYear() - 1);
+    }
+
+    // Get invoices in period
+    const periodInvoices = await this.db
+      .select()
+      .from(invoices)
+      .where(gte(invoices.createdAt, startDate));
+
+    // Calculate stats
+    const totalRevenue = periodInvoices.reduce(
+      (sum, inv) => sum + parseFloat(inv.total || "0"),
+      0
+    );
+    const paidInvoices = periodInvoices.filter((inv) => inv.status === "paid");
+    const unpaidInvoices = periodInvoices.filter(
+      (inv) => inv.status === "sent" || inv.status === "overdue"
+    );
+    const overdueInvoices = periodInvoices.filter((inv) => inv.status === "overdue");
+
+    return {
+      period,
+      total_invoices: periodInvoices.length,
+      total_revenue: totalRevenue,
+      paid_count: paidInvoices.length,
+      unpaid_count: unpaidInvoices.length,
+      overdue_count: overdueInvoices.length,
+      average_invoice_value: periodInvoices.length > 0 ? totalRevenue / periodInvoices.length : 0,
+    };
   }
 
   // ============================================================================
@@ -660,24 +767,144 @@ export class AIActionExecutor {
     };
   }
 
-  async create_quote(params: any) {
-    // TODO: Implement quote creation
-    return { message: "TODO: Implement create_quote" };
+  async create_quote(params: {
+    client_id: number;
+    quote_number: string;
+    valid_until: string;
+    subtotal: number;
+    tax_rate?: number;
+    title?: string;
+    description?: string;
+    project_id?: number;
+  }) {
+    const {
+      client_id,
+      quote_number,
+      valid_until,
+      subtotal,
+      tax_rate = 20.0,
+      title,
+      description,
+      project_id,
+    } = params;
+
+    // Calculate tax and total
+    const taxAmount = (subtotal * tax_rate) / 100;
+    const total = subtotal + taxAmount;
+
+    const [quote] = await this.db
+      .insert(quotes)
+      .values({
+        clientId: client_id,
+        quoteNumber: quote_number,
+        validUntil: new Date(valid_until),
+        status: "draft",
+        subtotal: subtotal.toString(),
+        taxRate: tax_rate.toString(),
+        taxAmount: taxAmount.toString(),
+        total: total.toString(),
+        title,
+        description,
+        projectId: project_id,
+      })
+      .returning();
+
+    return {
+      quote,
+      message: `Devis ${quote_number} créé avec succès`,
+    };
   }
 
-  async update_quote(params: any) {
-    // TODO: Implement quote update
-    return { message: "TODO: Implement update_quote" };
+  async update_quote(params: {
+    quote_id: number;
+    status?: string;
+    valid_until?: string;
+    title?: string;
+    description?: string;
+  }) {
+    const { quote_id, status, valid_until, title, description } = params;
+
+    const updateData: any = { updatedAt: new Date() };
+    if (status) updateData.status = status;
+    if (valid_until) updateData.validUntil = new Date(valid_until);
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+
+    const [updated] = await this.db
+      .update(quotes)
+      .set(updateData)
+      .where(eq(quotes.id, quote_id))
+      .returning();
+
+    return {
+      quote: updated,
+      message: `Devis #${quote_id} mis à jour`,
+    };
   }
 
-  async delete_quote(params: any) {
-    // TODO: Implement quote deletion
-    return { message: "TODO: Implement delete_quote" };
+  async delete_quote(params: { quote_id: number }) {
+    const { quote_id } = params;
+
+    await this.db.delete(quotes).where(eq(quotes.id, quote_id));
+
+    return {
+      message: `Devis #${quote_id} supprimé`,
+      quote_id,
+    };
   }
 
-  async convert_quote_to_invoice(params: any) {
-    // TODO: Implement quote to invoice conversion
-    return { message: "TODO: Implement convert_quote_to_invoice" };
+  async convert_quote_to_invoice(params: { quote_id: number }) {
+    const { quote_id } = params;
+
+    // Get quote details
+    const [quote] = await this.db
+      .select()
+      .from(quotes)
+      .where(eq(quotes.id, quote_id));
+
+    if (!quote) {
+      throw new Error(`Devis #${quote_id} introuvable`);
+    }
+
+    if (quote.status === "converted") {
+      throw new Error(`Devis #${quote_id} déjà converti`);
+    }
+
+    // Generate invoice number from quote number
+    const invoiceNumber = quote.quoteNumber.replace("QT", "INV");
+
+    // Create invoice from quote
+    const [invoice] = await this.db
+      .insert(invoices)
+      .values({
+        clientId: quote.clientId,
+        invoiceNumber,
+        issueDate: new Date(),
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 days
+        status: "draft",
+        subtotal: quote.subtotal,
+        taxRate: quote.taxRate,
+        taxAmount: quote.taxAmount,
+        total: quote.total,
+        notes: `Converti du devis ${quote.quoteNumber}`,
+      })
+      .returning();
+
+    // Update quote status
+    await this.db
+      .update(quotes)
+      .set({
+        status: "converted",
+        convertedToInvoiceId: invoice.id,
+        convertedAt: new Date(),
+      })
+      .where(eq(quotes.id, quote_id));
+
+    return {
+      invoice,
+      quote,
+      message: `Devis ${quote.quoteNumber} converti en facture ${invoiceNumber}`,
+    };
   }
 
   // ============================================================================
@@ -693,14 +920,75 @@ export class AIActionExecutor {
     };
   }
 
-  async create_room(params: any) {
-    // TODO: Implement room creation
-    return { message: "TODO: Implement create_room" };
+  async create_room(params: {
+    name: string;
+    type?: string;
+    hourly_rate: number;
+    half_day_rate?: number;
+    full_day_rate?: number;
+    capacity?: number;
+    description?: string;
+  }) {
+    const {
+      name,
+      type = "recording",
+      hourly_rate,
+      half_day_rate,
+      full_day_rate,
+      capacity = 1,
+      description,
+    } = params;
+
+    const [room] = await this.db
+      .insert(rooms)
+      .values({
+        name,
+        type,
+        hourlyRate: hourly_rate.toString(),
+        halfDayRate: half_day_rate?.toString(),
+        fullDayRate: full_day_rate?.toString(),
+        capacity,
+        description,
+        isActive: true,
+        isAvailableForBooking: true,
+      })
+      .returning();
+
+    return {
+      room,
+      message: `Salle "${name}" créée avec succès`,
+    };
   }
 
-  async update_room(params: any) {
-    // TODO: Implement room update
-    return { message: "TODO: Implement update_room" };
+  async update_room(params: {
+    room_id: number;
+    name?: string;
+    hourly_rate?: number;
+    is_active?: boolean;
+    is_available_for_booking?: boolean;
+    description?: string;
+  }) {
+    const { room_id, name, hourly_rate, is_active, is_available_for_booking, description } =
+      params;
+
+    const updateData: any = { updatedAt: new Date() };
+    if (name) updateData.name = name;
+    if (hourly_rate !== undefined) updateData.hourlyRate = hourly_rate.toString();
+    if (is_active !== undefined) updateData.isActive = is_active;
+    if (is_available_for_booking !== undefined)
+      updateData.isAvailableForBooking = is_available_for_booking;
+    if (description !== undefined) updateData.description = description;
+
+    const [updated] = await this.db
+      .update(rooms)
+      .set(updateData)
+      .where(eq(rooms.id, room_id))
+      .returning();
+
+    return {
+      room: updated,
+      message: `Salle #${room_id} mise à jour`,
+    };
   }
 
   // ============================================================================
@@ -716,14 +1004,83 @@ export class AIActionExecutor {
     };
   }
 
-  async create_equipment(params: any) {
-    // TODO: Implement equipment creation
-    return { message: "TODO: Implement create_equipment" };
+  async create_equipment(params: {
+    name: string;
+    category: string;
+    brand?: string;
+    model?: string;
+    room_id?: number;
+    status?: string;
+    description?: string;
+  }) {
+    const {
+      name,
+      category,
+      brand,
+      model,
+      room_id,
+      status = "operational",
+      description,
+    } = params;
+
+    const [equip] = await this.db
+      .insert(equipment)
+      .values({
+        name,
+        category,
+        brand,
+        model,
+        roomId: room_id,
+        status,
+        description,
+        condition: "good",
+        isAvailable: true,
+      })
+      .returning();
+
+    return {
+      equipment: equip,
+      message: `Équipement "${name}" créé avec succès`,
+    };
   }
 
-  async update_equipment(params: any) {
-    // TODO: Implement equipment update
-    return { message: "TODO: Implement update_equipment" };
+  async update_equipment(params: {
+    equipment_id: number;
+    name?: string;
+    status?: string;
+    condition?: string;
+    is_available?: boolean;
+    room_id?: number;
+    description?: string;
+  }) {
+    const {
+      equipment_id,
+      name,
+      status,
+      condition,
+      is_available,
+      room_id,
+      description,
+    } = params;
+
+    const updateData: any = { updatedAt: new Date() };
+    if (name) updateData.name = name;
+    if (status) updateData.status = status;
+    if (condition) updateData.condition = condition;
+    if (is_available !== undefined) updateData.isAvailable = is_available;
+    if (room_id !== undefined) updateData.roomId = room_id;
+    if (description !== undefined) updateData.description = description;
+
+    const [updated] = await this.db
+      .update(equipment)
+      .set(updateData)
+      .where(eq(equipment.id, equipment_id))
+      .returning();
+
+    return {
+      equipment: updated,
+      message: `Équipement #${equipment_id} mis à jour`,
+    };
   }
 
   // ============================================================================
@@ -747,19 +1104,108 @@ export class AIActionExecutor {
     };
   }
 
-  async create_project(params: any) {
-    // TODO: Implement project creation
-    return { message: "TODO: Implement create_project" };
+  async create_project(params: {
+    client_id: number;
+    name: string;
+    artist_name?: string;
+    type?: string;
+    genre?: string;
+    budget?: number;
+    description?: string;
+  }) {
+    const {
+      client_id,
+      name,
+      artist_name,
+      type = "album",
+      genre,
+      budget,
+      description,
+    } = params;
+
+    const [project] = await this.db
+      .insert(projects)
+      .values({
+        clientId: client_id,
+        name,
+        artistName: artist_name,
+        type,
+        genre,
+        budget: budget?.toString(),
+        description,
+        status: "pre_production",
+        trackCount: 0,
+      })
+      .returning();
+
+    return {
+      project,
+      message: `Projet "${name}" créé avec succès`,
+    };
   }
 
-  async update_project(params: any) {
-    // TODO: Implement project update
-    return { message: "TODO: Implement update_project" };
+  async update_project(params: {
+    project_id: number;
+    name?: string;
+    status?: string;
+    budget?: number;
+    total_cost?: number;
+    description?: string;
+  }) {
+    const { project_id, name, status, budget, total_cost, description } = params;
+
+    const updateData: any = { updatedAt: new Date() };
+    if (name) updateData.name = name;
+    if (status) updateData.status = status;
+    if (budget !== undefined) updateData.budget = budget.toString();
+    if (total_cost !== undefined) updateData.totalCost = total_cost.toString();
+    if (description !== undefined) updateData.description = description;
+
+    const [updated] = await this.db
+      .update(projects)
+      .set(updateData)
+      .where(eq(projects.id, project_id))
+      .returning();
+
+    return {
+      project: updated,
+      message: `Projet #${project_id} mis à jour`,
+    };
   }
 
-  async create_project_folder(params: any) {
-    // TODO: Implement project folder creation
-    return { message: "TODO: Implement create_project_folder" };
+  async create_project_folder(params: { project_id: number; folder_name?: string }) {
+    const { project_id, folder_name } = params;
+
+    // Get project details
+    const [project] = await this.db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, project_id));
+
+    if (!project) {
+      throw new Error(`Projet #${project_id} introuvable`);
+    }
+
+    // Generate folder path
+    const sanitizedName = (folder_name || project.name)
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-");
+    const folderPath = `/projects/${project_id}-${sanitizedName}`;
+
+    // Update project with storage location
+    await this.db
+      .update(projects)
+      .set({
+        storageLocation: folderPath,
+        updatedAt: new Date(),
+      })
+      .where(eq(projects.id, project_id));
+
+    return {
+      project_id,
+      folder_path: folderPath,
+      message: `Dossier créé pour le projet "${project.name}"`,
+    };
   }
 
   // ============================================================================
@@ -779,8 +1225,45 @@ export class AIActionExecutor {
     };
   }
 
-  async create_musician(params: any) {
-    // TODO: Implement musician creation
-    return { message: "TODO: Implement create_musician" };
+  async create_musician(params: {
+    name: string;
+    stage_name?: string;
+    email?: string;
+    phone?: string;
+    talent_type?: string;
+    instruments?: string[];
+    genres?: string[];
+    bio?: string;
+  }) {
+    const {
+      name,
+      stage_name,
+      email,
+      phone,
+      talent_type = "musician",
+      instruments = [],
+      genres = [],
+      bio,
+    } = params;
+
+    const [musician] = await this.db
+      .insert(musicians)
+      .values({
+        name,
+        stageName: stage_name,
+        email,
+        phone,
+        talentType: talent_type,
+        instruments: JSON.stringify(instruments),
+        genres: JSON.stringify(genres),
+        bio,
+        isActive: true,
+      })
+      .returning();
+
+    return {
+      musician,
+      message: `Talent "${name}" créé avec succès`,
+    };
   }
 }
