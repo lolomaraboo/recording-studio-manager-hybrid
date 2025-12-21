@@ -13,6 +13,7 @@ import { contractsRouter } from './contracts';
 import { expensesRouter } from './expenses';
 import { notificationsRouter } from './notifications';
 import { filesRouter } from './files';
+import { aiRouter } from './ai';
 
 /**
  * Main App Router
@@ -33,10 +34,11 @@ import { filesRouter } from './files';
  * - quotes: Quotes & quote items CRUD
  * - contracts: Legal contracts CRUD
  * - expenses: Business expenses CRUD
+ * - ai: AI Chatbot (Phase 2 - P0 Priority)
  *
  * **Future routers to add:**
- * - payments, analytics, reports, admin, stripe, files,
- * - notifications, clientAuth, clientPortal, calendar
+ * - payments, analytics, reports, admin, stripe,
+ * - clientAuth, clientPortal, calendar
  */
 export const appRouter = router({
   auth: authRouter,
@@ -53,6 +55,7 @@ export const appRouter = router({
   expenses: expensesRouter,
   notifications: notificationsRouter,
   files: filesRouter,
+  ai: aiRouter,
 });
 
 /**

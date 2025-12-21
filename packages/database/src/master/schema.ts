@@ -124,3 +124,29 @@ export const subscriptionPlans = pgTable("subscription_plans", {
 
 export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+
+/**
+ * AI Credits table (Master DB only)
+ * Tracks AI usage credits per organization
+ */
+export const aiCredits = pgTable("ai_credits", {
+  id: serial("id").primaryKey(),
+  organizationId: integer("organization_id").notNull().unique().references(() => organizations.id),
+
+  // Credits
+  creditsRemaining: integer("credits_remaining").notNull().default(0),
+  creditsUsedThisMonth: integer("credits_used_this_month").notNull().default(0),
+
+  // Limits by plan
+  plan: varchar("plan", { length: 50 }).notNull().default("trial"), // "trial" | "pro" | "enterprise"
+
+  // Recharge history
+  lastRechargeAt: timestamp("last_recharge_at"),
+  nextRechargeAt: timestamp("next_recharge_at"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type AICredit = typeof aiCredits.$inferSelect;
+export type InsertAICredit = typeof aiCredits.$inferInsert;

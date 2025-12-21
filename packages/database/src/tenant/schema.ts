@@ -583,3 +583,59 @@ export const notifications = pgTable("notifications", {
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
+ * AI Conversations table (Tenant DB)
+ * Stores AI chatbot conversation history
+ */
+export const aiConversations = pgTable("ai_conversations", {
+  id: serial("id").primaryKey(),
+
+  // Session ID for grouping messages
+  sessionId: varchar("session_id", { length: 255 }).notNull(),
+
+  // Context
+  userId: integer("user_id"), // User from master DB
+  pageContext: text("page_context"), // JSON object: { url, project_id, etc. }
+
+  // Messages
+  messages: text("messages").notNull(), // JSON array of { role, content, timestamp }
+
+  // Metadata
+  totalMessages: integer("total_messages").notNull().default(0),
+  actionsCalled: text("actions_called"), // JSON array of action names
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type AIConversation = typeof aiConversations.$inferSelect;
+export type InsertAIConversation = typeof aiConversations.$inferInsert;
+
+/**
+ * AI Action Logs table (Tenant DB)
+ * Logs all AI function calls and results
+ */
+export const aiActionLogs = pgTable("ai_action_logs", {
+  id: serial("id").primaryKey(),
+
+  // Conversation link
+  sessionId: varchar("session_id", { length: 255 }).notNull(),
+
+  // Action details
+  actionName: varchar("action_name", { length: 100 }).notNull(),
+  params: text("params"), // JSON object with action parameters
+  result: text("result"), // JSON object with action result
+
+  // Status
+  status: varchar("status", { length: 50 }).notNull().default("success"), // "success" | "error"
+  error: text("error"), // Error message if status = "error"
+
+  // Performance
+  executionTimeMs: integer("execution_time_ms"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type AIActionLog = typeof aiActionLogs.$inferSelect;
+export type InsertAIActionLog = typeof aiActionLogs.$inferInsert;
