@@ -219,7 +219,7 @@ export function Sessions() {
                               <div>
                                 <div className="font-medium">{session.title}</div>
                                 <div className="text-sm text-muted-foreground capitalize">
-                                  {session.type}
+                                  {session.status}
                                 </div>
                               </div>
                             </TableCell>

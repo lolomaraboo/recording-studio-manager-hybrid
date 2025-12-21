@@ -52,7 +52,7 @@ export function Clients() {
       (client) =>
         client.name.toLowerCase().includes(query) ||
         client.email?.toLowerCase().includes(query) ||
-        client.company?.toLowerCase().includes(query)
+        client.artistName?.toLowerCase().includes(query)
     );
   }, [clientsWithStats, searchQuery]);
 
@@ -61,7 +61,7 @@ export function Clients() {
     toast.info("Export Excel - À implémenter");
   };
 
-  const getTypeLabel = (type: string) => {
+  const _getTypeLabel = (type: string) => {
     switch (type) {
       case "solo_artist":
         return "Artiste Solo";
@@ -170,15 +170,15 @@ export function Clients() {
                                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                                   )}
                                 </div>
-                                {client.company && (
-                                  <div className="text-sm text-muted-foreground">{client.company}</div>
+                                {client.artistName && (
+                                  <div className="text-sm text-muted-foreground">{client.artistName}</div>
                                 )}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline" className="capitalize">
-                              {client.company ? "Entreprise" : "Particulier"}
+                              {client.type === "company" ? "Entreprise" : "Particulier"}
                             </Badge>
                           </TableCell>
                           <TableCell>

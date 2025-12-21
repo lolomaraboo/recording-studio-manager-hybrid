@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { FileText, Plus, Search, ArrowLeft, Download, Eye, Euro } from "lucide-react";
+import { FileText, Plus, Search, ArrowLeft, Download, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -77,7 +77,7 @@ export function Invoices() {
     };
   }, [invoices]);
 
-  const handleDownloadPDF = (invoiceId: number, invoiceNumber: string) => {
+  const handleDownloadPDF = (_invoiceId: number, invoiceNumber: string) => {
     // TODO: Implement PDF generation when backend supports it
     toast.info(`Génération PDF facture ${invoiceNumber} - À implémenter`);
   };

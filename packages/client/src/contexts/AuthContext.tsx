@@ -4,14 +4,14 @@ import { trpc } from '@/lib/trpc';
 interface User {
   id: number;
   email: string;
-  name: string;
+  name: string | null;
   role: string;
 }
 
 interface Organization {
   id: number;
   name: string;
-  slug: string;
+  slug?: string;
 }
 
 interface AuthContextType {

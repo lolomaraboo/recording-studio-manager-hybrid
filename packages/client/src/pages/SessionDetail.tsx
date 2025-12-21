@@ -437,8 +437,8 @@ export default function SessionDetail() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Type</p>
-                  <p className="text-sm font-medium capitalize">{session.type || "Recording"}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Statut</p>
+                  <p className="text-sm font-medium capitalize">{session.status || "Programmée"}</p>
                 </div>
 
                 <div>

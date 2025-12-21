@@ -30,8 +30,6 @@ import {
   MapPin,
   Calendar,
   FileText,
-  TrendingUp,
-  Clock,
   Star,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -116,7 +114,7 @@ export default function ClientDetail() {
     name: client?.name || "",
     email: client?.email || "",
     phone: client?.phone || "",
-    company: client?.company || "",
+    artistName: client?.artistName || "",
     address: client?.address || "",
     notes: client?.notes || "",
   });
@@ -128,7 +126,7 @@ export default function ClientDetail() {
         name: client.name,
         email: client.email || "",
         phone: client.phone || "",
-        company: client.company || "",
+        artistName: client.artistName || "",
         address: client.address || "",
         notes: client.notes || "",
       });
@@ -142,7 +140,7 @@ export default function ClientDetail() {
         name: formData.name,
         email: formData.email || undefined,
         phone: formData.phone || undefined,
-        company: formData.company || undefined,
+        artistName: formData.artistName || undefined,
         address: formData.address || undefined,
         notes: formData.notes || undefined,
       },
@@ -396,11 +394,11 @@ export default function ClientDetail() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="company">Entreprise</Label>
+                        <Label htmlFor="artistName">Nom d'artiste</Label>
                         <Input
-                          id="company"
-                          value={formData.company}
-                          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                          id="artistName"
+                          value={formData.artistName}
+                          onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                         />
                       </div>
 
@@ -416,10 +414,10 @@ export default function ClientDetail() {
                     </>
                   ) : (
                     <>
-                      {client.company && (
+                      {client.artistName && (
                         <div className="flex items-center gap-2">
                           <Building className="h-4 w-4 text-muted-foreground" />
-                          <p className="text-sm">{client.company}</p>
+                          <p className="text-sm">{client.artistName}</p>
                         </div>
                       )}
 
@@ -448,7 +446,7 @@ export default function ClientDetail() {
                         </div>
                       )}
 
-                      {!client.company && !client.email && !client.phone && !client.address && (
+                      {!client.artistName && !client.email && !client.phone && !client.address && (
                         <p className="text-sm text-muted-foreground">Aucune information de contact</p>
                       )}
                     </>
@@ -520,7 +518,7 @@ export default function ClientDetail() {
                                       <div>
                                         <div className="font-medium">{session.title}</div>
                                         <div className="text-sm text-muted-foreground capitalize">
-                                          {session.type}
+                                          {session.status}
                                         </div>
                                       </div>
                                     </TableCell>
@@ -628,7 +626,7 @@ export default function ClientDetail() {
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Type</p>
                     <Badge variant="outline" className="capitalize">
-                      {client.company ? "Entreprise" : "Particulier"}
+                      {client.type === "company" ? "Entreprise" : "Particulier"}
                     </Badge>
                   </div>
 

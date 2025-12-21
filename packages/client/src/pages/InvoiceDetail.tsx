@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+// Table imports removed - not currently used
 import {
   Dialog,
   DialogContent,
@@ -29,8 +29,6 @@ import {
   CheckCircle,
   Calendar,
   User,
-  FileText,
-  Euro,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -115,9 +113,6 @@ export default function InvoiceDetail() {
         dueDate: new Date(formData.dueDate).toISOString(),
         status: formData.status as "draft" | "sent" | "paid" | "overdue" | "cancelled",
         subtotal: formData.subtotal,
-        taxRate: formData.taxRate,
-        taxAmount: formData.taxAmount,
-        total: formData.total,
         notes: formData.notes,
       },
     });
@@ -142,7 +137,6 @@ export default function InvoiceDetail() {
       id: Number(id),
       data: {
         status: "paid",
-        paidAt: new Date().toISOString(),
       },
     });
   };
@@ -590,8 +584,8 @@ export default function InvoiceDetail() {
                 <CardContent className="space-y-2">
                   <div>
                     <p className="font-medium">{client.name}</p>
-                    {client.company && (
-                      <p className="text-sm text-muted-foreground">{client.company}</p>
+                    {client.artistName && (
+                      <p className="text-sm text-muted-foreground">{client.artistName}</p>
                     )}
                   </div>
                   {client.email && (

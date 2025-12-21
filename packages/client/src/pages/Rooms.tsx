@@ -84,11 +84,11 @@ export default function Rooms() {
   const [formData, setFormData] = useState<RoomFormData>(defaultFormData);
 
   const utils = trpc.useUtils();
-  const { data: rooms, isLoading } = trpc.rooms.getAll.useQuery();
+  const { data: rooms, isLoading } = trpc.rooms.list.useQuery();
 
   const createMutation = trpc.rooms.create.useMutation({
     onSuccess: () => {
-      utils.rooms.getAll.invalidate();
+      utils.rooms.list.invalidate();
       setIsDialogOpen(false);
       setFormData(defaultFormData);
     },
@@ -96,7 +96,7 @@ export default function Rooms() {
 
   const updateMutation = trpc.rooms.update.useMutation({
     onSuccess: () => {
-      utils.rooms.getAll.invalidate();
+      utils.rooms.list.invalidate();
       setIsDialogOpen(false);
       setEditingRoom(null);
       setFormData(defaultFormData);
@@ -105,7 +105,7 @@ export default function Rooms() {
 
   const deleteMutation = trpc.rooms.delete.useMutation({
     onSuccess: () => {
-      utils.rooms.getAll.invalidate();
+      utils.rooms.list.invalidate();
     },
   });
 
@@ -206,7 +206,7 @@ export default function Rooms() {
                 {rooms.map((room) => (
                   <TableRow key={room.id}>
                     <TableCell className="font-medium">{room.name}</TableCell>
-                    <TableCell>{roomTypeLabels[room.type]}</TableCell>
+                    <TableCell>{roomTypeLabels[room.type as keyof typeof roomTypeLabels]}</TableCell>
                     <TableCell>{room.capacity} pers.</TableCell>
                     <TableCell>{formatPrice(room.hourlyRate)}</TableCell>
                     <TableCell>{formatPrice(room.halfDayRate)}</TableCell>

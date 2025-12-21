@@ -445,13 +445,13 @@ function CreateProjectDialog({
 function ProjectDetailsDialog({
   projectId,
   onClose,
-  onUpdate,
+  onUpdate: _onUpdate,
 }: {
   projectId: number;
   onClose: () => void;
   onUpdate: () => void;
 }) {
-  const { data: project, isLoading } = trpc.projects.getById.useQuery({ id: projectId });
+  const { data: project, isLoading } = trpc.projects.get.useQuery({ id: projectId });
 
   if (isLoading || !project) {
     return (

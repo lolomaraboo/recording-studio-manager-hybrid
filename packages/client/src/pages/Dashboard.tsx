@@ -409,7 +409,7 @@ function renderWidget(
                   onClick={() => navigate("/sessions")}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="font-medium">{session.type}</div>
+                    <div className="font-medium">{session.title}</div>
                     <Badge variant="outline">{session.status}</Badge>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
@@ -452,7 +452,7 @@ function renderWidget(
                   onClick={() => navigate("/sessions")}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="font-medium">{session.type}</div>
+                    <div className="font-medium">{session.title}</div>
                     <Badge variant="outline">{session.status}</Badge>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">

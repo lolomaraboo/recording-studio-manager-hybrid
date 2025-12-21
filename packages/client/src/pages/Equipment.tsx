@@ -106,7 +106,7 @@ export default function Equipment() {
       name: formData.name,
       category: formData.category,
       status: formData.status,
-      purchasePrice: formData.purchasePrice ? parseInt(formData.purchasePrice) : 0,
+      purchasePrice: formData.purchasePrice ? formData.purchasePrice : "0",
       serialNumber: formData.serialNumber || undefined,
       maintenanceNotes: formData.maintenanceNotes || undefined,
     });

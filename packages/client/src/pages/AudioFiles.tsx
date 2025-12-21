@@ -67,9 +67,9 @@ export default function AudioFiles() {
     }
   };
 
-  const handleDownload = async (fileId: number, fileName: string) => {
+  const handleDownload = async (fileId: number, _fileName: string) => {
     try {
-      const result = await getDownloadUrl({ id: fileId });
+      const result = await getDownloadUrl();
       if (result.data?.url) {
         // Mock: In real implementation, this would download from S3
         toast.info("Téléchargement simulé (intégration S3 à venir)");
