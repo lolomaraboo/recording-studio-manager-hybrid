@@ -3,6 +3,10 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../_core/trpc";
 import { aiConversations, aiActionLogs } from "@rsm/database/tenant";
 import { eq, desc } from "drizzle-orm";
+import { getLLMProvider } from "../lib/llmProvider";
+import { AIActionExecutor } from "../lib/aiActions";
+import { AI_TOOLS } from "../lib/aiTools";
+import { SYSTEM_PROMPT } from "../lib/aiSystemPrompt";
 
 /**
  * AI Chatbot Router
@@ -19,8 +23,7 @@ export const aiRouter = router({
   /**
    * Chat with AI assistant
    *
-   * Phase 2.1: Placeholder implementation
-   * Phase 2.2: Will integrate with LLM provider + AI actions
+   * Phase 2.2: Full implementation with LLM provider + AI actions
    */
   chat: protectedProcedure
     .input(
@@ -37,19 +40,183 @@ export const aiRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
-      const { message, sessionId, context } = input;
+      const { message, sessionId: inputSessionId, context } = input;
 
-      // TODO Phase 2.2: Implement LLM provider integration
-      // TODO Phase 2.2: Implement AI actions execution
-      // TODO Phase 2.2: Implement hallucination detection
+      // Generate or reuse session ID
+      const sessionId = inputSessionId || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      // Placeholder response
-      return {
-        response: "AI chatbot is being implemented. This is a placeholder response.",
-        sessionId: sessionId || `session_${Date.now()}`,
-        actionsCalled: [] as string[],
-        creditsUsed: 0,
-      };
+      // Get LLM provider
+      const llm = getLLMProvider();
+
+      // Create AI action executor with tenant DB
+      const actionExecutor = new AIActionExecutor(tenantDb);
+
+      // Load conversation history if session exists
+      let conversationHistory: any[] = [];
+      if (inputSessionId) {
+        const existingConversations = await tenantDb
+          .select()
+          .from(aiConversations)
+          .where(eq(aiConversations.sessionId, inputSessionId))
+          .limit(1);
+
+        if (existingConversations.length > 0) {
+          conversationHistory = JSON.parse(existingConversations[0].messages || "[]");
+        }
+      }
+
+      // Add user message to history
+      conversationHistory.push({
+        role: "user",
+        content: message,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Prepare messages for LLM (without timestamps)
+      const llmMessages = conversationHistory.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      try {
+        // Call LLM with tools
+        const llmResponse = await llm.chatCompletion({
+          messages: llmMessages,
+          systemPrompt: SYSTEM_PROMPT,
+          temperature: 0.7,
+          maxTokens: 4096,
+          tools: AI_TOOLS,
+        });
+
+        const actionsCalled: string[] = [];
+        let finalResponse = llmResponse.content;
+
+        // Execute tool calls if any
+        if (llmResponse.toolCalls && llmResponse.toolCalls.length > 0) {
+          const toolResults: any[] = [];
+
+          for (const toolCall of llmResponse.toolCalls) {
+            const startTime = Date.now();
+
+            try {
+              // Execute action
+              const result = await actionExecutor.execute(toolCall.name, toolCall.input);
+
+              // Log action
+              await tenantDb.insert(aiActionLogs).values({
+                sessionId,
+                actionName: toolCall.name,
+                params: JSON.stringify(toolCall.input),
+                result: JSON.stringify(result),
+                status: result.success ? "success" : "error",
+                error: result.error,
+                executionTimeMs: Date.now() - startTime,
+              });
+
+              toolResults.push({
+                toolUseId: toolCall.id,
+                name: toolCall.name,
+                result: result.data,
+              });
+
+              actionsCalled.push(toolCall.name);
+            } catch (error: any) {
+              // Log error
+              await tenantDb.insert(aiActionLogs).values({
+                sessionId,
+                actionName: toolCall.name,
+                params: JSON.stringify(toolCall.input),
+                result: null,
+                status: "error",
+                error: error.message,
+                executionTimeMs: Date.now() - startTime,
+              });
+
+              toolResults.push({
+                toolUseId: toolCall.id,
+                name: toolCall.name,
+                error: error.message,
+              });
+            }
+          }
+
+          // If tools were called, make a second LLM call with results
+          if (toolResults.length > 0) {
+            const followUpMessages = [
+              ...llmMessages,
+              {
+                role: "assistant" as const,
+                content: llmResponse.content || "",
+              },
+              {
+                role: "user" as const,
+                content: `Tool results: ${JSON.stringify(toolResults)}`,
+              },
+            ];
+
+            const followUpResponse = await llm.chatCompletion({
+              messages: followUpMessages,
+              systemPrompt: SYSTEM_PROMPT,
+              temperature: 0.7,
+              maxTokens: 4096,
+            });
+
+            finalResponse = followUpResponse.content;
+          }
+        }
+
+        // Add assistant response to history
+        conversationHistory.push({
+          role: "assistant",
+          content: finalResponse,
+          timestamp: new Date().toISOString(),
+          actionsCalled: actionsCalled.length > 0 ? actionsCalled : undefined,
+        });
+
+        // Save conversation to DB
+        const existingConversations = await tenantDb
+          .select()
+          .from(aiConversations)
+          .where(eq(aiConversations.sessionId, sessionId))
+          .limit(1);
+
+        if (existingConversations.length > 0) {
+          // Update existing
+          await tenantDb
+            .update(aiConversations)
+            .set({
+              messages: JSON.stringify(conversationHistory),
+              totalMessages: conversationHistory.length,
+              actionsCalled: JSON.stringify(actionsCalled),
+              updatedAt: new Date(),
+            })
+            .where(eq(aiConversations.sessionId, sessionId));
+        } else {
+          // Create new
+          await tenantDb.insert(aiConversations).values({
+            sessionId,
+            userId: ctx.session.userId,
+            pageContext: context ? JSON.stringify(context) : null,
+            messages: JSON.stringify(conversationHistory),
+            totalMessages: conversationHistory.length,
+            actionsCalled: actionsCalled.length > 0 ? JSON.stringify(actionsCalled) : null,
+          });
+        }
+
+        // Return response
+        return {
+          response: finalResponse,
+          sessionId,
+          actionsCalled,
+          creditsUsed: llmResponse.usage.inputTokens + llmResponse.usage.outputTokens,
+        };
+      } catch (error: any) {
+        console.error("[AI Router] Chat error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `AI chat failed: ${error.message}`,
+        });
+      }
     }),
 
   /**

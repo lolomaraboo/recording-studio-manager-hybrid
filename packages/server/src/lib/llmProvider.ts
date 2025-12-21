@@ -115,66 +115,107 @@ export class LLMProvider {
   }
 
   /**
-   * Claude (Anthropic) chat completion
-   *
-   * TODO Phase 2.2: Implement with function calling
+   * Claude (Anthropic) chat completion with function calling
    */
   private async claudeChatCompletion(params: ChatParams): Promise<ChatResponse> {
     const { messages, systemPrompt, temperature = 0.7, maxTokens = 4096, tools } = params;
 
-    // TODO Phase 2.2: Implement actual API call
-    // const response = await this.anthropic.messages.create({
-    //   model: "claude-3-5-sonnet-20241022",
-    //   max_tokens: maxTokens,
-    //   temperature,
-    //   system: systemPrompt,
-    //   messages: messages.filter(m => m.role !== "system"),
-    //   tools,
-    // });
+    // Convert messages to Claude format (exclude system messages)
+    const claudeMessages = messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      }));
 
-    // Placeholder response
+    // Call Claude API
+    const response = await this.anthropic.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: maxTokens,
+      temperature,
+      system: systemPrompt || "You are a helpful AI assistant.",
+      messages: claudeMessages,
+      tools: tools || [],
+    });
+
+    // Extract content and tool calls
+    let textContent = "";
+    const toolCalls: ToolCall[] = [];
+
+    for (const block of response.content) {
+      if (block.type === "text") {
+        textContent += block.text;
+      } else if (block.type === "tool_use") {
+        toolCalls.push({
+          id: block.id,
+          name: block.name,
+          input: block.input as Record<string, any>,
+        });
+      }
+    }
+
     return {
-      content: "TODO: Implement Claude API call in Phase 2.2",
+      content: textContent,
+      toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
       usage: {
-        inputTokens: 0,
-        outputTokens: 0,
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
       },
     };
   }
 
   /**
-   * OpenAI (GPT-4) chat completion
-   *
-   * TODO Phase 2.2: Implement with function calling
+   * OpenAI (GPT-4) chat completion with function calling
    */
   private async openaiChatCompletion(params: ChatParams): Promise<ChatResponse> {
     const { messages, systemPrompt, temperature = 0.7, maxTokens = 4096, tools } = params;
 
-    // TODO Phase 2.2: Implement actual API call
-    // const response = await this.openai.chat.completions.create({
-    //   model: "gpt-4-turbo",
-    //   max_tokens: maxTokens,
-    //   temperature,
-    //   messages: [
-    //     ...(systemPrompt ? [{ role: "system" as const, content: systemPrompt }] : []),
-    //     ...messages,
-    //   ],
-    //   tools: tools?.map(t => ({
-    //     type: "function" as const,
-    //     function: {
-    //       name: t.name,
-    //       description: t.description,
-    //       parameters: t.input_schema,
-    //     },
-    //   })),
-    // });
+    // Convert messages to OpenAI format
+    const openaiMessages: any[] = [
+      ...(systemPrompt ? [{ role: "system" as const, content: systemPrompt }] : []),
+      ...messages,
+    ];
 
-    // Placeholder response
+    // Convert tools to OpenAI format
+    const openaiTools = tools?.map((t) => ({
+      type: "function" as const,
+      function: {
+        name: t.name,
+        description: t.description,
+        parameters: t.input_schema,
+      },
+    }));
+
+    // Call OpenAI API
+    const response = await this.openai.chat.completions.create({
+      model: "gpt-4-turbo",
+      max_tokens: maxTokens,
+      temperature,
+      messages: openaiMessages,
+      tools: openaiTools,
+    });
+
+    const choice = response.choices[0];
+    const message = choice.message;
+
+    // Extract tool calls
+    const toolCalls: ToolCall[] = [];
+    if (message.tool_calls) {
+      for (const tc of message.tool_calls) {
+        toolCalls.push({
+          id: tc.id,
+          name: tc.function.name,
+          input: JSON.parse(tc.function.arguments),
+        });
+      }
+    }
+
     return {
-      content: "TODO: Implement OpenAI API call in Phase 2.2",
+      content: message.content || "",
+      toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
       usage: {
-        inputTokens: 0,
-        outputTokens: 0,
+        inputTokens: response.usage?.prompt_tokens || 0,
+        outputTokens: response.usage?.completion_tokens || 0,
       },
     };
   }
