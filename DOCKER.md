@@ -4,47 +4,86 @@ Ce guide explique comment démarrer et gérer tous les services de l'application
 
 ## 📦 Services Inclus
 
-Le `docker-compose.yml` configure les services suivants :
+### Development Stack (docker-compose.dev.yml) - RECOMMANDÉ ✨
+
+Tous les services avec **hot reload** activé :
+
+| Service | Image | Port | Hot Reload | Description |
+|---------|-------|------|------------|-------------|
+| **postgres** | postgres:15-alpine | 5432 | N/A | PostgreSQL database (Master + Tenants) |
+| **redis** | redis:7-alpine | 6379 | N/A | Redis cache (sessions, AI credits) |
+| **server** | Custom build | 3001 | ✅ tsx watch | Backend Express + tRPC API |
+| **client** | Custom build | 5174 | ✅ Vite HMR | Frontend React + Vite |
+
+### Production Stack (docker-compose.yml)
 
 | Service | Image | Port | Description |
 |---------|-------|------|-------------|
 | **postgres** | postgres:15-alpine | 5432 | PostgreSQL database (Master + Tenants) |
 | **redis** | redis:7-alpine | 6379 | Redis cache (sessions, AI credits) |
-| **server** | Custom build | 3000 | Backend Express + tRPC API |
-| **client** | Custom build | 80 | Frontend React + Nginx |
+| **server** | Custom build | 3000 | Backend Express + tRPC API (optimized) |
+| **client** | Custom build | 80 | Frontend React + Nginx (optimized) |
 
-## 🚀 Quick Start
+## 🚀 Quick Start - Development Mode
 
-### 1. Configuration Environnement
+### Prérequis
 
-Copiez le fichier `.env.example` vers `.env` :
+**IMPORTANT:** Arrêtez PostgreSQL local avant de démarrer Docker :
 
 ```bash
-cp .env.example .env
+# Vérifiez si PostgreSQL local tourne
+brew services list | grep postgresql
+
+# Si actif, arrêtez-le
+brew services stop postgresql@17
 ```
 
-Éditez `.env` et remplissez les valeurs nécessaires :
+### 1. Démarrer Tous les Services (avec Hot Reload)
 
 ```bash
-# Requis pour Client Portal
-STRIPE_SECRET_KEY=sk_test_...      # Dashboard Stripe > API Keys
-RESEND_API_KEY=re_...               # Resend.com > API Keys
+# Lancer la stack de développement
+docker-compose -f docker-compose.dev.yml up -d
 
-# Optionnel (AI Chatbot)
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
+# Vérifier le statut
+docker-compose -f docker-compose.dev.yml ps
 ```
 
-### 2. Démarrer Tous les Services
-
-```bash
-docker-compose up -d
+**Expected Output:**
+```
+NAME             STATUS                     PORTS
+rsm-client-dev   Up (healthy)              0.0.0.0:5174->5174/tcp
+rsm-postgres     Up (healthy)              0.0.0.0:5432->5432/tcp
+rsm-redis        Up (healthy)              0.0.0.0:6379->6379/tcp
+rsm-server-dev   Up (healthy)              0.0.0.0:3001->3001/tcp
 ```
 
-Vérifier le statut :
+### 2. Accès aux Services
 
+- **Frontend:** http://localhost:5174
+- **Backend API:** http://localhost:3001/api/trpc
+- **Health Check:** http://localhost:3001/health
+- **Client Portal:** http://localhost:5174/client-portal/login
+  - Email: test@example.com
+  - Password: password123
+
+### 3. Hot Reload en Action
+
+**Backend (tsx watch):**
 ```bash
-docker-compose ps
+# Modifiez n'importe quel fichier dans packages/server/src/
+# Le serveur redémarre automatiquement
+
+# Vérifiez les logs
+docker logs rsm-server-dev --tail 20
+```
+
+**Frontend (Vite HMR):**
+```bash
+# Modifiez n'importe quel fichier dans packages/client/src/
+# La page se met à jour instantanément
+
+# Vérifiez les logs
+docker logs rsm-client-dev --tail 20
 ```
 
 ### 3. Initialiser la Base de Données
@@ -138,32 +177,70 @@ docker-compose build
 docker-compose up -d
 ```
 
-## 🔧 Development Mode (Sans Docker)
+## 🔧 Arrêt et Nettoyage
 
-Pour développer en local sans Docker :
+### Arrêter la Stack
 
 ```bash
-# Terminal 1: PostgreSQL + Redis (Docker uniquement)
-docker-compose up postgres redis
+# Arrêter tous les services (garde les volumes)
+docker-compose -f docker-compose.dev.yml down
 
-# Terminal 2: Backend (local)
-cd packages/server
-pnpm dev
-
-# Terminal 3: Frontend (local)
-cd packages/client
-pnpm dev
+# Arrêter + supprimer volumes (⚠️ PERTE DE DONNÉES)
+docker-compose -f docker-compose.dev.yml down -v
 ```
 
-**Avantages :**
-- Hot reload immédiat (tsx watch, Vite HMR)
-- Debugging facile (Chrome DevTools, VS Code)
-- Pas de rebuild Docker à chaque changement
+### Rebuild After Package Changes
 
-**Configuration :**
-- Backend: `http://localhost:3001` (pas 3000)
-- Frontend: `http://localhost:5174` (Vite default)
-- Utilisez `.env` à la racine du projet
+Si vous modifiez `package.json` ou installez de nouveaux packages :
+
+```bash
+# Rebuild backend
+docker-compose -f docker-compose.dev.yml up -d --build server
+
+# Rebuild frontend
+docker-compose -f docker-compose.dev.yml up -d --build client
+
+# Rebuild tout
+docker-compose -f docker-compose.dev.yml up -d --build
+```
+
+## 🆚 Development vs Production
+
+### Development (docker-compose.dev.yml)
+- ✅ **Hot reload**: Changements instantanés sans rebuild
+- ✅ **tsx watch**: Backend redémarre automatiquement
+- ✅ **Vite HMR**: Frontend met à jour sans refresh
+- ✅ **Source maps**: Debugging facile
+- ✅ **Volumes montés**: Code modifiable en live
+- 🐌 **Performance**: Moins optimisé (mode dev)
+
+### Production (docker-compose.yml)
+- ⚡ **Optimisé**: Builds minifiés et compressés
+- 🔒 **Sécurisé**: Pas de volumes montés
+- 🚀 **Nginx**: Serveur web performant pour frontend
+- ❌ **Pas de hot reload**: Rebuild requis
+- ✅ **Performance**: Production-ready
+
+## 💡 Pourquoi Docker Development Now?
+
+Avant (Sans Docker Dev):
+```bash
+# Problèmes fréquents
+❌ PostgreSQL local vs Docker conflict (port 5432)
+❌ "Works on my machine" syndrome
+❌ Différences dev/prod
+❌ Setup complexe pour nouveaux devs
+```
+
+Maintenant (Avec Docker Dev):
+```bash
+# Avantages
+✅ Environnement identique pour tous
+✅ Un seul PostgreSQL (Docker)
+✅ Hot reload fonctionne
+✅ Setup en 1 commande
+✅ Dev/Prod similaires
+```
 
 ## 📊 Healthchecks
 
@@ -258,8 +335,30 @@ docker-compose logs redis
 - **Redis Docker:** https://hub.docker.com/_/redis
 - **Drizzle ORM Migrations:** https://orm.drizzle.team/docs/migrations
 
+## 🎯 Quick Reference
+
+```bash
+# Start dev stack (hot reload)
+docker-compose -f docker-compose.dev.yml up -d
+
+# Watch logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Stop dev stack
+docker-compose -f docker-compose.dev.yml down
+
+# Rebuild after package.json changes
+docker-compose -f docker-compose.dev.yml up -d --build
+
+# Access services
+Frontend:  http://localhost:5174
+Backend:   http://localhost:3001/api/trpc
+Health:    http://localhost:3001/health
+Login:     http://localhost:5174/client-portal/login (test@example.com / password123)
+```
+
 ---
 
-**Dernière mise à jour:** 2025-12-21
+**Dernière mise à jour:** 2025-12-22
 **Version Docker Compose:** 3.8
 **Maintenu par:** Recording Studio Manager Team
