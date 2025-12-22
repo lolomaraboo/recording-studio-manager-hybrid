@@ -5,6 +5,7 @@ import session from 'express-session';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index';
 import { createContext } from './_core/context';
+import { handleStripeWebhook } from './webhooks/stripe-webhook';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -33,6 +34,15 @@ async function main() {
       credentials: true,
     })
   );
+
+  // Stripe webhook needs raw body for signature verification
+  // MUST be before express.json() middleware
+  app.post(
+    '/api/webhooks/stripe',
+    express.raw({ type: 'application/json' }),
+    handleStripeWebhook
+  );
+
   app.use(express.json());
   app.use(
     session({
