@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Music, User, LogOut, Calendar, FileText, CreditCard } from 'lucide-react';
+import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
+import { toast } from 'sonner';
 
 /**
  * Client Portal Header
@@ -17,21 +19,22 @@ import { Music, User, LogOut, Calendar, FileText, CreditCard } from 'lucide-reac
  * Simple header for client portal with:
  * - Studio branding
  * - Navigation links
- * - User menu
+ * - User menu with logout
  */
 export function ClientPortalHeader() {
   const navigate = useNavigate();
-
-  // TODO: Get client from context
-  const client = {
-    name: 'John Doe',
-    email: 'john@example.com',
-  };
+  const { client, logout } = useClientPortalAuth();
 
   const handleLogout = () => {
-    // TODO: Call logout API
+    logout();
+    toast.success('Logged out successfully');
     navigate('/client-portal/login');
   };
+
+  // Fallback if client is not loaded yet
+  if (!client) {
+    return null;
+  }
 
   return (
     <header className="border-b bg-card">
