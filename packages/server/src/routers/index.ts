@@ -17,6 +17,7 @@ import { aiRouter } from './ai';
 import { clientPortalAuthRouter } from './client-portal-auth';
 import { clientPortalDashboardRouter } from './client-portal-dashboard';
 import { clientPortalBookingRouter } from './client-portal-booking';
+import { clientPortalStripeRouter } from './client-portal-stripe';
 
 /**
  * Main App Router
@@ -41,9 +42,10 @@ import { clientPortalBookingRouter } from './client-portal-booking';
  * - clientPortalAuth: Client Portal Authentication (Phase 4.1)
  * - clientPortalDashboard: Client Portal Dashboard (Phase 4.1)
  * - clientPortalBooking: Client Portal Booking System (Phase 4.1)
+ * - clientPortalStripe: Client Portal Stripe Payments (Phase 4.1)
  *
  * **Future routers to add:**
- * - payments, analytics, reports, admin, stripe, calendar
+ * - payments, analytics, reports, admin, calendar
  */
 export const appRouter = router({
   auth: authRouter,
@@ -64,6 +66,7 @@ export const appRouter = router({
   clientPortalAuth: clientPortalAuthRouter,
   clientPortalDashboard: clientPortalDashboardRouter,
   clientPortalBooking: clientPortalBookingRouter,
+  clientPortalStripe: clientPortalStripeRouter,
 });
 
 /**
