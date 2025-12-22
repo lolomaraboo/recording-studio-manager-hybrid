@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 import { User, Mail, Phone, Save, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
 
 /**
  * Client Portal Profile Page
@@ -40,25 +41,30 @@ export default function Profile() {
   const handleProfileUpdate = async () => {
     setIsSaving(true);
 
-    // TODO: Call API to update profile
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    const sessionToken = localStorage.getItem('clientSessionToken');
+    if (!sessionToken) {
+      toast.error('Session expired. Please log in again.');
+      setIsSaving(false);
+      return;
+    }
 
-      // Update local context
-      if (client) {
-        updateClient({
-          ...client,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone || null,
-        });
+    try {
+      const result = await trpc.clientPortalAuth.updateProfile.mutate({
+        sessionToken,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+      });
+
+      // Update local context with new client data
+      if (result.client) {
+        updateClient(result.client);
       }
 
-      toast.success('Profile updated successfully');
+      toast.success(result.message || 'Profile updated successfully');
       setIsEditing(false);
-    } catch (error) {
-      toast.error('Failed to update profile');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update profile');
       console.error('Profile update error:', error);
     } finally {
       setIsSaving(false);
@@ -78,22 +84,30 @@ export default function Profile() {
       return;
     }
 
+    const sessionToken = localStorage.getItem('clientSessionToken');
+    if (!sessionToken) {
+      toast.error('Session expired. Please log in again.');
+      return;
+    }
+
     setIsSaving(true);
 
-    // TODO: Call API to change password
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await trpc.clientPortalAuth.changePassword.mutate({
+        sessionToken,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
 
-      toast.success('Password changed successfully');
+      toast.success(result.message || 'Password changed successfully');
       setShowPasswordForm(false);
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
-    } catch (error) {
-      toast.error('Failed to change password');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to change password');
       console.error('Password change error:', error);
     } finally {
       setIsSaving(false);

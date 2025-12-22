@@ -790,4 +790,200 @@ export const clientPortalAuthRouter = router({
         client: client[0],
       };
     }),
+
+  /**
+   * Update profile information
+   * Allows clients to update their name, email, and phone
+   */
+  updateProfile: publicProcedure
+    .input(
+      z.object({
+        sessionToken: z.string().length(64),
+        name: z.string().min(1).max(255),
+        email: z.string().email().max(255),
+        phone: z.string().max(50).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const organizationId = (ctx.req.session as any).organizationId || 1;
+      const tenantDb = await getTenantDb(organizationId);
+
+      // Validate session and get client
+      const sessionList = await tenantDb
+        .select()
+        .from(clientPortalSessions)
+        .where(eq(clientPortalSessions.token, input.sessionToken))
+        .limit(1);
+
+      if (sessionList.length === 0) {
+        throw new Error("Invalid session");
+      }
+
+      const session = sessionList[0];
+
+      // Check session expiration
+      if (isTokenExpired(session.expiresAt)) {
+        await tenantDb
+          .delete(clientPortalSessions)
+          .where(eq(clientPortalSessions.id, session.id));
+        throw new Error("Session expired");
+      }
+
+      const email = sanitizeEmail(input.email);
+
+      // Check if email is already used by another client
+      if (email) {
+        const existingClients = await tenantDb
+          .select()
+          .from(clients)
+          .where(eq(clients.email, email))
+          .limit(2);
+
+        const otherClient = existingClients.find(c => c.id !== session.clientId);
+        if (otherClient) {
+          throw new Error("Email is already in use");
+        }
+      }
+
+      // Update client information
+      const updatedClient = await tenantDb
+        .update(clients)
+        .set({
+          name: input.name,
+          email: email || null,
+          phone: input.phone || null,
+          updatedAt: new Date(),
+        })
+        .where(eq(clients.id, session.clientId))
+        .returning();
+
+      // If email changed, update client_portal_accounts email too
+      if (email) {
+        await tenantDb
+          .update(clientPortalAccounts)
+          .set({
+            email,
+            updatedAt: new Date(),
+          })
+          .where(eq(clientPortalAccounts.clientId, session.clientId));
+      }
+
+      // Log activity
+      await tenantDb.insert(clientPortalActivityLogs).values({
+        clientId: session.clientId,
+        action: "profile_update",
+        description: "Profile information updated",
+        status: "success",
+        ipAddress: ctx.req.ip,
+        userAgent: ctx.req.headers["user-agent"],
+      });
+
+      return {
+        client: updatedClient[0],
+        message: "Profile updated successfully",
+      };
+    }),
+
+  /**
+   * Change password
+   * Allows clients to change their password
+   */
+  changePassword: publicProcedure
+    .input(
+      z.object({
+        sessionToken: z.string().length(64),
+        currentPassword: z.string(),
+        newPassword: z.string().min(8),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const organizationId = (ctx.req.session as any).organizationId || 1;
+      const tenantDb = await getTenantDb(organizationId);
+
+      // Validate session and get client
+      const sessionList = await tenantDb
+        .select()
+        .from(clientPortalSessions)
+        .where(eq(clientPortalSessions.token, input.sessionToken))
+        .limit(1);
+
+      if (sessionList.length === 0) {
+        throw new Error("Invalid session");
+      }
+
+      const session = sessionList[0];
+
+      // Check session expiration
+      if (isTokenExpired(session.expiresAt)) {
+        await tenantDb
+          .delete(clientPortalSessions)
+          .where(eq(clientPortalSessions.id, session.id));
+        throw new Error("Session expired");
+      }
+
+      // Get account
+      const accountList = await tenantDb
+        .select()
+        .from(clientPortalAccounts)
+        .where(eq(clientPortalAccounts.clientId, session.clientId))
+        .limit(1);
+
+      if (accountList.length === 0) {
+        throw new Error("Account not found");
+      }
+
+      const account = accountList[0];
+
+      // Verify current password
+      if (!account.passwordHash) {
+        throw new Error("Password login not available");
+      }
+
+      const isValid = await verifyPassword(input.currentPassword, account.passwordHash);
+      if (!isValid) {
+        // Log failed attempt
+        await tenantDb.insert(clientPortalActivityLogs).values({
+          clientId: session.clientId,
+          action: "password_change",
+          description: "Failed password change attempt (invalid current password)",
+          status: "failed",
+          ipAddress: ctx.req.ip,
+          userAgent: ctx.req.headers["user-agent"],
+        });
+
+        throw new Error("Current password is incorrect");
+      }
+
+      // Validate new password strength
+      const passwordValidation = validatePasswordStrength(input.newPassword);
+      if (!passwordValidation.isValid) {
+        throw new Error(passwordValidation.errors.join(", "));
+      }
+
+      // Hash new password
+      const newPasswordHash = await hashPassword(input.newPassword);
+
+      // Update password
+      await tenantDb
+        .update(clientPortalAccounts)
+        .set({
+          passwordHash: newPasswordHash,
+          updatedAt: new Date(),
+        })
+        .where(eq(clientPortalAccounts.id, account.id));
+
+      // Log success
+      await tenantDb.insert(clientPortalActivityLogs).values({
+        clientId: session.clientId,
+        action: "password_change",
+        description: "Password changed successfully",
+        status: "success",
+        ipAddress: ctx.req.ip,
+        userAgent: ctx.req.headers["user-agent"],
+      });
+
+      return {
+        message: "Password changed successfully",
+      };
+    }),
 });
