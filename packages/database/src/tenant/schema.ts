@@ -639,3 +639,132 @@ export const aiActionLogs = pgTable("ai_action_logs", {
 
 export type AIActionLog = typeof aiActionLogs.$inferSelect;
 export type InsertAIActionLog = typeof aiActionLogs.$inferInsert;
+
+/**
+ * Client Portal Accounts table (Tenant DB)
+ * Stores client portal authentication credentials
+ */
+export const clientPortalAccounts = pgTable("client_portal_accounts", {
+  id: serial("id").primaryKey(),
+
+  // Link to client
+  clientId: integer("client_id").notNull().references(() => clients.id),
+
+  // Email/Password auth
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }), // Optional - null if only using magic links
+
+  // Security
+  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  lastLoginAt: timestamp("last_login_at"),
+  loginCount: integer("login_count").notNull().default(0),
+
+  // Account status
+  isActive: boolean("is_active").notNull().default(true),
+  isLocked: boolean("is_locked").notNull().default(false),
+  lockedAt: timestamp("locked_at"),
+  lockedReason: text("locked_reason"),
+
+  // Password reset
+  resetToken: varchar("reset_token", { length: 255 }),
+  resetTokenExpiresAt: timestamp("reset_token_expires_at"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type ClientPortalAccount = typeof clientPortalAccounts.$inferSelect;
+export type InsertClientPortalAccount = typeof clientPortalAccounts.$inferInsert;
+
+/**
+ * Client Portal Magic Links table (Tenant DB)
+ * Stores magic link tokens for passwordless authentication
+ */
+export const clientPortalMagicLinks = pgTable("client_portal_magic_links", {
+  id: serial("id").primaryKey(),
+
+  // Link to client
+  clientId: integer("client_id").notNull().references(() => clients.id),
+
+  // Token
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+
+  // Usage
+  usedAt: timestamp("used_at"),
+  ipAddress: varchar("ip_address", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("user_agent"),
+
+  // Purpose
+  purpose: varchar("purpose", { length: 50 }).notNull().default("login"), // "login" | "email_verification" | "password_reset"
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type ClientPortalMagicLink = typeof clientPortalMagicLinks.$inferSelect;
+export type InsertClientPortalMagicLink = typeof clientPortalMagicLinks.$inferInsert;
+
+/**
+ * Client Portal Sessions table (Tenant DB)
+ * Stores active client portal sessions
+ */
+export const clientPortalSessions = pgTable("client_portal_sessions", {
+  id: serial("id").primaryKey(),
+
+  // Link to client
+  clientId: integer("client_id").notNull().references(() => clients.id),
+
+  // Session token
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+
+  // Session info
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+  lastActivityAt: timestamp("last_activity_at").notNull().defaultNow(),
+
+  // Device info
+  deviceType: varchar("device_type", { length: 50 }), // "desktop" | "mobile" | "tablet"
+  deviceName: varchar("device_name", { length: 255 }),
+  browser: varchar("browser", { length: 100 }),
+  os: varchar("os", { length: 100 }),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type ClientPortalSession = typeof clientPortalSessions.$inferSelect;
+export type InsertClientPortalSession = typeof clientPortalSessions.$inferInsert;
+
+/**
+ * Client Portal Activity Logs table (Tenant DB)
+ * Audit log for client portal actions
+ */
+export const clientPortalActivityLogs = pgTable("client_portal_activity_logs", {
+  id: serial("id").primaryKey(),
+
+  // Link to client
+  clientId: integer("client_id").notNull().references(() => clients.id),
+
+  // Activity
+  action: varchar("action", { length: 100 }).notNull(), // "login" | "logout" | "view_invoice" | "book_session" | "make_payment" | "download_file"
+  description: text("description"),
+
+  // Context
+  resourceType: varchar("resource_type", { length: 50 }), // "invoice" | "session" | "file" | "payment"
+  resourceId: integer("resource_id"),
+
+  // Metadata
+  metadata: text("metadata"), // JSON object with additional data
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+
+  // Status
+  status: varchar("status", { length: 50 }).notNull().default("success"), // "success" | "failed" | "pending"
+  errorMessage: text("error_message"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type ClientPortalActivityLog = typeof clientPortalActivityLogs.$inferSelect;
+export type InsertClientPortalActivityLog = typeof clientPortalActivityLogs.$inferInsert;
