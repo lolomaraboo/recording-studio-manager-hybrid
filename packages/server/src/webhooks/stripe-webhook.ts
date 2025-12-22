@@ -4,7 +4,9 @@ import { getTenantDb } from "@rsm/database/connection";
 import {
   sessions,
   paymentTransactions,
-  clientPortalActivityLogs
+  clientPortalActivityLogs,
+  clients,
+  rooms,
 } from "@rsm/database/tenant/schema";
 import { eq, and } from "drizzle-orm";
 import {
@@ -13,6 +15,10 @@ import {
   parseStripeAmount,
   calculateStripeFee,
 } from "../utils/stripe-client";
+import {
+  sendPaymentReceiptEmail,
+  sendBookingConfirmationEmail,
+} from "../utils/email-service";
 
 /**
  * Stripe Webhook Handler
@@ -133,10 +139,16 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
 
   const tenantDb = await getTenantDb(organizationId);
 
-  // Verify booking exists
+  // Get booking with client and room details for email
   const bookingList = await tenantDb
-    .select()
+    .select({
+      session: sessions,
+      client: clients,
+      room: rooms,
+    })
     .from(sessions)
+    .innerJoin(clients, eq(sessions.clientId, clients.id))
+    .innerJoin(rooms, eq(sessions.roomId, rooms.id))
     .where(
       and(
         eq(sessions.id, bookingId),
@@ -150,7 +162,7 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     throw new Error(`Booking ${bookingId} not found`);
   }
 
-  const booking = bookingList[0];
+  const { session: booking, client, room } = bookingList[0];
 
   // Get payment intent
   const stripe = getStripeClient();
@@ -207,6 +219,45 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     }),
     status: "success",
   });
+
+  // Send payment receipt email
+  if (client.email) {
+    try {
+      await sendPaymentReceiptEmail(client.email, client.name, {
+        id: paymentTransaction.id,
+        bookingTitle: booking.title || "Studio Session",
+        amount: amount.toFixed(2),
+        paymentType,
+        last4: null, // Will be updated later in payment_intent.succeeded
+        brand: null,
+        paidAt: new Date(),
+      });
+    } catch (emailError: any) {
+      console.error(`[Stripe Webhook] Failed to send payment receipt email:`, emailError);
+      // Don't throw - email failure shouldn't fail the webhook
+    }
+  }
+
+  // Send booking confirmation email if this was a deposit payment
+  if (paymentType === "deposit" && client.email) {
+    try {
+      const totalAmount = parseFloat(booking.totalAmount || "0");
+      const depositAmount = totalAmount * 0.3;
+
+      await sendBookingConfirmationEmail(client.email, client.name, {
+        id: booking.id,
+        title: booking.title || "Studio Session",
+        roomName: room.name,
+        startTime: new Date(booking.startTime),
+        endTime: new Date(booking.endTime),
+        totalAmount: totalAmount.toFixed(2),
+        depositAmount: depositAmount.toFixed(2),
+      });
+    } catch (emailError: any) {
+      console.error(`[Stripe Webhook] Failed to send booking confirmation email:`, emailError);
+      // Don't throw - email failure shouldn't fail the webhook
+    }
+  }
 
   console.log(`[Stripe Webhook] Successfully processed checkout.session.completed for booking ${bookingId}`);
 }
