@@ -14,6 +14,8 @@ import { expensesRouter } from './expenses';
 import { notificationsRouter } from './notifications';
 import { filesRouter } from './files';
 import { aiRouter } from './ai';
+import { clientPortalAuthRouter } from './client-portal-auth';
+import { clientPortalDashboardRouter } from './client-portal-dashboard';
 
 /**
  * Main App Router
@@ -35,10 +37,12 @@ import { aiRouter } from './ai';
  * - contracts: Legal contracts CRUD
  * - expenses: Business expenses CRUD
  * - ai: AI Chatbot (Phase 2 - P0 Priority)
+ * - clientPortalAuth: Client Portal Authentication (Phase 4.1)
+ * - clientPortalDashboard: Client Portal Dashboard (Phase 4.1)
  *
  * **Future routers to add:**
  * - payments, analytics, reports, admin, stripe,
- * - clientAuth, clientPortal, calendar
+ * - clientPortal (bookings), calendar
  */
 export const appRouter = router({
   auth: authRouter,
@@ -56,6 +60,8 @@ export const appRouter = router({
   notifications: notificationsRouter,
   files: filesRouter,
   ai: aiRouter,
+  clientPortalAuth: clientPortalAuthRouter,
+  clientPortalDashboard: clientPortalDashboardRouter,
 });
 
 /**
