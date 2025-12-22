@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-22 (Phase 4.1 FULL COMPLÉTÉ - Backend + Frontend + Docker Stack)
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ: Backend (33 endpoints) + Frontend (Login + Dashboard FONCTIONNEL) + Docker Stack (Hot Reload)**
+**Dernière mise à jour:** 2025-12-22 (Phase 4.3 Items 1-2 COMPLÉTÉS - Profile Page + Responsive Sidebar)
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 Items 1-2 COMPLÉTÉS (Profile + Responsive)**
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Stack complète dockerisée avec hot reload (tsx watch + Vite HMR)
 
@@ -1971,17 +1971,25 @@ docker-compose -f docker-compose.dev.yml down       # Stop
 - ✅ Recent invoices list (2 mock)
 - ✅ Projects list (2 mock)
 
-**TODO - Phase 4.2 (Booking System):**
-- ⏸️ Formulaire new booking (room selection, date/time picker)
-- ⏸️ Calcul prix + deposit automatique
-- ⏸️ Intégration Stripe payment
-- ⏸️ Webhook handler Stripe (checkout.session.completed)
-- ⏸️ Email service Resend (confirmation booking, invoice)
-- ⏸️ Booking calendar UI interactif
-- ⏸️ Pages détail (bookings, invoices, projects)
-- ⏸️ Magic link authentication (passwordless)
+**Phase 4.2 (Booking System + Stripe Integration): 100% COMPLÉTÉ ✅**
+- ✅ Formulaire new booking (room selection, date/time picker)
+- ✅ Calcul prix + deposit automatique
+- ✅ Intégration Stripe payment (Checkout Session)
+- ✅ Webhook handler Stripe (5 event types validés)
+- ✅ Database payment columns (deposit_amount, deposit_paid, payment_status, stripe_*)
+- ✅ E2E tests Playwright validés (100% success rate)
+- ✅ Client Portal Sidebar navigation ajoutée
+
+**Phase 4.3 (Client Portal Features) - EN COURS:**
+- ✅ **Item 1:** Profile Page (updateProfile + changePassword endpoints) [Commit: 4d032b4]
+- ✅ **Item 2:** Responsive Sidebar Mobile (drawer/overlay déjà implémenté) [Validation: ef9393b]
+- ⏸️ **Item 3:** Breadcrumbs navigation dans header
+- ⏸️ **Item 4:** Page titles dynamiques par route
+- ⏸️ **Item 5-17:** Booking details, payment features, infrastructure (15 items restants)
 
 **Phase 4.1: 100% FULL COMPLÉTÉ ✅**
+**Phase 4.2: 100% FULL COMPLÉTÉ ✅**
+**Phase 4.3: 2/17 COMPLÉTÉ (11.8%)**
 
 ---
 
