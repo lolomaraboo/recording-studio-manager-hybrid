@@ -768,3 +768,59 @@ export const clientPortalActivityLogs = pgTable("client_portal_activity_logs", {
 
 export type ClientPortalActivityLog = typeof clientPortalActivityLogs.$inferSelect;
 export type InsertClientPortalActivityLog = typeof clientPortalActivityLogs.$inferInsert;
+
+/**
+ * Payment Transactions table (Tenant DB)
+ * Stores all payment transactions from Stripe
+ */
+export const paymentTransactions = pgTable("payment_transactions", {
+  id: serial("id").primaryKey(),
+
+  // Links
+  clientId: integer("client_id").notNull().references(() => clients.id),
+  sessionId: integer("session_id").references(() => sessions.id), // Booking session
+
+  // Stripe IDs
+  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }).unique(),
+  stripeCheckoutSessionId: varchar("stripe_checkout_session_id", { length: 255 }),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+
+  // Payment Details
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Amount in dollars
+  currency: varchar("currency", { length: 3 }).notNull().default("usd"), // ISO currency code
+  paymentType: varchar("payment_type", { length: 50 }).notNull(), // "deposit" | "balance" | "full" | "refund"
+
+  // Status
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // "pending" | "succeeded" | "failed" | "canceled" | "refunded"
+
+  // Stripe Details
+  stripeStatus: varchar("stripe_status", { length: 50 }), // Raw Stripe status
+  paymentMethod: varchar("payment_method", { length: 50 }), // "card" | "bank_transfer" | etc.
+  last4: varchar("last4", { length: 4 }), // Last 4 digits of card
+  brand: varchar("brand", { length: 50 }), // "visa" | "mastercard" | etc.
+
+  // Fees
+  stripeFee: decimal("stripe_fee", { precision: 10, scale: 2 }), // Stripe fee in dollars
+  netAmount: decimal("net_amount", { precision: 10, scale: 2 }), // Amount after fees
+
+  // Refund Info
+  refundedAmount: decimal("refunded_amount", { precision: 10, scale: 2 }), // Amount refunded
+  refundedAt: timestamp("refunded_at"),
+  refundReason: text("refund_reason"),
+
+  // Metadata
+  metadata: text("metadata"), // JSON object with additional data
+  description: text("description"),
+
+  // Error Info
+  errorCode: varchar("error_code", { length: 100 }),
+  errorMessage: text("error_message"),
+
+  // Timestamps
+  paidAt: timestamp("paid_at"), // When payment succeeded
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
+export type InsertPaymentTransaction = typeof paymentTransactions.$inferInsert;
