@@ -44,16 +44,28 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Toaster } from '@/components/ui/sonner';
+import { ClientPortalLayout } from './components/client-portal/ClientPortalLayout';
+import ClientLogin from './pages/client-portal/ClientLogin';
+import ClientDashboard from './pages/client-portal/ClientDashboard';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
+        {/* Staff Portal - Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected routes */}
+        {/* Client Portal - Public routes */}
+        <Route path="/client-portal/login" element={<ClientLogin />} />
+
+        {/* Client Portal - Protected routes */}
+        <Route path="/client-portal" element={<ClientPortalLayout />}>
+          <Route index element={<ClientDashboard />} />
+          {/* TODO: Add more client portal routes (bookings, invoices, projects) */}
+        </Route>
+
+        {/* Staff Portal - Protected routes */}
         <Route
           path="/"
           element={
