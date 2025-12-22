@@ -112,7 +112,7 @@ export default function ClientDashboard() {
             Here's an overview of your studio activity
           </p>
         </div>
-        <Button onClick={() => navigate('/client-portal/booking/new')}>
+        <Button onClick={() => navigate('/client-portal/bookings')}>
           <Plus className="mr-2 h-4 w-4" />
           New Booking
         </Button>
@@ -202,7 +202,7 @@ export default function ClientDashboard() {
                 <p>No upcoming bookings</p>
                 <Button
                   variant="link"
-                  onClick={() => navigate('/client-portal/booking/new')}
+                  onClick={() => navigate('/client-portal/bookings')}
                 >
                   Book a session
                 </Button>

@@ -7,6 +7,7 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { AssistantProvider } from './contexts/AssistantContext'
 import { ChatbotProvider } from './contexts/ChatbotContext'
 import { AuthProvider } from './contexts/AuthContext'
+import { ClientPortalAuthProvider } from './contexts/ClientPortalAuthContext'
 import App from './App'
 import './index.css'
 
@@ -40,11 +41,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <AssistantProvider>
-              <ChatbotProvider>
-                <App />
-              </ChatbotProvider>
-            </AssistantProvider>
+            <ClientPortalAuthProvider>
+              <AssistantProvider>
+                <ChatbotProvider>
+                  <App />
+                </ChatbotProvider>
+              </AssistantProvider>
+            </ClientPortalAuthProvider>
           </AuthProvider>
         </QueryClientProvider>
       </trpc.Provider>

@@ -56,9 +56,17 @@ export function verifyWebhookSignature(
     );
   }
 
+  console.log("[Stripe] Webhook secret loaded:", webhookSecret.substring(0, 15) + "...");
+  console.log("[Stripe] Raw body type:", typeof rawBody);
+  console.log("[Stripe] Raw body is Buffer:", Buffer.isBuffer(rawBody));
+
   const stripe = getStripeClient();
 
-  return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  // Convert Buffer to string for Stripe verification
+  const bodyString = Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody;
+  console.log("[Stripe] Body string length:", bodyString.length);
+
+  return stripe.webhooks.constructEvent(bodyString, signature, webhookSecret);
 }
 
 /**

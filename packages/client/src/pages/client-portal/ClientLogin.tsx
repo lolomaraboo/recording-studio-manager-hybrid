@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Music, Mail, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
+import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 
 /**
  * Client Portal Login Page
@@ -17,6 +19,8 @@ import { toast } from 'sonner';
  * - Tab 2: Magic Link (passwordless)
  */
 export default function ClientLogin() {
+  const navigate = useNavigate();
+  const { login: authLogin } = useClientPortalAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,21 +32,24 @@ export default function ClientLogin() {
   // Magic Link form
   const [magicEmail, setMagicEmail] = useState('');
 
+  // tRPC mutations
+  const loginMutation = trpc.clientPortalAuth.login.useMutation();
+
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
     try {
-      // TODO: Call API - trpc.clientPortalAuth.login.mutate({ email, password })
-      console.log('Password login:', { email, password });
+      const result = await loginMutation.mutateAsync({ email, password });
+      console.log('Login successful:', result);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Store session in context (localStorage)
+      authLogin(result.sessionToken, result.client);
 
       toast.success('Login successful!');
-      // TODO: Navigate to dashboard
-      // navigate('/client-portal');
+      // Navigate to client portal index (dashboard)
+      navigate('/client-portal');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
       toast.error('Login failed');

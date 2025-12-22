@@ -1,0 +1,324 @@
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
+import { User, Mail, Phone, Save, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+/**
+ * Client Portal Profile Page
+ *
+ * Allows clients to:
+ * - View their profile information
+ * - Update contact details
+ * - Change password
+ * - View account status
+ */
+export default function Profile() {
+  const { client, updateClient } = useClientPortalAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+
+  // Profile form state
+  const [formData, setFormData] = useState({
+    name: client?.name || '',
+    email: client?.email || '',
+    phone: client?.phone || '',
+  });
+
+  // Password form state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  const handleProfileUpdate = async () => {
+    setIsSaving(true);
+
+    // TODO: Call API to update profile
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Update local context
+      if (client) {
+        updateClient({
+          ...client,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+        });
+      }
+
+      toast.success('Profile updated successfully');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error('Failed to update profile');
+      console.error('Profile update error:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    // Validate passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    // Validate password strength
+    if (passwordData.newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    setIsSaving(true);
+
+    // TODO: Call API to change password
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      toast.success('Password changed successfully');
+      setShowPasswordForm(false);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (error) {
+      toast.error('Failed to change password');
+      console.error('Password change error:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    // Reset form data to original values
+    setFormData({
+      name: client?.name || '',
+      email: client?.email || '',
+      phone: client?.phone || '',
+    });
+    setIsEditing(false);
+  };
+
+  if (!client) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+            <p className="mt-4 text-muted-foreground">Unable to load profile</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-6 max-w-4xl">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-3xl font-bold">My Profile</h1>
+        <p className="text-muted-foreground mt-1">
+          Manage your account information and settings
+        </p>
+      </div>
+
+      {/* Account Status Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <User className="mr-2 h-5 w-5" />
+            Account Status
+          </CardTitle>
+          <CardDescription>Your current account information</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Account Type</p>
+              <p className="text-sm text-muted-foreground">Standard Client</p>
+            </div>
+            <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+              <CheckCircle2 className="mr-1 h-3 w-3" />
+              Active
+            </Badge>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Client ID</p>
+            <p className="text-sm text-muted-foreground font-mono">#{client.id.toString().padStart(6, '0')}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Profile Information Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center">
+                <User className="mr-2 h-5 w-5" />
+                Profile Information
+              </CardTitle>
+              <CardDescription>Your contact details and personal information</CardDescription>
+            </div>
+            {!isEditing && (
+              <Button onClick={() => setIsEditing(true)} variant="outline">
+                Edit Profile
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="flex items-center">
+              <User className="mr-2 h-4 w-4" />
+              Full Name
+            </Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              disabled={!isEditing}
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="flex items-center">
+              <Mail className="mr-2 h-4 w-4" />
+              Email Address
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              disabled={!isEditing}
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="flex items-center">
+              <Phone className="mr-2 h-4 w-4" />
+              Phone Number
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              disabled={!isEditing}
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          {isEditing && (
+            <div className="flex gap-2 pt-4">
+              <Button onClick={handleProfileUpdate} disabled={isSaving}>
+                <Save className="mr-2 h-4 w-4" />
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </Button>
+              <Button onClick={handleCancelEdit} variant="outline" disabled={isSaving}>
+                Cancel
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Password Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center">
+                <Key className="mr-2 h-5 w-5" />
+                Password & Security
+              </CardTitle>
+              <CardDescription>Manage your password and security settings</CardDescription>
+            </div>
+            {!showPasswordForm && (
+              <Button onClick={() => setShowPasswordForm(true)} variant="outline">
+                Change Password
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        {showPasswordForm && (
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                }
+                placeholder="Enter current password"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, newPassword: e.target.value })
+                }
+                placeholder="Enter new password (min. 8 characters)"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                }
+                placeholder="Confirm new password"
+              />
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button onClick={handlePasswordChange} disabled={isSaving}>
+                <Key className="mr-2 h-4 w-4" />
+                {isSaving ? 'Updating...' : 'Update Password'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowPasswordForm(false);
+                  setPasswordData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: '',
+                  });
+                }}
+                variant="outline"
+                disabled={isSaving}
+              >
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+    </div>
+  );
+}

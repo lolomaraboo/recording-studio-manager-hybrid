@@ -81,6 +81,7 @@ export type InsertRoom = typeof rooms.$inferInsert;
 
 /**
  * Sessions table (Tenant DB)
+ * Booking sessions with payment tracking
  */
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
@@ -91,7 +92,17 @@ export const sessions = pgTable("sessions", {
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time").notNull(),
   status: varchar("status", { length: 50 }).notNull().default("scheduled"), // "scheduled" | "in_progress" | "completed" | "cancelled"
+
+  // Payment fields
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
+  depositAmount: decimal("deposit_amount", { precision: 10, scale: 2 }), // Required deposit (e.g., 30% of total)
+  depositPaid: boolean("deposit_paid").notNull().default(false),
+  paymentStatus: varchar("payment_status", { length: 50 }).notNull().default("unpaid"), // "unpaid" | "partial" | "paid" | "refunded"
+
+  // Stripe tracking
+  stripeCheckoutSessionId: varchar("stripe_checkout_session_id", { length: 255 }), // Stripe Checkout Session ID
+  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }), // Stripe Payment Intent ID
+
   notes: text("notes"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

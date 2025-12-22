@@ -33,5 +33,9 @@
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.14.4"
+  "packageManager": "pnpm@9.14.4",
+  "dependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0"
+  }
 }

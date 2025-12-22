@@ -15,6 +15,13 @@
       "when": 1765917547059,
       "tag": "0001_woozy_kinsey_walden",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766424832312,
+      "tag": "0002_sour_magik",
+      "breakpoints": true
     }
   ]
 }

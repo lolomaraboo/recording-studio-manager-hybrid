@@ -47,6 +47,8 @@ import { Toaster } from '@/components/ui/sonner';
 import { ClientPortalLayout } from './components/client-portal/ClientPortalLayout';
 import ClientLogin from './pages/client-portal/ClientLogin';
 import ClientDashboard from './pages/client-portal/ClientDashboard';
+import Bookings from './pages/client-portal/Bookings';
+import Profile from './pages/client-portal/Profile';
 import {
   ClientPortalAuthProvider,
   ProtectedClientRoute,
@@ -74,7 +76,9 @@ function App() {
             }
           >
             <Route index element={<ClientDashboard />} />
-            {/* TODO: Add more client portal routes (bookings, invoices, projects) */}
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="profile" element={<Profile />} />
+            {/* TODO: Add more client portal routes (invoices, projects, payments) */}
           </Route>
 
           {/* Staff Portal - Protected routes */}

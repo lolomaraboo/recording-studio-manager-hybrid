@@ -47,10 +47,9 @@ export const clientPortalAuthRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      // TODO: Multi-tenant - Get organizationId from subdomain/slug
+      // For now, use org 1 (tenant_1) for testing
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const tenantDb = await getTenantDb(organizationId);
       const email = sanitizeEmail(input.email);
@@ -143,20 +142,60 @@ export const clientPortalAuthRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      console.log('[Client Portal Login] Request:', { email: input.email });
+
+      // TODO: Multi-tenant - Get organizationId from subdomain/slug
+      // For now, use org 1 (tenant_1) for testing
+      const organizationId = (ctx.req.session as any).organizationId || 1;
+      console.log('[Client Portal Login] Using organizationId:', organizationId);
 
       const tenantDb = await getTenantDb(organizationId);
       const email = sanitizeEmail(input.email);
+      console.log('[Client Portal Login] Sanitized email:', email);
 
       // Find account
-      const accountList = await tenantDb
-        .select()
-        .from(clientPortalAccounts)
-        .where(eq(clientPortalAccounts.email, email))
-        .limit(1);
+      console.log('[Client Portal Login] Querying for account with email:', email);
+
+      // DEBUG: Check which database we're connected to
+      const dbCheck = await tenantDb.execute(`SELECT current_database(), current_schema()`);
+      console.log('[Client Portal Login] Connected to database:', dbCheck);
+
+      // DEBUG: Check if table exists
+      const tableCheck = await tenantDb.execute(
+        `SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'client_portal_accounts'`
+      );
+      console.log('[Client Portal Login] Table exists check:', tableCheck);
+
+      // DEBUG: Count all rows in table
+      const countCheck = await tenantDb.execute(`SELECT COUNT(*) FROM client_portal_accounts`);
+      console.log('[Client Portal Login] Total rows in table:', countCheck);
+
+      // DEBUG: Try raw SQL first
+      const rawResult = await tenantDb.execute(
+        `SELECT id, email, client_id FROM client_portal_accounts WHERE email = '${email}' LIMIT 1`
+      );
+      console.log('[Client Portal Login] Raw SQL result:', rawResult);
+
+      let accountList;
+      try {
+        accountList = await tenantDb
+          .select()
+          .from(clientPortalAccounts)
+          .where(eq(clientPortalAccounts.email, email))
+          .limit(1);
+      } catch (err: any) {
+        console.error('[Client Portal Login] Query error:', err);
+        throw err;
+      }
+
+      console.log('[Client Portal Login] Drizzle query result:', accountList.length);
+      if (accountList.length > 0) {
+        console.log('[Client Portal Login] Account found:', {
+          id: accountList[0].id,
+          email: accountList[0].email,
+          clientId: accountList[0].clientId
+        });
+      }
 
       if (accountList.length === 0) {
         throw new Error("Invalid credentials");

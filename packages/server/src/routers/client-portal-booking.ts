@@ -12,8 +12,46 @@ import { eq, and, gte, lte, between, sql, desc } from "drizzle-orm";
 import { isTokenExpired } from "../utils/client-portal-auth";
 
 /**
+ * Extract organizationId from request context
+ *
+ * Multi-tenant strategy:
+ * - Production: Extract from subdomain (e.g., studio1.myapp.com → org_id)
+ * - Development: Use default org 1 (localhost has no subdomain)
+ *
+ * @param hostname - Request hostname (e.g., "studio1.myapp.com" or "localhost")
+ */
+function getOrganizationIdFromHostname(hostname: string | undefined): number {
+  console.log('[Multi-Tenant] Extracting organizationId from hostname:', hostname);
+
+  // Fallback if hostname not available
+  if (!hostname) {
+    console.warn('[Multi-Tenant] No hostname provided, defaulting to organizationId=1');
+    return 1;
+  }
+
+  // Development mode: localhost has no subdomain
+  if (hostname === 'localhost' || hostname.startsWith('localhost:')) {
+    return 1; // Default to org 1 in development
+  }
+
+  // Production: Extract subdomain
+  // Example: "studio1.myapp.com" → "studio1"
+  const subdomain = hostname.split('.')[0];
+
+  // TODO: Query master database to map subdomain → organizationId
+  // For now, assume subdomain = slug and hardcode mapping
+  // In real implementation: SELECT id FROM organizations WHERE slug = subdomain
+
+  console.warn(`[Multi-Tenant] TODO: Map subdomain "${subdomain}" to organizationId`);
+  return 1; // Fallback for now
+}
+
+/**
  * Middleware helper to validate client portal session
  * Extracts clientId from session token
+ *
+ * @param organizationId - Organization ID (from hostname/subdomain)
+ * @param sessionToken - Client session token from localStorage
  */
 async function validateClientSession(
   organizationId: number,
@@ -82,10 +120,8 @@ export const clientPortalBookingRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      // Extract organizationId from hostname (multi-tenant)
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -143,10 +179,7 @@ export const clientPortalBookingRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -201,10 +234,7 @@ export const clientPortalBookingRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -331,29 +361,49 @@ export const clientPortalBookingRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      console.log('[createBooking] Request received:', {
+        roomId: input.roomId,
+        title: input.title,
+        startTime: input.startTime,
+        endTime: input.endTime,
+        hostname: ctx.req.hostname,
+      });
+
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
+      console.log('[createBooking] Organization ID:', organizationId);
 
       const clientId = await validateClientSession(
         organizationId,
         input.sessionToken
       );
+      console.log('[createBooking] Client ID:', clientId);
+
       const tenantDb = await getTenantDb(organizationId);
+      console.log('[createBooking] Tenant DB connected');
 
       const startTime = new Date(input.startTime);
       const endTime = new Date(input.endTime);
 
+      console.log('[createBooking] Dates parsed:', {
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        now: new Date().toISOString(),
+        isPast: startTime < new Date(),
+      });
+
       // Validate time range
       if (endTime <= startTime) {
+        console.error('[createBooking] ERROR: End time before start time');
         throw new Error("End time must be after start time");
       }
 
       // Check if time is in the past
       if (startTime < new Date()) {
+        console.error('[createBooking] ERROR: Booking in the past');
         throw new Error("Cannot book in the past");
       }
+
+      console.log('[createBooking] Time validation passed, checking room...');
 
       // Verify room exists and is available
       const roomList = await tenantDb
@@ -362,34 +412,58 @@ export const clientPortalBookingRouter = router({
         .where(eq(rooms.id, input.roomId))
         .limit(1);
 
+      console.log('[createBooking] Room query result:', roomList.length);
+
       if (roomList.length === 0) {
+        console.error('[createBooking] ERROR: Room not found');
         throw new Error("Room not found");
       }
 
       const room = roomList[0];
 
+      console.log('[createBooking] Room details:', {
+        id: room.id,
+        name: room.name,
+        isActive: room.isActive,
+        isAvailableForBooking: room.isAvailableForBooking,
+      });
+
       if (!room.isActive || !room.isAvailableForBooking) {
+        console.error('[createBooking] ERROR: Room not available');
         throw new Error("Room not available for booking");
       }
 
+      console.log('[createBooking] Checking for conflicts...');
+
       // Double-check availability (prevent race conditions)
-      const conflicts = await tenantDb
-        .select()
-        .from(sessions)
-        .where(
-          and(
-            eq(sessions.roomId, input.roomId),
-            sql`${sessions.startTime} < ${endTime}`,
-            sql`${sessions.endTime} > ${startTime}`,
-            sql`${sessions.status} != 'cancelled'`
-          )
-        );
+      let conflicts;
+      try {
+        conflicts = await tenantDb
+          .select()
+          .from(sessions)
+          .where(
+            and(
+              eq(sessions.roomId, input.roomId),
+              sql`${sessions.startTime} < ${sql.raw(`'${endTime.toISOString()}'`)}`,
+              sql`${sessions.endTime} > ${sql.raw(`'${startTime.toISOString()}'`)}`,
+              sql`${sessions.status} != 'cancelled'`
+            )
+          );
+
+        console.log('[createBooking] Conflicts found:', conflicts.length);
+      } catch (error) {
+        console.error('[createBooking] ERROR checking conflicts:', error);
+        throw error;
+      }
 
       if (conflicts.length > 0) {
+        console.error('[createBooking] ERROR: Room has conflicts');
         throw new Error(
           "Room is no longer available for this time slot. Please choose another time."
         );
       }
+
+      console.log('[createBooking] No conflicts, calculating price...');
 
       // Calculate total amount
       const durationMs = endTime.getTime() - startTime.getTime();
@@ -405,6 +479,10 @@ export const clientPortalBookingRouter = router({
         totalAmount = hourlyRate * durationHours;
       }
 
+      // Calculate deposit (30% of total)
+      const depositPercentage = 0.3;
+      const depositAmount = totalAmount * depositPercentage;
+
       // Create session (booking request)
       const newSession = await tenantDb
         .insert(sessions)
@@ -417,6 +495,9 @@ export const clientPortalBookingRouter = router({
           endTime,
           status: "scheduled", // Initially scheduled, staff can confirm later
           totalAmount: totalAmount.toFixed(2),
+          depositAmount: depositAmount.toFixed(2),
+          depositPaid: false,
+          paymentStatus: "unpaid",
           notes: input.notes || null,
         })
         .returning();
@@ -460,10 +541,7 @@ export const clientPortalBookingRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -535,10 +613,7 @@ export const clientPortalBookingRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -596,10 +671,7 @@ export const clientPortalBookingRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -688,10 +760,7 @@ export const clientPortalBookingRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,

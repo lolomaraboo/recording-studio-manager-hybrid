@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,19 +9,25 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Music, User, LogOut, Calendar, FileText, CreditCard } from 'lucide-react';
+import { User, LogOut, Menu } from 'lucide-react';
 import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 import { toast } from 'sonner';
+
+interface ClientPortalHeaderProps {
+  onMobileMenuToggle?: () => void;
+}
 
 /**
  * Client Portal Header
  *
- * Simple header for client portal with:
- * - Studio branding
- * - Navigation links
- * - User menu with logout
+ * Simplified header for client portal with:
+ * - Mobile menu toggle button
+ * - Page title (optional)
+ * - User menu with profile and logout
+ *
+ * Navigation is now in ClientPortalSidebar
  */
-export function ClientPortalHeader() {
+export function ClientPortalHeader({ onMobileMenuToggle }: ClientPortalHeaderProps) {
   const navigate = useNavigate();
   const { client, logout } = useClientPortalAuth();
 
@@ -40,42 +46,21 @@ export function ClientPortalHeader() {
     <header className="border-b bg-card">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link
-            to="/client-portal"
-            className="flex items-center space-x-2 text-primary font-semibold text-lg"
+          {/* Mobile menu button (only visible on mobile) */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={onMobileMenuToggle}
+            aria-label="Toggle menu"
           >
-            <Music className="h-6 w-6" />
-            <span>Studio Portal</span>
-          </Link>
+            <Menu className="h-5 w-5" />
+          </Button>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/client-portal"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/client-portal/bookings"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              My Bookings
-            </Link>
-            <Link
-              to="/client-portal/invoices"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Invoices
-            </Link>
-            <Link
-              to="/client-portal/projects"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Projects
-            </Link>
-          </nav>
+          {/* Page title placeholder - can be dynamically set per page */}
+          <div className="flex-1">
+            {/* Empty for now - pages can add their own title here */}
+          </div>
 
           {/* User Menu */}
           <DropdownMenu>
@@ -102,21 +87,9 @@ export function ClientPortalHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/client-portal')}>
+              <DropdownMenuItem onClick={() => navigate('/client-portal/profile')}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/client-portal/bookings')}>
-                <Calendar className="mr-2 h-4 w-4" />
-                <span>My Bookings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/client-portal/invoices')}>
-                <FileText className="mr-2 h-4 w-4" />
-                <span>Invoices</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/client-portal/payments')}>
-                <CreditCard className="mr-2 h-4 w-4" />
-                <span>Payment History</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>

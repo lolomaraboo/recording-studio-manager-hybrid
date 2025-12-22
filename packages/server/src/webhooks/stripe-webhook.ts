@@ -43,6 +43,11 @@ import {
  * @param res - Express response
  */
 export async function handleStripeWebhook(req: Request, res: Response) {
+  console.log("[Stripe Webhook] Received webhook request");
+  console.log("[Stripe Webhook] Body type:", typeof req.body);
+  console.log("[Stripe Webhook] Body is Buffer:", Buffer.isBuffer(req.body));
+  console.log("[Stripe Webhook] Body length:", req.body?.length || 0);
+
   const signature = req.headers["stripe-signature"];
 
   if (!signature || typeof signature !== "string") {
@@ -52,11 +57,13 @@ export async function handleStripeWebhook(req: Request, res: Response) {
     });
   }
 
+  console.log("[Stripe Webhook] Signature present, verifying...");
+
   let event: Stripe.Event;
 
   try {
     // Verify webhook signature
-    // req.rawBody is set by express.raw() middleware
+    // req.body must be a Buffer or string for signature verification
     event = verifyWebhookSignature(req.body, signature);
   } catch (err: any) {
     console.error("[Stripe Webhook] Signature verification failed:", err.message);
@@ -203,6 +210,33 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     .returning();
 
   console.log(`[Stripe Webhook] Created payment transaction: ${paymentTransaction.id}`);
+
+  // Update booking payment status
+  if (paymentType === "deposit") {
+    // Mark deposit as paid
+    await tenantDb
+      .update(sessions)
+      .set({
+        depositPaid: true,
+        paymentStatus: "partial", // Deposit paid, balance remaining
+        stripeCheckoutSessionId: session.id,
+        stripePaymentIntentId: paymentIntent.id,
+      })
+      .where(eq(sessions.id, bookingId));
+
+    console.log(`[Stripe Webhook] Updated booking ${bookingId}: deposit paid, status=partial`);
+  } else if (paymentType === "balance") {
+    // Mark booking as fully paid
+    await tenantDb
+      .update(sessions)
+      .set({
+        paymentStatus: "paid", // Fully paid
+        stripePaymentIntentId: paymentIntent.id,
+      })
+      .where(eq(sessions.id, bookingId));
+
+    console.log(`[Stripe Webhook] Updated booking ${bookingId}: fully paid`);
+  }
 
   // Log activity
   await tenantDb.insert(clientPortalActivityLogs).values({

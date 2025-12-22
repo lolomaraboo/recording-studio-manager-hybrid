@@ -1,0 +1,42 @@
+# Development Dockerfile - Backend with hot reload
+FROM node:20-alpine
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.14.4 --activate
+
+# Set working directory
+WORKDIR /app
+
+# Copy workspace root files
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# Copy package.json files first (for layer caching)
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/database/package.json ./packages/database/
+COPY packages/server/package.json ./packages/server/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code (will be overridden by volumes in docker-compose)
+COPY packages/shared ./packages/shared
+COPY packages/database ./packages/database
+COPY packages/server ./packages/server
+COPY tsconfig.json ./
+
+# Build shared and database packages (needed for server to run)
+RUN pnpm --filter @rsm/shared build
+RUN pnpm --filter @rsm/database build
+
+# Set working directory to server
+WORKDIR /app/packages/server
+
+# Expose port
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start development server with tsx watch (hot reload)
+CMD ["pnpm", "dev"]

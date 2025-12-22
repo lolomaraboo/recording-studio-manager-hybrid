@@ -18,6 +18,23 @@ import {
 } from "../utils/stripe-client";
 
 /**
+ * Extract organization ID from hostname
+ * Development: localhost → org 1
+ * Production: subdomain → query master DB (TODO)
+ */
+function getOrganizationIdFromHostname(hostname: string): number {
+  // Development: localhost always maps to organization 1
+  if (hostname === "localhost" || hostname.startsWith("localhost:")) {
+    return 1;
+  }
+
+  // Production: Extract subdomain and query master DB
+  // TODO: Implement subdomain → organization lookup from master DB
+  // For now, return 1 as fallback
+  return 1;
+}
+
+/**
  * Middleware helper to validate client portal session
  */
 async function validateClientSession(
@@ -76,17 +93,23 @@ export const clientPortalStripeRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      try {
+        console.log('[createDepositCheckout] Request:', { bookingId: input.bookingId });
 
-      const clientId = await validateClientSession(
-        organizationId,
-        input.sessionToken
-      );
-      const tenantDb = await getTenantDb(organizationId);
-      const stripe = getStripeClient();
+        const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
+        console.log('[createDepositCheckout] Organization ID:', organizationId);
+
+        const clientId = await validateClientSession(
+          organizationId,
+          input.sessionToken
+        );
+        console.log('[createDepositCheckout] Client ID:', clientId);
+
+        const tenantDb = await getTenantDb(organizationId);
+        console.log('[createDepositCheckout] Tenant DB connected');
+
+        const stripe = getStripeClient();
+        console.log('[createDepositCheckout] Stripe client initialized');
 
       // Get booking (verify ownership)
       const bookingList = await tenantDb
@@ -216,6 +239,8 @@ export const clientPortalStripeRouter = router({
         userAgent: ctx.req.headers["user-agent"],
       });
 
+      console.log('[createDepositCheckout] Checkout session created:', checkoutSession.id);
+
       return {
         checkoutUrl: checkoutSession.url,
         checkoutSessionId: checkoutSession.id,
@@ -227,7 +252,11 @@ export const clientPortalStripeRouter = router({
         },
         expiresAt: new Date(checkoutSession.expires_at * 1000),
       };
-    }),
+    } catch (error) {
+      console.error('[createDepositCheckout] ERROR:', error);
+      throw error;
+    }
+  }),
 
   /**
    * Create Stripe Checkout Session for remaining balance
@@ -241,10 +270,7 @@ export const clientPortalStripeRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -392,10 +418,7 @@ export const clientPortalStripeRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,
@@ -453,10 +476,7 @@ export const clientPortalStripeRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const clientId = await validateClientSession(
         organizationId,

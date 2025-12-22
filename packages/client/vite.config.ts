@@ -13,10 +13,14 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    host: '0.0.0.0', // Required for Docker
+    port: 5174,
+    watch: {
+      usePolling: true, // Required for Docker volumes on macOS/Windows
+    },
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.VITE_API_URL || 'http://localhost:3001',
         changeOrigin: true,
       },
     },
