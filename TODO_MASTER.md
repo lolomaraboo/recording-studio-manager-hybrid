@@ -1766,8 +1766,8 @@ ALTER TABLE sessions ADD COLUMN stripe_payment_intent_id VARCHAR(255);
 #### Prochaines Étapes - Phase 4.3 Client Portal Features
 
 **P1 - FONCTIONNALITÉS (Features):**
-1. ⏸️ Page Profile (/client-portal/profile) - fichier créé, implémentation manquante
-2. ⏸️ Responsive sidebar mobile (drawer/overlay au lieu de sidebar)
+1. ✅ Page Profile (/client-portal/profile) - updateProfile + changePassword endpoints [Commit: 4d032b4]
+2. ✅ Responsive sidebar mobile (drawer/overlay) - DÉJÀ IMPLÉMENTÉ Session 3 Phase 4.2 [ClientPortalSidebar.tsx:220-256]
 3. ⏸️ Breadcrumbs dans header (navigation path)
 4. ⏸️ Page title dynamique par route
 5. ⏸️ Page détail booking (view booking details + historique)
