@@ -36,6 +36,10 @@ import ContractDetail from './pages/ContractDetail';
 import TrackCreate from './pages/TrackCreate';
 import Calendar from './pages/Calendar';
 import AudioFiles from './pages/AudioFiles';
+import FinancialReports from './pages/FinancialReports';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
+import Team from './pages/Team';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -94,6 +98,10 @@ function App() {
           <Route path="expenses/:id" element={<ExpenseDetail />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="audio-files" element={<AudioFiles />} />
+          <Route path="financial-reports" element={<FinancialReports />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="team" element={<Team />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
