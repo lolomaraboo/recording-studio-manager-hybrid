@@ -16,6 +16,7 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { toast } from 'sonner';
 
 /**
  * Client Portal - Booking Detail Page
@@ -33,6 +34,17 @@ export default function BookingDetail() {
   usePageTitle('Booking Details');
 
   const bookingId = id ? parseInt(id, 10) : null;
+
+  // Create balance checkout mutation
+  const createBalanceCheckoutMutation = trpc.clientPortalStripe.createBalanceCheckout.useMutation({
+    onSuccess: (data) => {
+      // Redirect to Stripe Checkout
+      window.location.href = data.checkoutUrl!;
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to create payment session: ${error.message}`);
+    },
+  });
 
   // Fetch booking details
   const bookingQuery = trpc.clientPortalBooking.getBooking.useQuery(
@@ -271,6 +283,37 @@ export default function BookingDetail() {
               </p>
             </div>
           </div>
+
+          {/* Pay Balance Button */}
+          {booking.depositPaid && balance > 0 && booking.paymentStatus !== 'paid' && (
+            <div className="pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Ready to pay the remaining balance?</p>
+                  <p className="text-sm text-muted-foreground">
+                    Complete your payment to finalize this booking
+                  </p>
+                </div>
+                <Button
+                  onClick={() => {
+                    if (!sessionToken || !bookingId) return;
+                    createBalanceCheckoutMutation.mutate({
+                      sessionToken,
+                      bookingId,
+                    });
+                  }}
+                  disabled={createBalanceCheckoutMutation.isPending}
+                  size="lg"
+                  className="ml-4"
+                >
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  {createBalanceCheckoutMutation.isPending
+                    ? 'Redirecting...'
+                    : `Pay Balance ($${balance.toFixed(2)})`}
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
