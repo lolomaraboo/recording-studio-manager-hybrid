@@ -14,6 +14,7 @@ import { expensesRouter } from './expenses';
 import { notificationsRouter } from './notifications';
 import { filesRouter } from './files';
 import { aiRouter } from './ai';
+import { searchRouter } from './search';
 import { clientPortalAuthRouter } from './client-portal-auth';
 import { clientPortalDashboardRouter } from './client-portal-dashboard';
 import { clientPortalBookingRouter } from './client-portal-booking';
@@ -39,6 +40,7 @@ import { clientPortalStripeRouter } from './client-portal-stripe';
  * - contracts: Legal contracts CRUD
  * - expenses: Business expenses CRUD
  * - ai: AI Chatbot (Phase 2 - P0 Priority)
+ * - search: Global search across all entities
  * - clientPortalAuth: Client Portal Authentication (Phase 4.1)
  * - clientPortalDashboard: Client Portal Dashboard (Phase 4.1)
  * - clientPortalBooking: Client Portal Booking System (Phase 4.1)
@@ -63,6 +65,7 @@ export const appRouter = router({
   notifications: notificationsRouter,
   files: filesRouter,
   ai: aiRouter,
+  search: searchRouter,
   clientPortalAuth: clientPortalAuthRouter,
   clientPortalDashboard: clientPortalDashboardRouter,
   clientPortalBooking: clientPortalBookingRouter,

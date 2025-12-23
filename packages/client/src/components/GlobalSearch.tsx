@@ -13,10 +13,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { trpc } from "@/lib/trpc";
 
 interface SearchResult {
   id: number;
-  type: "client" | "session" | "invoice" | "equipment" | "message";
+  type: "client" | "session" | "invoice" | "equipment" | "musician";
   title: string;
   subtitle: string;
   description?: string;
@@ -29,7 +30,7 @@ const typeIcons = {
   session: Music,
   invoice: FileText,
   equipment: Package,
-  message: MessageSquare,
+  musician: MessageSquare,
 };
 
 const typeLabels = {
@@ -37,7 +38,7 @@ const typeLabels = {
   session: "Session",
   invoice: "Facture",
   equipment: "Équipement",
-  message: "Message",
+  musician: "Talent",
 };
 
 const typeColors = {
@@ -45,7 +46,7 @@ const typeColors = {
   session: "bg-purple-500/10 text-purple-500",
   invoice: "bg-green-500/10 text-green-500",
   equipment: "bg-orange-500/10 text-orange-500",
-  message: "bg-pink-500/10 text-pink-500",
+  musician: "bg-pink-500/10 text-pink-500",
 };
 
 interface GlobalSearchProps {
@@ -59,10 +60,17 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // TODO: Implement real search with trpc.search.global.useQuery
-  // For now, return empty results
-  const results: SearchResult[] = [];
-  const isLoading = false;
+  // Real search with tRPC
+  const { data: results = [], isLoading } = trpc.search.global.useQuery(
+    {
+      query,
+      limit: 20,
+    },
+    {
+      enabled: open && query.length >= 2,
+      refetchOnWindowFocus: false,
+    }
+  );
 
   // Group results by type
   const groupedResults = results?.reduce((acc, result) => {
@@ -130,7 +138,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Rechercher des clients, sessions, factures, équipements, messages..."
+            placeholder="Rechercher des clients, sessions, factures, équipements, talents..."
             className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-2" />}
@@ -142,7 +150,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-sm">Tapez au moins 2 caractères pour rechercher</p>
               <p className="text-xs mt-2">
-                Recherchez dans les clients, sessions, factures, équipements et messages
+                Recherchez dans les clients, sessions, factures, équipements et talents
               </p>
             </div>
           ) : !results || results.length === 0 ? (
@@ -150,7 +158,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-sm">Aucun résultat trouvé</p>
               <p className="text-xs mt-2">
-                Recherche backend en cours de développement
+                Essayez avec un autre terme de recherche
               </p>
             </div>
           ) : (
