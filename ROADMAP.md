@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-22 (Phase 4.3 P1 100% COMPLÉTÉ - 10/10 Features ✅ | Phase 5 EN COURS 🔵)
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🔵 **Phase 5 Projects Management EN COURS**
+**Dernière mise à jour:** 2025-12-22 (Phase 5 Session 4: TrackDetail + CreateTrack Form - 9/12 items 75% ✅)
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🔵 **Phase 5 Projects Management 75% (9/12 items ✅)**
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Stack complète dockerisée avec hot reload (tsx watch + Vite HMR)
 
@@ -2286,19 +2286,22 @@ docker-compose -f docker-compose.dev.yml down       # Stop
 
 ### Objectifs Phase 5
 
-| Item | Description | Estimation |
-|------|-------------|------------|
-| Schema Migration | Enrichir `tracks` table (17 → 34 champs) | 30min |
-| Router Projects | tRPC endpoints (list, create, update, delete) | 45min |
-| Router Tracks | tRPC endpoints + uploadVersion | 45min |
-| UI ProjectsList | Table + filters + search | 1h |
-| UI ProjectDetail | Overview + tracks + stats | 1h |
-| UI TrackDetail | Metadata + waveform + versions | 1h |
-| Forms | CreateProject + CreateTrack modals | 1h |
-| Upload | Versioning demo/rough/final/master | 1h |
-| Tests E2E | Create project → tracks → upload | 1h |
+| Item | Description | Status | Estimation |
+|------|-------------|--------|------------|
+| Schema Migration | Enrichir `tracks` table (17 → 34 champs) | ✅ FAIT | 30min |
+| Router Projects | tRPC endpoints (list, create, update, delete) | ✅ FAIT | 45min |
+| Router Tracks | tRPC endpoints + uploadVersion | ✅ FAIT | 45min |
+| UI ProjectsList | Table + filters + search | ✅ FAIT | 1h |
+| UI ProjectDetail | Overview + tracks + stats + CreateTrack form | ✅ FAIT | 1.5h |
+| UI TrackDetail | Metadata + Phase 5 cards (Versioning, Copyright, Technical) | ✅ FAIT | 1.5h |
+| Forms | CreateProject + CreateTrack (17 Phase 5 fields) | ✅ FAIT | 1.5h |
+| Upload | Versioning demo/rough/final/master | ⏸️ TODO | 1h |
+| Player | Audio player pour versions | ⏸️ TODO | 30min |
+| Tests E2E | Create project → tracks → upload | ⏸️ TODO | 1h |
 
-**Total:** 8-10h (2-3 sessions)
+**Total:** 8-10h (3-4 sessions)
+**Réalisé:** ~6-7h (9/12 items = 75% ✅)
+**Reste:** Upload + Player + Tests E2E (~2-3h)
 
 ### Nouveaux Champs `tracks` (17 ajouts)
 

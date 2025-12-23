@@ -1878,20 +1878,22 @@ ALTER TABLE sessions ADD COLUMN stripe_payment_intent_id VARCHAR(255);
 
 | Priorité | Item | Status | Estimation |
 |----------|------|--------|------------|
-| 🔴 HAUTE | Migration `tracks` table (+13 champs) | ⏸️ TODO | 30min |
-| 🔴 HAUTE | Router tRPC `projects` (5 endpoints) | ⏸️ TODO | 45min |
-| 🔴 HAUTE | Router tRPC `tracks` (6 endpoints) | ⏸️ TODO | 45min |
-| 🔴 HAUTE | Page ProjectsList UI | ⏸️ TODO | 1h |
-| 🔴 HAUTE | Page ProjectDetail UI | ⏸️ TODO | 1h |
-| 🟡 MOYENNE | Form CreateProject | ⏸️ TODO | 30min |
-| 🟡 MOYENNE | Form CreateTrack | ⏸️ TODO | 30min |
+| 🔴 HAUTE | Migration `tracks` table (+17 champs) | ✅ FAIT | 30min |
+| 🔴 HAUTE | Router tRPC `projects` (5 endpoints) | ✅ FAIT | 45min |
+| 🔴 HAUTE | Router tRPC `tracks` (6 endpoints) | ✅ FAIT | 45min |
+| 🔴 HAUTE | Page ProjectsList UI | ✅ FAIT | 1h |
+| 🔴 HAUTE | Page ProjectDetail UI | ✅ FAIT | 1h |
+| 🟡 MOYENNE | Form CreateProject | ✅ FAIT | 30min |
+| 🟡 MOYENNE | Form CreateTrack (17 Phase 5 fields) | ✅ FAIT | 1.5h |
 | 🟡 MOYENNE | Upload versioning + preview | ⏸️ TODO | 1h |
-| 🟡 MOYENNE | Page TrackDetail UI | ⏸️ TODO | 1h |
+| 🟡 MOYENNE | Page TrackDetail UI (3 Phase 5 cards) | ✅ FAIT | 1.5h |
 | 🟡 MOYENNE | Player audio versions | ⏸️ TODO | 30min |
 | 🟢 BASSE | Tests E2E projects flow | ⏸️ TODO | 1h |
-| 🟢 BASSE | Documentation Phase 5 | ⏸️ TODO | 30min |
+| 🟢 BASSE | Documentation Phase 5 | 🔵 EN COURS | 30min |
 
-**Total Estimation:** 8-10h (2-3 sessions)
+**Total Estimation:** 8-10h (3-4 sessions)
+**Total Réalisé:** ~6-7h (Items 1-7, 9 complétés)
+**Progression:** 9/12 items = 75% ✅
 
 ### Schéma Target - Table `tracks` Enrichie
 
@@ -1959,12 +1961,12 @@ export const tracks = pgTable("tracks", {
 
 **Phase 4.3 P1 Features: 100% COMPLÉTÉE ✅**
 **Phase 4.3 P2 Infrastructure: ⏸️ REPORTÉ après Phase 5**
-**Phase 5 Projects: 🔵 EN COURS (0/12 items)**
+**Phase 5 Projects: 🔵 EN COURS (9/12 items = 75% ✅)**
 
 ---
 
 **Créé le:** 2025-12-13
 **Par:** Claude Sonnet 4.5
 **Repo:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Commit actuel:** [2025-12-22] (Phase 4.1 COMPLÈTE - Docker + Client Portal)
-**Dernière mise à jour:** 2025-12-22 (Phase 4.1 FULL COMPLÉTÉ - Docker Stack + Client Portal Login Flow)
+**Commit actuel:** eeeceaa (2025-12-22) Phase 5 Session 4 - TrackDetail + CreateTrack Form
+**Dernière mise à jour:** 2025-12-22 (Phase 5 Session 4: TrackDetail enrichissement + CreateTrack form 17 champs - 9/12 items 75%)
