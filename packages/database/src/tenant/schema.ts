@@ -272,14 +272,41 @@ export const tracks = pgTable("tracks", {
   // Status
   status: varchar("status", { length: 50 }).notNull().default("recording"), // "recording" | "editing" | "mixing" | "mastering" | "completed"
 
-  // Details
+  // Musical Details
   bpm: integer("bpm"),
   key: varchar("key", { length: 20 }), // Musical key (e.g., "C Major", "Am")
   lyrics: text("lyrics"),
 
-  // Files
+  // Files (Original)
   fileUrl: varchar("file_url", { length: 500 }),
   waveformUrl: varchar("waveform_url", { length: 500 }),
+
+  // ========== VERSIONING (4 champs) - Phase 5 ==========
+  // Different versions of the track through production stages
+  demoUrl: varchar("demo_url", { length: 500 }),
+  roughMixUrl: varchar("rough_mix_url", { length: 500 }),
+  finalMixUrl: varchar("final_mix_url", { length: 500 }),
+  masterUrl: varchar("master_url", { length: 500 }),
+
+  // ========== COPYRIGHT METADATA (8 champs) - Phase 5 ==========
+  // Music industry metadata for distribution and rights management
+  composer: varchar("composer", { length: 300 }), // Who wrote the music
+  lyricist: varchar("lyricist", { length: 300 }), // Who wrote the lyrics
+  copyrightHolder: varchar("copyright_holder", { length: 300 }), // Owner of rights
+  copyrightYear: integer("copyright_year"),
+  genreTags: text("genre_tags"), // JSON array: ["Rock", "Indie", "Alternative"]
+  mood: varchar("mood", { length: 100 }), // "Energetic", "Melancholic", "Upbeat", etc.
+  language: varchar("language", { length: 50 }).default("fr"), // ISO 639-1 code
+  explicitContent: boolean("explicit_content").default(false),
+
+  // ========== TECHNICAL DETAILS (5 champs) - Phase 5 ==========
+  // Production technical information for studio reference
+  patchPreset: text("patch_preset"), // JSON: Synth/instrument settings
+  instrumentsUsed: text("instruments_used"), // JSON array: ["Fender Stratocaster", "Prophet-5"]
+  microphonesUsed: text("microphones_used"), // JSON array: ["Neumann U87", "Shure SM57"]
+  effectsChain: text("effects_chain"), // JSON: {pre: [...], post: [...], master: [...]}
+  dawSessionPath: varchar("daw_session_path", { length: 500 }), // Path to DAW project file
+  recordedInRoomId: integer("recorded_in_room_id").references(() => rooms.id), // Which studio room
 
   // Notes
   notes: text("notes"),
@@ -291,6 +318,45 @@ export const tracks = pgTable("tracks", {
 
 export type Track = typeof tracks.$inferSelect;
 export type InsertTrack = typeof tracks.$inferInsert;
+
+/**
+ * Track Comments table (Tenant DB)
+ * Timestamped comments on track versions for collaboration and feedback
+ */
+export const trackComments = pgTable("track_comments", {
+  id: serial("id").primaryKey(),
+  trackId: integer("track_id").notNull().references(() => tracks.id, { onDelete: "cascade" }),
+
+  // Version-specific comments (demo, rough, final, master)
+  versionType: varchar("version_type", { length: 50 }).notNull(), // "demo" | "roughMix" | "finalMix" | "master"
+
+  // Author (from Master DB users table - for now use client portal user)
+  authorId: integer("author_id").notNull(), // FK to master DB users (or client_id for now)
+  authorName: varchar("author_name", { length: 255 }).notNull(), // Denormalized for performance
+  authorType: varchar("author_type", { length: 50 }).notNull().default("client"), // "client" | "staff" | "admin"
+
+  // Comment content
+  content: text("content").notNull(),
+  timestamp: decimal("timestamp", { precision: 10, scale: 3 }).notNull(), // Time in seconds (e.g., 125.500 = 2:05.5)
+
+  // Thread support (for replies)
+  parentId: integer("parent_id").references((): any => trackComments.id, { onDelete: "cascade" }), // null = root comment
+
+  // Status
+  status: varchar("status", { length: 50 }).notNull().default("open"), // "open" | "resolved" | "archived"
+
+  // Metadata
+  isEdited: boolean("is_edited").notNull().default(false),
+  editedAt: timestamp("edited_at"),
+  resolvedBy: integer("resolved_by"), // User ID who resolved
+  resolvedAt: timestamp("resolved_at"),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type TrackComment = typeof trackComments.$inferSelect;
+export type InsertTrackComment = typeof trackComments.$inferInsert;
 
 /**
  * Musicians table (Tenant DB)

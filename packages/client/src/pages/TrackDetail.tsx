@@ -23,6 +23,9 @@ import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { FileUploadButton } from "@/components/FileUploadButton";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { WaveformPlayer } from "@/components/WaveformPlayer";
+import { TrackComments } from "@/components/TrackComments";
+import type { CommentMarker } from "@/components/WaveformPlayer";
 
 const statusLabels: Record<string, { label: string; variant: any }> = {
   recording: { label: "Enregistrement", variant: "outline" },
@@ -37,6 +40,11 @@ export default function TrackDetail() {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // Comments state
+  const [selectedVersion, setSelectedVersion] = useState<'demo' | 'roughMix' | 'finalMix' | 'master'>('master');
+  const [newCommentTimestamp, setNewCommentTimestamp] = useState<number | null>(null);
+  const [waveformPlayerRef, setWaveformPlayerRef] = useState<any>(null);
 
   // Fetch track data
   const { data: track, isLoading, refetch } = trpc.projects.tracks.get.useQuery(
@@ -838,6 +846,91 @@ export default function TrackDetail() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Waveform & Comments */}
+            {(track.demoUrl || track.roughMixUrl || track.finalMixUrl || track.masterUrl) && (
+              <Card className="col-span-full">
+                <CardHeader>
+                  <CardTitle>Waveform & Commentaires</CardTitle>
+                  <CardDescription>
+                    Écoutez et commentez à des moments précis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Version selector */}
+                  <div className="flex items-center gap-2">
+                    <Label>Version:</Label>
+                    <div className="flex gap-2">
+                      {track.demoUrl && (
+                        <Button
+                          size="sm"
+                          variant={selectedVersion === 'demo' ? 'default' : 'outline'}
+                          onClick={() => setSelectedVersion('demo')}
+                        >
+                          Demo
+                        </Button>
+                      )}
+                      {track.roughMixUrl && (
+                        <Button
+                          size="sm"
+                          variant={selectedVersion === 'roughMix' ? 'default' : 'outline'}
+                          onClick={() => setSelectedVersion('roughMix')}
+                        >
+                          Rough Mix
+                        </Button>
+                      )}
+                      {track.finalMixUrl && (
+                        <Button
+                          size="sm"
+                          variant={selectedVersion === 'finalMix' ? 'default' : 'outline'}
+                          onClick={() => setSelectedVersion('finalMix')}
+                        >
+                          Final Mix
+                        </Button>
+                      )}
+                      {track.masterUrl && (
+                        <Button
+                          size="sm"
+                          variant={selectedVersion === 'master' ? 'default' : 'outline'}
+                          onClick={() => setSelectedVersion('master')}
+                        >
+                          Master
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Waveform Player */}
+                  {(() => {
+                    const versionUrls = {
+                      demo: track.demoUrl,
+                      roughMix: track.roughMixUrl,
+                      finalMix: track.finalMixUrl,
+                      master: track.masterUrl,
+                    };
+                    const currentUrl = versionUrls[selectedVersion];
+
+                    if (!currentUrl) return null;
+
+                    return (
+                      <WaveformPlayer
+                        src={currentUrl}
+                        title={`${track.title} - ${selectedVersion}`}
+                        onAddCommentAtTime={setNewCommentTimestamp}
+                        showComments
+                      />
+                    );
+                  })()}
+
+                  {/* Comments section */}
+                  <TrackComments
+                    trackId={track.id}
+                    versionType={selectedVersion}
+                    newCommentTimestamp={newCommentTimestamp}
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {/* Quick Actions */}
             <Card>

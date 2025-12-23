@@ -41,7 +41,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 
-type ProjectStatus = "planning" | "in_progress" | "mixing" | "mastering" | "completed" | "cancelled";
+type ProjectStatus = "pre_production" | "recording" | "editing" | "mixing" | "mastering" | "completed" | "delivered" | "archived";
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -135,12 +135,14 @@ export default function Projects() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="planning">Planification</SelectItem>
-                  <SelectItem value="in_progress">En cours</SelectItem>
+                  <SelectItem value="pre_production">Pré-production</SelectItem>
+                  <SelectItem value="recording">Enregistrement</SelectItem>
+                  <SelectItem value="editing">Édition</SelectItem>
                   <SelectItem value="mixing">Mixage</SelectItem>
                   <SelectItem value="mastering">Mastering</SelectItem>
                   <SelectItem value="completed">Terminé</SelectItem>
-                  <SelectItem value="cancelled">Annulé</SelectItem>
+                  <SelectItem value="delivered">Livré</SelectItem>
+                  <SelectItem value="archived">Archivé</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -291,7 +293,7 @@ function CreateProjectDialog({
     artist: "",
     genre: "",
     description: "",
-    status: "planning" as ProjectStatus,
+    status: "pre_production" as ProjectStatus,
     startDate: "",
     budget: "",
   });
@@ -383,10 +385,14 @@ function CreateProjectDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="planning">Planification</SelectItem>
-                  <SelectItem value="in_progress">En cours</SelectItem>
+                  <SelectItem value="pre_production">Pré-production</SelectItem>
+                  <SelectItem value="recording">Enregistrement</SelectItem>
+                  <SelectItem value="editing">Édition</SelectItem>
                   <SelectItem value="mixing">Mixage</SelectItem>
                   <SelectItem value="mastering">Mastering</SelectItem>
+                  <SelectItem value="completed">Terminé</SelectItem>
+                  <SelectItem value="delivered">Livré</SelectItem>
+                  <SelectItem value="archived">Archivé</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -700,12 +706,14 @@ function ProjectDetailsDialog({
 // Helper pour obtenir le badge de statut
 function getStatusBadge(status: ProjectStatus) {
   const config: Record<ProjectStatus, { variant: "default" | "secondary" | "destructive" | "outline", label: string, icon: any }> = {
-    planning: { variant: "outline", label: "Planification", icon: Clock },
-    in_progress: { variant: "default", label: "En cours", icon: Music },
+    pre_production: { variant: "outline", label: "Pré-production", icon: Clock },
+    recording: { variant: "default", label: "Enregistrement", icon: Music },
+    editing: { variant: "default", label: "Édition", icon: Music },
     mixing: { variant: "secondary", label: "Mixage", icon: Music },
     mastering: { variant: "secondary", label: "Mastering", icon: Music },
     completed: { variant: "default", label: "Terminé", icon: CheckCircle2 },
-    cancelled: { variant: "destructive", label: "Annulé", icon: XCircle },
+    delivered: { variant: "default", label: "Livré", icon: CheckCircle2 },
+    archived: { variant: "outline", label: "Archivé", icon: XCircle },
   };
 
   const { variant, label, icon: Icon } = config[status];

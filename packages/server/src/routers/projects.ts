@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
-import { projects, tracks } from "@rsm/database/tenant/schema";
-import { eq, and } from "drizzle-orm";
+import { projects, tracks, trackComments } from "@rsm/database/tenant/schema";
+import { eq, and, desc } from "drizzle-orm";
 
 /**
  * Projects Router
@@ -368,6 +368,211 @@ export const projectsRouter = router({
         }
 
         await ctx.tenantDb.delete(tracks).where(eq(tracks.id, input.id));
+
+        return { success: true };
+      }),
+  }),
+
+  /**
+   * Track Comments Sub-router
+   * Timestamped comments on track versions for collaboration
+   */
+  trackComments: router({
+    /**
+     * List comments for a track version
+     */
+    list: protectedProcedure
+      .input(
+        z.object({
+          trackId: z.number(),
+          versionType: z.enum(["demo", "roughMix", "finalMix", "master"]).optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const whereCondition = input.versionType
+          ? and(eq(trackComments.trackId, input.trackId), eq(trackComments.versionType, input.versionType))
+          : eq(trackComments.trackId, input.trackId);
+
+        const comments = await ctx.tenantDb
+          .select()
+          .from(trackComments)
+          .where(whereCondition)
+          .orderBy(trackComments.timestamp, desc(trackComments.createdAt));
+
+        return comments;
+      }),
+
+    /**
+     * Get single comment by ID
+     */
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const comment = await ctx.tenantDb
+          .select()
+          .from(trackComments)
+          .where(eq(trackComments.id, input.id))
+          .limit(1);
+
+        if (comment.length === 0) {
+          throw new Error("Comment not found");
+        }
+
+        return comment[0];
+      }),
+
+    /**
+     * Create new comment
+     */
+    create: protectedProcedure
+      .input(
+        z.object({
+          trackId: z.number(),
+          versionType: z.enum(["demo", "roughMix", "finalMix", "master"]),
+          content: z.string().min(1).max(5000),
+          timestamp: z.number().min(0), // Time in seconds (e.g., 125.5)
+          parentId: z.number().optional(), // For threaded replies
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        // Get author info from session
+        const authorId = ctx.session?.userId || ctx.session?.clientId || 0;
+        const authorName = ctx.session?.userName || ctx.session?.clientName || "Anonymous";
+        const authorType = ctx.session?.userId ? "staff" : "client";
+
+        const newComment = await ctx.tenantDb
+          .insert(trackComments)
+          .values({
+            trackId: input.trackId,
+            versionType: input.versionType,
+            content: input.content,
+            timestamp: input.timestamp.toString(),
+            parentId: input.parentId,
+            authorId,
+            authorName,
+            authorType,
+          } as any)
+          .returning();
+
+        return newComment[0];
+      }),
+
+    /**
+     * Update comment (edit content)
+     */
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          content: z.string().min(1).max(5000),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const { id, content } = input;
+
+        const updated = await ctx.tenantDb
+          .update(trackComments)
+          .set({
+            content,
+            isEdited: true,
+            editedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(trackComments.id, id))
+          .returning();
+
+        if (updated.length === 0) {
+          throw new Error("Comment not found");
+        }
+
+        return updated[0];
+      }),
+
+    /**
+     * Resolve comment (mark as resolved)
+     */
+    resolve: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const resolvedBy = ctx.session?.userId || ctx.session?.clientId || 0;
+
+        const updated = await ctx.tenantDb
+          .update(trackComments)
+          .set({
+            status: "resolved",
+            resolvedBy,
+            resolvedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(trackComments.id, input.id))
+          .returning();
+
+        if (updated.length === 0) {
+          throw new Error("Comment not found");
+        }
+
+        return updated[0];
+      }),
+
+    /**
+     * Reopen comment (unmark as resolved)
+     */
+    reopen: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const updated = await ctx.tenantDb
+          .update(trackComments)
+          .set({
+            status: "open",
+            resolvedBy: null,
+            resolvedAt: null,
+            updatedAt: new Date(),
+          })
+          .where(eq(trackComments.id, input.id))
+          .returning();
+
+        if (updated.length === 0) {
+          throw new Error("Comment not found");
+        }
+
+        return updated[0];
+      }),
+
+    /**
+     * Delete comment
+     */
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        await ctx.tenantDb.delete(trackComments).where(eq(trackComments.id, input.id));
 
         return { success: true };
       }),
