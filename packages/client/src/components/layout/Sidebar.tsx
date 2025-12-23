@@ -171,6 +171,11 @@ const navSections: NavSection[] = [
         icon: <FolderOpen className="h-5 w-5" />,
       },
       {
+        title: "Tracks",
+        href: "/tracks",
+        icon: <Music className="h-5 w-5" />,
+      },
+      {
         title: "Fichiers Audio",
         href: "/audio-files",
         icon: <Music className="h-5 w-5" />,
