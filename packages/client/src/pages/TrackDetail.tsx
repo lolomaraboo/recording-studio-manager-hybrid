@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Music, Edit, Trash2, Save, X, Clock, Hash } from "lucide-react";
+import { ArrowLeft, Music, Edit, Trash2, Save, X, Clock, Hash, Download, FileAudio, Copyright, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -386,6 +386,256 @@ export default function TrackDetail() {
                     />
                   ) : (
                     <p className="text-sm whitespace-pre-wrap">{track.notes || "Aucune note"}</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Versioning Card - Phase 5 */}
+            {(track.demoUrl || track.roughMixUrl || track.finalMixUrl || track.masterUrl) && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <FileAudio className="h-5 w-5" />
+                    <CardTitle>Versioning</CardTitle>
+                  </div>
+                  <CardDescription>Différentes versions de la piste durant la production</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {track.demoUrl && (
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
+                      <div>
+                        <p className="text-sm font-medium">Demo</p>
+                        <p className="text-xs text-muted-foreground">Version démo initiale</p>
+                      </div>
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={track.demoUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {track.roughMixUrl && (
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
+                      <div>
+                        <p className="text-sm font-medium">Rough Mix</p>
+                        <p className="text-xs text-muted-foreground">Mixage brut</p>
+                      </div>
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={track.roughMixUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {track.finalMixUrl && (
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
+                      <div>
+                        <p className="text-sm font-medium">Final Mix</p>
+                        <p className="text-xs text-muted-foreground">Mixage final</p>
+                      </div>
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={track.finalMixUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {track.masterUrl && (
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-900">
+                      <div>
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100">Master</p>
+                        <p className="text-xs text-green-700 dark:text-green-300">Version masterisée finale</p>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-green-300 dark:border-green-800" asChild>
+                        <a href={track.masterUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Copyright Metadata Card - Phase 5 */}
+            {(track.composer || track.lyricist || track.copyrightHolder || track.copyrightYear || track.genreTags || track.mood || track.language || track.explicitContent) && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Copyright className="h-5 w-5" />
+                    <CardTitle>Copyright & Métadonnées</CardTitle>
+                  </div>
+                  <CardDescription>Informations pour la distribution et gestion des droits</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {track.composer && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Compositeur</p>
+                        <p className="text-sm font-medium">{track.composer}</p>
+                      </div>
+                    )}
+
+                    {track.lyricist && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Parolier</p>
+                        <p className="text-sm font-medium">{track.lyricist}</p>
+                      </div>
+                    )}
+
+                    {track.copyrightHolder && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Détenteur des droits</p>
+                        <p className="text-sm font-medium">{track.copyrightHolder}</p>
+                      </div>
+                    )}
+
+                    {track.copyrightYear && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Année copyright</p>
+                        <p className="text-sm font-medium">© {track.copyrightYear}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {track.genreTags && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Genres</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(() => {
+                          try {
+                            const genres = JSON.parse(track.genreTags);
+                            return genres.map((genre: string, i: number) => (
+                              <Badge key={i} variant="secondary">{genre}</Badge>
+                            ));
+                          } catch {
+                            return <span className="text-sm">{track.genreTags}</span>;
+                          }
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {track.mood && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Ambiance</p>
+                        <Badge variant="outline">{track.mood}</Badge>
+                      </div>
+                    )}
+
+                    {track.language && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Langue</p>
+                        <Badge variant="outline">{track.language.toUpperCase()}</Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  {track.explicitContent && (
+                    <div className="flex items-center gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900">
+                      <Badge variant="destructive">Explicit</Badge>
+                      <p className="text-xs text-red-700 dark:text-red-300">Contenu explicite</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Technical Details Card - Phase 5 */}
+            {(track.patchPreset || track.instrumentsUsed || track.microphonesUsed || track.effectsChain || track.dawSessionPath) && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Wrench className="h-5 w-5" />
+                    <CardTitle>Détails Techniques</CardTitle>
+                  </div>
+                  <CardDescription>Informations de production pour référence studio</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {track.instrumentsUsed && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Instruments utilisés</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(() => {
+                          try {
+                            const instruments = JSON.parse(track.instrumentsUsed);
+                            return instruments.map((instrument: string, i: number) => (
+                              <Badge key={i} variant="outline">{instrument}</Badge>
+                            ));
+                          } catch {
+                            return <span className="text-sm">{track.instrumentsUsed}</span>;
+                          }
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {track.microphonesUsed && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Microphones utilisés</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(() => {
+                          try {
+                            const microphones = JSON.parse(track.microphonesUsed);
+                            return microphones.map((mic: string, i: number) => (
+                              <Badge key={i} variant="outline">{mic}</Badge>
+                            ));
+                          } catch {
+                            return <span className="text-sm">{track.microphonesUsed}</span>;
+                          }
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {track.patchPreset && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Patch/Preset</p>
+                      <div className="p-3 bg-muted rounded-md">
+                        <pre className="text-xs overflow-x-auto">
+                          {(() => {
+                            try {
+                              return JSON.stringify(JSON.parse(track.patchPreset), null, 2);
+                            } catch {
+                              return track.patchPreset;
+                            }
+                          })()}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {track.effectsChain && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Chaîne d'effets</p>
+                      <div className="p-3 bg-muted rounded-md">
+                        <pre className="text-xs overflow-x-auto">
+                          {(() => {
+                            try {
+                              return JSON.stringify(JSON.parse(track.effectsChain), null, 2);
+                            } catch {
+                              return track.effectsChain;
+                            }
+                          })()}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {track.dawSessionPath && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Session DAW</p>
+                      <p className="text-xs font-mono bg-muted p-2 rounded-md break-all">{track.dawSessionPath}</p>
+                    </div>
                   )}
                 </CardContent>
               </Card>

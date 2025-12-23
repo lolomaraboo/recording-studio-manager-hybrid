@@ -67,6 +67,7 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showCreateTrackDialog, setShowCreateTrackDialog] = useState(false);
 
   // Fetch project data with tracks
   const { data: project, isLoading, refetch } = trpc.projects.get.useQuery(
@@ -99,6 +100,46 @@ export default function ProjectDetail() {
     },
   });
 
+  const createTrackMutation = trpc.projects.tracks.create.useMutation({
+    onSuccess: () => {
+      toast.success("Piste créée");
+      setShowCreateTrackDialog(false);
+      setTrackFormData({
+        title: "",
+        trackNumber: (project?.tracks?.length || 0) + 1,
+        duration: 0,
+        isrc: "",
+        status: "recording",
+        bpm: undefined,
+        key: "",
+        lyrics: "",
+        demoUrl: "",
+        roughMixUrl: "",
+        finalMixUrl: "",
+        masterUrl: "",
+        composer: "",
+        lyricist: "",
+        copyrightHolder: "",
+        copyrightYear: undefined,
+        genreTags: "",
+        mood: "",
+        language: "fr",
+        explicitContent: false,
+        patchPreset: "",
+        instrumentsUsed: "",
+        microphonesUsed: "",
+        effectsChain: "",
+        dawSessionPath: "",
+        notes: "",
+        technicalNotes: "",
+      });
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
   // Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -121,6 +162,40 @@ export default function ProjectDetail() {
     totalCost: "",
     label: "",
     notes: "",
+  });
+
+  // Track form state
+  const [trackFormData, setTrackFormData] = useState({
+    title: "",
+    trackNumber: 1,
+    duration: 0,
+    isrc: "",
+    status: "recording" as "recording" | "editing" | "mixing" | "mastering" | "completed",
+    bpm: undefined as number | undefined,
+    key: "",
+    lyrics: "",
+    // Versioning (4 fields)
+    demoUrl: "",
+    roughMixUrl: "",
+    finalMixUrl: "",
+    masterUrl: "",
+    // Copyright Metadata (8 fields)
+    composer: "",
+    lyricist: "",
+    copyrightHolder: "",
+    copyrightYear: undefined as number | undefined,
+    genreTags: "", // JSON array as string
+    mood: "",
+    language: "fr",
+    explicitContent: false,
+    // Technical Details (5 fields)
+    patchPreset: "", // JSON as string
+    instrumentsUsed: "", // JSON array as string
+    microphonesUsed: "", // JSON array as string
+    effectsChain: "", // JSON as string
+    dawSessionPath: "",
+    notes: "",
+    technicalNotes: "",
   });
 
   // Update form when project loads
@@ -162,6 +237,16 @@ export default function ProjectDetail() {
 
   const handleDelete = () => {
     deleteMutation.mutate({ id: Number(id) });
+  };
+
+  const handleCreateTrack = () => {
+    createTrackMutation.mutate({
+      projectId: Number(id),
+      ...trackFormData,
+      duration: trackFormData.duration || undefined,
+      bpm: trackFormData.bpm || undefined,
+      copyrightYear: trackFormData.copyrightYear || undefined,
+    });
   };
 
   const client = clients?.find((c) => c.id === project?.clientId);
@@ -494,7 +579,13 @@ export default function ProjectDetail() {
                       {project.tracks?.length || 0} piste(s) dans ce projet
                     </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => {
+                    setTrackFormData({
+                      ...trackFormData,
+                      trackNumber: (project.tracks?.length || 0) + 1,
+                    });
+                    setShowCreateTrackDialog(true);
+                  }}>
                     <Plus className="mr-2 h-4 w-4" />
                     Ajouter une piste
                   </Button>
@@ -666,6 +757,316 @@ export default function ProjectDetail() {
           </div>
         </div>
       </main>
+
+      {/* Create Track Dialog */}
+      <Dialog open={showCreateTrackDialog} onOpenChange={setShowCreateTrackDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Ajouter une piste</DialogTitle>
+            <DialogDescription>
+              Créer une nouvelle piste dans le projet {project?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Basic Info */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold">Informations de base</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="track-title">Titre *</Label>
+                  <Input
+                    id="track-title"
+                    value={trackFormData.title}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, title: e.target.value })}
+                    placeholder="Nom de la piste"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-number">Numéro de piste</Label>
+                  <Input
+                    id="track-number"
+                    type="number"
+                    min="1"
+                    value={trackFormData.trackNumber}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, trackNumber: parseInt(e.target.value) || 1 })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-duration">Durée (secondes)</Label>
+                  <Input
+                    id="track-duration"
+                    type="number"
+                    min="0"
+                    value={trackFormData.duration}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, duration: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-isrc">ISRC</Label>
+                  <Input
+                    id="track-isrc"
+                    value={trackFormData.isrc}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, isrc: e.target.value })}
+                    placeholder="Code ISRC"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-bpm">BPM</Label>
+                  <Input
+                    id="track-bpm"
+                    type="number"
+                    min="1"
+                    max="300"
+                    value={trackFormData.bpm || ""}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, bpm: e.target.value ? parseInt(e.target.value) : undefined })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-key">Tonalité</Label>
+                  <Input
+                    id="track-key"
+                    value={trackFormData.key}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, key: e.target.value })}
+                    placeholder="C, Am, F#..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Versioning URLs */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold">Versioning (URLs de fichiers)</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="track-demo-url">Demo URL</Label>
+                  <Input
+                    id="track-demo-url"
+                    value={trackFormData.demoUrl}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, demoUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-rough-mix-url">Rough Mix URL</Label>
+                  <Input
+                    id="track-rough-mix-url"
+                    value={trackFormData.roughMixUrl}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, roughMixUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-final-mix-url">Final Mix URL</Label>
+                  <Input
+                    id="track-final-mix-url"
+                    value={trackFormData.finalMixUrl}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, finalMixUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-master-url">Master URL</Label>
+                  <Input
+                    id="track-master-url"
+                    value={trackFormData.masterUrl}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, masterUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Copyright Metadata */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold">Copyright & Métadonnées</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="track-composer">Compositeur</Label>
+                  <Input
+                    id="track-composer"
+                    value={trackFormData.composer}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, composer: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-lyricist">Parolier</Label>
+                  <Input
+                    id="track-lyricist"
+                    value={trackFormData.lyricist}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, lyricist: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-copyright-holder">Détenteur des droits</Label>
+                  <Input
+                    id="track-copyright-holder"
+                    value={trackFormData.copyrightHolder}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, copyrightHolder: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-copyright-year">Année copyright</Label>
+                  <Input
+                    id="track-copyright-year"
+                    type="number"
+                    min="1900"
+                    max="2100"
+                    value={trackFormData.copyrightYear || ""}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, copyrightYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                    placeholder="2025"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-genre-tags">Genres (JSON array)</Label>
+                  <Input
+                    id="track-genre-tags"
+                    value={trackFormData.genreTags}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, genreTags: e.target.value })}
+                    placeholder='["Rock", "Indie"]'
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-mood">Ambiance</Label>
+                  <Input
+                    id="track-mood"
+                    value={trackFormData.mood}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, mood: e.target.value })}
+                    placeholder="Energetic, Melancholic..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-language">Langue (ISO 639-1)</Label>
+                  <Input
+                    id="track-language"
+                    value={trackFormData.language}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, language: e.target.value })}
+                    placeholder="fr, en, es..."
+                    maxLength={2}
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2 pt-6">
+                  <input
+                    type="checkbox"
+                    id="track-explicit-content"
+                    checked={trackFormData.explicitContent}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, explicitContent: e.target.checked })}
+                    className="rounded border-gray-300"
+                  />
+                  <Label htmlFor="track-explicit-content">Contenu explicite</Label>
+                </div>
+              </div>
+            </div>
+
+            {/* Technical Details */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold">Détails Techniques</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="track-instruments-used">Instruments utilisés (JSON array)</Label>
+                  <Input
+                    id="track-instruments-used"
+                    value={trackFormData.instrumentsUsed}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, instrumentsUsed: e.target.value })}
+                    placeholder='["Fender Stratocaster", "Prophet-5"]'
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="track-microphones-used">Microphones utilisés (JSON array)</Label>
+                  <Input
+                    id="track-microphones-used"
+                    value={trackFormData.microphonesUsed}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, microphonesUsed: e.target.value })}
+                    placeholder='["Neumann U87", "Shure SM57"]'
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="track-daw-session-path">Chemin de session DAW</Label>
+                  <Input
+                    id="track-daw-session-path"
+                    value={trackFormData.dawSessionPath}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, dawSessionPath: e.target.value })}
+                    placeholder="/path/to/project.als"
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="track-patch-preset">Patch/Preset (JSON)</Label>
+                  <Textarea
+                    id="track-patch-preset"
+                    value={trackFormData.patchPreset}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, patchPreset: e.target.value })}
+                    placeholder='{"synth": "Prophet-5", "patch": "Brass Lead"}'
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="track-effects-chain">Chaîne d'effets (JSON)</Label>
+                  <Textarea
+                    id="track-effects-chain"
+                    value={trackFormData.effectsChain}
+                    onChange={(e) => setTrackFormData({ ...trackFormData, effectsChain: e.target.value })}
+                    placeholder='{"pre": ["Comp"], "post": ["Reverb"], "master": []}'
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold">Notes</h3>
+              <div className="space-y-2">
+                <Label htmlFor="track-notes">Notes générales</Label>
+                <Textarea
+                  id="track-notes"
+                  value={trackFormData.notes}
+                  onChange={(e) => setTrackFormData({ ...trackFormData, notes: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="track-technical-notes">Notes techniques</Label>
+                <Textarea
+                  id="track-technical-notes"
+                  value={trackFormData.technicalNotes}
+                  onChange={(e) => setTrackFormData({ ...trackFormData, technicalNotes: e.target.value })}
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateTrackDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleCreateTrack} disabled={createTrackMutation.isPending || !trackFormData.title}>
+              <Plus className="mr-2 h-4 w-4" />
+              Créer la piste
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
