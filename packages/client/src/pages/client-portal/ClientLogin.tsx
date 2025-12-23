@@ -34,6 +34,7 @@ export default function ClientLogin() {
 
   // tRPC mutations
   const loginMutation = trpc.clientPortalAuth.login.useMutation();
+  const requestMagicLinkMutation = trpc.clientPortalAuth.requestMagicLink.useMutation();
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,11 +65,8 @@ export default function ClientLogin() {
     setIsLoading(true);
 
     try {
-      // TODO: Call API - trpc.clientPortalAuth.requestMagicLink.mutate({ email: magicEmail })
-      console.log('Magic link request:', { email: magicEmail });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await requestMagicLinkMutation.mutateAsync({ email: magicEmail });
+      console.log('Magic link request:', result);
 
       setMagicLinkSent(true);
       toast.success('Magic link sent! Check your email.');

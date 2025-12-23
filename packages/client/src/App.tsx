@@ -50,6 +50,7 @@ import ClientDashboard from './pages/client-portal/ClientDashboard';
 import Bookings from './pages/client-portal/Bookings';
 import BookingDetail from './pages/client-portal/BookingDetail';
 import Profile from './pages/client-portal/Profile';
+import MagicLinkVerify from './pages/auth/MagicLinkVerify';
 import {
   ClientPortalAuthProvider,
   ProtectedClientRoute,
@@ -66,6 +67,7 @@ function App() {
 
           {/* Client Portal - Public routes */}
           <Route path="/client-portal/login" element={<ClientLogin />} />
+          <Route path="/auth/magic-link" element={<MagicLinkVerify />} />
 
           {/* Client Portal - Protected routes */}
           <Route

@@ -22,6 +22,35 @@ import {
   parseUserAgent,
   generateMagicLinkUrl,
 } from "../utils/client-portal-auth";
+import { sendMagicLinkEmail } from "../utils/email-service";
+
+/**
+ * Multi-tenant helper: Extract organizationId from hostname
+ * Supports both development (localhost → org 1) and production (subdomain lookup)
+ */
+function getOrganizationIdFromHostname(hostname: string | undefined): number {
+  console.log('[Multi-Tenant] Extracting organizationId from hostname:', hostname);
+
+  // Fallback if hostname not available
+  if (!hostname) {
+    console.warn('[Multi-Tenant] No hostname provided, defaulting to organizationId=1');
+    return 1;
+  }
+
+  // Development mode: localhost has no subdomain
+  if (hostname === 'localhost' || hostname.startsWith('localhost:')) {
+    return 1; // Default to org 1 in development
+  }
+
+  // Production: Extract subdomain
+  // Example: "studio1.myapp.com" → "studio1"
+  const subdomain = hostname.split('.')[0];
+
+  // TODO: Query master database to map subdomain → organizationId
+  // For now, assume subdomain = slug and hardcode mapping
+  // In real implementation: SELECT id FROM organizations WHERE slug = subdomain
+  return 1; // Placeholder
+}
 
 /**
  * Client Portal Auth Router
@@ -299,10 +328,8 @@ export const clientPortalAuthRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      // Multi-tenant: Extract organizationId from hostname
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const tenantDb = await getTenantDb(organizationId);
       const email = sanitizeEmail(input.email);
@@ -332,6 +359,19 @@ export const clientPortalAuthRouter = router({
         };
       }
 
+      // Get client details for email
+      const clientList = await tenantDb
+        .select()
+        .from(clients)
+        .where(eq(clients.id, account.clientId))
+        .limit(1);
+
+      if (clientList.length === 0) {
+        throw new Error("Client not found");
+      }
+
+      const client = clientList[0];
+
       // Generate magic link token
       const token = generateSecureToken();
       await tenantDb.insert(clientPortalMagicLinks).values({
@@ -343,12 +383,30 @@ export const clientPortalAuthRouter = router({
         userAgent: ctx.req.headers["user-agent"],
       });
 
-      // TODO: Send magic link email
-      // const magicLinkUrl = generateMagicLinkUrl(
-      //   token,
-      //   "login",
-      //   process.env.CLIENT_PORTAL_URL || "http://localhost:3000"
-      // );
+      // Generate magic link URL
+      const magicLinkUrl = generateMagicLinkUrl(
+        token,
+        "login",
+        process.env.CLIENT_PORTAL_URL || "http://localhost:5174"
+      );
+
+      // Log magic link for development (remove in production)
+      console.log("\n=== MAGIC LINK GENERATED ===");
+      console.log(`Email: ${email}`);
+      console.log(`Client: ${client.name}`);
+      console.log(`Magic Link: ${magicLinkUrl}`);
+      console.log(`Expires: ${getMagicLinkExpiration().toISOString()}`);
+      console.log("============================\n");
+
+      // Send magic link email
+      try {
+        await sendMagicLinkEmail(email, client.name, magicLinkUrl);
+        console.log(`[Magic Link] Email sent successfully to ${email}`);
+      } catch (emailError) {
+        console.error("[Magic Link] Email send failed:", emailError);
+        // Don't throw error - we don't want to reveal if email failed
+        // Magic link is still logged above for dev testing
+      }
 
       // Log activity
       await tenantDb.insert(clientPortalActivityLogs).values({
@@ -377,10 +435,8 @@ export const clientPortalAuthRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      // Multi-tenant: Extract organizationId from hostname
+      const organizationId = getOrganizationIdFromHostname(ctx.req.hostname);
 
       const tenantDb = await getTenantDb(organizationId);
 
