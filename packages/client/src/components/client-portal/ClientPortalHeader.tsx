@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,8 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { User, LogOut, Menu } from 'lucide-react';
 import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
+import { useClientPortalBreadcrumbs } from '@/hooks/useClientPortalBreadcrumbs';
 import { toast } from 'sonner';
 
 interface ClientPortalHeaderProps {
@@ -22,7 +32,7 @@ interface ClientPortalHeaderProps {
  *
  * Simplified header for client portal with:
  * - Mobile menu toggle button
- * - Page title (optional)
+ * - Breadcrumb navigation
  * - User menu with profile and logout
  *
  * Navigation is now in ClientPortalSidebar
@@ -30,6 +40,7 @@ interface ClientPortalHeaderProps {
 export function ClientPortalHeader({ onMobileMenuToggle }: ClientPortalHeaderProps) {
   const navigate = useNavigate();
   const { client, logout } = useClientPortalAuth();
+  const breadcrumbs = useClientPortalBreadcrumbs();
 
   const handleLogout = () => {
     logout();
@@ -57,9 +68,30 @@ export function ClientPortalHeader({ onMobileMenuToggle }: ClientPortalHeaderPro
             <Menu className="h-5 w-5" />
           </Button>
 
-          {/* Page title placeholder - can be dynamically set per page */}
-          <div className="flex-1">
-            {/* Empty for now - pages can add their own title here */}
+          {/* Breadcrumb Navigation */}
+          <div className="flex-1 px-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbs.map((breadcrumb, index) => (
+                  <React.Fragment key={breadcrumb.href}>
+                    <BreadcrumbItem>
+                      {index === breadcrumbs.length - 1 ? (
+                        <BreadcrumbPage className="flex items-center gap-2">
+                          {breadcrumb.icon}
+                          <span className="hidden sm:inline">{breadcrumb.label}</span>
+                        </BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink to={breadcrumb.href} className="flex items-center gap-2">
+                          {breadcrumb.icon}
+                          <span className="hidden sm:inline">{breadcrumb.label}</span>
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                    {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
 
           {/* User Menu */}
