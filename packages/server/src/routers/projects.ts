@@ -447,10 +447,10 @@ export const projectsRouter = router({
           throw new Error("Tenant database not available");
         }
 
-        // Get author info from session
-        const authorId = ctx.session?.userId || ctx.session?.clientId || 0;
-        const authorName = ctx.session?.userName || ctx.session?.clientName || "Anonymous";
-        const authorType = ctx.session?.userId ? "staff" : "client";
+        // Get author info from user context
+        const authorId = ctx.user?.id || 0;
+        const authorName = ctx.user?.name || "Anonymous";
+        const authorType = "staff"; // protectedProcedure is for staff users
 
         const newComment = await ctx.tenantDb
           .insert(trackComments)
@@ -514,7 +514,7 @@ export const projectsRouter = router({
           throw new Error("Tenant database not available");
         }
 
-        const resolvedBy = ctx.session?.userId || ctx.session?.clientId || 0;
+        const resolvedBy = ctx.user?.id || 0;
 
         const updated = await ctx.tenantDb
           .update(trackComments)
