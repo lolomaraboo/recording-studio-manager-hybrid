@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-22 (Phase 5 Session 4: TrackDetail + CreateTrack Form - 9/12 items 75% ✅)
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🔵 **Phase 5 Projects Management 75% (9/12 items ✅)**
+**Dernière mise à jour:** 2025-12-23 (Phase 5 Sessions 5-6: Upload + Audio Player - 11/12 items 92% ✅)
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🎉 **Phase 5 Projects Management 92% (11/12 items ✅)**
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Stack complète dockerisée avec hot reload (tsx watch + Vite HMR)
 
@@ -2295,13 +2295,13 @@ docker-compose -f docker-compose.dev.yml down       # Stop
 | UI ProjectDetail | Overview + tracks + stats + CreateTrack form | ✅ FAIT | 1.5h |
 | UI TrackDetail | Metadata + Phase 5 cards (Versioning, Copyright, Technical) | ✅ FAIT | 1.5h |
 | Forms | CreateProject + CreateTrack (17 Phase 5 fields) | ✅ FAIT | 1.5h |
-| Upload | Versioning demo/rough/final/master | ⏸️ TODO | 1h |
-| Player | Audio player pour versions | ⏸️ TODO | 30min |
-| Tests E2E | Create project → tracks → upload | ⏸️ TODO | 1h |
+| Upload | Versioning demo/rough/final/master + Cloudinary | ✅ FAIT | 2h |
+| Player | Audio player HTML5 custom (2 modes) | ✅ FAIT | 1.5h |
+| Tests E2E | Create project → tracks → upload | ⏸️ TODO (optionnel) | 1h |
 
 **Total:** 8-10h (3-4 sessions)
-**Réalisé:** ~6-7h (9/12 items = 75% ✅)
-**Reste:** Upload + Player + Tests E2E (~2-3h)
+**Réalisé:** ~11h (11/12 items = 92% ✅ - 6 sessions)
+**Reste:** Tests E2E optionnels (~1h)
 
 ### Nouveaux Champs `tracks` (17 ajouts)
 

@@ -1885,15 +1885,15 @@ ALTER TABLE sessions ADD COLUMN stripe_payment_intent_id VARCHAR(255);
 | 🔴 HAUTE | Page ProjectDetail UI | ✅ FAIT | 1h |
 | 🟡 MOYENNE | Form CreateProject | ✅ FAIT | 30min |
 | 🟡 MOYENNE | Form CreateTrack (17 Phase 5 fields) | ✅ FAIT | 1.5h |
-| 🟡 MOYENNE | Upload versioning + preview | ⏸️ TODO | 1h |
+| 🟡 MOYENNE | Upload versioning + preview | ✅ FAIT | 2h |
 | 🟡 MOYENNE | Page TrackDetail UI (3 Phase 5 cards) | ✅ FAIT | 1.5h |
-| 🟡 MOYENNE | Player audio versions | ⏸️ TODO | 30min |
+| 🟡 MOYENNE | Player audio versions | ✅ FAIT | 1.5h |
 | 🟢 BASSE | Tests E2E projects flow | ⏸️ TODO | 1h |
-| 🟢 BASSE | Documentation Phase 5 | 🔵 EN COURS | 30min |
+| 🟢 BASSE | Documentation Phase 5 | ✅ FAIT | 30min |
 
 **Total Estimation:** 8-10h (3-4 sessions)
-**Total Réalisé:** ~6-7h (Items 1-7, 9 complétés)
-**Progression:** 9/12 items = 75% ✅
+**Total Réalisé:** ~11h (Items 1-10, 12 complétés - 6 sessions)
+**Progression:** 11/12 items = 92% ✅
 
 ### Schéma Target - Table `tracks` Enrichie
 
@@ -1959,14 +1959,70 @@ export const tracks = pgTable("tracks", {
 
 ---
 
+### Session 5 (2h) - Upload Versioning (2025-12-23)
+
+**Accomplissements:**
+- ✅ Service Cloudinary pour upload audio (cloudinary-service.ts, +102 lignes)
+- ✅ Endpoint Express `/api/upload/audio` avec multer (upload.ts, +140 lignes)
+- ✅ Mutation tRPC `updateVersionUrl` pour mettre à jour URLs (projects.ts, +39 lignes)
+- ✅ Composant FileUploadButton avec progress tracking (FileUploadButton.tsx, +187 lignes)
+- ✅ Intégration upload dans ProjectDetail form (CreateTrack, +48 lignes)
+- ✅ Intégration upload dans TrackDetail Versioning Card (+146 lignes)
+
+**Technologies:**
+- Cloudinary (cloud storage gratuit 25GB)
+- Multer (multipart/form-data parsing)
+- XMLHttpRequest (upload progress events)
+
+**Fonctionnalités:**
+- Upload progress bar 0-100%
+- File validation (audio/* only, max 100MB)
+- Toast notifications success/error
+- Replace file button
+- Auto-organize: `tracks/{trackId}/{versionType}/`
+
+**Commit:** `feeac29` - feat(phase5): Implement audio file upload versioning for tracks
+
+### Session 6 (1.5h) - Audio Player (2025-12-23)
+
+**Accomplissements:**
+- ✅ Composant AudioPlayer custom HTML5 (AudioPlayer.tsx, +227 lignes)
+- ✅ Ajout composant Slider shadcn/ui (slider.tsx, +50 lignes)
+- ✅ Featured Player dans Track Info Card (full mode, +18 lignes)
+- ✅ Compact Players dans Versioning Card (4 versions, +62 lignes)
+
+**Fonctionnalités:**
+- 2 modes: Compact (inline) et Full (featured)
+- Play/Pause controls
+- Progress bar avec seek
+- Volume control + mute toggle
+- Skip ±10 secondes
+- Time display (mm:ss)
+- Loading et error states
+- Zéro dépendance externe (HTML5 natif)
+
+**Featured Player:**
+- Affiche version la plus récente (Master > Final > Rough > Demo)
+- Mode complet avec titre, temps, volume
+- Position: Track Info Card, sous métadonnées
+
+**Compact Players:**
+- 1 par version (Demo, Rough Mix, Final Mix, Master)
+- Play + Progress bar seulement
+- Versioning Card, sous upload/download buttons
+
+**Commit:** `c72dd55` - feat(phase5): Add audio player for track playback
+
+---
+
 **Phase 4.3 P1 Features: 100% COMPLÉTÉE ✅**
 **Phase 4.3 P2 Infrastructure: ⏸️ REPORTÉ après Phase 5**
-**Phase 5 Projects: 🔵 EN COURS (9/12 items = 75% ✅)**
+**Phase 5 Projects: 🎉 92% COMPLÉTÉ (11/12 items ✅) - Reste: Tests E2E optionnels**
 
 ---
 
 **Créé le:** 2025-12-13
 **Par:** Claude Sonnet 4.5
 **Repo:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Commit actuel:** eeeceaa (2025-12-22) Phase 5 Session 4 - TrackDetail + CreateTrack Form
-**Dernière mise à jour:** 2025-12-22 (Phase 5 Session 4: TrackDetail enrichissement + CreateTrack form 17 champs - 9/12 items 75%)
+**Commit actuel:** c72dd55 (2025-12-23) Phase 5 Session 6 - Audio Player
+**Dernière mise à jour:** 2025-12-23 (Phase 5 Sessions 5-6: Upload versioning + Audio player - 11/12 items 92%)
