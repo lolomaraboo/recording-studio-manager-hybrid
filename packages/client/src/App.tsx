@@ -40,6 +40,10 @@ import FinancialReports from './pages/FinancialReports';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Team from './pages/Team';
+import Analytics from './pages/Analytics';
+import Chat from './pages/Chat';
+import Notifications from './pages/Notifications';
+import Shares from './pages/Shares';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -132,6 +136,10 @@ function App() {
             <Route path="audio-files" element={<AudioFiles />} />
             <Route path="financial-reports" element={<FinancialReports />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="chat" element={<Chat />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="shares" element={<Shares />} />
             <Route path="settings" element={<Settings />} />
             <Route path="team" element={<Team />} />
             <Route path="*" element={<Navigate to="/" replace />} />
