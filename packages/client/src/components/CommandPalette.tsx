@@ -35,7 +35,7 @@ export function CommandPalette() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "p" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
       }
@@ -152,7 +152,7 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Rechercher une page ou une action..." />
+      <CommandInput placeholder="Rechercher une page ou une action... (⌘P)" />
       <CommandList>
         <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
         <CommandGroup heading="Navigation">
