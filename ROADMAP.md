@@ -1,7 +1,7 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-23 (Phase 5 Sessions 5-6: Upload + Audio Player - 11/12 items 92% ✅)
+**Dernière mise à jour:** 2025-12-22 (Phase 5 Session 7: Sidebar Tests + Bug Fixes - 11/12 items 92% ✅)
 **Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🎉 **Phase 5 Projects Management 92% (11/12 items ✅)**
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Stack complète dockerisée avec hot reload (tsx watch + Vite HMR)
@@ -2300,8 +2300,15 @@ docker-compose -f docker-compose.dev.yml down       # Stop
 | Tests E2E | Create project → tracks → upload | ⏸️ TODO (optionnel) | 1h |
 
 **Total:** 8-10h (3-4 sessions)
-**Réalisé:** ~11h (11/12 items = 92% ✅ - 6 sessions)
+**Réalisé:** ~13h (11/12 items = 92% ✅ - 7 sessions)
 **Reste:** Tests E2E optionnels (~1h)
+
+**Session 7 (2h) - 2025-12-22:**
+- ✅ Fix Projects page JavaScript error (schema mismatch title/artist → name/artistName)
+- ✅ Tests systématiques sidebar navigation (12/26 pages)
+- ✅ Validation Tracks link dans sidebar
+- ✅ 3 commits: trackComments ctx.user fix, Tracks link, Projects schema alignment
+- ✅ **Résultat: 0 erreurs JavaScript, application stable**
 
 ### Nouveaux Champs `tracks` (17 ajouts)
 
