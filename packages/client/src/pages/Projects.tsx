@@ -79,8 +79,9 @@ export default function Projects() {
 
   // Filtrer les projets
   const filteredProjects = projects?.filter((project: any) => {
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.artist?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      project.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.artistName?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -161,9 +162,9 @@ export default function Projects() {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{project.title}</CardTitle>
-                      {project.artist && (
-                        <CardDescription className="truncate">{project.artist}</CardDescription>
+                      <CardTitle className="text-lg truncate">{project.name}</CardTitle>
+                      {project.artistName && (
+                        <CardDescription className="truncate">{project.artistName}</CardDescription>
                       )}
                     </div>
                     {getStatusBadge(project.status)}
@@ -289,8 +290,8 @@ function CreateProjectDialog({
 }) {
   const [formData, setFormData] = useState({
     clientId: "",
-    title: "",
-    artist: "",
+    name: "",
+    artistName: "",
     genre: "",
     description: "",
     status: "pre_production" as ProjectStatus,
@@ -303,13 +304,13 @@ function CreateProjectDialog({
 
     onSubmit({
       clientId: parseInt(formData.clientId),
-      title: formData.title,
-      artist: formData.artist || undefined,
+      name: formData.name,
+      artistName: formData.artistName || undefined,
       genre: formData.genre || undefined,
       description: formData.description || undefined,
       status: formData.status,
-      startDate: formData.startDate || undefined,
-      budget: formData.budget ? parseFloat(formData.budget) * 100 : undefined,
+      startDate: formData.startDate ? new Date(formData.startDate) : undefined,
+      budget: formData.budget ? parseFloat(formData.budget) : undefined,
     });
   };
 
@@ -345,22 +346,22 @@ function CreateProjectDialog({
             </div>
 
             <div className="space-y-2 col-span-2">
-              <Label htmlFor="title">Titre du projet *</Label>
+              <Label htmlFor="name">Titre du projet *</Label>
               <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Ex: Album 'Nouveau Départ'"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="artist">Artiste</Label>
+              <Label htmlFor="artistName">Artiste</Label>
               <Input
-                id="artist"
-                value={formData.artist}
-                onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
+                id="artistName"
+                value={formData.artistName}
+                onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                 placeholder="Ex: Jean Dupont"
               />
             </div>
@@ -477,9 +478,9 @@ function ProjectDetailsDialog({
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <DialogTitle className="text-2xl">{project.title}</DialogTitle>
-              {project.artist && (
-                <DialogDescription className="text-base">{project.artist}</DialogDescription>
+              <DialogTitle className="text-2xl">{project.name}</DialogTitle>
+              {project.artistName && (
+                <DialogDescription className="text-base">{project.artistName}</DialogDescription>
               )}
             </div>
             {getStatusBadge(project.status)}
