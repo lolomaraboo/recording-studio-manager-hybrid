@@ -6,6 +6,7 @@ import {
   rooms,
   clientPortalSessions,
   clientPortalActivityLogs,
+  paymentTransactions,
 } from "@rsm/database/tenant/schema";
 import { getTenantDb } from "@rsm/database/connection";
 import { eq, and, gte, lte, between, sql, desc } from "drizzle-orm";
@@ -640,6 +641,13 @@ export const clientPortalBookingRouter = router({
 
       const booking = bookingList[0];
 
+      // Get payment transactions for this booking
+      const transactions = await tenantDb
+        .select()
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.sessionId, input.bookingId))
+        .orderBy(desc(paymentTransactions.createdAt));
+
       // Log activity
       await tenantDb.insert(clientPortalActivityLogs).values({
         clientId,
@@ -655,6 +663,7 @@ export const clientPortalBookingRouter = router({
       return {
         ...booking.session,
         room: booking.room,
+        paymentHistory: transactions,
       };
     }),
 

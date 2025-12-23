@@ -48,6 +48,7 @@ import { ClientPortalLayout } from './components/client-portal/ClientPortalLayou
 import ClientLogin from './pages/client-portal/ClientLogin';
 import ClientDashboard from './pages/client-portal/ClientDashboard';
 import Bookings from './pages/client-portal/Bookings';
+import BookingDetail from './pages/client-portal/BookingDetail';
 import Profile from './pages/client-portal/Profile';
 import {
   ClientPortalAuthProvider,
@@ -77,6 +78,7 @@ function App() {
           >
             <Route index element={<ClientDashboard />} />
             <Route path="bookings" element={<Bookings />} />
+            <Route path="bookings/:id" element={<BookingDetail />} />
             <Route path="profile" element={<Profile />} />
             {/* TODO: Add more client portal routes (invoices, projects, payments) */}
           </Route>
