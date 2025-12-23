@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useClientPortalAuth } from "@/contexts/ClientPortalAuthContext";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 /**
  * Client Portal - Bookings Page
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 export default function Bookings() {
   const navigate = useNavigate();
   const { sessionToken } = useClientPortalAuth();
+  usePageTitle('My Bookings');
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
 

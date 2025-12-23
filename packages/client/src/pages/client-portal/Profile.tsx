@@ -8,6 +8,7 @@ import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 import { User, Mail, Phone, Save, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 /**
  * Client Portal Profile Page
@@ -20,6 +21,7 @@ import { trpc } from '@/lib/trpc';
  */
 export default function Profile() {
   const { client, updateClient } = useClientPortalAuth();
+  usePageTitle('Profile');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);

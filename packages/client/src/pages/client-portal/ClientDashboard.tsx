@@ -12,6 +12,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 /**
  * Client Portal Dashboard
@@ -24,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
  */
 export default function ClientDashboard() {
   const navigate = useNavigate();
+  usePageTitle('Dashboard');
 
   // TODO: Fetch from API
   const stats = {
