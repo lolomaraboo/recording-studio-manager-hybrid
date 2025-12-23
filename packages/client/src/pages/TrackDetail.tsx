@@ -22,6 +22,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { FileUploadButton } from "@/components/FileUploadButton";
+import { AudioPlayer } from "@/components/AudioPlayer";
 
 const statusLabels: Record<string, { label: string; variant: any }> = {
   recording: { label: "Enregistrement", variant: "outline" },
@@ -350,6 +351,21 @@ export default function TrackDetail() {
                         <p className="text-sm font-mono">{track.isrc}</p>
                       </div>
                     )}
+
+                    {/* Featured Audio Player - Show latest version */}
+                    {!isEditing && (track.masterUrl || track.finalMixUrl || track.roughMixUrl || track.demoUrl) && (
+                      <div className="pt-4 border-t">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Écouter: {track.masterUrl ? 'Master' : track.finalMixUrl ? 'Final Mix' : track.roughMixUrl ? 'Rough Mix' : 'Demo'}
+                        </p>
+                        <AudioPlayer
+                          src={track.masterUrl || track.finalMixUrl || track.roughMixUrl || track.demoUrl || ''}
+                          title={track.title}
+                          showTime
+                          showVolume
+                        />
+                      </div>
+                    )}
                   </>
                 )}
               </CardContent>
@@ -413,131 +429,151 @@ export default function TrackDetail() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {/* Demo */}
-                <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                  <div>
-                    <p className="text-sm font-medium">Demo</p>
-                    <p className="text-xs text-muted-foreground">Version démo initiale</p>
+                <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Demo</p>
+                      <p className="text-xs text-muted-foreground">Version démo initiale</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {track.demoUrl ? (
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={track.demoUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4 mr-2" />
+                            Télécharger
+                          </a>
+                        </Button>
+                      ) : null}
+                      <FileUploadButton
+                        versionType="demo"
+                        trackId={track.id}
+                        currentUrl={track.demoUrl || undefined}
+                        onUploadSuccess={(url) => {
+                          updateVersionUrlMutation.mutate({
+                            id: track.id,
+                            versionType: "demo",
+                            url,
+                          });
+                          toast.success("Demo uploadé !");
+                        }}
+                        onUploadError={(error) => toast.error(error)}
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {track.demoUrl ? (
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={track.demoUrl} target="_blank" rel="noopener noreferrer">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </a>
-                      </Button>
-                    ) : null}
-                    <FileUploadButton
-                      versionType="demo"
-                      trackId={track.id}
-                      currentUrl={track.demoUrl || undefined}
-                      onUploadSuccess={(url) => {
-                        updateVersionUrlMutation.mutate({
-                          id: track.id,
-                          versionType: "demo",
-                          url,
-                        });
-                        toast.success("Demo uploadé !");
-                      }}
-                      onUploadError={(error) => toast.error(error)}
-                    />
-                  </div>
+                  {track.demoUrl && (
+                    <AudioPlayer src={track.demoUrl} compact showTime={false} showVolume={false} />
+                  )}
                 </div>
 
                 {/* Rough Mix */}
-                <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                  <div>
-                    <p className="text-sm font-medium">Rough Mix</p>
-                    <p className="text-xs text-muted-foreground">Mixage brut</p>
+                <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Rough Mix</p>
+                      <p className="text-xs text-muted-foreground">Mixage brut</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {track.roughMixUrl ? (
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={track.roughMixUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4 mr-2" />
+                            Télécharger
+                          </a>
+                        </Button>
+                      ) : null}
+                      <FileUploadButton
+                        versionType="roughMix"
+                        trackId={track.id}
+                        currentUrl={track.roughMixUrl || undefined}
+                        onUploadSuccess={(url) => {
+                          updateVersionUrlMutation.mutate({
+                            id: track.id,
+                            versionType: "roughMix",
+                            url,
+                          });
+                          toast.success("Rough Mix uploadé !");
+                        }}
+                        onUploadError={(error) => toast.error(error)}
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {track.roughMixUrl ? (
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={track.roughMixUrl} target="_blank" rel="noopener noreferrer">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </a>
-                      </Button>
-                    ) : null}
-                    <FileUploadButton
-                      versionType="roughMix"
-                      trackId={track.id}
-                      currentUrl={track.roughMixUrl || undefined}
-                      onUploadSuccess={(url) => {
-                        updateVersionUrlMutation.mutate({
-                          id: track.id,
-                          versionType: "roughMix",
-                          url,
-                        });
-                        toast.success("Rough Mix uploadé !");
-                      }}
-                      onUploadError={(error) => toast.error(error)}
-                    />
-                  </div>
+                  {track.roughMixUrl && (
+                    <AudioPlayer src={track.roughMixUrl} compact showTime={false} showVolume={false} />
+                  )}
                 </div>
 
                 {/* Final Mix */}
-                <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                  <div>
-                    <p className="text-sm font-medium">Final Mix</p>
-                    <p className="text-xs text-muted-foreground">Mixage final</p>
+                <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Final Mix</p>
+                      <p className="text-xs text-muted-foreground">Mixage final</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {track.finalMixUrl ? (
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={track.finalMixUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4 mr-2" />
+                            Télécharger
+                          </a>
+                        </Button>
+                      ) : null}
+                      <FileUploadButton
+                        versionType="finalMix"
+                        trackId={track.id}
+                        currentUrl={track.finalMixUrl || undefined}
+                        onUploadSuccess={(url) => {
+                          updateVersionUrlMutation.mutate({
+                            id: track.id,
+                            versionType: "finalMix",
+                            url,
+                          });
+                          toast.success("Final Mix uploadé !");
+                        }}
+                        onUploadError={(error) => toast.error(error)}
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {track.finalMixUrl ? (
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={track.finalMixUrl} target="_blank" rel="noopener noreferrer">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </a>
-                      </Button>
-                    ) : null}
-                    <FileUploadButton
-                      versionType="finalMix"
-                      trackId={track.id}
-                      currentUrl={track.finalMixUrl || undefined}
-                      onUploadSuccess={(url) => {
-                        updateVersionUrlMutation.mutate({
-                          id: track.id,
-                          versionType: "finalMix",
-                          url,
-                        });
-                        toast.success("Final Mix uploadé !");
-                      }}
-                      onUploadError={(error) => toast.error(error)}
-                    />
-                  </div>
+                  {track.finalMixUrl && (
+                    <AudioPlayer src={track.finalMixUrl} compact showTime={false} showVolume={false} />
+                  )}
                 </div>
 
                 {/* Master */}
-                <div className="flex items-center justify-between p-3 border rounded-lg bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-900">
-                  <div>
-                    <p className="text-sm font-medium text-green-900 dark:text-green-100">Master</p>
-                    <p className="text-xs text-green-700 dark:text-green-300">Version masterisée finale</p>
+                <div className="space-y-2 p-3 border rounded-lg bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-900">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-green-900 dark:text-green-100">Master</p>
+                      <p className="text-xs text-green-700 dark:text-green-300">Version masterisée finale</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {track.masterUrl ? (
+                        <Button size="sm" variant="outline" className="border-green-300 dark:border-green-800" asChild>
+                          <a href={track.masterUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4 mr-2" />
+                            Télécharger
+                          </a>
+                        </Button>
+                      ) : null}
+                      <FileUploadButton
+                        versionType="master"
+                        trackId={track.id}
+                        currentUrl={track.masterUrl || undefined}
+                        onUploadSuccess={(url) => {
+                          updateVersionUrlMutation.mutate({
+                            id: track.id,
+                            versionType: "master",
+                            url,
+                          });
+                          toast.success("Master uploadé !");
+                        }}
+                        onUploadError={(error) => toast.error(error)}
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {track.masterUrl ? (
-                      <Button size="sm" variant="outline" className="border-green-300 dark:border-green-800" asChild>
-                        <a href={track.masterUrl} target="_blank" rel="noopener noreferrer">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </a>
-                      </Button>
-                    ) : null}
-                    <FileUploadButton
-                      versionType="master"
-                      trackId={track.id}
-                      currentUrl={track.masterUrl || undefined}
-                      onUploadSuccess={(url) => {
-                        updateVersionUrlMutation.mutate({
-                          id: track.id,
-                          versionType: "master",
-                          url,
-                        });
-                        toast.success("Master uploadé !");
-                      }}
-                      onUploadError={(error) => toast.error(error)}
-                    />
-                  </div>
+                  {track.masterUrl && (
+                    <AudioPlayer src={track.masterUrl} compact showTime={false} showVolume={false} />
+                  )}
                 </div>
               </CardContent>
             </Card>
