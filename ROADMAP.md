@@ -1,10 +1,18 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
-**Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-22 (Phase 5 Session 7: Sidebar Tests + Bug Fixes - 11/12 items 92% ✅)
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🎉 **Phase 5 Projects Management 92% (11/12 items ✅)**
+> **⚠️ DOCUMENTATION CORRIGÉE - 2025-12-23**
+>
+> Ce fichier contenait des features marquées ✅ qui **n'étaient PAS implémentées**.
+> **Audit complet effectué** - Distinction claire: ✅ FAIT vs ❌ NON FAIT vs ⚠️ À VÉRIFIER
+>
+> Voir section "État Actuel vs Vision Cible" pour la réalité brutale.
+
+**Version actuelle:** 2.0.0 (Stack Hybride - Local Dev)
+**Dernière mise à jour:** 2025-12-23 (Audit documentation + corrections mensonges)
+**Dernière feature:** 2025-12-22 (Phase 5 Session 7: Track Comments - 11/12 items 92%)
+**Status actuel:** ✅ Phase 1-4 COMPLÉTÉES + 🟡 Phase 5 en cours (92%)
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
-**Docker:** ✅ Stack complète dockerisée avec hot reload (tsx watch + Vite HMR)
+**Environnement:** Docker Compose + PostgreSQL local (Database-per-Tenant)
 
 > **🚀 Migration en 4 phases - Timeline: 5-6 mois**
 >
@@ -20,49 +28,76 @@
 
 ---
 
-## 🎯 Vision Cible
+## 🎯 État Actuel vs Vision Cible
 
-### Stack Hybride Final
+### Stack Hybride ACTUEL (Implémenté)
 
 ```
-Frontend: React 19 + TypeScript + TailwindCSS 4 + shadcn/ui
-Backend: Express + tRPC 11 + TypeScript
-Database: PostgreSQL Database-per-Tenant VRAI (isolation physique)
-ORM: Drizzle ORM (TypeScript-first)
-Multi-région: us-east-1 + eu-west-1 + ap-southeast-1
-Real-time: Socket.IO WebSockets
-Auth: Manus OAuth + 2FA TOTP
-Storage: S3 pour fichiers audio
-Monitoring: Prometheus + Grafana
+Frontend: React 19 + TypeScript + TailwindCSS 4 + shadcn/ui  ✅ RÉEL
+Backend: Express + tRPC 11 + TypeScript                      ✅ RÉEL
+Database: PostgreSQL Database-per-Tenant (local)             ✅ RÉEL
+ORM: Drizzle ORM (TypeScript-first)                          ✅ RÉEL
+Auth: Manus OAuth (basique)                                  ✅ RÉEL
+Dev: Docker Compose + hot reload                             ✅ RÉEL
 ```
 
-### Fonctionnalités Complètes (100%)
+### Stack Cible FUTUR (Non implémenté)
 
-**Core Business (De Claude):**
-- ✅ Database-per-Tenant VRAI (isolation physique)
-- ✅ Multi-région deployment (3 régions AWS)
-- ✅ Portail client self-service complet
-- ✅ Gestion projets musicaux + Kanban
-- ✅ Fichiers audio + stockage S3 + versioning
-- ✅ Devis & propositions professionnelles
-- ✅ Contrats avec e-signature DocuSign
-- ✅ SSO/SAML (Okta, Auth0, Azure AD)
-- ✅ 2FA TOTP avec backup codes
-- ✅ Custom domains + SSL automatique
-- ✅ White-label branding complet
-- ✅ Audit logging SOC2-ready
-- ✅ Currency exchange (6 devises)
-- ✅ i18n (6 langues: EN, FR, ES, DE, IT, PT)
+```
+Multi-région: us-east-1 + eu-west-1 + ap-southeast-1        📝 PLANNED
+Real-time: Socket.IO WebSockets                              ⚠️ À VÉRIFIER
+Auth: 2FA TOTP avec backup codes                             📝 PLANNED
+Storage: S3 pour fichiers audio                              ⚠️ À VÉRIFIER
+Monitoring: Prometheus + Grafana                             📝 PLANNED
+```
 
-**UX/DX Moderne (De Manus):**
-- ✅ Interface React 19 élégante
-- ✅ Type safety bout-en-bout (tRPC)
+---
+
+### Fonctionnalités RÉELLEMENT Implémentées
+
+**Core Architecture (CONFIRMÉ):**
+- ✅ Database-per-Tenant VRAI (isolation physique PostgreSQL local)
+- ✅ 43 pages UI complètes (Dashboard, Clients, Sessions, Projects, Invoices, etc.)
+- ✅ Backend tRPC 20+ routers (clients, sessions, projects, invoices, etc.)
+- ✅ Portail client (auth + booking)
+- ✅ Gestion projets musicaux (projects + tracks)
+- ✅ Devis & propositions (quotes router)
+- ✅ Stripe Integration (paiements en ligne)
+- ✅ AI Chatbot (Anthropic SDK)
+
+**UX/DX Moderne (CONFIRMÉ):**
+- ✅ Interface React 19 + TypeScript strict mode
+- ✅ Type safety bout-en-bout (tRPC 11)
 - ✅ UI shadcn/ui professionnelle
-- ✅ Recherche globale Cmd+K
-- ✅ Chat temps réel Socket.IO
-- ✅ Notifications SSE élégantes
-- ✅ Optimistic updates
-- ✅ Sidebar intelligente drag & drop
+- ✅ Monorepo pnpm (4 packages: shared, database, server, client)
+
+---
+
+### Features NON Implémentées (Documentation Corrigée)
+
+**⚠️ ATTENTION: Ces features étaient marquées ✅ mais sont FAUSSES**
+
+**Enterprise Features (NON FAITES):**
+- ❌ Multi-région deployment (AWS) - Code inexistant
+- ❌ DocuSign e-signature - Commentaire TODO uniquement
+- ❌ SSO/SAML (Okta, Auth0, Azure AD) - Aucun code
+- ❌ 2FA TOTP avec backup codes - Non implémenté
+- ❌ Custom domains + SSL automatique - Aucun code DNS/SSL
+- ❌ White-label branding complet - Non implémenté
+- ❌ Audit logging SOC2-ready - Pas de compliance features
+- ❌ i18n (6 langues) - 100% français hardcodé
+- ❌ Monitoring Prometheus + Grafana - Dependencies absentes
+
+**À VÉRIFIER (Statut Incertain):**
+- ⚠️ Currency exchange (6 devises) - Enum ou vrai exchange?
+- ⚠️ Fichiers audio + S3 versioning - S3 réel ou local?
+- ⚠️ Chat temps réel Socket.IO - Implémenté?
+- ⚠️ Recherche globale Cmd+K - Implémentée?
+- ⚠️ Notifications SSE - Implémentées?
+- ⚠️ Optimistic updates - Pattern utilisé?
+- ⚠️ Sidebar drag & drop - Fonctionnelle?
+
+**Si Planifiées Sérieusement → Documenter dans Phase 6+**
 
 ---
 

@@ -1,41 +1,63 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **🚀 STACK HYBRIDE - Phase 3 COMPLÈTE (42 Pages UI) ✅**
-> **Phase actuelle**: Phase 3 P4 Pages Finales COMPLÉTÉ
-> **Dernière mise à jour**: 2025-12-21 (Phase 3 P4 - 4 pages finales: FinancialReports, Reports, Settings, Team)
+> **⚠️ DOCUMENTATION CORRIGÉE - 2025-12-23**
+>
+> **Audit documentation effectué** - Séparation claire features implémentées vs planifiées.
+> **Budget $80k**: Retiré car non pertinent (projet personnel/dev local).
+> **Multi-région/SSO/i18n**: Déplacés vers section "Features Futures Planifiées".
+
+> **📊 ÉTAT ACTUEL**
+> **Phase actuelle**: Phase 5 en cours (Projects Management - 92%)
+> **Dernière feature**: 2025-12-22 (Track Comments avec waveform graphique)
+> **Dernière correction doc**: 2025-12-23 (Nettoyage mensonges dans ROADMAP/TODO)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
-> **Milestone**: ✅ Phase 1 + ✅ Phase 2 AI Complète + ✅ Phase 2.5 Auth + ✅ Phase 2.6 Chatbot UI + ✅ Phase 3 UI (42 pages)
+> **Milestone**: ✅ Phase 1-4 COMPLÉTÉES + 🟡 Phase 5 (92%)
 
 ---
 
-## 📊 Vue d'Ensemble Migration
+## 📊 Phases Réellement Complétées
 
-| Phase | Durée | Budget | Status |
-|-------|-------|--------|--------|
-| **Phase 1: Infrastructure & Base** | 4-6 sem | ~$15k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2.2 & 2.3: AI Chatbot** | 4 jours | ~$2k | ✅ COMPLÉTÉ (100%) |
-| **Phase 2.4: AI Actions Complete** | 2h | - | ✅ COMPLÉTÉ (37/37 - 100%) |
-| **Phase 2.5: Auth + Tests** | 1 jour | - | ✅ COMPLÉTÉ (100%) |
-| **Phase 3: UI Pages** | 2 sem | ~$10k | ✅ COMPLÉTÉ (42 pages - 100%) |
-| Phase 2: Features Critiques | 6-8 sem | ~$25k | 🔵 READY TO START |
-| Phase 4: Multi-Région | 4-6 sem | ~$15k | ⏸️ PENDING |
+| Phase | Durée réelle | Status | Complété |
+|-------|--------------|--------|----------|
+| **Phase 1: Infrastructure & Base** | ~6 semaines | ✅ COMPLÉTÉ | 100% |
+| **Phase 2: Portage UI Composants** | ~2 semaines | ✅ COMPLÉTÉ | 14/14 composants |
+| **Phase 2.2-2.4: AI Chatbot** | ~4 jours | ✅ COMPLÉTÉ | 37/37 actions |
+| **Phase 2.5: Auth** | ~1 jour | ✅ COMPLÉTÉ | Backend + Frontend |
+| **Phase 2.6: Chatbot UI** | ~1 jour | ✅ COMPLÉTÉ | Interface complète |
+| **Phase 3: UI Pages** | ~2 semaines | ✅ COMPLÉTÉ | 43 pages |
+| **Phase 4.1: Client Portal** | ~1 semaine | ✅ COMPLÉTÉ | Auth + Dashboard |
+| **Phase 4.2: Booking + Stripe** | ~1 semaine | ✅ COMPLÉTÉ | Paiements en ligne |
+| **Phase 4.3: Client Features** | ~1 semaine | ✅ COMPLÉTÉ | 10/10 features |
+| **Phase 5: Projects Management** | En cours | 🟡 EN COURS | 11/12 items (92%) |
 
-**Total:** 5-6 mois | ~$80k développement
+**Phases Futures (Non Définies):**
+| **Phase 6+** | TBD | ⏸️ À PLANIFIER | Voir "Features Futures" |
 
 ---
 
-## 🎯 Stack Technique Cible
+## 🎯 Stack Technique ACTUEL (Confirmé)
 
 ```
-Frontend: React 19 + TypeScript + TailwindCSS 4 + shadcn/ui
-Backend: Express + tRPC 11 + TypeScript
-Database: PostgreSQL Database-per-Tenant VRAI (isolation physique)
-ORM: Drizzle ORM (TypeScript-first)
-Auth: Manus OAuth + 2FA TOTP
-Storage: S3 pour fichiers audio
-Real-time: Socket.IO WebSockets
-Multi-région: us-east-1 + eu-west-1 + ap-southeast-1
-Monitoring: Prometheus + Grafana
+Frontend: React 19 + TypeScript + TailwindCSS 4 + shadcn/ui  ✅ RÉEL
+Backend: Express + tRPC 11 + TypeScript                      ✅ RÉEL
+Database: PostgreSQL Database-per-Tenant (local)             ✅ RÉEL
+ORM: Drizzle ORM (TypeScript-first)                          ✅ RÉEL
+Auth: Manus OAuth (basique)                                  ✅ RÉEL
+Payments: Stripe Integration                                 ✅ RÉEL
+AI: Anthropic SDK (Claude)                                   ✅ RÉEL
+Dev: Docker Compose + hot reload                             ✅ RÉEL
+```
+
+## 🔮 Stack Cible FUTUR (Non Implémenté)
+
+```
+Auth: 2FA TOTP avec backup codes                             📝 PLANNED
+Storage: S3 pour fichiers audio                              📝 PLANNED
+Real-time: Socket.IO WebSockets                              📝 PLANNED
+Multi-région: us-east-1 + eu-west-1 + ap-southeast-1        📝 PLANNED
+Monitoring: Prometheus + Grafana                             📝 PLANNED
+i18n: 6 langues (EN, FR, ES, DE, IT, PT)                    📝 PLANNED
+SSO/SAML: Enterprise auth                                    📝 PLANNED
 ```
 
 ---
