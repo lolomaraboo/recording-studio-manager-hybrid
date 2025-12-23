@@ -1,9 +1,20 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Calendar,
   Clock,
@@ -14,6 +25,7 @@ import {
   ArrowLeft,
   FileText,
   CreditCard,
+  XCircle,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { toast } from 'sonner';
@@ -35,6 +47,10 @@ export default function BookingDetail() {
 
   const bookingId = id ? parseInt(id, 10) : null;
 
+  // Cancel booking modal state
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+
   // Create balance checkout mutation
   const createBalanceCheckoutMutation = trpc.clientPortalStripe.createBalanceCheckout.useMutation({
     onSuccess: (data) => {
@@ -43,6 +59,20 @@ export default function BookingDetail() {
     },
     onError: (error: any) => {
       toast.error(`Failed to create payment session: ${error.message}`);
+    },
+  });
+
+  // Cancel booking mutation
+  const cancelBookingMutation = trpc.clientPortalBooking.cancelBooking.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setShowCancelDialog(false);
+      setCancelReason('');
+      // Refresh booking data
+      bookingQuery.refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to cancel booking: ${error.message}`);
     },
   });
 
@@ -153,17 +183,30 @@ export default function BookingDetail() {
   const depositAmount = parseFloat(String(booking.depositAmount || 0));
   const balance = totalAmount - depositAmount;
 
+  const canCancelBooking = booking.status !== 'cancelled' && booking.status !== 'completed' && new Date(booking.startTime) > new Date();
+
   return (
     <div className="container mx-auto p-6 space-y-6 max-w-5xl">
-      {/* Back Button */}
-      <Button
-        onClick={() => navigate('/client-portal/bookings')}
-        variant="ghost"
-        className="mb-4"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Bookings
-      </Button>
+      {/* Back Button + Cancel Booking */}
+      <div className="flex items-center justify-between mb-4">
+        <Button
+          onClick={() => navigate('/client-portal/bookings')}
+          variant="ghost"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Bookings
+        </Button>
+
+        {canCancelBooking && (
+          <Button
+            onClick={() => setShowCancelDialog(true)}
+            variant="destructive"
+          >
+            <XCircle className="mr-2 h-4 w-4" />
+            Cancel Booking
+          </Button>
+        )}
+      </div>
 
       {/* Booking Header */}
       <Card>
@@ -376,6 +419,63 @@ export default function BookingDetail() {
           )}
         </CardContent>
       </Card>
+
+      {/* Cancel Booking Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Booking</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this booking?
+              {booking.depositPaid && (
+                <span className="block mt-2 font-medium text-orange-600">
+                  A refund of ${depositAmount.toFixed(2)} will be issued to your original payment method.
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cancel-reason">Reason for cancellation (optional)</Label>
+              <Textarea
+                id="cancel-reason"
+                placeholder="Please let us know why you're cancelling..."
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCancelDialog(false);
+                setCancelReason('');
+              }}
+              disabled={cancelBookingMutation.isPending}
+            >
+              Keep Booking
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!sessionToken || !bookingId) return;
+                cancelBookingMutation.mutate({
+                  sessionToken,
+                  bookingId,
+                  reason: cancelReason || undefined,
+                });
+              }}
+              disabled={cancelBookingMutation.isPending}
+            >
+              {cancelBookingMutation.isPending ? 'Cancelling...' : 'Cancel Booking'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

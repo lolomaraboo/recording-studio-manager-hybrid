@@ -11,6 +11,7 @@ import {
 import { getTenantDb } from "@rsm/database/connection";
 import { eq, and, gte, lte, between, sql, desc } from "drizzle-orm";
 import { isTokenExpired } from "../utils/client-portal-auth";
+import { getStripeClient } from "../utils/stripe-client";
 
 /**
  * Extract organizationId from request context
@@ -717,11 +718,74 @@ export const clientPortalBookingRouter = router({
         throw new Error("Cannot cancel a booking that has already started or passed");
       }
 
+      // Check for existing payments and process refunds
+      let refundInfo: { refundId: string; amount: number } | null = null;
+
+      if (booking.depositPaid || booking.paymentStatus === "partial" || booking.paymentStatus === "paid") {
+        const stripe = getStripeClient();
+
+        // Get payment transactions for this booking
+        const transactions = await tenantDb
+          .select()
+          .from(paymentTransactions)
+          .where(
+            and(
+              eq(paymentTransactions.sessionId, input.bookingId),
+              eq(paymentTransactions.status, "completed")
+            )
+          )
+          .orderBy(desc(paymentTransactions.createdAt));
+
+        if (transactions.length > 0) {
+          // Refund the most recent successful payment
+          const lastPayment = transactions[0];
+
+          if (lastPayment.stripePaymentIntentId) {
+            try {
+              const refund = await stripe.refunds.create({
+                payment_intent: lastPayment.stripePaymentIntentId,
+                reason: "requested_by_customer",
+                metadata: {
+                  booking_id: booking.id.toString(),
+                  client_id: clientId.toString(),
+                  organization_id: organizationId.toString(),
+                  cancellation_reason: input.reason || "No reason provided",
+                },
+              });
+
+              refundInfo = {
+                refundId: refund.id,
+                amount: refund.amount / 100, // Convert from cents
+              };
+
+              // Log refund transaction
+              await tenantDb.insert(paymentTransactions).values({
+                sessionId: input.bookingId,
+                type: "refund",
+                amount: refund.amount / 100,
+                currency: refund.currency,
+                status: refund.status === "succeeded" ? "completed" : "pending",
+                stripePaymentIntentId: lastPayment.stripePaymentIntentId,
+                metadata: JSON.stringify({
+                  refund_id: refund.id,
+                  original_payment_intent: lastPayment.stripePaymentIntentId,
+                  cancellation_reason: input.reason,
+                }),
+              });
+            } catch (error: any) {
+              console.error("[cancelBooking] Stripe refund failed:", error);
+              throw new Error(`Refund failed: ${error.message}`);
+            }
+          }
+        }
+      }
+
       // Update booking status
       await tenantDb
         .update(sessions)
         .set({
           status: "cancelled",
+          paymentStatus: refundInfo ? "refunded" : booking.paymentStatus,
           notes: input.reason
             ? `${booking.notes || ""}\n\nCancellation reason: ${input.reason}`
             : booking.notes,
@@ -733,12 +797,13 @@ export const clientPortalBookingRouter = router({
       await tenantDb.insert(clientPortalActivityLogs).values({
         clientId,
         action: "cancel_booking",
-        description: `Cancelled booking "${booking.title}"${input.reason ? `: ${input.reason}` : ""}`,
+        description: `Cancelled booking "${booking.title}"${input.reason ? `: ${input.reason}` : ""}${refundInfo ? ` - Refund issued: $${refundInfo.amount.toFixed(2)}` : ""}`,
         resourceType: "session",
         resourceId: input.bookingId,
         metadata: JSON.stringify({
           reason: input.reason,
           originalStartTime: booking.startTime,
+          refund: refundInfo,
         }),
         status: "success",
         ipAddress: ctx.req.ip,
@@ -746,12 +811,15 @@ export const clientPortalBookingRouter = router({
       });
 
       return {
-        message: "Booking cancelled successfully",
+        message: refundInfo
+          ? `Booking cancelled successfully. Refund of $${refundInfo.amount.toFixed(2)} has been issued.`
+          : "Booking cancelled successfully",
         booking: {
           id: booking.id,
           title: booking.title,
           status: "cancelled",
         },
+        refund: refundInfo,
       };
     }),
 
