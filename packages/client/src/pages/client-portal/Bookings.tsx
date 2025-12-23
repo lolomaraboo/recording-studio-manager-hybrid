@@ -4,6 +4,8 @@ import { useClientPortalAuth } from "@/contexts/ClientPortalAuthContext";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { BookingCalendar } from "@/components/client-portal/BookingCalendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 /**
  * Client Portal - Bookings Page
@@ -31,6 +33,14 @@ export default function Bookings() {
 
   // Fetch available rooms
   const roomsQuery = trpc.clientPortalBooking.listRooms.useQuery({
+    sessionToken: sessionToken || "",
+  }, {
+    enabled: !!sessionToken,
+    retry: false,
+  });
+
+  // Fetch client's bookings for calendar view
+  const myBookingsQuery = trpc.clientPortalBooking.listMyBookings.useQuery({
     sessionToken: sessionToken || "",
   }, {
     enabled: !!sessionToken,
@@ -101,12 +111,19 @@ export default function Bookings() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Book a Studio Session</h1>
-          <p className="text-gray-600 mt-2">Select a room and choose your session time</p>
+          <h1 className="text-3xl font-bold text-gray-900">Studio Bookings</h1>
+          <p className="text-gray-600 mt-2">Book a session or view your calendar</p>
         </div>
 
-        {/* Room Selection */}
-        {!showBookingForm ? (
+        <Tabs defaultValue="book" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="book">Book a Room</TabsTrigger>
+            <TabsTrigger value="calendar">My Bookings Calendar</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="book">
+            {/* Room Selection */}
+            {!showBookingForm ? (
           <div>
             <h2 className="text-xl font-semibold mb-4">Available Rooms</h2>
 
@@ -291,6 +308,24 @@ export default function Bookings() {
             </form>
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            {myBookingsQuery.isLoading && (
+              <p className="text-gray-500">Loading bookings...</p>
+            )}
+
+            {myBookingsQuery.error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800">Failed to load bookings: {myBookingsQuery.error.message}</p>
+              </div>
+            )}
+
+            {myBookingsQuery.data && (
+              <BookingCalendar bookings={myBookingsQuery.data.bookings} />
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
