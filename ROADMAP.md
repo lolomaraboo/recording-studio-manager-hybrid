@@ -1,8 +1,8 @@
 # Roadmap - Recording Studio Manager HYBRIDE
 
 **Version cible:** 2.0.0 (Stack Hybride)
-**Dernière mise à jour:** 2025-12-22 (Phase 4.3 Items 1-2 COMPLÉTÉS - Profile Page + Responsive Sidebar)
-**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 Items 1-2 COMPLÉTÉS (Profile + Responsive)**
+**Dernière mise à jour:** 2025-12-22 (Phase 4.3 P1 100% COMPLÉTÉ - 10/10 Features ✅ | Phase 5 EN COURS 🔵)
+**Status actuel:** ✅ Phase 1 100% + ✅ Phase 2 14/14 + ✅ **Phase 2.2, 2.3, 2.4 & 2.6 AI Chatbot COMPLÉTÉ (37/37 actions + UI)** + ✅ Phase 2.5 COMPLÉTÉ + ✅ UI/UX Improvements + ✅ **Phase 3 COMPLÉTÉ: 42/42 Pages (100% ✅)** + ✅ **Phase 4.1 Client Portal FULL COMPLÉTÉ** + ✅ **Phase 4.2 Booking System + Stripe Integration 100% COMPLÉTÉ** + ✅ **Phase 4.3 P1 Client Portal Features 100% COMPLÉTÉ (10/10 ✅)** + 🔵 **Phase 5 Projects Management EN COURS**
 **Repo GitHub:** https://github.com/lolomaraboo/recording-studio-manager-hybrid
 **Docker:** ✅ Stack complète dockerisée avec hot reload (tsx watch + Vite HMR)
 
@@ -2266,21 +2266,94 @@ docker-compose -f docker-compose.dev.yml down       # Stop
 
 ---
 
-## 🎯 Prochaines Versions Post-v2.0
+## 🎵 PHASE 5: Projects & Tracks Management (EN COURS - 2025-12-22)
 
-### v2.1 - IA Avancée (Q2 2026)
+**Status:** 🔵 EN COURS
+**Timeline:** 2-3 sessions (~6-8h)
+**Priorité:** 🔴 CRITIQUE BUSINESS
+
+### Décision Stratégique
+
+**Date:** 2025-12-22
+**Question:** Phase 5 (Projects) OU Phase 4.3 P2 (Infrastructure) en premier ?
+**Décision:** ✅ **Phase 5 EN PREMIER**
+
+**Raisons:**
+1. Valeur business immédiate (feature différenciante)
+2. MVP actuel fonctionnel sans P2 Infrastructure
+3. Feedback beta: Feature critique manquante
+4. Risque technique faible vs P2
+
+### Objectifs Phase 5
+
+| Item | Description | Estimation |
+|------|-------------|------------|
+| Schema Migration | Enrichir `tracks` table (17 → 34 champs) | 30min |
+| Router Projects | tRPC endpoints (list, create, update, delete) | 45min |
+| Router Tracks | tRPC endpoints + uploadVersion | 45min |
+| UI ProjectsList | Table + filters + search | 1h |
+| UI ProjectDetail | Overview + tracks + stats | 1h |
+| UI TrackDetail | Metadata + waveform + versions | 1h |
+| Forms | CreateProject + CreateTrack modals | 1h |
+| Upload | Versioning demo/rough/final/master | 1h |
+| Tests E2E | Create project → tracks → upload | 1h |
+
+**Total:** 8-10h (2-3 sessions)
+
+### Nouveaux Champs `tracks` (17 ajouts)
+
+**Versioning (4 champs):**
+- demo_url, rough_mix_url, final_mix_url, master_url
+
+**Metadata Copyright (8 champs):**
+- composer, lyricist, copyright_holder, copyright_year
+- genre_tags (JSON), mood, language, explicit_content
+
+**Technical (5 champs):**
+- instruments_used (JSON), microphones_used (JSON)
+- effects_chain (JSON), daw_session_path, recorded_in_room_id
+
+**Résultat:** 34 champs total (> Version Claude 30 champs ✅)
+
+---
+
+## 🎯 Phase 4.3 P2 Infrastructure (REPORTÉ après Phase 5)
+
+**Items P2 (0/7 = 0%):**
+11. Migration Drizzle propre (✅ déjà fait - 0002_sour_magik.sql)
+12. Connect-Redis sessions
+13. Multi-tenant production (subdomain → org)
+14. Rate limiting avec Redis
+15. Production docker-compose.yml (nginx)
+16. Monitoring/alerting paiements
+17. Webhook retry logic
+
+**Raison report:** Optimisations techniques invisibles, pas de valeur business court terme
+
+---
+
+## 🎯 Prochaines Versions Post-Phase 5
+
+### v2.1 - Phase 4.3 P2 Infrastructure (Q1 2026)
+- Redis sessions persistence
+- Rate limiting production
+- Multi-tenant subdomain routing
+- Monitoring/alerting paiements
+- Production docker-compose (nginx, SSL)
+
+### v2.2 - IA Avancée (Q2 2026)
 - Génération automatique contrats IA
 - Recommandations pricing intelligentes
 - Prédiction churn clients ML
 - Assistant vocal pour réservations
 
-### v2.2 - Mobile App (Q3 2026)
+### v2.3 - Mobile App (Q3 2026)
 - React Native app iOS/Android
 - Notifications push natives
 - Mode offline avec sync
 - Géolocalisation studios
 
-### v2.3 - Marketplace (Q4 2026)
+### v2.4 - Marketplace (Q4 2026)
 - Intégrations tierces (plugins)
 - Templates devis/contrats community
 - Thèmes UI customisables

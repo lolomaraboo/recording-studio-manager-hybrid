@@ -1763,22 +1763,22 @@ ALTER TABLE sessions ADD COLUMN stripe_payment_intent_id VARCHAR(255);
 - ✅ Database validation après webhooks
 - ✅ Visual screenshots pour regression
 
-#### Prochaines Étapes - Phase 4.3 Client Portal Features
+#### Phase 4.3 Client Portal Features - STATUT
 
-**P1 - FONCTIONNALITÉS (Features):**
+**P1 - FONCTIONNALITÉS (10/10 = 100%) ✅ COMPLÉTÉ:**
 1. ✅ Page Profile (/client-portal/profile) - updateProfile + changePassword endpoints [Commit: 4d032b4]
 2. ✅ Responsive sidebar mobile (drawer/overlay) - DÉJÀ IMPLÉMENTÉ Session 3 Phase 4.2 [ClientPortalSidebar.tsx:220-256]
-3. ⏸️ Breadcrumbs dans header (navigation path)
-4. ⏸️ Page title dynamique par route
-5. ⏸️ Page détail booking (view booking details + historique)
-6. ⏸️ Pay balance button (payer reste après deposit)
-7. ⏸️ Cancel booking avec refund Stripe
-8. ⏸️ Booking calendar UI interactif (disponibilités temps réel)
-9. ⏸️ Magic link authentication (passwordless login)
-10. ⏸️ Email confirmations personnalisées (templates Resend)
+3. ✅ Breadcrumbs dans header (navigation path) [Commit: ba79f35]
+4. ✅ Page title dynamique par route [Commit: 00a53c0]
+5. ✅ Page détail booking (view booking details + historique) [Commit: 5794262]
+6. ✅ Pay balance button (payer reste après deposit) [Commit: 8ec311c]
+7. ✅ Cancel booking avec refund Stripe [Commit: accc491]
+8. ✅ Booking calendar UI interactif (disponibilités temps réel) [Commit: dfc470a]
+9. ✅ Magic link authentication (passwordless login) [Commit: d0508c7]
+10. ✅ Email confirmations personnalisées (templates Resend) [Commit: f778803]
 
-**P2 - INFRASTRUCTURE:**
-11. ⏸️ Générer migration Drizzle propre (drizzle-kit generate)
+**P2 - INFRASTRUCTURE (0/7 = 0%) ⏸️ REPORTÉ après Phase 5:**
+11. ⏸️ Générer migration Drizzle propre (drizzle-kit generate) - ✅ DÉJÀ FAIT (0002_sour_magik.sql)
 12. ⏸️ Implémenter connect-redis pour sessions
 13. ⏸️ Multi-tenant production: master DB query subdomain → org
 14. ⏸️ Rate limiting avec Redis (par IP/org)
@@ -1792,6 +1792,174 @@ ALTER TABLE sessions ADD COLUMN stripe_payment_intent_id VARCHAR(255);
 **Phase 4.2 Booking System: 100% COMPLÉTÉE ✅**
 **Phase 4.2 Stripe Integration: 100% COMPLÉTÉE ✅**
 **Phase 4.2 Client Portal UI: 100% COMPLÉTÉE ✅**
+**Phase 4.3 P1 Features: 100% COMPLÉTÉE ✅**
+
+---
+
+## 🎵 PHASE 5: Projects & Tracks Management (NEXT - PRIORITAIRE)
+
+**Status:** 🔵 EN COURS
+**Timeline:** 2-3 sessions (~6-8h)
+**Priorité:** 🔴 CRITIQUE BUSINESS (Feature différenciante vs concurrence)
+
+### Contexte & Décision Stratégique
+
+**Date Décision:** 2025-12-22
+**Question:** Phase 5 (Projects features) OU Phase 4.3 P2 (Infrastructure) en premier ?
+**Décision:** ✅ **Phase 5 EN PREMIER**
+
+**Raisons:**
+1. **Valeur Business Immédiate:**
+   - Phase 5 = Feature critique pour studios (gestion projets musicaux)
+   - P2 = Optimisations techniques invisibles pour utilisateurs
+   - ROI: Phase 5 (élevé) >> P2 (faible court terme)
+
+2. **État MVP Actuel:**
+   - Phases 1-4.3 P1 = 100% complété ✅
+   - App fonctionnelle SANS P2 (memory store OK <100 users)
+   - App INCOMPLÈTE sans Phase 5 (manque feature différenciante)
+
+3. **Feedback Beta:**
+   - Sans Phase 5: "Manque gestion projets" → Churn ❌
+   - Avec Phase 5: "Complet pour studios" → Retention ✅
+   - P2: Transparente, utilisateurs ne remarquent rien
+
+4. **Risque Technique:**
+   - Phase 5: Faible (patterns établis, schema 75% fait)
+   - P2: Moyen (refactoring sessions, nouveau middleware)
+
+### Analyse Comparative Schémas Projects
+
+**Version Claude (Production Python):**
+- Table `projects`: 20+ champs (complet production-ready)
+- Table `tracks`: 30+ champs (versioning, metadata, technical)
+
+**Version Manus (Dev TypeScript/MySQL):**
+- Table `projects`: 14 champs (basique MVP)
+- PAS de versioning tracks, PAS de metadata
+
+**Version Hybride (Actuelle PostgreSQL):**
+- Table `projects`: 23 champs ✅ (MEILLEUR que Claude)
+- Table `tracks`: 17 champs 🟡 (basique, manque versioning/metadata)
+
+**Gap à combler:**
+- ❌ Versioning: demo_url, rough_mix_url, final_mix_url, master_url
+- ❌ Metadata: composer, lyricist, copyright, genre_tags, mood, language
+- ❌ Technical: instruments, mics, effects_chain, daw_session_path
+
+### Plan Phase 5
+
+**Session 1 (2h) - Backend + Schema:**
+1. 🔵 Migration Drizzle: Enrichir `tracks` table (17 → 30 champs)
+   - Versioning: 4 URLs (demo, rough, final, master)
+   - Metadata copyright: 8 champs (composer, lyricist, copyright_holder, etc.)
+   - Technical: 5 champs (instruments, mics, effects, DAW path, room_id)
+2. 🔵 Endpoints tRPC backend:
+   - Router `projects`: list, getById, create, update, delete
+   - Router `tracks`: list, getById, create, update, uploadVersion, delete
+3. 🔵 Tests endpoints (curl/Postman)
+
+**Session 2 (2-3h) - UI Pages:**
+4. 🔵 Page ProjectsList (table + filters + search)
+5. 🔵 Page ProjectDetail (overview + tracks list + stats)
+6. 🔵 Form CreateProject + modal
+7. 🔵 Form CreateTrack + modal
+8. 🔵 Upload versioning (demo/rough/final/master avec preview)
+
+**Session 3 (2-3h) - Track Detail + Tests:**
+9. 🔵 Page TrackDetail (metadata complet + waveform + versions)
+10. 🔵 Affichage metadata copyright (composer, ISRC, genre tags)
+11. 🔵 Player audio avec versions switchable
+12. 🔵 Tests E2E complets:
+    - Create project → Add tracks → Upload versions → View metadata
+13. 🔵 Documentation + commit
+
+### Items Phase 5
+
+| Priorité | Item | Status | Estimation |
+|----------|------|--------|------------|
+| 🔴 HAUTE | Migration `tracks` table (+13 champs) | ⏸️ TODO | 30min |
+| 🔴 HAUTE | Router tRPC `projects` (5 endpoints) | ⏸️ TODO | 45min |
+| 🔴 HAUTE | Router tRPC `tracks` (6 endpoints) | ⏸️ TODO | 45min |
+| 🔴 HAUTE | Page ProjectsList UI | ⏸️ TODO | 1h |
+| 🔴 HAUTE | Page ProjectDetail UI | ⏸️ TODO | 1h |
+| 🟡 MOYENNE | Form CreateProject | ⏸️ TODO | 30min |
+| 🟡 MOYENNE | Form CreateTrack | ⏸️ TODO | 30min |
+| 🟡 MOYENNE | Upload versioning + preview | ⏸️ TODO | 1h |
+| 🟡 MOYENNE | Page TrackDetail UI | ⏸️ TODO | 1h |
+| 🟡 MOYENNE | Player audio versions | ⏸️ TODO | 30min |
+| 🟢 BASSE | Tests E2E projects flow | ⏸️ TODO | 1h |
+| 🟢 BASSE | Documentation Phase 5 | ⏸️ TODO | 30min |
+
+**Total Estimation:** 8-10h (2-3 sessions)
+
+### Schéma Target - Table `tracks` Enrichie
+
+```typescript
+export const tracks = pgTable("tracks", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+
+  // Basic Info (EXISTANT)
+  title: varchar("title", { length: 255 }).notNull(),
+  trackNumber: integer("track_number"),
+  duration: integer("duration"), // seconds
+  isrc: varchar("isrc", { length: 50 }),
+
+  // Status (EXISTANT)
+  status: varchar("status", { length: 50 }).notNull().default("recording"),
+
+  // Musical (EXISTANT)
+  bpm: integer("bpm"),
+  key: varchar("key", { length: 20 }),
+  lyrics: text("lyrics"),
+
+  // Files (EXISTANT)
+  fileUrl: varchar("file_url", { length: 500 }),
+  waveformUrl: varchar("waveform_url", { length: 500 }),
+
+  // Notes (EXISTANT)
+  notes: text("notes"),
+  technicalNotes: text("technical_notes"),
+
+  // ========== NOUVEAUX CHAMPS ==========
+
+  // Versioning (4 champs) - CRITIQUE
+  demoUrl: varchar("demo_url", { length: 500 }),
+  roughMixUrl: varchar("rough_mix_url", { length: 500 }),
+  finalMixUrl: varchar("final_mix_url", { length: 500 }),
+  masterUrl: varchar("master_url", { length: 500 }),
+
+  // Metadata Copyright (8 champs) - IMPORTANT
+  composer: varchar("composer", { length: 300 }),
+  lyricist: varchar("lyricist", { length: 300 }),
+  copyrightHolder: varchar("copyright_holder", { length: 300 }),
+  copyrightYear: integer("copyright_year"),
+  genreTags: text("genre_tags"), // JSON array
+  mood: varchar("mood", { length: 100 }),
+  language: varchar("language", { length: 50 }).default('fr'),
+  explicitContent: boolean("explicit_content").default(false),
+
+  // Technical Details (5 champs) - NICE-TO-HAVE
+  patchPreset: text("patch_preset"), // JSON
+  instrumentsUsed: text("instruments_used"), // JSON
+  microphonesUsed: text("microphones_used"), // JSON
+  effectsChain: text("effects_chain"), // JSON
+  dawSessionPath: varchar("daw_session_path", { length: 500 }),
+  recordedInRoomId: integer("recorded_in_room_id").references(() => rooms.id),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+```
+
+**Total:** 17 champs existants + 17 nouveaux = **34 champs** (> Claude 30 champs ✅)
+
+---
+
+**Phase 4.3 P1 Features: 100% COMPLÉTÉE ✅**
+**Phase 4.3 P2 Infrastructure: ⏸️ REPORTÉ après Phase 5**
+**Phase 5 Projects: 🔵 EN COURS (0/12 items)**
 
 ---
 
