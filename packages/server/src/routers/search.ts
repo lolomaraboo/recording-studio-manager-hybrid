@@ -39,18 +39,17 @@ export const searchRouter = router({
         const clientResults = await db
           .select({
             id: clients.id,
-            firstName: clients.firstName,
-            lastName: clients.lastName,
+            name: clients.name,
+            artistName: clients.artistName,
             email: clients.email,
             phone: clients.phone,
           })
           .from(clients)
           .where(
             and(
-              eq(clients.organizationId, organizationId),
               or(
-                ilike(clients.firstName, searchTerm),
-                ilike(clients.lastName, searchTerm),
+                ilike(clients.name, searchTerm),
+                ilike(clients.artistName, searchTerm),
                 ilike(clients.email, searchTerm),
                 ilike(clients.phone, searchTerm)
               )
@@ -62,8 +61,8 @@ export const searchRouter = router({
           ...clientResults.map((client) => ({
             id: client.id,
             type: "client" as const,
-            title: `${client.firstName} ${client.lastName}`,
-            subtitle: client.email || "",
+            title: client.name,
+            subtitle: client.artistName || client.email || "",
             description: client.phone || undefined,
             url: `/clients/${client.id}`,
             score: 1.0, // Base score, can be improved with ranking algorithm
@@ -77,19 +76,17 @@ export const searchRouter = router({
           .select({
             id: sessions.id,
             title: sessions.title,
-            scheduledDate: sessions.scheduledDate,
+            startTime: sessions.startTime,
             clientId: clients.id,
-            clientName: sql<string>`${clients.firstName} || ' ' || ${clients.lastName}`,
+            clientName: clients.name,
           })
           .from(sessions)
           .leftJoin(clients, eq(sessions.clientId, clients.id))
           .where(
             and(
-              eq(sessions.organizationId, organizationId),
               or(
                 ilike(sessions.title, searchTerm),
-                ilike(clients.firstName, searchTerm),
-                ilike(clients.lastName, searchTerm)
+                ilike(clients.name, searchTerm)
               )
             )
           )
@@ -101,8 +98,8 @@ export const searchRouter = router({
             type: "session" as const,
             title: session.title || "Session sans titre",
             subtitle: session.clientName || "Client inconnu",
-            description: session.scheduledDate
-              ? new Date(session.scheduledDate).toLocaleDateString("fr-FR")
+            description: session.startTime
+              ? new Date(session.startTime).toLocaleDateString("fr-FR")
               : undefined,
             url: `/sessions/${session.id}`,
             score: 0.9,
@@ -117,7 +114,7 @@ export const searchRouter = router({
             id: invoices.id,
             invoiceNumber: invoices.invoiceNumber,
             clientId: clients.id,
-            clientName: sql<string>`${clients.firstName} || ' ' || ${clients.lastName}`,
+            clientName: clients.name,
             totalAmount: invoices.totalAmount,
             status: invoices.status,
           })
@@ -125,11 +122,9 @@ export const searchRouter = router({
           .leftJoin(clients, eq(invoices.clientId, clients.id))
           .where(
             and(
-              eq(invoices.organizationId, organizationId),
               or(
                 ilike(invoices.invoiceNumber, searchTerm),
-                ilike(clients.firstName, searchTerm),
-                ilike(clients.lastName, searchTerm)
+                ilike(clients.name, searchTerm)
               )
             )
           )
@@ -163,7 +158,6 @@ export const searchRouter = router({
           .from(equipment)
           .where(
             and(
-              eq(equipment.organizationId, organizationId),
               or(
                 ilike(equipment.name, searchTerm),
                 ilike(equipment.manufacturer, searchTerm),
@@ -191,18 +185,17 @@ export const searchRouter = router({
         const musicianResults = await db
           .select({
             id: musicians.id,
-            firstName: musicians.firstName,
-            lastName: musicians.lastName,
-            specialty: musicians.specialty,
+            name: musicians.name,
+            stageName: musicians.stageName,
+            talentType: musicians.talentType,
           })
           .from(musicians)
           .where(
             and(
-              eq(musicians.organizationId, organizationId),
               or(
-                ilike(musicians.firstName, searchTerm),
-                ilike(musicians.lastName, searchTerm),
-                ilike(musicians.specialty, searchTerm)
+                ilike(musicians.name, searchTerm),
+                ilike(musicians.stageName, searchTerm),
+                ilike(musicians.talentType, searchTerm)
               )
             )
           )
@@ -212,8 +205,8 @@ export const searchRouter = router({
           ...musicianResults.map((musician) => ({
             id: musician.id,
             type: "musician" as const,
-            title: `${musician.firstName} ${musician.lastName}`,
-            subtitle: musician.specialty || "Musicien",
+            title: musician.stageName || musician.name,
+            subtitle: musician.talentType || "Talent",
             url: `/talents/${musician.id}`,
             score: 0.8,
           }))
