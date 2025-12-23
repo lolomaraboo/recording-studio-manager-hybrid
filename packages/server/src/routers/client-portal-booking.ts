@@ -12,6 +12,7 @@ import { getTenantDb } from "@rsm/database/connection";
 import { eq, and, gte, lte, between, sql, desc } from "drizzle-orm";
 import { isTokenExpired } from "../utils/client-portal-auth";
 import { getStripeClient } from "../utils/stripe-client";
+import { sendBookingConfirmationEmail, sendCancellationEmail } from "../utils/email-service";
 
 /**
  * Extract organizationId from request context
@@ -522,6 +523,36 @@ export const clientPortalBookingRouter = router({
         userAgent: ctx.req.headers["user-agent"],
       });
 
+      // Get client details for email
+      const clientList = await tenantDb
+        .select()
+        .from(clients)
+        .where(eq(clients.id, clientId))
+        .limit(1);
+
+      const client = clientList[0];
+
+      // Send booking confirmation email
+      try {
+        await sendBookingConfirmationEmail(
+          client.email,
+          client.name,
+          {
+            id: newSession[0].id,
+            title: input.title,
+            roomName: room.name,
+            startTime,
+            endTime,
+            totalAmount: totalAmount.toFixed(2),
+            depositAmount: depositAmount.toFixed(2),
+          }
+        );
+        console.log(`[createBooking] Confirmation email sent to ${client.email}`);
+      } catch (emailError) {
+        console.error('[createBooking] Failed to send confirmation email:', emailError);
+        // Don't throw error - booking was successful even if email failed
+      }
+
       return {
         booking: newSession[0],
         room,
@@ -809,6 +840,45 @@ export const clientPortalBookingRouter = router({
         ipAddress: ctx.req.ip,
         userAgent: ctx.req.headers["user-agent"],
       });
+
+      // Get client and room details for cancellation email
+      const clientAndRoomList = await tenantDb
+        .select({
+          client: clients,
+          room: rooms,
+        })
+        .from(clients)
+        .innerJoin(sessions, eq(clients.id, sessions.clientId))
+        .innerJoin(rooms, eq(sessions.roomId, rooms.id))
+        .where(eq(sessions.id, input.bookingId))
+        .limit(1);
+
+      if (clientAndRoomList.length > 0) {
+        const { client, room } = clientAndRoomList[0];
+
+        // Send cancellation email
+        try {
+          await sendCancellationEmail(
+            client.email,
+            client.name,
+            {
+              bookingId: booking.id,
+              bookingTitle: booking.title || "Studio Session",
+              roomName: room.name,
+              startTime: new Date(booking.startTime),
+              endTime: new Date(booking.endTime),
+              cancelledAt: new Date(),
+              reason: input.reason,
+              refundAmount: refundInfo ? refundInfo.amount.toFixed(2) : undefined,
+              refundProcessed: refundInfo ? true : false,
+            }
+          );
+          console.log(`[cancelBooking] Cancellation email sent to ${client.email}`);
+        } catch (emailError) {
+          console.error('[cancelBooking] Failed to send cancellation email:', emailError);
+          // Don't throw error - cancellation was successful even if email failed
+        }
+      }
 
       return {
         message: refundInfo

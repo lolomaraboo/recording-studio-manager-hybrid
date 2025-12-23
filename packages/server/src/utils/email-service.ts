@@ -478,3 +478,168 @@ export async function sendBookingReminderEmail(
 
   console.log(`[Email] Booking reminder sent to ${to} for booking ${booking.id}`);
 }
+
+/**
+ * Send booking cancellation email (with refund info if applicable)
+ *
+ * @param to - Recipient email
+ * @param clientName - Client's name
+ * @param cancellation - Cancellation details
+ */
+export async function sendCancellationEmail(
+  to: string,
+  clientName: string,
+  cancellation: {
+    bookingId: number;
+    bookingTitle: string;
+    roomName: string;
+    startTime: Date;
+    endTime: Date;
+    cancelledAt: Date;
+    reason?: string;
+    refundAmount?: string;
+    refundProcessed: boolean;
+  }
+): Promise<void> {
+  const resend = getResendClient();
+
+  const formatDate = (date: Date) =>
+    new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+
+  const formatTime = (date: Date) =>
+    new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date);
+
+  const formatDateTime = (date: Date) =>
+    new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(date);
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Cancelled</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+    <h1 style="color: white; margin: 0; font-size: 28px;">🚫 Booking Cancelled</h1>
+  </div>
+
+  <div style="background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 10px 10px;">
+    <h2 style="color: #333; margin-top: 0;">Hi ${clientName},</h2>
+
+    <p>Your booking has been cancelled as requested.</p>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #667eea;">📋 Cancelled Booking Details</h3>
+
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Booking #:</td>
+          <td style="padding: 8px 0; font-weight: bold; text-align: right;">#${cancellation.bookingId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Session:</td>
+          <td style="padding: 8px 0; font-weight: bold; text-align: right;">${cancellation.bookingTitle}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Room:</td>
+          <td style="padding: 8px 0; font-weight: bold; text-align: right;">${cancellation.roomName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Date:</td>
+          <td style="padding: 8px 0; font-weight: bold; text-align: right;">${formatDate(cancellation.startTime)}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Time:</td>
+          <td style="padding: 8px 0; font-weight: bold; text-align: right;">${formatTime(cancellation.startTime)} - ${formatTime(cancellation.endTime)}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Cancelled:</td>
+          <td style="padding: 8px 0; font-weight: bold; text-align: right;">${formatDateTime(cancellation.cancelledAt)}</td>
+        </tr>
+        ${
+          cancellation.reason
+            ? `
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Reason:</td>
+          <td style="padding: 8px 0; font-style: italic; text-align: right;">${cancellation.reason}</td>
+        </tr>
+        `
+            : ""
+        }
+      </table>
+    </div>
+
+    ${
+      cancellation.refundProcessed && cancellation.refundAmount
+        ? `
+    <div style="background: #dcfce7; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; border-radius: 4px;">
+      <p style="margin: 0; color: #166534;">
+        <strong>✓ Refund Processed</strong><br>
+        A refund of <strong>$${cancellation.refundAmount}</strong> has been processed and will appear in your account within 5-10 business days.
+      </p>
+    </div>
+    `
+        : cancellation.refundAmount
+          ? `
+    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+      <p style="margin: 0; color: #92400e;">
+        <strong>⏳ Refund Pending</strong><br>
+        A refund of <strong>$${cancellation.refundAmount}</strong> is being processed and will appear in your account within 5-10 business days.
+      </p>
+    </div>
+    `
+          : ""
+    }
+
+    <p style="color: #666; margin-top: 20px;">
+      We're sorry to see you cancel. If you have any questions or would like to reschedule, please don't hesitate to contact us.
+    </p>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${process.env.CLIENT_PORTAL_URL || "http://localhost:3000"}/bookings"
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+        View My Bookings
+      </a>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+
+    <p style="color: #666; font-size: 14px;">
+      Questions? Reply to this email or contact us at ${EMAIL_CONFIG.replyTo}
+    </p>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; color: #999; font-size: 12px;">
+    <p>© ${new Date().getFullYear()} Studio Portal. All rights reserved.</p>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  await resend.emails.send({
+    from: EMAIL_CONFIG.from,
+    to,
+    subject: `🚫 Booking Cancelled - ${cancellation.bookingTitle}`,
+    html: htmlContent,
+    replyTo: EMAIL_CONFIG.replyTo,
+  });
+
+  console.log(`[Email] Cancellation email sent to ${to} for booking ${cancellation.bookingId}`);
+}
