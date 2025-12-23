@@ -41,6 +41,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { FileUploadButton } from "@/components/FileUploadButton";
 
 const projectTypeLabels: Record<string, string> = {
   album: "Album",
@@ -841,46 +842,82 @@ export default function ProjectDetail() {
 
             {/* Versioning URLs */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold">Versioning (URLs de fichiers)</h3>
+              <h3 className="text-sm font-semibold">Versioning (Upload de fichiers audio)</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="track-demo-url">Demo URL</Label>
-                  <Input
-                    id="track-demo-url"
-                    value={trackFormData.demoUrl}
-                    onChange={(e) => setTrackFormData({ ...trackFormData, demoUrl: e.target.value })}
-                    placeholder="https://..."
-                  />
+                  <Label htmlFor="track-demo-url">Demo</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="track-demo-url"
+                      value={trackFormData.demoUrl}
+                      onChange={(e) => setTrackFormData({ ...trackFormData, demoUrl: e.target.value })}
+                      placeholder="URL généré après upload..."
+                      readOnly
+                    />
+                    <FileUploadButton
+                      versionType="demo"
+                      currentUrl={trackFormData.demoUrl}
+                      onUploadSuccess={(url) => setTrackFormData({ ...trackFormData, demoUrl: url })}
+                      onUploadError={(error) => toast.error(error)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="track-rough-mix-url">Rough Mix URL</Label>
-                  <Input
-                    id="track-rough-mix-url"
-                    value={trackFormData.roughMixUrl}
-                    onChange={(e) => setTrackFormData({ ...trackFormData, roughMixUrl: e.target.value })}
-                    placeholder="https://..."
-                  />
+                  <Label htmlFor="track-rough-mix-url">Rough Mix</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="track-rough-mix-url"
+                      value={trackFormData.roughMixUrl}
+                      onChange={(e) => setTrackFormData({ ...trackFormData, roughMixUrl: e.target.value })}
+                      placeholder="URL généré après upload..."
+                      readOnly
+                    />
+                    <FileUploadButton
+                      versionType="roughMix"
+                      currentUrl={trackFormData.roughMixUrl}
+                      onUploadSuccess={(url) => setTrackFormData({ ...trackFormData, roughMixUrl: url })}
+                      onUploadError={(error) => toast.error(error)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="track-final-mix-url">Final Mix URL</Label>
-                  <Input
-                    id="track-final-mix-url"
-                    value={trackFormData.finalMixUrl}
-                    onChange={(e) => setTrackFormData({ ...trackFormData, finalMixUrl: e.target.value })}
-                    placeholder="https://..."
-                  />
+                  <Label htmlFor="track-final-mix-url">Final Mix</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="track-final-mix-url"
+                      value={trackFormData.finalMixUrl}
+                      onChange={(e) => setTrackFormData({ ...trackFormData, finalMixUrl: e.target.value })}
+                      placeholder="URL généré après upload..."
+                      readOnly
+                    />
+                    <FileUploadButton
+                      versionType="finalMix"
+                      currentUrl={trackFormData.finalMixUrl}
+                      onUploadSuccess={(url) => setTrackFormData({ ...trackFormData, finalMixUrl: url })}
+                      onUploadError={(error) => toast.error(error)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="track-master-url">Master URL</Label>
-                  <Input
-                    id="track-master-url"
-                    value={trackFormData.masterUrl}
-                    onChange={(e) => setTrackFormData({ ...trackFormData, masterUrl: e.target.value })}
-                    placeholder="https://..."
-                  />
+                  <Label htmlFor="track-master-url">Master</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="track-master-url"
+                      value={trackFormData.masterUrl}
+                      onChange={(e) => setTrackFormData({ ...trackFormData, masterUrl: e.target.value })}
+                      placeholder="URL généré après upload..."
+                      readOnly
+                    />
+                    <FileUploadButton
+                      versionType="master"
+                      currentUrl={trackFormData.masterUrl}
+                      onUploadSuccess={(url) => setTrackFormData({ ...trackFormData, masterUrl: url })}
+                      onUploadError={(error) => toast.error(error)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

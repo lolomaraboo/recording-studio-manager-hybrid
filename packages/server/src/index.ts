@@ -6,6 +6,7 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index';
 import { createContext } from './_core/context';
 import { handleStripeWebhook } from './webhooks/stripe-webhook';
+import uploadRouter from './routes/upload';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -65,6 +66,9 @@ async function main() {
       service: 'recording-studio-manager-api',
     });
   });
+
+  // Upload routes (before tRPC to handle multipart/form-data)
+  app.use('/api/upload', uploadRouter);
 
   // tRPC middleware
   app.use(

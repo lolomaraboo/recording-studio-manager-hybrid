@@ -317,6 +317,47 @@ export const projectsRouter = router({
       }),
 
     /**
+     * Update track version URL (after upload)
+     */
+    updateVersionUrl: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          versionType: z.enum(["demo", "roughMix", "finalMix", "master"]),
+          url: z.string().url(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.tenantDb) {
+          throw new Error("Tenant database not available");
+        }
+
+        const { id, versionType, url } = input;
+
+        // Map version type to database column
+        const columnMap = {
+          demo: "demoUrl",
+          roughMix: "roughMixUrl",
+          finalMix: "finalMixUrl",
+          master: "masterUrl",
+        } as const;
+
+        const column = columnMap[versionType];
+
+        const updated = await ctx.tenantDb
+          .update(tracks)
+          .set({ [column]: url })
+          .where(eq(tracks.id, id))
+          .returning();
+
+        if (updated.length === 0) {
+          throw new Error("Track not found");
+        }
+
+        return updated[0];
+      }),
+
+    /**
      * Delete track
      */
     delete: protectedProcedure
