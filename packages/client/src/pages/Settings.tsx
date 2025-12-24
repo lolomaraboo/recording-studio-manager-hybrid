@@ -125,15 +125,57 @@ export default function Settings() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="europe-paris">
-                      Europe/Paris (GMT+1)
-                    </SelectItem>
-                    <SelectItem value="europe-london">
-                      Europe/London (GMT+0)
-                    </SelectItem>
-                    <SelectItem value="america-new-york">
-                      America/New York (GMT-5)
-                    </SelectItem>
+                    {/* Europe */}
+                    <SelectItem value="europe-paris">Europe/Paris (GMT+1)</SelectItem>
+                    <SelectItem value="europe-london">Europe/London (GMT+0)</SelectItem>
+                    <SelectItem value="europe-berlin">Europe/Berlin (GMT+1)</SelectItem>
+                    <SelectItem value="europe-madrid">Europe/Madrid (GMT+1)</SelectItem>
+                    <SelectItem value="europe-rome">Europe/Rome (GMT+1)</SelectItem>
+                    <SelectItem value="europe-amsterdam">Europe/Amsterdam (GMT+1)</SelectItem>
+                    <SelectItem value="europe-brussels">Europe/Brussels (GMT+1)</SelectItem>
+                    <SelectItem value="europe-zurich">Europe/Zurich (GMT+1)</SelectItem>
+                    <SelectItem value="europe-lisbon">Europe/Lisbon (GMT+0)</SelectItem>
+                    <SelectItem value="europe-athens">Europe/Athens (GMT+2)</SelectItem>
+                    <SelectItem value="europe-moscow">Europe/Moscow (GMT+3)</SelectItem>
+                    <SelectItem value="europe-istanbul">Europe/Istanbul (GMT+3)</SelectItem>
+
+                    {/* Americas */}
+                    <SelectItem value="america-new-york">America/New York (GMT-5)</SelectItem>
+                    <SelectItem value="america-chicago">America/Chicago (GMT-6)</SelectItem>
+                    <SelectItem value="america-denver">America/Denver (GMT-7)</SelectItem>
+                    <SelectItem value="america-los-angeles">America/Los Angeles (GMT-8)</SelectItem>
+                    <SelectItem value="america-toronto">America/Toronto (GMT-5)</SelectItem>
+                    <SelectItem value="america-vancouver">America/Vancouver (GMT-8)</SelectItem>
+                    <SelectItem value="america-mexico-city">America/Mexico City (GMT-6)</SelectItem>
+                    <SelectItem value="america-sao-paulo">America/São Paulo (GMT-3)</SelectItem>
+                    <SelectItem value="america-buenos-aires">America/Buenos Aires (GMT-3)</SelectItem>
+                    <SelectItem value="america-lima">America/Lima (GMT-5)</SelectItem>
+                    <SelectItem value="america-santiago">America/Santiago (GMT-3)</SelectItem>
+
+                    {/* Asia */}
+                    <SelectItem value="asia-dubai">Asia/Dubai (GMT+4)</SelectItem>
+                    <SelectItem value="asia-shanghai">Asia/Shanghai (GMT+8)</SelectItem>
+                    <SelectItem value="asia-tokyo">Asia/Tokyo (GMT+9)</SelectItem>
+                    <SelectItem value="asia-hong-kong">Asia/Hong Kong (GMT+8)</SelectItem>
+                    <SelectItem value="asia-singapore">Asia/Singapore (GMT+8)</SelectItem>
+                    <SelectItem value="asia-seoul">Asia/Seoul (GMT+9)</SelectItem>
+                    <SelectItem value="asia-bangkok">Asia/Bangkok (GMT+7)</SelectItem>
+                    <SelectItem value="asia-jakarta">Asia/Jakarta (GMT+7)</SelectItem>
+                    <SelectItem value="asia-manila">Asia/Manila (GMT+8)</SelectItem>
+                    <SelectItem value="asia-kolkata">Asia/Kolkata (GMT+5:30)</SelectItem>
+
+                    {/* Pacific */}
+                    <SelectItem value="pacific-auckland">Pacific/Auckland (GMT+12)</SelectItem>
+                    <SelectItem value="pacific-sydney">Pacific/Sydney (GMT+10)</SelectItem>
+                    <SelectItem value="pacific-melbourne">Pacific/Melbourne (GMT+10)</SelectItem>
+                    <SelectItem value="pacific-fiji">Pacific/Fiji (GMT+12)</SelectItem>
+                    <SelectItem value="pacific-honolulu">Pacific/Honolulu (GMT-10)</SelectItem>
+
+                    {/* Africa */}
+                    <SelectItem value="africa-cairo">Africa/Cairo (GMT+2)</SelectItem>
+                    <SelectItem value="africa-johannesburg">Africa/Johannesburg (GMT+2)</SelectItem>
+                    <SelectItem value="africa-lagos">Africa/Lagos (GMT+1)</SelectItem>
+                    <SelectItem value="africa-nairobi">Africa/Nairobi (GMT+3)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
