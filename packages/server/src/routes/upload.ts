@@ -1,6 +1,11 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import multer from 'multer';
 import { uploadAudioFile } from '../utils/cloudinary-service';
+
+// Extend Express Request to include Multer file
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
 
 const router = Router();
 
@@ -54,7 +59,7 @@ const upload = multer({
  *   }
  * }
  */
-router.post('/audio', upload.single('file'), async (req, res) => {
+router.post('/audio', upload.single('file'), async (req: MulterRequest, res) => {
   try {
     console.log('[Upload] Received upload request');
 
@@ -183,7 +188,7 @@ const uploadLogo = multer({
   },
 });
 
-router.post('/logo', uploadLogo.single('file'), async (req, res) => {
+router.post('/logo', uploadLogo.single('file'), async (req: MulterRequest, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
