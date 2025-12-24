@@ -17,8 +17,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      # Bind to localhost only (Nginx will proxy)
-      - "127.0.0.1:5432:5432"
+      # Bind to localhost only (use 5434 to avoid conflicts with other PostgreSQL instances)
+      - "127.0.0.1:5434:5432"
     networks:
       - rsm_network
     healthcheck:
@@ -59,7 +59,8 @@ services:
       - redis_data:/data
     ports:
       # Bind to localhost only
-      - "127.0.0.1:6379:6379"
+      # Use port 6380 to avoid conflicts with other Redis instances (e.g., Mem0)
+      - "127.0.0.1:6380:6379"
     networks:
       - rsm_network
     healthcheck:
