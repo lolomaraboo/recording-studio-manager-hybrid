@@ -165,11 +165,15 @@ export default function Settings() {
                     <SelectItem value="asia-kolkata">Asia/Kolkata (GMT+5:30)</SelectItem>
 
                     {/* Pacific */}
+                    <SelectItem value="pacific-tahiti">Pacific/Tahiti (GMT-10)</SelectItem>
                     <SelectItem value="pacific-auckland">Pacific/Auckland (GMT+12)</SelectItem>
                     <SelectItem value="pacific-sydney">Pacific/Sydney (GMT+10)</SelectItem>
                     <SelectItem value="pacific-melbourne">Pacific/Melbourne (GMT+10)</SelectItem>
                     <SelectItem value="pacific-fiji">Pacific/Fiji (GMT+12)</SelectItem>
                     <SelectItem value="pacific-honolulu">Pacific/Honolulu (GMT-10)</SelectItem>
+                    <SelectItem value="pacific-marquesas">Pacific/Marquesas (GMT-9:30)</SelectItem>
+                    <SelectItem value="pacific-gambier">Pacific/Gambier (GMT-9)</SelectItem>
+                    <SelectItem value="pacific-noumea">Pacific/Nouméa (GMT+11)</SelectItem>
 
                     {/* Africa */}
                     <SelectItem value="africa-cairo">Africa/Cairo (GMT+2)</SelectItem>
