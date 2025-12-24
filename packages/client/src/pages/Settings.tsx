@@ -124,7 +124,7 @@ export default function Settings() {
                   <SelectTrigger id="timezone">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[300px] overflow-y-auto">
                     {/* Europe */}
                     <SelectItem value="europe-paris">Europe/Paris (GMT+1)</SelectItem>
                     <SelectItem value="europe-london">Europe/London (GMT+0)</SelectItem>
