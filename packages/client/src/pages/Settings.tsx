@@ -29,6 +29,7 @@ import {
   Smartphone,
   Save,
   Upload,
+  Download,
 } from "lucide-react";
 
 export default function Settings() {
