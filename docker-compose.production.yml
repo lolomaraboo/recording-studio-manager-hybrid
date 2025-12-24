@@ -169,7 +169,7 @@ services:
       dockerfile: packages/client/Dockerfile.production
       args:
         # Build-time environment variables
-        VITE_API_URL: /api
+        VITE_API_URL: /api/trpc
     container_name: rsm-client
     restart: unless-stopped
     ports:

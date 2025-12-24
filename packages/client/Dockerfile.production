@@ -5,7 +5,7 @@
 FROM node:20-alpine AS builder
 
 # Accept build args
-ARG VITE_API_URL=/api
+ARG VITE_API_URL=/api/trpc
 
 WORKDIR /app
 
