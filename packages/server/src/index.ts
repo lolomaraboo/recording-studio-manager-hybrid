@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
+import { RedisStore } from 'connect-redis';
+import Redis from 'ioredis';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index';
 import { createContext } from './_core/context';
@@ -22,6 +24,17 @@ const PORT = process.env.PORT || 3001;
 
 async function main() {
   const app = express();
+
+  // Initialize Redis client for session storage
+  const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+
+  redis.on('connect', () => {
+    console.log('✅ Redis connected for session storage');
+  });
+
+  redis.on('error', (err) => {
+    console.error('❌ Redis connection error:', err);
+  });
 
   // Middleware
   app.use(
@@ -47,6 +60,10 @@ async function main() {
   app.use(express.json());
   app.use(
     session({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rsm:session:',
+      }),
       secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
       resave: false,
       saveUninitialized: false,
