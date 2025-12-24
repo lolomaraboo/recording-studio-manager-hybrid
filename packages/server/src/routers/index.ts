@@ -19,6 +19,7 @@ import { clientPortalAuthRouter } from './client-portal-auth';
 import { clientPortalDashboardRouter } from './client-portal-dashboard';
 import { clientPortalBookingRouter } from './client-portal-booking';
 import { clientPortalStripeRouter } from './client-portal-stripe';
+import { adminRouter } from './admin';
 
 /**
  * Main App Router
@@ -52,6 +53,7 @@ import { clientPortalStripeRouter } from './client-portal-stripe';
 export const appRouter = router({
   auth: authRouter,
   organizations: organizationsRouter,
+  admin: adminRouter,
   sessions: sessionsRouter,
   clients: clientsRouter,
   invoices: invoicesRouter,

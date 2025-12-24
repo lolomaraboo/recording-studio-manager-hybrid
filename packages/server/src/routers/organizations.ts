@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { router, protectedProcedure, adminProcedure } from '../_core/trpc';
 import { organizations } from '@rsm/database/master';
 import { getMasterDb } from '@rsm/database/connection';
+import { createTenantDatabase, deleteTenantDatabase } from '../services/tenant-provisioning';
 
 /**
  * Organizations Router
@@ -105,7 +106,20 @@ export const organizationsRouter = router({
         })
         .returning();
 
-      // TODO: Create entry in tenantDatabases and create actual tenant database
+      // Create tenant database and apply migrations
+      const tenantResult = await createTenantDatabase(org.id);
+
+      if (!tenantResult.success) {
+        console.error('[Organizations] Failed to create tenant database:', tenantResult.error);
+        // Rollback organization creation
+        await db.delete(organizations).where(eq(organizations.id, org.id));
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to create tenant database: ${tenantResult.error}`,
+        });
+      }
+
+      console.log(`[Organizations] Organization ${org.id} created with tenant DB: ${tenantResult.databaseName}`);
 
       return org;
     }),
@@ -161,7 +175,16 @@ export const organizationsRouter = router({
     .mutation(async ({ input }) => {
       const db = await getMasterDb();
 
-      // TODO: Delete tenant database first
+      // Delete tenant database first
+      try {
+        await deleteTenantDatabase(input.id);
+      } catch (error) {
+        console.error('[Organizations] Failed to delete tenant database:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to delete tenant database',
+        });
+      }
 
       await db.delete(organizations).where(eq(organizations.id, input.id));
 

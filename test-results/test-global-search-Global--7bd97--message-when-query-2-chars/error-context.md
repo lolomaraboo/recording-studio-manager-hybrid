@@ -1,0 +1,445 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: RSM
+        - button "Réduire la sidebar" [ref=e7] [cursor=pointer]:
+          - img
+      - button "Rechercher... ⌘ K" [ref=e9] [cursor=pointer]:
+        - img
+        - text: Rechercher...
+        - generic:
+          - generic: ⌘
+          - text: K
+      - navigation [ref=e11]:
+        - link "Dashboard" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e13]:
+            - img [ref=e14]
+            - generic [ref=e17]: Dashboard
+            - button "Ajouter aux favoris" [ref=e18]:
+              - img [ref=e19]
+        - button "Planning Sessions Calendrier" [ref=e21] [cursor=pointer]:
+          - button "Planning" [ref=e22]:
+            - generic [ref=e23]:
+              - img [ref=e24]
+              - generic [ref=e26]: Planning
+            - generic [ref=e27]:
+              - img [ref=e29]
+              - img [ref=e36]
+          - generic [ref=e38]:
+            - link "Sessions" [ref=e39]:
+              - /url: /sessions
+              - generic [ref=e40]:
+                - img [ref=e41]
+                - generic [ref=e45]: Sessions
+                - generic [ref=e46]:
+                  - button "Créer sessions" [ref=e47]:
+                    - img [ref=e48]
+                  - button "Ajouter aux favoris" [ref=e49]:
+                    - img [ref=e50]
+            - link "Calendrier" [ref=e52]:
+              - /url: /calendar
+              - generic [ref=e53]:
+                - img [ref=e54]
+                - generic [ref=e56]: Calendrier
+                - generic [ref=e57]:
+                  - button "Créer calendrier" [ref=e58]:
+                    - img [ref=e59]
+                  - button "Ajouter aux favoris" [ref=e60]:
+                    - img [ref=e61]
+        - button "Contacts Clients Équipe Talents" [ref=e63] [cursor=pointer]:
+          - button "Contacts" [ref=e64]:
+            - generic [ref=e65]:
+              - img [ref=e66]
+              - generic [ref=e71]: Contacts
+            - generic [ref=e72]:
+              - img [ref=e74]
+              - img [ref=e81]
+          - generic [ref=e83]:
+            - link "Clients" [ref=e84]:
+              - /url: /clients
+              - generic [ref=e85]:
+                - img [ref=e86]
+                - generic [ref=e91]: Clients
+                - generic [ref=e92]:
+                  - button "Créer clients" [ref=e93]:
+                    - img [ref=e94]
+                  - button "Ajouter aux favoris" [ref=e95]:
+                    - img [ref=e96]
+            - link "Équipe" [ref=e98]:
+              - /url: /team
+              - generic [ref=e99]:
+                - img [ref=e100]
+                - generic [ref=e103]: Équipe
+                - generic [ref=e104]:
+                  - button "Créer équipe" [ref=e105]:
+                    - img [ref=e106]
+                  - button "Ajouter aux favoris" [ref=e107]:
+                    - img [ref=e108]
+            - link "Talents" [ref=e110]:
+              - /url: /talents
+              - generic [ref=e111]:
+                - img [ref=e112]
+                - generic [ref=e117]: Talents
+                - generic [ref=e118]:
+                  - button "Créer talents" [ref=e119]:
+                    - img [ref=e120]
+                  - button "Ajouter aux favoris" [ref=e121]:
+                    - img [ref=e122]
+        - button "Ressources Salles Équipement" [ref=e124] [cursor=pointer]:
+          - button "Ressources" [ref=e125]:
+            - generic [ref=e126]:
+              - img [ref=e127]
+              - generic [ref=e129]: Ressources
+            - generic [ref=e130]:
+              - img [ref=e132]
+              - img [ref=e139]
+          - generic [ref=e141]:
+            - link "Salles" [ref=e142]:
+              - /url: /rooms
+              - generic [ref=e143]:
+                - img [ref=e144]
+                - generic [ref=e147]: Salles
+                - generic [ref=e148]:
+                  - button "Créer salles" [ref=e149]:
+                    - img [ref=e150]
+                  - button "Ajouter aux favoris" [ref=e151]:
+                    - img [ref=e152]
+            - link "Équipement" [ref=e154]:
+              - /url: /equipment
+              - generic [ref=e155]:
+                - img [ref=e156]
+                - generic [ref=e160]: Équipement
+                - generic [ref=e161]:
+                  - button "Créer équipement" [ref=e162]:
+                    - img [ref=e163]
+                  - button "Ajouter aux favoris" [ref=e164]:
+                    - img [ref=e165]
+        - button "Finance Factures Devis Contrats Dépenses Rapports Financiers" [ref=e167] [cursor=pointer]:
+          - button "Finance" [ref=e168]:
+            - generic [ref=e169]:
+              - img [ref=e170]
+              - generic [ref=e172]: Finance
+            - generic [ref=e173]:
+              - img [ref=e175]
+              - img [ref=e182]
+          - generic [ref=e184]:
+            - link "Factures" [ref=e185]:
+              - /url: /invoices
+              - generic [ref=e186]:
+                - img [ref=e187]
+                - generic [ref=e190]: Factures
+                - generic [ref=e191]:
+                  - button "Créer factures" [ref=e192]:
+                    - img [ref=e193]
+                  - button "Ajouter aux favoris" [ref=e194]:
+                    - img [ref=e195]
+            - link "Devis" [ref=e197]:
+              - /url: /quotes
+              - generic [ref=e198]:
+                - img [ref=e199]
+                - generic [ref=e202]: Devis
+                - generic [ref=e203]:
+                  - button "Créer devis" [ref=e204]:
+                    - img [ref=e205]
+                  - button "Ajouter aux favoris" [ref=e206]:
+                    - img [ref=e207]
+            - link "Contrats" [ref=e209]:
+              - /url: /contracts
+              - generic [ref=e210]:
+                - img [ref=e211]
+                - generic [ref=e214]: Contrats
+                - generic [ref=e215]:
+                  - button "Créer contrats" [ref=e216]:
+                    - img [ref=e217]
+                  - button "Ajouter aux favoris" [ref=e218]:
+                    - img [ref=e219]
+            - link "Dépenses" [ref=e221]:
+              - /url: /expenses
+              - generic [ref=e222]:
+                - img [ref=e223]
+                - generic [ref=e225]: Dépenses
+                - generic [ref=e226]:
+                  - button "Créer dépenses" [ref=e227]:
+                    - img [ref=e228]
+                  - button "Ajouter aux favoris" [ref=e229]:
+                    - img [ref=e230]
+            - link "Rapports Financiers" [ref=e232]:
+              - /url: /financial-reports
+              - generic [ref=e233]:
+                - img [ref=e234]
+                - generic [ref=e236]: Rapports Financiers
+                - generic [ref=e237]:
+                  - button "Créer rapports financiers" [ref=e238]:
+                    - img [ref=e239]
+                  - button "Ajouter aux favoris" [ref=e240]:
+                    - img [ref=e241]
+        - button "Analyse Analytics Rapports" [ref=e243] [cursor=pointer]:
+          - button "Analyse" [ref=e244]:
+            - generic [ref=e245]:
+              - img [ref=e246]
+              - generic [ref=e249]: Analyse
+            - generic [ref=e250]:
+              - img [ref=e252]
+              - img [ref=e259]
+          - generic [ref=e261]:
+            - link "Analytics" [ref=e262]:
+              - /url: /analytics
+              - generic [ref=e263]:
+                - img [ref=e264]
+                - generic [ref=e266]: Analytics
+                - generic [ref=e267]:
+                  - button "Créer analytics" [ref=e268]:
+                    - img [ref=e269]
+                  - button "Ajouter aux favoris" [ref=e270]:
+                    - img [ref=e271]
+            - link "Rapports" [ref=e273]:
+              - /url: /reports
+              - generic [ref=e274]:
+                - img [ref=e275]
+                - generic [ref=e278]: Rapports
+                - generic [ref=e279]:
+                  - button "Créer rapports" [ref=e280]:
+                    - img [ref=e281]
+                  - button "Ajouter aux favoris" [ref=e282]:
+                    - img [ref=e283]
+        - button "Projets Projets Tracks Fichiers Audio Partages" [ref=e285] [cursor=pointer]:
+          - button "Projets" [ref=e286]:
+            - generic [ref=e287]:
+              - img [ref=e288]
+              - generic [ref=e290]: Projets
+            - generic [ref=e291]:
+              - img [ref=e293]
+              - img [ref=e300]
+          - generic [ref=e302]:
+            - link "Projets" [ref=e303]:
+              - /url: /projects
+              - generic [ref=e304]:
+                - img [ref=e305]
+                - generic [ref=e307]: Projets
+                - generic [ref=e308]:
+                  - button "Créer projets" [ref=e309]:
+                    - img [ref=e310]
+                  - button "Ajouter aux favoris" [ref=e311]:
+                    - img [ref=e312]
+            - link "Tracks" [ref=e314]:
+              - /url: /tracks
+              - generic [ref=e315]:
+                - img [ref=e316]
+                - generic [ref=e320]: Tracks
+                - generic [ref=e321]:
+                  - button "Créer tracks" [ref=e322]:
+                    - img [ref=e323]
+                  - button "Ajouter aux favoris" [ref=e324]:
+                    - img [ref=e325]
+            - link "Fichiers Audio" [ref=e327]:
+              - /url: /audio-files
+              - generic [ref=e328]:
+                - img [ref=e329]
+                - generic [ref=e333]: Fichiers Audio
+                - generic [ref=e334]:
+                  - button "Créer fichiers audio" [ref=e335]:
+                    - img [ref=e336]
+                  - button "Ajouter aux favoris" [ref=e337]:
+                    - img [ref=e338]
+            - link "Partages" [ref=e340]:
+              - /url: /shares
+              - generic [ref=e341]:
+                - img [ref=e342]
+                - generic [ref=e348]: Partages
+                - generic [ref=e349]:
+                  - button "Créer partages" [ref=e350]:
+                    - img [ref=e351]
+                  - button "Ajouter aux favoris" [ref=e352]:
+                    - img [ref=e353]
+        - button "Communication Messages Notifications" [ref=e355] [cursor=pointer]:
+          - button "Communication" [ref=e356]:
+            - generic [ref=e357]:
+              - img [ref=e358]
+              - generic [ref=e360]: Communication
+            - generic [ref=e361]:
+              - img [ref=e363]
+              - img [ref=e370]
+          - generic [ref=e372]:
+            - link "Messages" [ref=e373]:
+              - /url: /chat
+              - generic [ref=e374]:
+                - img [ref=e375]
+                - generic [ref=e377]: Messages
+                - generic [ref=e378]:
+                  - button "Créer messages" [ref=e379]:
+                    - img [ref=e380]
+                  - button "Ajouter aux favoris" [ref=e381]:
+                    - img [ref=e382]
+            - link "Notifications" [ref=e384]:
+              - /url: /notifications
+              - generic [ref=e385]:
+                - img [ref=e386]
+                - generic [ref=e389]: Notifications
+                - generic [ref=e390]:
+                  - button "Créer notifications" [ref=e391]:
+                    - img [ref=e392]
+                  - button "Ajouter aux favoris" [ref=e393]:
+                    - img [ref=e394]
+        - status [ref=e396]
+      - generic [ref=e397]:
+        - link "Paramètres" [ref=e398] [cursor=pointer]:
+          - /url: /settings
+          - button "Paramètres" [ref=e399]:
+            - img
+            - generic [ref=e400]: Paramètres
+        - button "Déconnexion" [ref=e401] [cursor=pointer]:
+          - img
+          - generic [ref=e402]: Déconnexion
+    - generic [ref=e403]:
+      - banner [ref=e404]:
+        - generic [ref=e405]:
+          - link "Test Studio" [ref=e406] [cursor=pointer]:
+            - /url: /dashboard
+            - generic [ref=e407]:
+              - img [ref=e409]
+              - generic [ref=e413]: Test Studio
+          - generic [ref=e414]:
+            - generic [ref=e415]: Test User
+            - button "Mode sombre" [ref=e416] [cursor=pointer]:
+              - img
+            - button [ref=e417] [cursor=pointer]:
+              - img
+      - main [ref=e418]:
+        - generic [ref=e419]:
+          - generic [ref=e420]:
+            - generic [ref=e421]:
+              - heading "Dashboard" [level=2] [ref=e422]:
+                - img [ref=e423]
+                - text: Dashboard
+              - paragraph [ref=e426]: Voici un aperçu de votre activité
+            - generic [ref=e427]:
+              - button "Réinitialiser" [ref=e428] [cursor=pointer]:
+                - img
+                - text: Réinitialiser
+              - button "Configurer les widgets" [ref=e429] [cursor=pointer]:
+                - img
+                - text: Configurer les widgets
+          - generic [ref=e430]:
+            - generic [ref=e432]:
+              - button [ref=e434]:
+                - img [ref=e435]
+              - generic [ref=e443]:
+                - generic [ref=e444]: Statistiques Rapides
+                - generic [ref=e445]:
+                  - generic [ref=e446]:
+                    - generic [ref=e447]: Clients
+                    - generic [ref=e448]: "4"
+                  - generic [ref=e449]:
+                    - generic [ref=e450]: Salles
+                    - generic [ref=e451]: "2"
+                  - generic [ref=e452]:
+                    - generic [ref=e453]: Équipement
+                    - generic [ref=e454]: "0"
+                  - generic [ref=e455]:
+                    - generic [ref=e456]: Projets
+                    - generic [ref=e457]: "1"
+            - generic [ref=e459]:
+              - button [ref=e461]:
+                - img [ref=e462]
+              - generic [ref=e470]:
+                - generic [ref=e471]:
+                  - img [ref=e472]
+                  - text: Sessions aujourd'hui
+                - generic [ref=e475] [cursor=pointer]:
+                  - generic [ref=e476]:
+                    - generic [ref=e477]: Final Stripe Payment Test
+                    - generic [ref=e478]: scheduled
+                  - generic [ref=e479]:
+                    - img [ref=e480]
+                    - text: 04:00 - 08:00
+            - generic [ref=e484]:
+              - button [ref=e486]:
+                - img [ref=e487]
+              - generic [ref=e495]:
+                - generic [ref=e496]:
+                  - img [ref=e497]
+                  - text: Sessions à venir (7 jours)
+                - generic [ref=e499]:
+                  - img [ref=e500]
+                  - paragraph [ref=e502]: Aucune session à venir
+            - generic [ref=e504]:
+              - button [ref=e506]:
+                - img [ref=e507]
+              - generic [ref=e515]:
+                - generic [ref=e516]:
+                  - img [ref=e517]
+                  - text: Factures en attente
+                - generic [ref=e520]:
+                  - generic [ref=e521]: "0"
+                  - generic [ref=e522]: 0.00€ en attente
+                  - button "Voir les factures" [ref=e523] [cursor=pointer]
+            - generic [ref=e525]:
+              - button [ref=e527]:
+                - img [ref=e528]
+              - generic [ref=e537]:
+                - img [ref=e538]
+                - text: Alertes & Rappels
+            - generic [ref=e541]:
+              - button [ref=e543]:
+                - img [ref=e544]
+              - generic [ref=e552]:
+                - generic [ref=e553]:
+                  - img [ref=e554]
+                  - text: Revenus hebdomadaires
+                - generic [ref=e556]:
+                  - generic [ref=e557]: 0.00€
+                  - generic [ref=e558]: Ce mois
+            - generic [ref=e560]:
+              - button [ref=e562]:
+                - img [ref=e563]
+              - generic [ref=e571]:
+                - generic [ref=e572]:
+                  - img [ref=e573]
+                  - text: Top Clients
+                - generic [ref=e578]:
+                  - img [ref=e579]
+                  - paragraph [ref=e584]: Données disponibles prochainement
+            - generic [ref=e586]:
+              - button [ref=e588]:
+                - img [ref=e589]
+              - generic [ref=e598]:
+                - img [ref=e599]
+                - text: Équipement en maintenance
+            - generic [ref=e602]:
+              - button [ref=e604]:
+                - img [ref=e605]
+              - generic [ref=e613]:
+                - generic [ref=e614]:
+                  - img [ref=e615]
+                  - text: Messages non lus
+                - generic [ref=e617]:
+                  - img [ref=e618]
+                  - paragraph [ref=e620]: Aucun message non lu
+          - status [ref=e621]
+    - generic [ref=e622]:
+      - generic [ref=e623]:
+        - generic [ref=e624]:
+          - img [ref=e625]
+          - generic [ref=e628]: AI Assistant
+        - generic [ref=e629]:
+          - button "Mode fenêtre flottante" [ref=e630] [cursor=pointer]:
+            - img
+          - button "Réduire" [ref=e631] [cursor=pointer]:
+            - img
+      - generic [ref=e633]:
+        - img [ref=e634]
+        - generic [ref=e637]:
+          - heading "AI Assistant" [level=3] [ref=e638]
+          - paragraph [ref=e639]: Posez-moi une question sur le studio ou demandez-moi d'effectuer une action.
+          - paragraph [ref=e640]: "Exemples: \"Crée une facture\", \"Liste les clients\", \"Crée un projet\""
+      - generic [ref=e642]:
+        - textbox "Tapez votre message..." [ref=e643]
+        - button [disabled]:
+          - img
+  - region "Notifications alt+T"
+```
