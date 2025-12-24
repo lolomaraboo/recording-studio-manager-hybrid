@@ -1,6 +1,7 @@
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { eq } from 'drizzle-orm';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getMasterDb } from '@rsm/database/connection';
@@ -116,7 +117,7 @@ export async function deleteTenantDatabase(organizationId: number): Promise<void
     const masterDb = await getMasterDb();
     await masterDb
       .delete(tenantDatabases)
-      .where({ organizationId });
+      .where(eq(tenantDatabases.organizationId, organizationId));
 
     // Step 2: Drop the database
     const host = process.env.DATABASE_HOST || 'postgres';
