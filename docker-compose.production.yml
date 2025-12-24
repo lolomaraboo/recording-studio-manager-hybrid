@@ -133,7 +133,8 @@ services:
       ENABLE_DEBUG_LOGS: ${ENABLE_DEBUG_LOGS:-false}
     ports:
       # Bind to localhost only (Nginx will proxy)
-      - "127.0.0.1:3000:3000"
+      # Use port 3001 to avoid conflict with ai-project-manager (port 3000)
+      - "127.0.0.1:3001:3000"
     networks:
       - rsm_network
     depends_on:
