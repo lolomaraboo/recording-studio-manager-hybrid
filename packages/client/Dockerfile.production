@@ -12,6 +12,8 @@ RUN corepack enable && corepack prepare pnpm@9.14.4 --activate
 # Copy root package files
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/database/package.json ./packages/database/
+COPY packages/server/package.json ./packages/server/
 COPY packages/client/package.json ./packages/client/
 
 # Install dependencies
@@ -19,11 +21,15 @@ RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY packages/shared ./packages/shared
+COPY packages/database ./packages/database
+COPY packages/server ./packages/server
 COPY packages/client ./packages/client
 COPY tsconfig.json ./
 
-# Build packages in order (shared → client)
+# Build packages in order (shared → database → server → client)
 RUN pnpm --filter @rsm/shared build
+RUN pnpm --filter @rsm/database build
+RUN pnpm --filter @rsm/server build
 RUN pnpm --filter @rsm/client build
 
 # Stage 2: Production with nginx
