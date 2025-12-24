@@ -123,6 +123,7 @@ async function createMasterSchema(): Promise<void> {
         slug VARCHAR(100) NOT NULL UNIQUE,
         subdomain VARCHAR(100) NOT NULL UNIQUE,
         owner_id INTEGER NOT NULL REFERENCES users(id),
+        logo_url VARCHAR(500),
         phone VARCHAR(50),
         address TEXT,
         city VARCHAR(100),
