@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../trpc";
-import { db } from "../db";
-import { clients, sessions, invoices, equipment, musicians } from "@database/schema";
-import { or, ilike, sql, and, eq } from "drizzle-orm";
+import { router, protectedProcedure } from "../_core/trpc";
+import { clients, sessions, invoices, equipment, musicians } from "@rsm/database/tenant";
+import { or, ilike, and, eq } from "drizzle-orm";
 
 export const searchRouter = router({
   /**
@@ -20,9 +19,9 @@ export const searchRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
       const { query, limit, types } = input;
       const searchTerm = `%${query}%`;
-      const organizationId = ctx.user.organizationId;
 
       const results: Array<{
         id: number;
@@ -36,7 +35,7 @@ export const searchRouter = router({
 
       // Search clients (if enabled or no filter)
       if (!types || types.includes("client")) {
-        const clientResults = await db
+        const clientResults = await tenantDb
           .select({
             id: clients.id,
             name: clients.name,
@@ -72,7 +71,7 @@ export const searchRouter = router({
 
       // Search sessions (if enabled or no filter)
       if (!types || types.includes("session")) {
-        const sessionResults = await db
+        const sessionResults = await tenantDb
           .select({
             id: sessions.id,
             title: sessions.title,
@@ -109,7 +108,7 @@ export const searchRouter = router({
 
       // Search invoices (if enabled or no filter)
       if (!types || types.includes("invoice")) {
-        const invoiceResults = await db
+        const invoiceResults = await tenantDb
           .select({
             id: invoices.id,
             invoiceNumber: invoices.invoiceNumber,
@@ -136,7 +135,7 @@ export const searchRouter = router({
             type: "invoice" as const,
             title: invoice.invoiceNumber || `Facture #${invoice.id}`,
             subtitle: invoice.clientName || "Client inconnu",
-            description: `${((invoice.totalAmount || 0) / 100).toFixed(2)}€ - ${
+            description: `${invoice.totalAmount || '0'}€ - ${
               invoice.status || "pending"
             }`,
             url: `/invoices/${invoice.id}`,
@@ -147,12 +146,12 @@ export const searchRouter = router({
 
       // Search equipment (if enabled or no filter)
       if (!types || types.includes("equipment")) {
-        const equipmentResults = await db
+        const equipmentResults = await tenantDb
           .select({
             id: equipment.id,
             name: equipment.name,
             category: equipment.category,
-            manufacturer: equipment.manufacturer,
+            brand: equipment.brand,
             status: equipment.status,
           })
           .from(equipment)
@@ -160,7 +159,7 @@ export const searchRouter = router({
             and(
               or(
                 ilike(equipment.name, searchTerm),
-                ilike(equipment.manufacturer, searchTerm),
+                ilike(equipment.brand, searchTerm),
                 ilike(equipment.category, searchTerm)
               )
             )
@@ -172,7 +171,7 @@ export const searchRouter = router({
             id: eq.id,
             type: "equipment" as const,
             title: eq.name || "Équipement sans nom",
-            subtitle: eq.manufacturer || eq.category || "",
+            subtitle: eq.brand || eq.category || "",
             description: eq.status || undefined,
             url: `/equipment/${eq.id}`,
             score: 0.7,
@@ -182,7 +181,7 @@ export const searchRouter = router({
 
       // Search musicians/talents (if enabled or no filter)
       if (!types || types.includes("musician")) {
-        const musicianResults = await db
+        const musicianResults = await tenantDb
           .select({
             id: musicians.id,
             name: musicians.name,
