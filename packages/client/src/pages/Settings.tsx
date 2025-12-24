@@ -16,7 +16,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
-import { useToast } from "@/hooks/use-toast";
 import {
   Settings as SettingsIcon,
   User,
@@ -41,7 +40,6 @@ export default function Settings() {
   const [uploading, setUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
   // Get organization data
   const { data: organization } = trpc.organizations.get.useQuery();
@@ -53,21 +51,13 @@ export default function Settings() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner une image (PNG, JPG, SVG, WebP)",
-        variant: "destructive",
-      });
+      alert("Veuillez sélectionner une image (PNG, JPG, SVG, WebP)");
       return;
     }
 
     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Erreur",
-        description: "L'image ne doit pas dépasser 5 MB",
-        variant: "destructive",
-      });
+      alert("L'image ne doit pas dépasser 5 MB");
       return;
     }
 
@@ -104,18 +94,11 @@ export default function Settings() {
           },
         });
 
-        toast({
-          title: "Succès",
-          description: "Logo mis à jour avec succès",
-        });
+        alert("Logo mis à jour avec succès !");
       }
     } catch (error: any) {
       console.error('Logo upload error:', error);
-      toast({
-        title: "Erreur",
-        description: error.message || "Échec de l'upload du logo",
-        variant: "destructive",
-      });
+      alert(error.message || "Échec de l'upload du logo");
       setLogoPreview(null);
     } finally {
       setUploading(false);
