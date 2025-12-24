@@ -5,10 +5,10 @@ import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import Redis from 'ioredis';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { appRouter } from './routers/index';
-import { createContext } from './_core/context';
-import { handleStripeWebhook } from './webhooks/stripe-webhook';
-import uploadRouter from './routes/upload';
+import { appRouter } from './routers/index.js';
+import { createContext } from './_core/context.js';
+import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
+import uploadRouter from './routes/upload.js';
 
 /**
  * Recording Studio Manager - tRPC Server

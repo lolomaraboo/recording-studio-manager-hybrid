@@ -1,25 +1,25 @@
-import { router } from '../_core/trpc';
-import { authRouter } from './auth';
-import { organizationsRouter } from './organizations';
-import { sessionsRouter } from './sessions';
-import { clientsRouter } from './clients';
-import { invoicesRouter } from './invoices';
-import { roomsRouter } from './rooms';
-import { equipmentRouter } from './equipment';
-import { projectsRouter } from './projects';
-import { musiciansRouter } from './musicians';
-import { quotesRouter } from './quotes';
-import { contractsRouter } from './contracts';
-import { expensesRouter } from './expenses';
-import { notificationsRouter } from './notifications';
-import { filesRouter } from './files';
-import { aiRouter } from './ai';
-import { searchRouter } from './search';
-import { clientPortalAuthRouter } from './client-portal-auth';
-import { clientPortalDashboardRouter } from './client-portal-dashboard';
-import { clientPortalBookingRouter } from './client-portal-booking';
-import { clientPortalStripeRouter } from './client-portal-stripe';
-import { adminRouter } from './admin';
+import { router } from '../_core/trpc.js';
+import { authRouter } from './auth.js';
+import { organizationsRouter } from './organizations.js';
+import { sessionsRouter } from './sessions.js';
+import { clientsRouter } from './clients.js';
+import { invoicesRouter } from './invoices.js';
+import { roomsRouter } from './rooms.js';
+import { equipmentRouter } from './equipment.js';
+import { projectsRouter } from './projects.js';
+import { musiciansRouter } from './musicians.js';
+import { quotesRouter } from './quotes.js';
+import { contractsRouter } from './contracts.js';
+import { expensesRouter } from './expenses.js';
+import { notificationsRouter } from './notifications.js';
+import { filesRouter } from './files.js';
+import { aiRouter } from './ai.js';
+import { searchRouter } from './search.js';
+import { clientPortalAuthRouter } from './client-portal-auth.js';
+import { clientPortalDashboardRouter } from './client-portal-dashboard.js';
+import { clientPortalBookingRouter } from './client-portal-booking.js';
+import { clientPortalStripeRouter } from './client-portal-stripe.js';
+import { adminRouter } from './admin.js';
 
 /**
  * Main App Router
