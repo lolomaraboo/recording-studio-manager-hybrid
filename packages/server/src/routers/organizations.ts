@@ -119,6 +119,7 @@ export const organizationsRouter = router({
         id: z.number(),
         data: z.object({
           name: z.string().min(2).max(200).optional(),
+          logoUrl: z.string().max(500).nullable().optional(),
           phone: z.string().optional(),
           timezone: z.string().optional(),
           currency: z.string().optional(),

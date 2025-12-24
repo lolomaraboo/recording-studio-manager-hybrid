@@ -268,6 +268,28 @@ export default function Settings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Logo Upload */}
+              <div className="space-y-2">
+                <Label>Logo du studio</Label>
+                <div className="flex items-center gap-4">
+                  <div className="h-20 w-20 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
+                    {/* TODO: Display actual logo if exists */}
+                    <Building2 className="h-10 w-10 text-primary" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      id="logoUrl"
+                      type="url"
+                      placeholder="https://example.com/logo.png"
+                      className="max-w-md"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Entrez l'URL de votre logo (PNG, JPG ou SVG). Recommandé: 200x200px minimum.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Separator />
               <div className="space-y-2">
                 <Label htmlFor="orgName">Nom du studio</Label>
                 <Input id="orgName" defaultValue="Studio Pro Recording" />

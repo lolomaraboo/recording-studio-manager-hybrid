@@ -19,9 +19,17 @@ export function Header() {
         {/* Logo et nom de l'organisation */}
         <Link to="/dashboard">
           <div className="flex items-center gap-2 cursor-pointer">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Music className="h-6 w-6 text-primary-foreground" />
-            </div>
+            {organization?.logoUrl ? (
+              <img
+                src={organization.logoUrl}
+                alt={organization.name}
+                className="h-10 w-10 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+                <Music className="h-6 w-6 text-primary-foreground" />
+              </div>
+            )}
             <span className="text-lg font-bold">{organization?.name || "RSM"}</span>
           </div>
         </Link>

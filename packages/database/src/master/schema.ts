@@ -38,6 +38,7 @@ export const organizations = pgTable("organizations", {
   slug: varchar("slug", { length: 100 }).notNull().unique(),
   subdomain: varchar("subdomain", { length: 100 }).notNull().unique(),
   ownerId: integer("owner_id").notNull().references(() => users.id),
+  logoUrl: varchar("logo_url", { length: 500 }),
   phone: varchar("phone", { length: 50 }),
   address: text("address"),
   city: varchar("city", { length: 100 }),
