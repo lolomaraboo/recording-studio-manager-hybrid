@@ -143,4 +143,91 @@ router.delete('/audio/:publicId(*)', async (req, res) => {
   }
 });
 
+/**
+ * Upload logo/image endpoint
+ * POST /api/upload/logo
+ *
+ * Body (multipart/form-data):
+ * - file: Image file (PNG, JPG, SVG, WebP)
+ * - organizationId: Organization ID
+ *
+ * Returns:
+ * {
+ *   success: true,
+ *   data: {
+ *     url: string,
+ *     secureUrl: string,
+ *     publicId: string
+ *   }
+ * }
+ */
+const uploadLogo = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedMimes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/svg+xml',
+      'image/webp',
+    ];
+
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type: ${file.mimetype}. Only images are allowed.`));
+    }
+  },
+});
+
+router.post('/logo', uploadLogo.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No file provided',
+      });
+    }
+
+    const { organizationId } = req.body;
+
+    console.log('[Upload] Logo upload:', {
+      originalName: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      organizationId,
+    });
+
+    // Upload to Cloudinary (images folder)
+    const { uploadImageFile } = await import('../utils/cloudinary-service');
+    const folder = organizationId ? `logos/org_${organizationId}` : 'logos/temp';
+
+    const result = await uploadImageFile(
+      req.file.buffer,
+      req.file.originalname,
+      folder
+    );
+
+    console.log('[Upload] Logo upload success:', result.publicId);
+
+    res.json({
+      success: true,
+      data: {
+        url: result.url,
+        secureUrl: result.secureUrl,
+        publicId: result.publicId,
+      },
+    });
+  } catch (error: any) {
+    console.error('[Upload] Logo upload failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Upload failed',
+    });
+  }
+});
+
 export default router;

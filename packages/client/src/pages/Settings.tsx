@@ -14,7 +14,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { trpc } from "@/lib/trpc";
+import { useToast } from "@/hooks/use-toast";
 import {
   Settings as SettingsIcon,
   User,
@@ -36,6 +38,89 @@ export default function Settings() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  // Get organization data
+  const { data: organization } = trpc.organizations.get.useQuery();
+  const updateOrganization = trpc.organizations.update.useMutation();
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner une image (PNG, JPG, SVG, WebP)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erreur",
+        description: "L'image ne doit pas dépasser 5 MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Preview image
+      const reader = new FileReader();
+      reader.onload = () => setLogoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+
+      // Upload to server
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('organizationId', organization?.id.toString() || '');
+
+      const response = await fetch('/api/upload/logo', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
+      }
+
+      // Update organization with new logo URL
+      if (organization) {
+        await updateOrganization.mutateAsync({
+          id: organization.id,
+          data: {
+            logoUrl: result.data.secureUrl,
+          },
+        });
+
+        toast({
+          title: "Succès",
+          description: "Logo mis à jour avec succès",
+        });
+      }
+    } catch (error: any) {
+      console.error('Logo upload error:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Échec de l'upload du logo",
+        variant: "destructive",
+      });
+      setLogoPreview(null);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -272,19 +357,36 @@ export default function Settings() {
               <div className="space-y-2">
                 <Label>Logo du studio</Label>
                 <div className="flex items-center gap-4">
-                  <div className="h-20 w-20 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
-                    {/* TODO: Display actual logo if exists */}
-                    <Building2 className="h-10 w-10 text-primary" />
+                  <div className="h-20 w-20 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden border-2 border-dashed border-muted">
+                    {logoPreview || organization?.logoUrl ? (
+                      <img
+                        src={logoPreview || organization?.logoUrl || ''}
+                        alt="Logo preview"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Building2 className="h-10 w-10 text-muted-foreground" />
+                    )}
                   </div>
                   <div className="flex-1 space-y-2">
-                    <Input
-                      id="logoUrl"
-                      type="url"
-                      placeholder="https://example.com/logo.png"
-                      className="max-w-md"
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                      onChange={handleLogoUpload}
+                      className="hidden"
                     />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {uploading ? "Upload en cours..." : "Changer le logo"}
+                    </Button>
                     <p className="text-xs text-muted-foreground">
-                      Entrez l'URL de votre logo (PNG, JPG ou SVG). Recommandé: 200x200px minimum.
+                      PNG, JPG, SVG ou WebP. Max 5 MB. Recommandé: 200x200px minimum.
                     </p>
                   </div>
                 </div>

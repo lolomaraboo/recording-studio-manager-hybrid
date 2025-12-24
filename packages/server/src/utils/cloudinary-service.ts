@@ -97,4 +97,53 @@ export async function getAudioFileInfo(publicId: string): Promise<UploadApiRespo
   }
 }
 
+/**
+ * Upload image file to Cloudinary
+ * @param buffer - File buffer from multer
+ * @param filename - Original filename
+ * @param folder - Cloudinary folder (e.g., 'logos/org_1')
+ * @returns Upload result with URL and metadata
+ */
+export async function uploadImageFile(
+  buffer: Buffer,
+  filename: string,
+  folder: string = 'images'
+): Promise<UploadResult> {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: 'image',
+        public_id: filename.replace(/\.[^/.]+$/, ''), // Remove extension
+        overwrite: true, // Overwrite if same filename
+        unique_filename: false,
+        use_filename: true,
+        format: 'auto', // Auto-detect format
+        transformation: [
+          { width: 400, height: 400, crop: 'limit' }, // Max 400x400, preserve aspect ratio
+          { quality: 'auto:good' },
+        ],
+      },
+      (error, result) => {
+        if (error) {
+          console.error('[Cloudinary] Image upload failed:', error);
+          reject(error);
+        } else if (result) {
+          const uploadResult: UploadResult = {
+            url: result.url,
+            publicId: result.public_id,
+            secureUrl: result.secure_url,
+            format: result.format,
+            bytes: result.bytes,
+          };
+          console.log('[Cloudinary] Image upload success:', uploadResult.publicId);
+          resolve(uploadResult);
+        }
+      }
+    );
+
+    uploadStream.end(buffer);
+  });
+}
+
 export default cloudinary;
