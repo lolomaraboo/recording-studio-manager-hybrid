@@ -4,6 +4,9 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
+# Accept build args
+ARG VITE_API_URL=/api
+
 WORKDIR /app
 
 # Install pnpm
@@ -30,6 +33,9 @@ COPY tsconfig.json ./
 RUN pnpm --filter @rsm/shared build
 RUN pnpm --filter @rsm/database build
 RUN pnpm --filter @rsm/server build
+
+# Set environment variable for Vite build
+ENV VITE_API_URL=${VITE_API_URL}
 RUN pnpm --filter @rsm/client build
 
 # Stage 2: Production with nginx
