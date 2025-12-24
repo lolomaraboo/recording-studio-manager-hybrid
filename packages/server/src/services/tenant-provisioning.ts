@@ -2,8 +2,12 @@ import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { getMasterDb } from '@rsm/database/connection';
 import { tenantDatabases } from '@rsm/database/master';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Tenant Provisioning Service
@@ -46,15 +50,14 @@ export async function createTenantDatabase(organizationId: number): Promise<Tena
       SELECT 1 FROM pg_database WHERE datname = ${databaseName}
     `;
 
-    if (checkResult.length > 0) {
-      console.log(`[TenantProvisioning] Database ${databaseName} already exists`);
-      await adminSql.end();
-      return { databaseName, success: true };
+    if (checkResult.length === 0) {
+      // Create database (needs raw query)
+      await adminSql.unsafe(`CREATE DATABASE ${databaseName}`);
+      console.log(`[TenantProvisioning] Database ${databaseName} created`);
+    } else {
+      console.log(`[TenantProvisioning] Database ${databaseName} already exists, will apply migrations`);
     }
 
-    // Create database (needs raw query)
-    await adminSql.unsafe(`CREATE DATABASE ${databaseName}`);
-    console.log(`[TenantProvisioning] Database ${databaseName} created`);
     await adminSql.end();
 
     // Step 2: Apply migrations to the new tenant database
