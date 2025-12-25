@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { router, publicProcedure } from "../_core/trpc";
-import { users, organizations, tenantDatabases } from "@rsm/database/master/schema";
+import { users, organizations, tenantDatabases, organizationMembers } from "@rsm/database/master/schema";
 import { getMasterDb } from "@rsm/database/connection";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { createTenantDatabase } from "../services/tenant-provisioning";
 
 /**
  * Auth Router
@@ -70,14 +71,14 @@ export const authRouter = router({
 
       const orgId = newOrg[0].id;
 
-      // Create tenant database entry
-      await masterDb
-        .insert(tenantDatabases)
-        .values({
-          organizationId: orgId,
-          databaseName: `tenant_${orgId}`,
-        })
-        .returning();
+      // Create tenant database (physical DB + migrations + registry)
+      const tenantCreationResult = await createTenantDatabase(orgId);
+
+      if (!tenantCreationResult.success) {
+        throw new Error(`Failed to create tenant database: ${tenantCreationResult.error}`);
+      }
+
+      console.log(`[Register] Tenant database created successfully for org ${orgId}`);
 
       // Set session
       (ctx.req.session as any).userId = userId;
@@ -133,15 +134,34 @@ export const authRouter = router({
         throw new Error("Invalid credentials");
       }
 
-      // Find organization
-      const orgList = await masterDb
+      // Find organization - try owner first, then membership
+      let orgList = await masterDb
         .select()
         .from(organizations)
         .where(eq(organizations.ownerId, user.id))
         .limit(1);
 
+      // If not owner, try membership
       if (orgList.length === 0) {
-        throw new Error("No organization found");
+        const membershipList = await masterDb
+          .select({
+            id: organizations.id,
+            name: organizations.name,
+            ownerId: organizations.ownerId,
+            subdomain: organizations.subdomain,
+            createdAt: organizations.createdAt,
+            updatedAt: organizations.updatedAt,
+          })
+          .from(organizationMembers)
+          .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
+          .where(eq(organizationMembers.userId, user.id))
+          .limit(1);
+
+        if (membershipList.length === 0) {
+          throw new Error("No organization found - user must be owner or member of an organization");
+        }
+
+        orgList = membershipList;
       }
 
       const org = orgList[0];

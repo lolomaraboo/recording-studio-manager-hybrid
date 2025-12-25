@@ -39,12 +39,22 @@ async function main() {
   // Middleware
   app.use(
     cors({
-      origin: [
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://192.168.8.50:5174',
-        'http://192.168.8.50:5173',
-      ],
+      origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+
+        // Allow localhost for development
+        const localhostPattern = /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+):\d+$/;
+
+        // Allow production HTTPS subdomains: https://*.recording-studio-manager.com
+        const productionPattern = /^https:\/\/([a-z0-9-]+\.)?recording-studio-manager\.com$/;
+
+        if (localhostPattern.test(origin) || productionPattern.test(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true,
     })
   );
