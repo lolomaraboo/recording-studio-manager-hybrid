@@ -26,30 +26,28 @@
 ## Current Position
 
 Phase: 1 of 8 (Production Stability)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2025-12-24 - Roadmap initialized with 8 phases
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2025-12-25 - Completed 01-01-PLAN.md (CORS fix & commits)
 
-Progress: ░░░░░░░░░░ 0% (0/24 plans complete)
+Progress: █░░░░░░░░░ 4% (1/24 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: N/A
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 10 min
+- Total execution time: 0.17 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1 | 1/3 | 10 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: N/A
-- Trend: Not yet established
-
-*Will be updated after first plan completion*
+- Last 5 plans: [10 min]
+- Trend: Baseline established (1 plan)
 
 ## Accumulated Context
 
@@ -65,6 +63,9 @@ Progress: ░░░░░░░░░░ 0% (0/24 plans complete)
 | Init | English-first, i18n v2.0 | Marché US/UK = 60%+ studios, i18n = 6 semaines dev. Canada/Europe après traction |
 | Init | Stripe billing vs custom | Time-to-market, PCI compliance gratuit. Custom billing = 4+ semaines overhead |
 | Init | Monitoring basique v1.0 | <100 tenants = health checks + Sentry suffit. Prometheus/Grafana = overhead ops prématuré |
+| 1 | CORS regex pattern over static array | Dynamic origin callback with regex allows flexible subdomain matching vs hardcoded list. Maintains security with pattern validation. |
+| 1 | Docker restart vs rebuild for deployment | Server uses tsx (no build step), restart sufficient to load new code. Rebuild would fail (no dist/ directory). |
+| 1 | Automated Playwright verification | Repeatable validation > manual testing. Created test suite for future regression testing of HTTPS/CORS. |
 
 ### Deferred Issues
 
@@ -72,11 +73,13 @@ None yet. (ISSUES.md will be created during execution)
 
 ### Blockers/Concerns Carried Forward
 
-**From current state analysis:**
-- CORS blocker active in production (backend refuses HTTPS origins)
-- auth.ts modifications uncommitted (tenant auto-provisioning code)
+**Resolved in Phase 1 Plan 1:**
+- ✅ CORS blocker fixed (now accepts https://*.recording-studio-manager.com)
+- ✅ auth.ts committed (tenant auto-provisioning integrated)
+- ✅ Test cleanup committed (.gitignore updated for Playwright artifacts)
+
+**Still outstanding:**
 - Phase 5 Item 11 identity unknown (need to find in TODO_MASTER what's missing)
-- Test cleanup files untracked (error-context.md deleted, playwright screenshots)
 
 ## Project Alignment
 
@@ -87,6 +90,6 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-24 (Roadmap creation)
-Stopped at: ROADMAP.md created with 8 phases (24 total plans). STATE.md initialized. Ready to plan Phase 1.
+Last session: 2025-12-25T04:05:27Z
+Stopped at: Completed 01-01-PLAN.md (CORS fix & commits). Production HTTPS verified working. Ready for 01-02-PLAN.md (monitoring setup).
 Resume file: None
