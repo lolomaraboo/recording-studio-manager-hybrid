@@ -73,7 +73,7 @@ export async function createTenantDatabase(organizationId: number): Promise<Tena
     const tenantDb = drizzle(tenantSql);
 
     // Apply migrations
-    const migrationsFolder = path.resolve(__dirname, '../../../database/drizzle/migrations');
+    const migrationsFolder = path.resolve(__dirname, '../../../database/drizzle/migrations/tenant');
     console.log(`[TenantProvisioning] Applying migrations from: ${migrationsFolder}`);
 
     await migrate(tenantDb, { migrationsFolder });
