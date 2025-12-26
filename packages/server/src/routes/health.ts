@@ -30,7 +30,7 @@ router.get('/health', (_req, res) => {
  */
 router.get('/health/db', async (_req, res) => {
   try {
-    const masterDb = getMasterDb();
+    const masterDb = await getMasterDb();
 
     // Query master DB to verify connection
     const result = await masterDb.execute(sql`SELECT 1 as health_check`);
@@ -101,7 +101,7 @@ router.get('/health/full', async (_req, res) => {
 
   // Check PostgreSQL
   try {
-    const masterDb = getMasterDb();
+    const masterDb = await getMasterDb();
     const result = await masterDb.execute(sql`SELECT 1 as health_check`);
 
     if (result && result.rows && result.rows.length > 0) {
