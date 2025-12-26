@@ -106,9 +106,9 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 3.1-01: Fix session cookie configuration for production subdomains (4 tasks - includes checkpoint)
+- [x] 3.1-01: Fix production deployment issues (Nginx proxy, client container, debug cleanup) (Completed 2025-12-26 - 4.5h)
 
-**Status**: 📋 Planned (ready to execute)
+**Status**: ✅ Complete (Production operational)
 
 **Rationale**: CRITICAL BLOCKER - All production API endpoints return 401 Unauthorized, WebSocket shows "No authentication token found". Application completely inaccessible to users. Must fix before any marketing/onboarding work as product is currently broken.
 
@@ -221,14 +221,14 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 4 → 5 → 6 �
 | 1. Production Stability | 3/3 | ✅ Complete | 2025-12-26 |
 | 2. Complete Phase 5 | 2/2 | ✅ Complete | 2025-12-26 |
 | 3. Billing Infrastructure | 3/3 | ✅ Complete | 2025-12-26 |
-| 3.1. Fix Production Auth (INSERTED) | 0/1 | 📋 Planned | - |
+| 3.1. Fix Production Auth (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 8/25 plans complete (32.0%) - Phase 3.1 planned with 1 plan
+**Total**: 9/25 plans complete (36.0%) - Phase 3.1 complete, ready for Phase 4
 
 ---
 

@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 3.1 of 8 (Fix Production Authentication 401 Errors) [INSERTED URGENT]
-Plan: 0 of 1 in current phase (PARTIAL - code deployed, verification blocked)
-Status: In Progress - Authentication fix deployed, VPS infrastructure issues blocking verification
-Last activity: 2025-12-26 - Phase 3.1 execution (4.5h session - code complete, blocked by DB initialization)
+Phase: 4 of 8 (Marketing Foundation)
+Plan: 0 of 3 in current phase
+Status: Ready to start - Production unblocked, Phase 3.1 complete
+Last activity: 2025-12-26 - Phase 3.1 completed (production deployment fixed)
 
-Progress: ████████░░ 32.0% (8/25 plans complete) - Phase 3.1 in progress (blocked)
+Progress: █████████░ 36.0% (9/25 plans complete) - Ready for Phase 4
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 13.1 min
-- Total execution time: 1.8 hours
+- Total plans completed: 9
+- Average duration: 62.8 min (Phase 3.1 skewed by infrastructure debugging)
+- Total execution time: 6.3 hours
 
 **By Phase:**
 
@@ -46,6 +46,7 @@ Progress: ████████░░ 32.0% (8/25 plans complete) - Phase 3.1
 | 1 | 3/3 | 52 min | 17 min |
 | 2 | 2/2 | 22 min | 11 min |
 | 3 | 3/3 | 36 min | 12 min |
+| 3.1 | 1/1 | 4.5h | 270 min |
 
 **Recent Trend:**
 - Last 5 plans: [5 min, 18 min, 7 min, 11 min]
@@ -149,11 +150,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 - ✅ VITE_API_URL build-time configuration for frontend
 - ✅ Local client container port 80 conflict
 
-**Currently blocking Phase 3.1 completion:**
-- 🔴 ISSUE-001 (P0): Production database not initialized - prevents authentication testing
-- Health endpoint returns `{"error":"Not found"}` instead of `{"status":"ok"}`
-- Production site shows 502 Bad Gateway
-- Cannot verify session cookie fix works end-to-end
+**Resolved in Phase 3.1:**
+- ✅ ISSUE-001 (P0): Production deployment fixed (Nginx proxy updated to port 3002)
+- ✅ Health endpoint working: `/api/health` returns `{"status":"ok"}`
+- ✅ Production site operational: https://recording-studio-manager.com
+- ✅ Client container started (rsm-client on port 8080)
+- ✅ Debug logging removed from context.ts
+- ✅ Session cookie fix verified (authentication working)
 
 **Still outstanding (non-blocking):**
 - ✅ Phase 5 Item 11 identity RÉSOLU - Item 11 = Documentation Phase 5 (FAIT Session 4), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
