@@ -121,12 +121,12 @@ Plans:
 
 **Research**: Unlikely (Playwright already configured, tests patterns established)
 
-**Plans**: TBD (to be planned)
+**Plans**: 1 plan
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 3.2 to break down)
+- [ ] 3.2-01: Comprehensive E2E test suite - consolidate 13 existing tests, fill coverage gaps (booking, payment, client portal), organize into e2e/ directory
 
-**Status**: 📋 Not planned yet
+**Status**: 📋 Ready to execute
 
 **Rationale**: Before launching marketing (Phase 4), validate entire application works end-to-end in production. Critical flows: signup → dashboard → booking → payment → project creation → track upload → AI chatbot. Ensures production quality before driving traffic.
 
