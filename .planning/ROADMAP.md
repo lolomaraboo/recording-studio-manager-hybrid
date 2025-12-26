@@ -79,7 +79,7 @@ Plans:
 
 Plans:
 - [x] 03-01: Stripe Subscriptions setup with pricing tiers (€29/€99/€299) (Completed 2025-12-25 - 18 min)
-- [ ] 03-02: Trial period logic (14 days free) + usage limits
+- [x] 03-02: Usage limits enforcement + subscription management (Completed 2025-12-26 - 7 min)
 - [ ] 03-03: Customer Portal + subscription management UI
 
 **Rationale**: Can't sell without billing. Stripe already integrated (Phase 4.2) but only one-time payments. Subscriptions = recurring revenue model. Customer Portal = reduce support burden.
@@ -192,14 +192,14 @@ Phases execute sequentially: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Production Stability | 3/3 | ✅ Complete | 2025-12-26 |
 | 2. Complete Phase 5 | 2/2 | ✅ Complete | 2025-12-26 |
-| 3. Billing Infrastructure | 1/3 | In progress | - |
+| 3. Billing Infrastructure | 2/3 | In progress | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 6/24 plans complete (25.0%)
+**Total**: 7/24 plans complete (29.2%)
 
 ---
 

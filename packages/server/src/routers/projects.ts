@@ -2,6 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { projects, tracks, trackComments } from "@rsm/database/tenant/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { checkStorageLimit } from "../middleware/subscription-limits";
 
 /**
  * Projects Router
@@ -325,6 +326,7 @@ export const projectsRouter = router({
           id: z.number(),
           versionType: z.enum(["demo", "roughMix", "finalMix", "master"]),
           url: z.string().url(),
+          fileSizeMB: z.number().optional(), // File size in MB for storage limit check
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -332,7 +334,12 @@ export const projectsRouter = router({
           throw new Error("Tenant database not available");
         }
 
-        const { id, versionType, url } = input;
+        const { id, versionType, url, fileSizeMB } = input;
+
+        // Check storage limit before uploading track (if file size provided)
+        if (ctx.organizationId && fileSizeMB) {
+          await checkStorageLimit(ctx.organizationId, ctx.tenantDb, fileSizeMB);
+        }
 
         // Map version type to database column
         const columnMap = {

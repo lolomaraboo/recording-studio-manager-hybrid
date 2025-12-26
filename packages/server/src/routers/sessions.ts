@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
 import { sessions } from '@rsm/database/tenant';
+import { checkSessionLimit } from '../middleware/subscription-limits';
 
 /**
  * Sessions Router
@@ -83,6 +84,11 @@ export const sessionsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
+
+      // Check session limit before creating new session
+      if (ctx.organizationId) {
+        await checkSessionLimit(ctx.organizationId, tenantDb);
+      }
 
       const [session] = await tenantDb
         .insert(sessions)
