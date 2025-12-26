@@ -79,7 +79,9 @@ services:
     container_name: rsm-client
     restart: unless-stopped
     environment:
-      VITE_API_URL: http://localhost:3000
+      # API URL must be absolute path (not localhost) for browser access
+      # Browser makes requests from client-side, not from Docker network
+      VITE_API_URL: /api  # Relative path - uses same domain (Nginx proxies to server)
     ports:
       - "8080:80"  # Map container port 80 to host port 8080 (Nginx proxies from 8080)
     depends_on:

@@ -1,6 +1,10 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
+# Build-time environment variables
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=${VITE_API_URL}
+
 WORKDIR /app
 
 # Install pnpm
