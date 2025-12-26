@@ -48,8 +48,8 @@ COPY packages/shared/package.json ./packages/shared/
 COPY packages/database/package.json ./packages/database/
 COPY packages/server/package.json ./packages/server/
 
-# Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+# Install all dependencies (tsx needed for running TypeScript in production)
+RUN pnpm install --frozen-lockfile
 
 # Copy built artifacts from builder
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
