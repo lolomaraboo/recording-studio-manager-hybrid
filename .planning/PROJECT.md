@@ -75,11 +75,13 @@ Comment on sait que c'est prêt à vendre :
 
 **Go-to-Market :**
 - Landing page marketing (hero, features, pricing, testimonials, CTA)
-- Pricing page (3 tiers: Starter €29/mois, Pro €99/mois, Enterprise €299/mois)
+- Pricing page (**RÉEL Stripe 28 nov:** Studio Free €0/mois, Studio Pro €19/mois ou €190/an, Studio Enterprise €59/mois ou €590/an + Packs IA 2€/5€/7€)
 - Démo publique (studio-demo.recording-studio-manager.com pré-rempli)
 - Documentation utilisateur (guides: setup, booking, projects, invoicing)
 - Support email (support@recording-studio-manager.com avec Resend)
 - Legal pages (Terms, Privacy, GDPR compliance)
+
+**Note:** Pricing strategy updated 28 nov 2024 (vs initial roadmap €29/€99/€299) - Plan Free added for acquisition, tiers repositioned -34% to -80% for market competitiveness, AI credit packs added for usage-based monetization.
 
 **Polish Production :**
 - Onboarding flow nouveau studio (wizard 3 étapes)
@@ -98,19 +100,42 @@ Comment on sait que c'est prêt à vendre :
 
 ### Not Building (v1.0)
 
-**Reporté à v2.0+ :**
-- SSO/SAML (Okta, Auth0, Azure AD) - Enterprise feature, complexe
-- 2FA TOTP avec backup codes - Sécurité avancée
-- Multi-région deployment (AWS us-east-1 + eu-west-1) - Scaling futur
-- i18n (6 langues: EN, FR, ES, DE, IT, PT) - English d'abord suffit
-- Prometheus + Grafana monitoring - Monitoring avancé
-- S3 storage pour fichiers audio - Local storage suffit v1.0
-- White-label branding complet - Tous ont même branding v1.0
-- Mobile apps natives (iOS, Android) - Web responsive suffit
-- Advanced analytics (prédictions IA, ML recommendations)
-- API publique pour intégrations tierces
-- Webhooks pour clients
-- Custom domains par tenant (studio-name.com)
+**Reporté à v2.0 Enterprise (6-9 mois) :**
+
+*Note: 15 features existent en production dans Version Claude (Python) mais pas encore portées vers Hybrid. Voir `.planning/ROADMAP_V2_ENTERPRISE.md` pour détails complets.*
+
+**Phase 9 - Security & Compliance (🔴 Critical, 6-8 weeks):**
+- SSO/SAML (Okta, Auth0, Azure AD) - Required by 80% Fortune 500
+- 2FA TOTP avec backup codes - Compliance requirement (SOC2, GDPR)
+- Audit logs SOC2-ready - Enterprise compliance mandatory
+
+**Phase 10 - Localization (🟡 High, 4-6 weeks):**
+- i18n (6 langues: EN, FR, ES, DE, IT, PT) - International expansion
+- Multi-devises (EUR, USD, GBP, CAD, JPY, AUD) - Global payments
+
+**Phase 11 - Customization (🟡 Medium, 3-4 weeks):**
+- White-label branding complet - Reseller/OEM channel
+- Custom domains par tenant - Enterprise branding
+- Theme manager - Per-org customization
+
+**Phase 12 - Integrations (🟢 Medium, 4-6 weeks):**
+- Google Calendar sync bidirectional - Popular integration
+- Twilio SMS notifications - Client communications
+- DocuSign e-signature - Contract automation
+
+**Phase 13 - Infrastructure (🟢 Low, 4-6 weeks):**
+- Multi-région deployment (AWS us-east-1 + eu-west-1 + ap-southeast-1) - Global scale
+- PostgreSQL streaming replication - High availability
+- Backup manager automated - Disaster recovery
+- Advanced rate limiting (Redis) - DDoS protection
+- Prometheus + Grafana monitoring - Production observability
+
+**Total effort:** ~200KB Python code to port, 25-35 weeks (6-9 months), $100k-150k budget
+
+**Alternative technologies (decided against):**
+- ~~S3 storage~~ → Using Cloudinary instead (simpler, 25GB free tier)
+- ~~MySQL~~ → PostgreSQL only (advanced features needed)
+- ~~Single-Database~~ → Database-per-Tenant for isolation
 
 **Explicitement hors scope :**
 - Gestion multi-sites (studios avec plusieurs locations)
@@ -223,6 +248,40 @@ Comment on sait que c'est prêt à vendre :
 - **2 vCPU** : API peut ralentir si >50 requêtes/sec
 - **Storage 100GB** : Suffisant pour 1000+ studios (files audio sur Cloudinary)
 - **Mitigation** : Connection pooling PostgreSQL, Redis caching, lazy loading
+
+## Recent Discoveries (2025-12-26)
+
+**Deep comparative analysis of 3 versions revealed:**
+
+**93+ Features Implemented (Not Originally Planned):**
+- ✅ AI Chatbot: 37 actions vs "assistant" vague in planning
+- ✅ Client Portal: 10 features (magic link auth, device fingerprinting) vs basic auth
+- ✅ Audio System: 4 professional components (Cloudinary, custom player 227 lines)
+- ✅ 20 UX Components: Cmd+K, dark mode, global search, notifications, etc.
+- ✅ Testing: 92.63% coverage (Playwright E2E + Vitest unit) - not mentioned in roadmap
+- ✅ 52 pages delivered vs 39 planned (+33%)
+- ✅ 35 database tables vs ~20 expected (+75%)
+
+**15 Enterprise Features Missing (Exist in Claude Python version):**
+- See `.planning/ROADMAP_V2_ENTERPRISE.md` for full details
+- ~200KB Python code to port to TypeScript
+- Estimated 6-9 months development effort
+- Critical for enterprise customers (SSO, 2FA, compliance)
+
+**Technology Decisions (Not Documented):**
+1. Cloudinary instead of S3 - Simpler, 25GB free tier, faster setup
+2. Magic Link authentication - Modern UX, passwordless option
+3. Device fingerprinting - Enhanced security tracking
+4. Custom HTML5 audio player - Zero dependencies, full control
+5. Pricing strategy change - €0/€19/€59 vs €29/€99/€299 planned
+6. Free tier addition - Freemium acquisition strategy
+7. AI credit packs - Usage-based monetization model
+
+**Documentation Created:**
+- `.planning/DEEP_ANALYSIS_3_VERSIONS.md` - Full comparison (Claude vs Manus vs Hybrid)
+- `.planning/EXECUTIVE_SUMMARY.md` - Executive summary with recommendations
+- `.planning/ROADMAP_V2_ENTERPRISE.md` - Detailed v2.0 enterprise roadmap
+- `.planning/ISSUES.md` - Updated with ISSUE-010 (planning gaps), ISSUE-011 (missing features), ISSUE-012 (undocumented decisions)
 
 ## Decisions Made
 

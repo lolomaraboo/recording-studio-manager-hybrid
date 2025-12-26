@@ -63,7 +63,7 @@ Plans:
 ---
 
 ### Phase 3: Billing Infrastructure
-**Goal**: Stripe subscription billing with 3 pricing tiers (Starter/Pro/Enterprise), trial periods, usage limits
+**Goal**: Stripe subscription billing with 3 pricing tiers (Studio Free/Pro/Enterprise), trial periods, usage limits
 
 **Depends on**: Phase 2 (complete feature set to monetize)
 
@@ -78,11 +78,39 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [x] 03-01: Stripe Subscriptions setup with pricing tiers (€29/€99/€299) (Completed 2025-12-25 - 18 min)
+- [x] 03-01: Stripe Subscriptions setup with pricing tiers (**RÉEL:** Studio Free €0, Pro €19/€190, Enterprise €59/€590 + AI packs 2€/5€/7€) (Completed 2025-12-25 - 18 min)
 - [x] 03-02: Usage limits enforcement + subscription management (Completed 2025-12-26 - 7 min)
 - [x] 03-03: Customer Portal + subscription management UI (Completed 2025-12-26 - 11 min)
 
+**Status**: ✅ Complete (All 3 plans finished - 36 min total)
+
 **Rationale**: Can't sell without billing. Stripe already integrated (Phase 4.2) but only one-time payments. Subscriptions = recurring revenue model. Customer Portal = reduce support burden.
+
+**Pricing Note:** Initial roadmap planned €29/€99/€299 but actual Stripe configuration (28 nov 2024) uses €0/€19/€59 + annual options + AI credit packs. Free tier added for freemium acquisition, prices repositioned -34% to -80% for market competitiveness.
+
+---
+
+### Phase 3.1: Fix Production Authentication 401 Errors (INSERTED)
+**Goal**: Resolve critical production authentication failures preventing all API access
+
+**Depends on**: Phase 3 (billing infrastructure complete)
+
+**Research**: Likely (Auth.js session management, production environment debugging)
+
+**Research topics**:
+- Auth.js session cookie configuration in production (domain, secure flags)
+- WebSocket authentication token passing mechanism
+- CORS impact on authentication headers
+- Production environment variables validation
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 3.1-01: Fix session cookie configuration for production subdomains (4 tasks - includes checkpoint)
+
+**Status**: 📋 Planned (ready to execute)
+
+**Rationale**: CRITICAL BLOCKER - All production API endpoints return 401 Unauthorized, WebSocket shows "No authentication token found". Application completely inaccessible to users. Must fix before any marketing/onboarding work as product is currently broken.
 
 ---
 
@@ -186,20 +214,21 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Production Stability | 3/3 | ✅ Complete | 2025-12-26 |
 | 2. Complete Phase 5 | 2/2 | ✅ Complete | 2025-12-26 |
-| 3. Billing Infrastructure | 2/3 | In progress | - |
+| 3. Billing Infrastructure | 3/3 | ✅ Complete | 2025-12-26 |
+| 3.1. Fix Production Auth (INSERTED) | 0/1 | 📋 Planned | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 7/24 plans complete (29.2%)
+**Total**: 8/25 plans complete (32.0%) - Phase 3.1 planned with 1 plan
 
 ---
 
@@ -219,4 +248,34 @@ Success criteria (from PROJECT.md):
 - [x] Security production (Phase 8)
 - [x] Legal ready (Phase 6)
 
-After v1.0 ships: Features like SSO, 2FA, multi-région, i18n become v2.0+ milestones.
+## v2.0 Enterprise Roadmap (Post-Launch)
+
+**Goal:** Port 15 enterprise features from Version Claude (Python) to Hybrid (TypeScript)
+
+**Timeline:** 6-9 months (25-35 weeks)
+**Budget:** $100k-150k development + $20k services
+**Priority:** Critical for enterprise customers (Fortune 500, compliance, international expansion)
+
+### Phases v2.0
+
+| Phase | Goal | Duration | Priority |
+|-------|------|----------|----------|
+| **Phase 9: Security & Compliance** | SSO/SAML, 2FA TOTP, Audit logs SOC2 | 6-8 weeks | 🔴 CRITICAL |
+| **Phase 10: Localization** | i18n (6 languages), Multi-currency (6) | 4-6 weeks | 🟡 HIGH |
+| **Phase 11: Customization** | White-label, Custom domains, Theme manager | 3-4 weeks | 🟡 MEDIUM |
+| **Phase 12: Integrations** | Google Calendar, Twilio SMS, DocuSign | 4-6 weeks | 🟢 MEDIUM |
+| **Phase 13: Infrastructure** | Multi-region, Backups, Rate limiting, Monitoring | 4-6 weeks | 🟢 LOW |
+
+**Total:** 21-30 weeks = 5-7.5 months
+
+**Details:** See `.planning/ROADMAP_V2_ENTERPRISE.md` for comprehensive plan with:
+- Task breakdowns per feature
+- Source code references (Claude Python version)
+- Technical specifications
+- ROI analysis & business impact
+- Risk mitigation strategies
+
+**Why v2.0 matters:**
+- **Current:** Cannot sell to enterprise (>100 employees)
+- **With v2.0:** Enterprise-ready, reseller channel opens ($1M+ potential)
+- **Break-even:** 20-28 enterprise customers @ €199/month (12-18 months)
