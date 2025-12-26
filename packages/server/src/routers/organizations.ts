@@ -6,6 +6,7 @@ import { organizations, subscriptionPlans } from '@rsm/database/master';
 import { getMasterDb } from '@rsm/database/connection';
 import { createTenantDatabase, deleteTenantDatabase } from '../services/tenant-provisioning';
 import { getStripeClient } from '../utils/stripe-client';
+import { getUsageStats } from '../middleware/subscription-limits';
 
 /**
  * Organizations Router
@@ -656,5 +657,35 @@ export const organizationsRouter = router({
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       paymentMethod,
     };
+  }),
+
+  /**
+   * Get usage statistics for organization
+   *
+   * Returns:
+   * - Sessions used/limit/percentage
+   * - Storage used/limit/percentage
+   *
+   * Used for dashboard meters and usage warnings.
+   *
+   * Port from Python subscription_limits.py get_limits_status_api()
+   */
+  getUsageStats: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.organizationId) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'No organization context',
+      });
+    }
+
+    if (!ctx.tenantDb) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'No tenant database connection',
+      });
+    }
+
+    const stats = await getUsageStats(ctx.organizationId, ctx.tenantDb);
+    return stats;
   }),
 });

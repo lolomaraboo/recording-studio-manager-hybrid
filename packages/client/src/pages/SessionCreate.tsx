@@ -9,22 +9,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 export default function SessionCreate() {
   const navigate = useNavigate();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Fetch related data for selects
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: rooms } = trpc.rooms.list.useQuery();
+  const { data: subscription } = trpc.subscriptions.getCurrentSubscription.useQuery();
 
-  // Create mutation
+  // Create mutation with limit error handling
   const createMutation = trpc.sessions.create.useMutation({
     onSuccess: (data) => {
       toast.success("Session créée avec succès");
       navigate(`/sessions/${data.id}`);
     },
-    onError: (error) => {
-      toast.error(`Erreur: ${error.message}`);
+    onError: (error: any) => {
+      // Check if it's a session limit error
+      if (error.data?.code === "FORBIDDEN" && error.message?.includes("session limit")) {
+        setShowUpgradeModal(true);
+      } else {
+        toast.error(`Erreur: ${error.message}`);
+      }
     },
   });
 
@@ -268,6 +276,15 @@ export default function SessionCreate() {
           </CardContent>
         </Card>
       </form>
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <UpgradeModal
+          limitType="sessions"
+          currentPlan={subscription?.subscriptionTier || "trial"}
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      )}
     </div>
   );
 }

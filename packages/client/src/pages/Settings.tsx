@@ -33,6 +33,233 @@ import {
   Download,
 } from "lucide-react";
 
+/**
+ * Billing Tab Content Component
+ *
+ * Displays subscription info, usage meters, and Customer Portal integration
+ */
+function BillingTabContent() {
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
+
+  // Fetch subscription and usage data
+  const { data: subscription, isLoading: subLoading } = trpc.subscriptions.getCurrentSubscription.useQuery();
+  const { data: subscriptionInfo } = trpc.organizations.getSubscriptionInfo.useQuery();
+  const { data: usageStats } = trpc.organizations.getUsageStats.useQuery();
+  const { data: availablePlans } = trpc.subscriptions.getAvailablePlans.useQuery();
+
+  const createPortalSession = trpc.subscriptions.createPortalSession.useMutation({
+    onSuccess: (data) => {
+      // Redirect to Stripe Customer Portal
+      window.location.href = data.portalUrl;
+    },
+    onError: (error) => {
+      alert(error.message);
+      setIsLoadingPortal(false);
+    },
+  });
+
+  const handleManageBilling = () => {
+    setIsLoadingPortal(true);
+    createPortalSession.mutate();
+  };
+
+  if (subLoading) {
+    return <div className="p-4 text-center text-muted-foreground">Chargement...</div>;
+  }
+
+  // Format plan name
+  const planDisplayName = subscription?.subscriptionTier
+    ? subscription.subscriptionTier.charAt(0).toUpperCase() + subscription.subscriptionTier.slice(1)
+    : "Trial";
+
+  // Find current plan details
+  const currentPlan = availablePlans?.find(p => p.name === subscription?.subscriptionTier);
+
+  // Format renewal date
+  const renewalDate = subscription?.currentPeriodEnd
+    ? new Date(subscription.currentPeriodEnd).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    : null;
+
+  // Determine status badge
+  const statusBadge = subscription?.subscriptionStatus === "active"
+    ? <Badge>Actif</Badge>
+    : subscription?.subscriptionStatus === "trial"
+    ? <Badge variant="secondary">Essai</Badge>
+    : <Badge variant="destructive">Inactif</Badge>;
+
+  // Helper to render usage progress bar
+  const renderUsageMeter = (label: string, used: number, limit: number | null, percentage: number, unit: string) => {
+    const isWarning = percentage >= 80 && percentage < 100;
+    const isDanger = percentage >= 100;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium">{label}</Label>
+          {isWarning && <Badge variant="secondary" className="text-xs">Attention</Badge>}
+          {isDanger && <Badge variant="destructive" className="text-xs">Limite atteinte</Badge>}
+        </div>
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>
+              {used} {used === 1 ? unit.slice(0, -1) : unit} utilisé{used > 1 ? 's' : ''}
+            </span>
+            <span>
+              {limit === null ? 'Illimité' : `${limit} max`}
+            </span>
+          </div>
+          {limit !== null && (
+            <div className="w-full bg-secondary rounded-full h-2">
+              <div
+                className={`h-2 rounded-full transition-all ${
+                  isDanger ? 'bg-destructive' : isWarning ? 'bg-yellow-500' : 'bg-primary'
+                }`}
+                style={{ width: `${Math.min(percentage, 100)}%` }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {/* Current Plan */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Plan actuel</CardTitle>
+          <CardDescription>
+            Gérez votre abonnement et vos informations de facturation
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-lg font-semibold">Plan {planDisplayName}</h3>
+                {statusBadge}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {subscriptionInfo?.billingPeriod === "monthly" && currentPlan
+                  ? `${currentPlan.priceMonthly} € / mois`
+                  : subscriptionInfo?.billingPeriod === "yearly" && currentPlan
+                  ? `${currentPlan.priceYearly} € / an`
+                  : "Essai gratuit"}
+                {renewalDate && ` · Renouvellement le ${renewalDate}`}
+              </p>
+              {subscriptionInfo?.cancelAtPeriodEnd && (
+                <p className="text-sm text-destructive font-medium mt-1">
+                  Résiliation programmée pour le {renewalDate}
+                </p>
+              )}
+            </div>
+            <Button variant="outline" onClick={handleManageBilling} disabled={isLoadingPortal}>
+              {isLoadingPortal ? "Chargement..." : "Gérer l'abonnement"}
+            </Button>
+          </div>
+
+          {currentPlan && currentPlan.features && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Fonctionnalités incluses:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                {JSON.parse(currentPlan.features as any).map((feature: string, idx: number) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Usage Meters */}
+      {usageStats && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Utilisation</CardTitle>
+            <CardDescription>
+              Votre consommation pour la période en cours
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {renderUsageMeter(
+              "Sessions",
+              usageStats.sessionsUsed,
+              usageStats.sessionsLimit,
+              usageStats.sessionsPercentage,
+              "sessions"
+            )}
+            <Separator />
+            {renderUsageMeter(
+              "Stockage",
+              Math.round(usageStats.storageUsedMB / 1024 * 10) / 10,
+              usageStats.storageLimitGB,
+              usageStats.storagePercentage,
+              "GB"
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Payment Method */}
+      {subscriptionInfo?.paymentMethod && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Moyen de paiement</CardTitle>
+            <CardDescription>
+              Carte bancaire utilisée pour les paiements
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white font-bold text-xs">
+                  {subscriptionInfo.paymentMethod.brand.toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-medium">•••• •••• •••• {subscriptionInfo.paymentMethod.last4}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Expire {subscriptionInfo.paymentMethod.expMonth}/{subscriptionInfo.paymentMethod.expYear}
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleManageBilling} disabled={isLoadingPortal}>
+                Modifier
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stripe Customer Portal Link */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Gestion de la facturation</CardTitle>
+          <CardDescription>
+            Accédez à votre portail client Stripe pour gérer vos factures
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button variant="outline" className="w-full" onClick={handleManageBilling} disabled={isLoadingPortal}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            {isLoadingPortal ? "Chargement..." : "Ouvrir le portail de facturation"}
+          </Button>
+          <p className="text-xs text-muted-foreground mt-2">
+            Vous serez redirigé vers Stripe pour modifier votre carte, voir vos factures, ou annuler votre abonnement.
+          </p>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
 export default function Settings() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -685,109 +912,7 @@ export default function Settings() {
 
         {/* Billing Tab */}
         <TabsContent value="billing" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Plan actuel</CardTitle>
-              <CardDescription>
-                Gérez votre abonnement et vos informations de facturation
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-lg font-semibold">Plan Professional</h3>
-                    <Badge>Actif</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    99,00 € / mois · Renouvellement le 1er janvier 2026
-                  </p>
-                </div>
-                <Button variant="outline">Changer de plan</Button>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Fonctionnalités incluses:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    Salles illimitées
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    100 GB de stockage
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    Support prioritaire
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    Rapports avancés
-                  </li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Moyen de paiement</CardTitle>
-              <CardDescription>
-                Carte bancaire utilisée pour les paiements
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white font-bold">
-                    VISA
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">•••• •••• •••• 4242</p>
-                    <p className="text-xs text-muted-foreground">Expire 12/2027</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm">
-                  Modifier
-                </Button>
-              </div>
-              <Button variant="outline" className="w-full">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Ajouter une carte
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Historique de facturation</CardTitle>
-              <CardDescription>Vos dernières factures</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  { date: "1er décembre 2025", amount: "99,00 €", status: "Payée" },
-                  { date: "1er novembre 2025", amount: "99,00 €", status: "Payée" },
-                  { date: "1er octobre 2025", amount: "99,00 €", status: "Payée" },
-                ].map((invoice, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-3 border rounded-lg"
-                  >
-                    <div>
-                      <p className="text-sm font-medium">{invoice.date}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {invoice.amount} · {invoice.status}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <BillingTabContent />
         </TabsContent>
       </Tabs>
     </div>

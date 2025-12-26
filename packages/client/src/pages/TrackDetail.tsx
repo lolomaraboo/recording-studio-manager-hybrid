@@ -25,6 +25,7 @@ import { FileUploadButton } from "@/components/FileUploadButton";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { WaveformPlayer } from "@/components/WaveformPlayer";
 import { TrackComments } from "@/components/TrackComments";
+import { UpgradeModal } from "@/components/UpgradeModal";
 import type { CommentMarker } from "@/components/WaveformPlayer";
 
 const statusLabels: Record<string, { label: string; variant: any }> = {
@@ -40,6 +41,7 @@ export default function TrackDetail() {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Comments state
   const [selectedVersion, setSelectedVersion] = useState<'demo' | 'roughMix' | 'finalMix' | 'master'>('master');
@@ -52,6 +54,9 @@ export default function TrackDetail() {
     { enabled: !!id }
   );
 
+  // Fetch subscription for upgrade modal
+  const { data: subscription } = trpc.subscriptions.getCurrentSubscription.useQuery();
+
   // Fetch project data for the track
   const { data: project } = trpc.projects.get.useQuery(
     { id: track?.projectId || 0 },
@@ -63,8 +68,13 @@ export default function TrackDetail() {
     onSuccess: () => {
       refetch();
     },
-    onError: (error) => {
-      toast.error(`Erreur: ${error.message}`);
+    onError: (error: any) => {
+      // Check if it's a storage limit error
+      if (error.data?.code === "FORBIDDEN" && error.message?.includes("Storage limit")) {
+        setShowUpgradeModal(true);
+      } else {
+        toast.error(`Erreur: ${error.message}`);
+      }
     },
   });
 
@@ -971,6 +981,15 @@ export default function TrackDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <UpgradeModal
+          limitType="storage"
+          currentPlan={subscription?.subscriptionTier || "trial"}
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      )}
     </div>
   );
 }

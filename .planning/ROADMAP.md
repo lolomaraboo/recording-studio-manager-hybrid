@@ -80,7 +80,7 @@ Plans:
 Plans:
 - [x] 03-01: Stripe Subscriptions setup with pricing tiers (€29/€99/€299) (Completed 2025-12-25 - 18 min)
 - [x] 03-02: Usage limits enforcement + subscription management (Completed 2025-12-26 - 7 min)
-- [ ] 03-03: Customer Portal + subscription management UI
+- [x] 03-03: Customer Portal + subscription management UI (Completed 2025-12-26 - 11 min)
 
 **Rationale**: Can't sell without billing. Stripe already integrated (Phase 4.2) but only one-time payments. Subscriptions = recurring revenue model. Customer Portal = reduce support burden.
 

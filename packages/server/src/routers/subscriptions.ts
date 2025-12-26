@@ -239,4 +239,76 @@ export const subscriptionsRouter = router({
       stripeCustomerId: organization.stripeCustomerId,
     };
   }),
+
+  /**
+   * Create Stripe Customer Portal Session
+   *
+   * Enables self-service billing management:
+   * - Update payment method
+   * - View invoice history
+   * - Cancel subscription
+   * - Download receipts
+   *
+   * Returns:
+   * - portalUrl: URL to Stripe Customer Portal
+   *
+   * Note: Requires Customer Portal configuration in Stripe Dashboard:
+   * - Dashboard > Settings > Billing > Customer Portal
+   * - Enable customer cancellation, payment method updates, invoice history
+   * - Set business information (name, support email)
+   *
+   * Port from Python billing_routes.py create_customer_portal_session() (lines 301-343)
+   */
+  createPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
+    console.log("[createPortalSession] Request:", {
+      userId: ctx.user.id,
+      organizationId: ctx.organizationId,
+    });
+
+    if (!ctx.organizationId) {
+      throw new Error("No organization context");
+    }
+
+    const masterDb = await getMasterDb();
+    const stripe = getStripeClient();
+
+    // 1. Get organization's Stripe customer ID
+    const orgList = await masterDb
+      .select()
+      .from(organizations)
+      .where(eq(organizations.id, ctx.organizationId))
+      .limit(1);
+
+    if (orgList.length === 0) {
+      throw new Error(`Organization ${ctx.organizationId} not found`);
+    }
+
+    const organization = orgList[0];
+    const stripeCustomerId = organization.stripeCustomerId;
+
+    if (!stripeCustomerId) {
+      throw new Error(
+        "No Stripe customer ID found. Please subscribe to a plan first."
+      );
+    }
+
+    console.log("[createPortalSession] Using Stripe customer:", stripeCustomerId);
+
+    // 2. Create billing portal session
+    const returnUrl = `${process.env.CLIENT_URL || "https://app.recording-studio-manager.com"}/settings?tab=billing`;
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: stripeCustomerId,
+      return_url: returnUrl,
+    });
+
+    console.log("[createPortalSession] Portal session created:", {
+      sessionId: session.id,
+      url: session.url,
+    });
+
+    return {
+      portalUrl: session.url,
+    };
+  }),
 });
