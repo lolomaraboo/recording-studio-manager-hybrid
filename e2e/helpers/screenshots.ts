@@ -80,7 +80,7 @@ function sanitizeFilename(name: string): string {
  * Ensure screenshots directory exists
  */
 export async function ensureScreenshotsDir(): Promise<void> {
-  const fs = require('fs');
+  const fs = await import('fs');
   if (!fs.existsSync(SCREENSHOTS_DIR)) {
     fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
   }
