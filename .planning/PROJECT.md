@@ -45,9 +45,9 @@ Transformer Recording Studio Manager en **plateforme SaaS commerciale prête à 
 
 Comment on sait que c'est prêt à vendre :
 
-- [ ] **Phase 5 complétée** - Projects Management 100% fonctionnel (track audio upload, versioning, comments, waveform player)
+- [x] **Phase 5 complétée** - Projects Management 100% fonctionnel (track audio upload, versioning, comments, waveform player)
 - [ ] **Production stable** - 0 erreurs CORS, authentification multi-tenant fonctionne, monitoring basique actif
-- [ ] **Stripe billing complet** - Subscriptions Starter/Pro/Enterprise implémentées avec webhooks
+- [x] **Stripe billing complet** - Subscriptions Free/Pro/Enterprise implémentées avec webhooks, Customer Portal, usage limits
 - [ ] **Landing page publique** - recording-studio-manager.com explique le produit, pricing visible, CTA signup
 - [ ] **Démo fonctionnelle** - Studio démo pré-rempli accessible publiquement pour trial
 - [ ] **Support infrastructure** - Email support configuré, documentation utilisateur basique, FAQ
@@ -281,6 +281,7 @@ Comment on sait que c'est prêt à vendre :
 - `.planning/DEEP_ANALYSIS_3_VERSIONS.md` - Full comparison (Claude vs Manus vs Hybrid)
 - `.planning/EXECUTIVE_SUMMARY.md` - Executive summary with recommendations
 - `.planning/ROADMAP_V2_ENTERPRISE.md` - Detailed v2.0 enterprise roadmap
+- `.planning/DECISIONS_LOG.md` - Technical decisions log (7 undocumented choices explained)
 - `.planning/ISSUES.md` - Updated with ISSUE-010 (planning gaps), ISSUE-011 (missing features), ISSUE-012 (undocumented decisions)
 
 ## Decisions Made
@@ -293,7 +294,7 @@ Décisions prises durant exploration initiale :
 | **Phase 5 avant Phase 4.3 P2** | Projects Management prioritaire vs Infrastructure polish | Feature différenciante business > optimisations invisibles. Feedback beta: "manque gestion projets" = churn risk. |
 | **Production sur VPS unique** | Hostinger 4GB vs AWS multi-région | Budget-conscious, scaling basé sur tenants réels. Multi-région = $500+/mois prématuré. |
 | **CORS HTTPS à fixer** | Ajouter https:// au pattern subdomain | Backend accepte http:// mais bloque https:// → Production broken. Fix critique avant marketing. |
-| **Pricing tiers 3 niveaux** | Starter €29, Pro €99, Enterprise €299 | Adresser tous segments. Starter = petits studios, Pro = moyens, Enterprise = gros + features avancées future. |
+| **Pricing tiers 3 niveaux** | Free €0, Pro €19/€190, Enterprise €59/€590 + AI packs | Adresser tous segments avec freemium. Free = acquisition, Pro = petits studios, Enterprise = moyens/gros. Prix repositionnés -34% à -80% vs plan initial pour compétitivité marché. AI packs (2€/5€/7€) = usage-based monetization. |
 | **English-first, i18n later** | v1.0 English seulement | Marché US/UK = 60%+ studios, i18n = 6 semaines dev. French Canada + Europe = v2.0 après traction. |
 | **Stripe billing vs build custom** | Stripe Subscriptions + Customer Portal | Time-to-market, PCI compliance gratuit, webhooks robustes. Custom billing = 4+ semaines. |
 | **Monitoring basique v1.0** | Health checks + Sentry errors vs Prometheus/Grafana | <100 tenants = simple suffit. Prometheus = overhead ops prématuré. |
@@ -306,7 +307,7 @@ Choses à clarifier durant exécution :
 
 - [x] **Item 11 Phase 5** : ✅ RÉSOLU - Item 11 = Documentation Phase 5 (FAIT), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
 - [x] **CORS fix approach** : ✅ RÉSOLU - Cookie domain `.recording-studio-manager.com`, sameSite: lax, trust proxy configuré
-- [ ] **Pricing validation** : €29/€99/€299 alignés marché ? Tester avec beta users ?
+- [x] **Pricing validation** : ✅ RÉSOLU - €0/€19/€59 configuré dans Stripe (28 nov 2024). Repositionné -34% à -80% vs plan initial pour compétitivité marché. Tester avec beta users pour valider adoption freemium.
 - [ ] **Onboarding steps** : 3 étapes (Account → Studio Info → First Room) suffisantes ?
 - [ ] **Demo data** : Combien de sessions/clients/projects pré-remplir studio-demo ?
 - [ ] **Backup strategy** : Daily snapshots suffisant OU continuous replication requise ?
