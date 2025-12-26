@@ -337,25 +337,153 @@ Add basic resource monitoring to deployment:
 
 ---
 
+---
+
+## 🟡 Medium - Enterprise Features Missing (From Claude Version)
+
+### ISSUE-010: GSD Roadmap Misalignment with Reality
+**Discovered:** 2025-12-26 during deep analysis of 3 versions
+**Status:** DOCUMENTED
+**Severity:** P2 - Planning accuracy
+
+**Description:**
+Comprehensive comparison of Claude, Manus, and Hybrid versions revealed major discrepancies between GSD planning and actual implementation:
+
+**Pricing Mismatch:**
+- GSD Roadmap: €29/€99/€299
+- Stripe Reality (28 nov): €0/€19/€59 + packs IA (2€/5€/7€)
+- Impact: -50% to -80% price difference, undocumented Free tier
+
+**Features Over-delivered:**
+- 93+ features implemented but not in GSD
+- AI Chatbot: 37 actions (vs "assistant" vague)
+- Client Portal: 10 features (vs auth + booking)
+- Audio System: 4 pro components (vs upload simple)
+- Testing: 92.63% coverage (not mentioned)
+
+**Enterprise Features Missing:**
+- 15 features from Claude version not ported to Hybrid
+- ~200KB Python code (SSO, 2FA, i18n, monitoring, etc.)
+- Estimated: 6-9 months effort to port
+
+**Resolution:**
+Created `.planning/DEEP_ANALYSIS_3_VERSIONS.md` with full inventory. Requires:
+1. Update PROJECT.md with discovered features
+2. Update ROADMAP.md with realistic Phase v2.0 (Enterprise)
+3. Document pricing strategy decision
+4. Plan enterprise features roadmap
+
+**Related Files:**
+- `.planning/DEEP_ANALYSIS_3_VERSIONS.md`
+- `.planning/FEATURES_INVENTORY.md`
+
+**Time Estimate:** Documentation 2-3h, Enterprise roadmap planning 1-2 days
+
+---
+
+### ISSUE-011: 15 Enterprise Features Not Ported from Claude
+**Discovered:** 2025-12-26 during version comparison
+**Status:** TODO (v2.0 roadmap)
+**Severity:** P2 - Feature completeness
+
+**Description:**
+Version Claude (Python) has 15 enterprise features implemented and in production that are completely absent from Hybrid version:
+
+**Priority 1 (Security & Compliance):**
+1. SSO/SAML (17KB) - Okta, Auth0, Azure AD
+2. 2FA TOTP (6KB) - Two-factor with backup codes
+3. Audit logs SOC2 (17KB) - Compliance-ready logging
+
+**Priority 2 (Localization & Customization):**
+4. i18n (8KB) - 6 languages (EN, FR, ES, DE, IT, PT)
+5. Multi-devises (16KB) - 6 currencies with exchange
+6. White-label (30KB) - Branding + theme customization
+
+**Priority 3 (Integrations):**
+7. Google Calendar (20KB) - Bidirectional sync
+8. Twilio SMS (19KB) - Notifications
+9. DocuSign (12KB) - E-signature
+
+**Priority 4 (Infrastructure):**
+10. Multi-région (16KB) - AWS deployment
+11. DB Replication (17KB) - PostgreSQL streaming
+12. Backup manager (15KB) - Automated snapshots
+13. Advanced rate limit (17KB) - Redis-based
+14. Prometheus/Grafana (13KB) - Monitoring
+15. Compliance manager (7KB) - GDPR/CCPA
+
+**Impact:**
+- Hybrid cannot serve enterprise customers without these
+- Competitive disadvantage vs Claude version
+- Estimated effort: 25-35 weeks (6-9 months, 1 dev)
+
+**Proposed Roadmap:**
+See `.planning/DEEP_ANALYSIS_3_VERSIONS.md` Section "Roadmap de Convergence"
+
+**Time Estimate:** Full implementation 6-9 months
+
+---
+
+### ISSUE-012: Undocumented Technology Decisions
+**Discovered:** 2025-12-26 during code analysis
+**Status:** TODO - Documentation needed
+**Severity:** P3 - Knowledge management
+
+**Description:**
+Several major technology decisions made during Hybrid development are not documented in GSD:
+
+**Decisions Found:**
+1. **Cloudinary vs S3** - Audio storage choice (not documented why)
+2. **Magic Link auth** - Passwordless login added (not planned)
+3. **Device fingerprinting** - Security feature (not mentioned)
+4. **Custom HTML5 player** - 227 lines (vs assuming library)
+5. **Pricing strategy** - €19/€59 vs €29/€99 (why -66%?)
+6. **Free tier addition** - Not in roadmap, why added?
+7. **AI credit packs** - Separate pricing (business model change)
+
+**Impact:**
+- Future developers won't understand rationale
+- Risk of reversing good decisions without context
+- Difficult to onboard new team members
+
+**Resolution:**
+Document all major decisions in:
+- PROJECT.md (technical choices)
+- ROADMAP.md (feature choices)
+- New file: `docs/DECISIONS_LOG.md`
+
+**Time Estimate:** 3-4 hours to document thoroughly
+
+---
+
 ## Issue Summary
 
 **By Severity:**
 - P0 Critical: 1 (ISSUE-001 - Database not initialized) 🔴 BLOCKING
 - P1 High: 4 (ISSUE-002 through ISSUE-005) ✅ All resolved
-- P2 Medium: 0
+- P2 Medium: 3 (ISSUE-010, ISSUE-011, ISSUE-012) - Strategic gaps
 - P3 Low: 5 (ISSUE-006 through ISSUE-009) - Technical debt / improvements
 
+**By Category:**
+- **Infrastructure:** 5 issues (1 blocking, 4 resolved)
+- **Documentation:** 2 issues (GSD alignment, tech decisions)
+- **Features:** 1 issue (15 enterprise features missing)
+- **Process:** 3 issues (deployment, rollback, monitoring)
+
 **By Status:**
-- Open: 5 (1 blocking, 4 improvements)
+- Open: 8 (1 critical, 3 medium priority, 4 low priority)
 - Resolved: 4 (all infrastructure issues)
 
 **Next Actions:**
 1. **IMMEDIATE:** Resolve ISSUE-001 (database initialization) to unblock Phase 3.1
-2. **Short-term:** Clean up debug logging (ISSUE-006)
-3. **Medium-term:** Improve deployment script (ISSUE-007, ISSUE-008)
-4. **Long-term:** Add VPS monitoring (ISSUE-009)
+2. **This Week:** Document discovered features and decisions (ISSUE-010, ISSUE-012)
+3. **This Month:** Create v2.0 Enterprise roadmap (ISSUE-011)
+4. **Short-term:** Clean up debug logging (ISSUE-006)
+5. **Medium-term:** Improve deployment (ISSUE-007, ISSUE-008)
+6. **Long-term:** Add VPS monitoring (ISSUE-009), implement enterprise features
 
 ---
 
 *Last updated: 2025-12-26*
 *Phase: 3.1-fix-production-authentication-401-errors*
+*Analysis: Deep comparison of 3 versions completed*
