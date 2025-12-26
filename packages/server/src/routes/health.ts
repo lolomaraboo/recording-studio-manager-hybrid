@@ -35,7 +35,7 @@ router.get('/health/db', async (_req, res) => {
     // Query master DB to verify connection
     const result = await masterDb.execute(sql`SELECT 1 as health_check`);
 
-    if (result && result.rows && result.rows.length > 0) {
+    if (result && result.rowCount !== undefined && result.rowCount >= 0) {
       res.status(200).json({
         status: 'ok',
         service: 'postgresql',
@@ -104,7 +104,7 @@ router.get('/health/full', async (_req, res) => {
     const masterDb = await getMasterDb();
     const result = await masterDb.execute(sql`SELECT 1 as health_check`);
 
-    if (result && result.rows && result.rows.length > 0) {
+    if (result && result.rowCount !== undefined && result.rowCount >= 0) {
       checks.database.status = 'ok';
     } else {
       checks.database.status = 'error';
