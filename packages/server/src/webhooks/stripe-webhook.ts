@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Stripe from "stripe";
-import { getTenantDb } from "@rsm/database/connection";
+import { getTenantDb, getMasterDb } from "@rsm/database/connection";
 import {
   sessions,
   paymentTransactions,
@@ -8,6 +8,7 @@ import {
   clients,
   rooms,
 } from "@rsm/database/tenant/schema";
+import { organizations } from "@rsm/database/master/schema";
 import { eq, and } from "drizzle-orm";
 import {
   getStripeClient,
@@ -91,6 +92,27 @@ export async function handleStripeWebhook(req: Request, res: Response) {
 
       case "payment_intent.payment_failed":
         await handlePaymentIntentFailed(event);
+        break;
+
+      // Subscription lifecycle events
+      case "customer.subscription.created":
+        await handleSubscriptionCreated(event);
+        break;
+
+      case "customer.subscription.updated":
+        await handleSubscriptionUpdated(event);
+        break;
+
+      case "customer.subscription.deleted":
+        await handleSubscriptionDeleted(event);
+        break;
+
+      case "invoice.payment_succeeded":
+        await handleInvoicePaymentSucceeded(event);
+        break;
+
+      case "invoice.payment_failed":
+        await handleInvoicePaymentFailed(event);
         break;
 
       default:
@@ -190,7 +212,7 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
       sessionId: bookingId,
       stripePaymentIntentId: paymentIntent.id,
       stripeCheckoutSessionId: session.id,
-      stripeCustomerId: session.customer as string | null,
+      stripeCustomerId: (session.customer as string) || undefined,
       amount: amount.toFixed(2),
       currency: paymentIntent.currency,
       paymentType,
@@ -556,4 +578,260 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
   });
 
   console.log(`[Stripe Webhook] Recorded payment failure for booking ${bookingId}`);
+}
+
+/**
+ * Handle customer.subscription.created event
+ *
+ * Triggered when:
+ * - Customer starts a new subscription (including trial)
+ *
+ * Actions:
+ * - Update organizations table with subscription info
+ * - Set subscriptionTier, stripe_subscription_id, trial_ends_at
+ * - Log subscription creation
+ *
+ * Port from Python stripe_subscriptions.py handle_webhook() (lines 500-660)
+ */
+async function handleSubscriptionCreated(event: Stripe.Event) {
+  const subscription = event.data.object as Stripe.Subscription;
+
+  console.log(`[Stripe Webhook] Processing customer.subscription.created: ${subscription.id}`);
+
+  // Extract metadata
+  const organizationId = parseInt(subscription.metadata?.organization_id || "0");
+
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organization_id in subscription metadata");
+    return;
+  }
+
+  const masterDb = await getMasterDb();
+
+  // Calculate trial end date
+  const trialEndsAt = subscription.trial_end
+    ? new Date(subscription.trial_end * 1000)
+    : null;
+
+  // Update organization
+  await masterDb
+    .update(organizations)
+    .set({
+      stripeSubscriptionId: subscription.id,
+      subscriptionStatus: subscription.status as any,
+      trialEndsAt,
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      updatedAt: new Date(),
+    })
+    .where(eq(organizations.id, organizationId));
+
+  console.log(`[Stripe Webhook] Updated organization ${organizationId} with subscription ${subscription.id}`);
+  console.log(`[Stripe Webhook] Trial ends at: ${trialEndsAt?.toISOString() || "No trial"}`);
+  console.log(`[Stripe Webhook] Current period end: ${new Date((subscription as any).current_period_end * 1000).toISOString()}`);
+}
+
+/**
+ * Handle customer.subscription.updated event
+ *
+ * Triggered when:
+ * - Subscription status changes (trial → active, active → past_due, etc.)
+ * - Subscription is upgraded/downgraded
+ * - Billing period renews
+ *
+ * Actions:
+ * - Update organizations table with new status and period
+ */
+async function handleSubscriptionUpdated(event: Stripe.Event) {
+  const subscription = event.data.object as Stripe.Subscription;
+
+  console.log(`[Stripe Webhook] Processing customer.subscription.updated: ${subscription.id}`);
+
+  const organizationId = parseInt(subscription.metadata?.organization_id || "0");
+
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organization_id in subscription metadata");
+    return;
+  }
+
+  const masterDb = await getMasterDb();
+
+  // Update organization subscription status
+  await masterDb
+    .update(organizations)
+    .set({
+      subscriptionStatus: subscription.status as any,
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      updatedAt: new Date(),
+    })
+    .where(eq(organizations.id, organizationId));
+
+  console.log(`[Stripe Webhook] Updated organization ${organizationId} subscription status: ${subscription.status}`);
+}
+
+/**
+ * Handle customer.subscription.deleted event
+ *
+ * Triggered when:
+ * - Subscription is canceled and grace period expires
+ * - Customer stops paying and all retry attempts fail
+ *
+ * Actions:
+ * - Set organization status to SUSPENDED
+ * - Clear subscription IDs
+ * - Log cancellation
+ *
+ * Port from Python stripe_subscriptions.py handle_webhook()
+ */
+async function handleSubscriptionDeleted(event: Stripe.Event) {
+  const subscription = event.data.object as Stripe.Subscription;
+
+  console.log(`[Stripe Webhook] Processing customer.subscription.deleted: ${subscription.id}`);
+
+  const organizationId = parseInt(subscription.metadata?.organization_id || "0");
+
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organization_id in subscription metadata");
+    return;
+  }
+
+  const masterDb = await getMasterDb();
+
+  // Update organization - set to suspended
+  await masterDb
+    .update(organizations)
+    .set({
+      subscriptionStatus: "canceled",
+      updatedAt: new Date(),
+    })
+    .where(eq(organizations.id, organizationId));
+
+  console.log(`[Stripe Webhook] Organization ${organizationId} subscription canceled`);
+
+  // TODO: Send cancellation confirmation email
+  // await sendSubscriptionCanceledEmail(organization.email, organization.name);
+}
+
+/**
+ * Handle invoice.payment_succeeded event
+ *
+ * Triggered when:
+ * - Subscription invoice is paid successfully
+ * - Trial converts to paid subscription
+ * - Recurring payment succeeds
+ *
+ * Actions:
+ * - Update organization status to ACTIVE
+ * - Update current_period_end
+ * - Send confirmation email if trial conversion
+ *
+ * IMPORTANT: Also used for one-time booking payments - check metadata.type
+ *
+ * Port from Python stripe_subscriptions.py handle_webhook()
+ */
+async function handleInvoicePaymentSucceeded(event: Stripe.Event) {
+  const invoice = event.data.object as Stripe.Invoice;
+
+  console.log(`[Stripe Webhook] Processing invoice.payment_succeeded: ${invoice.id}`);
+
+  // Check if this is a subscription invoice or one-time payment
+  if (!(invoice as any).subscription) {
+    console.log("[Stripe Webhook] Invoice is not for a subscription, skipping");
+    return;
+  }
+
+  // Get subscription to access metadata
+  const stripe = getStripeClient();
+  const subscription = await stripe.subscriptions.retrieve(
+    (invoice as any).subscription as string
+  );
+
+  const organizationId = parseInt(subscription.metadata?.organization_id || "0");
+
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organization_id in subscription metadata");
+    return;
+  }
+
+  const masterDb = await getMasterDb();
+
+  // Check if this was a trial conversion
+  const isTrialConversion = invoice.billing_reason === "subscription_create";
+
+  // Update organization - set to active, update period
+  await masterDb
+    .update(organizations)
+    .set({
+      subscriptionStatus: "active",
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      updatedAt: new Date(),
+    })
+    .where(eq(organizations.id, organizationId));
+
+  console.log(`[Stripe Webhook] Organization ${organizationId} subscription payment succeeded`);
+  console.log(`[Stripe Webhook] Trial conversion: ${isTrialConversion}`);
+  console.log(`[Stripe Webhook] Current period end: ${new Date((subscription as any).current_period_end * 1000).toISOString()}`);
+
+  // TODO: Send subscription confirmation email if trial conversion
+  if (isTrialConversion) {
+    // await sendSubscriptionConfirmationEmail(organization.email, organization.name);
+  }
+}
+
+/**
+ * Handle invoice.payment_failed event
+ *
+ * Triggered when:
+ * - Subscription payment fails (card declined, insufficient funds)
+ * - Retry attempts fail
+ *
+ * Actions:
+ * - Set organization status to PAST_DUE
+ * - Send dunning email warning
+ * - Log payment failure
+ *
+ * Port from Python stripe_subscriptions.py handle_webhook()
+ */
+async function handleInvoicePaymentFailed(event: Stripe.Event) {
+  const invoice = event.data.object as Stripe.Invoice;
+
+  console.log(`[Stripe Webhook] Processing invoice.payment_failed: ${invoice.id}`);
+
+  // Check if this is a subscription invoice
+  if (!(invoice as any).subscription) {
+    console.log("[Stripe Webhook] Invoice is not for a subscription, skipping");
+    return;
+  }
+
+  // Get subscription to access metadata
+  const stripe = getStripeClient();
+  const subscription = await stripe.subscriptions.retrieve(
+    (invoice as any).subscription as string
+  );
+
+  const organizationId = parseInt(subscription.metadata?.organization_id || "0");
+
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organization_id in subscription metadata");
+    return;
+  }
+
+  const masterDb = await getMasterDb();
+
+  // Update organization - set to past_due
+  await masterDb
+    .update(organizations)
+    .set({
+      subscriptionStatus: "past_due",
+      updatedAt: new Date(),
+    })
+    .where(eq(organizations.id, organizationId));
+
+  console.log(`[Stripe Webhook] Organization ${organizationId} subscription payment failed`);
+  console.log(`[Stripe Webhook] Attempt count: ${invoice.attempt_count}`);
+
+  // TODO: Send dunning email warning
+  // await sendPaymentFailedEmail(organization.email, organization.name, {
+  //   attemptCount: invoice.attempt_count,
+  //   nextRetry: invoice.next_payment_attempt,
+  // });
 }

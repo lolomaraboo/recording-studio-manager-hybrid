@@ -20,6 +20,7 @@ import { clientPortalDashboardRouter } from './client-portal-dashboard.js';
 import { clientPortalBookingRouter } from './client-portal-booking.js';
 import { clientPortalStripeRouter } from './client-portal-stripe.js';
 import { adminRouter } from './admin.js';
+import { subscriptionsRouter } from './subscriptions.js';
 
 /**
  * Main App Router
@@ -54,6 +55,7 @@ export const appRouter = router({
   auth: authRouter,
   organizations: organizationsRouter,
   admin: adminRouter,
+  subscriptions: subscriptionsRouter,
   sessions: sessionsRouter,
   clients: clientsRouter,
   invoices: invoicesRouter,

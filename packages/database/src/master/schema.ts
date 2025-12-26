@@ -48,6 +48,10 @@ export const organizations = pgTable("organizations", {
   language: varchar("language", { length: 10 }).notNull().default("fr"),
   subscriptionTier: varchar("subscription_tier", { length: 50 }).notNull().default("trial"), // "trial" | "starter" | "pro" | "enterprise"
   trialEndsAt: timestamp("trial_ends_at"),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
+  subscriptionStatus: varchar("subscription_status", { length: 50 }).default("trial"), // "trial" | "active" | "past_due" | "canceled" | "suspended"
+  currentPeriodEnd: timestamp("current_period_end"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -115,6 +119,8 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   description: text("description"),
   priceMonthly: integer("price_monthly").notNull(), // cents
   priceYearly: integer("price_yearly").notNull(), // cents
+  stripePriceIdMonthly: varchar("stripe_price_id_monthly", { length: 255 }),
+  stripePriceIdYearly: varchar("stripe_price_id_yearly", { length: 255 }),
   features: text("features").notNull(), // JSON array
   maxUsers: integer("max_users"),
   maxSessions: integer("max_sessions"),
