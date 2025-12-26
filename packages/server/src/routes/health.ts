@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getMasterDb } from '@rsm/database/connection';
+import { sql } from 'drizzle-orm';
 import Redis from 'ioredis';
 
 /**
@@ -32,7 +33,7 @@ router.get('/health/db', async (_req, res) => {
     const masterDb = getMasterDb();
 
     // Query master DB to verify connection
-    const result = await masterDb.execute('SELECT 1 as health_check');
+    const result = await masterDb.execute(sql`SELECT 1 as health_check`);
 
     if (result && result.rows && result.rows.length > 0) {
       res.status(200).json({
@@ -101,7 +102,7 @@ router.get('/health/full', async (_req, res) => {
   // Check PostgreSQL
   try {
     const masterDb = getMasterDb();
-    const result = await masterDb.execute('SELECT 1 as health_check');
+    const result = await masterDb.execute(sql`SELECT 1 as health_check`);
 
     if (result && result.rows && result.rows.length > 0) {
       checks.database.status = 'ok';
