@@ -26,28 +26,28 @@
 ## Current Position
 
 Phase: 1 of 8 (Production Stability)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2025-12-25 - Completed 01-01-PLAN.md (CORS fix & commits)
+Last activity: 2025-12-26 - Completed 01-02-PLAN.md (Monitoring setup)
 
-Progress: █░░░░░░░░░ 4% (1/24 plans complete)
+Progress: ██░░░░░░░░ 8% (2/24 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 10 min
-- Total execution time: 0.17 hours
+- Total plans completed: 2
+- Average duration: 14 min
+- Total execution time: 0.47 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 1/3 | 10 min | 10 min |
+| 1 | 2/3 | 28 min | 14 min |
 
 **Recent Trend:**
-- Last 5 plans: [10 min]
-- Trend: Baseline established (1 plan)
+- Last 5 plans: [10 min, 18 min]
+- Trend: Consistent delivery (2 plans)
 
 ## Accumulated Context
 
@@ -66,6 +66,9 @@ Progress: █░░░░░░░░░ 4% (1/24 plans complete)
 | 1 | CORS regex pattern over static array | Dynamic origin callback with regex allows flexible subdomain matching vs hardcoded list. Maintains security with pattern validation. |
 | 1 | Docker restart vs rebuild for deployment | Server uses tsx (no build step), restart sufficient to load new code. Rebuild would fail (no dist/ directory). |
 | 1 | Automated Playwright verification | Repeatable validation > manual testing. Created test suite for future regression testing of HTTPS/CORS. |
+| 1 | Uptime Kuma over UptimeRobot | Self-hosted monitoring provides more control, no external dependencies. User-requested alternative to SaaS monitoring. |
+| 1 | 60-second heartbeat interval | Balanced monitoring frequency for early problem detection without excessive overhead on free tier. |
+| 1 | Sentry DSN configuration deferred | Code infrastructure ready in both backend and frontend. Environment variables to be added when Sentry project created. |
 
 ### Deferred Issues
 
@@ -78,8 +81,15 @@ None yet. (ISSUES.md will be created during execution)
 - ✅ auth.ts committed (tenant auto-provisioning integrated)
 - ✅ Test cleanup committed (.gitignore updated for Playwright artifacts)
 
+**Resolved in Phase 1 Plan 2:**
+- ✅ Database health check fixed (postgres-js compatibility)
+- ✅ PostgreSQL authentication issue resolved in production
+- ✅ Uptime Kuma monitoring deployed and configured
+- ✅ All health endpoints operational (200 OK)
+
 **Still outstanding:**
 - Phase 5 Item 11 identity unknown (need to find in TODO_MASTER what's missing)
+- Sentry DSN environment variables need to be added when project created
 
 ## Project Alignment
 
@@ -90,6 +100,6 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-25T04:05:27Z
-Stopped at: Completed 01-01-PLAN.md (CORS fix & commits). Production HTTPS verified working. Ready for 01-02-PLAN.md (monitoring setup).
+Last session: 2025-12-26T06:13:51Z
+Stopped at: Completed 01-02-PLAN.md (Monitoring setup). Health checks operational, Uptime Kuma monitoring active. Ready for 01-03-PLAN.md (production validation).
 Resume file: None
