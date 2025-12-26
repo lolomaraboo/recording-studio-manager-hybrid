@@ -55,7 +55,10 @@ RUN pnpm install --frozen-lockfile --prod
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/packages/database/dist ./packages/database/dist
 COPY --from=builder /app/packages/database/drizzle ./packages/database/drizzle
-COPY --from=builder /app/packages/server/dist ./packages/server/dist
+
+# Copy server source code (uses tsx, no build step)
+COPY --from=builder /app/packages/server/src ./packages/server/src
+COPY --from=builder /app/packages/server/tsconfig.json ./packages/server/
 
 # Copy package.json files for workspace resolution
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
