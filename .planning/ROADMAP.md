@@ -114,6 +114,24 @@ Plans:
 
 ---
 
+### Phase 3.2: End-to-End Testing (INSERTED)
+**Goal**: Validate full user journey with Playwright - comprehensive E2E testing before marketing launch
+
+**Depends on**: Phase 3.1 (production operational)
+
+**Research**: Unlikely (Playwright already configured, tests patterns established)
+
+**Plans**: TBD (to be planned)
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 3.2 to break down)
+
+**Status**: 📋 Not planned yet
+
+**Rationale**: Before launching marketing (Phase 4), validate entire application works end-to-end in production. Critical flows: signup → dashboard → booking → payment → project creation → track upload → AI chatbot. Ensures production quality before driving traffic.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -214,7 +232,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -222,6 +240,7 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 4 → 5 → 6 �
 | 2. Complete Phase 5 | 2/2 | ✅ Complete | 2025-12-26 |
 | 3. Billing Infrastructure | 3/3 | ✅ Complete | 2025-12-26 |
 | 3.1. Fix Production Auth (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
+| 3.2. End-to-End Testing (INSERTED) | 0/? | 📋 Not planned | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
