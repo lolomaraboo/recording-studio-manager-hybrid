@@ -25,12 +25,12 @@
 
 ## Current Position
 
-Phase: 3 of 8 (Billing Infrastructure)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2025-12-26 - Completed 03-03-PLAN.md (Customer Portal & Billing UI)
+Phase: 3.1 of 8 (Fix Production Authentication 401 Errors) [INSERTED URGENT]
+Plan: 0 of 1 in current phase (PARTIAL - code deployed, verification blocked)
+Status: In Progress - Authentication fix deployed, VPS infrastructure issues blocking verification
+Last activity: 2025-12-26 - Phase 3.1 execution (4.5h session - code complete, blocked by DB initialization)
 
-Progress: ███████░░░ 33.3% (8/24 plans complete)
+Progress: ████████░░ 32.0% (8/25 plans complete) - Phase 3.1 in progress (blocked)
 
 ## Performance Metrics
 
@@ -80,10 +80,33 @@ Progress: ███████░░░ 33.3% (8/24 plans complete)
 | 3 | Subscription email templates deferred to Phase 6 | Webhook handlers mark email functions as TODO (sendSubscriptionConfirmationEmail, sendPaymentFailedEmail). Phase 6 (Support & Documentation) will implement all email templates together. Core subscription flow functional without emails. |
 | 3 | Storage check in updateVersionUrl endpoint | Plan suggested uploadTrack endpoint, but actual router uses updateVersionUrl pattern. Added optional fileSizeMB parameter for flexibility and consistency with existing architecture. |
 | 3 | TenantDb type for middleware | Used PostgresJsDatabase (TenantDb) instead of NodePgDatabase as codebase uses postgres.js adapter consistently. Maintains type safety across middleware and routers. |
+| 3.1 | Cookie domain with leading dot | `.recording-studio-manager.com` (with dot) enables subdomain cookie sharing per RFC standard vs wildcard patterns. Required for multi-tenant authentication. |
+| 3.1 | Trust proxy configuration | `app.set('trust proxy', 1)` instead of array/function for single Nginx proxy. Simple case, no need for complex trust logic. |
+| 3.1 | sameSite: lax vs none | Chose 'lax' for balance of security and usability. Allows top-level navigation, blocks CSRF without requiring always-secure like 'none'. |
+| 3.1 | Direct tsx command in Dockerfile | Avoid pnpm wrapper to prevent runtime DNS lookups. Workaround for VPS systemd-resolved issues where containers can't resolve DNS via 127.0.0.53. |
+| 3.1 | Port 3002 vs debugging 3001 | Changed production port instead of debugging orphaned docker-proxy processes. Pragmatic choice - faster deployment, equally effective. |
+| 3.1 | Google DNS in daemon.json | Use 8.8.8.8 instead of host resolver for container DNS. systemd-resolved (127.0.0.53) doesn't work inside Docker containers on Ubuntu 24.04. |
 
 ### Deferred Issues
 
-None yet. (ISSUES.md will be created during execution)
+**Production Blockers (from Phase 3.1):**
+- ISSUE-001 (P0): Production database not initialized - migrations need to run on VPS
+- ISSUE-006 (P3): Debug logging in context.ts should be removed after verification
+
+**Infrastructure Improvements:**
+- ISSUE-007 (P3): Deployment script missing migration step
+- ISSUE-008 (P3): No automated rollback strategy for failed deployments
+- ISSUE-009 (P3): VPS resource monitoring not configured
+
+See `.planning/ISSUES.md` for full details and resolution steps.
+
+### Roadmap Evolution
+
+- **2025-12-26:** Phase 3.1 inserted after Phase 3 - "Fix Production Authentication 401 Errors" (URGENT)
+  - Reason: Critical production blocker discovered - all API endpoints returning 401 Unauthorized
+  - Impact: All tRPC queries/mutations failing, WebSocket authentication broken
+  - Symptoms: User reported console errors showing `GET /api/trpc/* 401`, `[WebSocket] No authentication token found`
+  - Priority: BLOCKER - Must resolve before Phase 4 (Marketing) as product is currently inaccessible
 
 ### Blockers/Concerns Carried Forward
 
@@ -104,11 +127,24 @@ None yet. (ISSUES.md will be created during execution)
 - ✅ Signup flow validated (tenant_6 auto-provisioned successfully)
 - ✅ Core flows tested (dashboard, bookings, AI chatbot all functional)
 
-**Still outstanding:**
+**Resolved in Phase 3.1 (Infrastructure):**
+- ✅ VPS Docker DNS resolution (systemd-resolved incompatibility)
+- ✅ Port 3001 conflict with orphaned docker-proxy processes
+- ✅ VITE_API_URL build-time configuration for frontend
+- ✅ Local client container port 80 conflict
+
+**Currently blocking Phase 3.1 completion:**
+- 🔴 ISSUE-001 (P0): Production database not initialized - prevents authentication testing
+- Health endpoint returns `{"error":"Not found"}` instead of `{"status":"ok"}`
+- Production site shows 502 Bad Gateway
+- Cannot verify session cookie fix works end-to-end
+
+**Still outstanding (non-blocking):**
 - Phase 5 Item 11 identity unknown (need to find in TODO_MASTER what's missing)
 - Sentry DSN environment variables need to be added when project created
 - Stripe payment UI implementation status (backend ready, frontend unclear)
 - Projects "Create Project" UI flow needs manual verification
+- Debug logging cleanup in context.ts (after auth verification)
 
 ## Project Alignment
 
@@ -119,6 +155,11 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-26T08:26:17Z
-Stopped at: Completed 03-03-PLAN.md (Customer Portal & Billing UI). Phase 3 complete (3/3 plans done).
-Resume file: None
+Last session: 2025-12-26T13:47:00Z
+Stopped at: Phase 3.1-01 execution - authentication code deployed, blocked by ISSUE-001 (database not initialized on VPS)
+Resume context:
+  - Authentication fix complete (8 commits: 2740c52 through 7eef7cd)
+  - VPS infrastructure issues resolved (DNS, ports, VITE_API_URL)
+  - Production deployment blocked by database initialization
+  - Next: Run migrations on VPS, verify health endpoint, test authentication flow
+Resume file: .planning/phases/3.1-fix-production-authentication-401-errors/3.1-01-SUMMARY.md
