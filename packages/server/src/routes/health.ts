@@ -32,19 +32,14 @@ router.get('/health/db', async (_req, res) => {
   try {
     const masterDb = await getMasterDb();
 
-    // Query master DB to verify connection
-    const result = await masterDb.execute(sql`SELECT 1 as health_check`);
+    // Simple ping using SELECT 1 (use select().from(sql) for compatibility)
+    await masterDb.execute(sql`SELECT 1`);
 
-    // Drizzle execute() returns an array of rows
-    if (Array.isArray(result) && result.length > 0) {
-      res.status(200).json({
-        status: 'ok',
-        service: 'postgresql',
-        timestamp: Date.now(),
-      });
-    } else {
-      throw new Error('Unexpected query result');
-    }
+    res.status(200).json({
+      status: 'ok',
+      service: 'postgresql',
+      timestamp: Date.now(),
+    });
   } catch (error: any) {
     console.error('Database health check failed:', error);
     res.status(503).json({
@@ -103,15 +98,8 @@ router.get('/health/full', async (_req, res) => {
   // Check PostgreSQL
   try {
     const masterDb = await getMasterDb();
-    const result = await masterDb.execute(sql`SELECT 1 as health_check`);
-
-    // Drizzle execute() returns an array of rows
-    if (Array.isArray(result) && result.length > 0) {
-      checks.database.status = 'ok';
-    } else {
-      checks.database.status = 'error';
-      checks.database.error = 'Unexpected query result';
-    }
+    await masterDb.execute(sql`SELECT 1`);
+    checks.database.status = 'ok';
   } catch (error: any) {
     checks.database.status = 'error';
     checks.database.error = error.message;
