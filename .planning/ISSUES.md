@@ -6,21 +6,25 @@
 
 ## 🔴 Active Issues
 
-### ISSUE-010 (P1): E2E Tests Auth Failures
-**Status:** 🔄 In Progress  
-**Created:** 2025-12-26  
-**Phase:** 3.2 - End-to-End Testing  
+### ISSUE-010 (P1): E2E Tests Auth Failures - Backend Registration Fixed
+**Status:** ✅ PARTIALLY RESOLVED (2025-12-26)
+**Created:** 2025-12-26
+**Phase:** 3.2 - End-to-End Testing
 
 **Problem:**
-- Auth login tests fail (no valid test credentials in production)
-- Workflow tests requiring authentication blocked
-- 13/79 tests passing (infrastructure + UI validation OK)
-- Need permanent test account for E2E test suite
+- ✅ **FIXED:** Backend registration endpoint returned 500 SQL error (missing Stripe columns)
+- ⚠️ **REMAINING:** Auth login tests timeout on redirect (4/7 passing)
+- 13/79 tests passing initially → Expected improvement after registration fix
+
+**Root Cause (Resolved):**
+- PostgreSQL schema missing 4 Stripe columns (stripe_customer_id, stripe_subscription_id, subscription_status, current_period_end)
+- Drizzle migration 0006 never ran on production
+- Manual ALTER TABLE applied successfully
 
 **Impact:**
-- Cannot validate full user journeys automatically
-- Auth workflows untested (signup, login, session persistence)
-- Blocks complete E2E validation before Phase 4 (Marketing)
+- Registration endpoint now functional (200 OK)
+- Auth workflows partially tested (signup works, login redirect issues remain)
+- E2E validation partially unblocked
 
 **Resolution Steps:**
 1. Create permanent test account in production
