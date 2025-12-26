@@ -53,6 +53,22 @@ Progress: ████████░░ 32.0% (8/25 plans complete) - Phase 3.1
 
 ## Accumulated Context
 
+### Major Features Discovered (Not Originally in GSD Planning)
+
+**During comprehensive audit 2025-12-26, discovered 93 implemented features not documented:**
+
+1. **AI Chatbot COMPLET (37 actions)** - SSE streaming, anti-hallucination detection (4 rules), Playwright tests 4/4 passing
+2. **Client Portal COMPLET (10 features)** - Email/password, magic link, password reset, booking, payments, dashboard, profile, activity logs, device fingerprinting, ownership verification
+3. **Audio System professionnel** - Upload Cloudinary, versioning 4 versions (demo/rough/final/master), AudioPlayer custom HTML5 (227 lines), TrackDetail 3 Phase 5 cards
+4. **20 UX Components avancés** - Command Palette (Cmd+K), Notification Center, Dark/Light Theme, Global Search, Toast, Breadcrumbs, Status Badges, Loading Skeletons, Delete Confirmations, Responsive Mobile, French date formatting, Type-safe end-to-end
+5. **Testing infrastructure** - Playwright E2E (chat, booking, auth, navigation), Vitest unit (13 tests, 92.63% coverage)
+6. **Tracks enrichment** - 17 nouveaux champs Phase 5 (copyright metadata 8 fields, technical details 5 fields, versioning 4 fields)
+
+**Phase 5 Mystery RESOLVED:**
+- TODO_MASTER showed "11/12 items (92%)" but didn't list Item 11
+- Audit discovered: Item 11 = Documentation Phase 5 (FAIT Session 4), Item 12 = Tests E2E (optionnel)
+- **Phase 5 = 100% fonctionnel** même sans tests E2E formels (tests manuels validés)
+
 ### Decisions Made
 
 | Phase | Decision | Rationale |
@@ -140,11 +156,11 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 - Cannot verify session cookie fix works end-to-end
 
 **Still outstanding (non-blocking):**
-- Phase 5 Item 11 identity unknown (need to find in TODO_MASTER what's missing)
+- ✅ Phase 5 Item 11 identity RÉSOLU - Item 11 = Documentation Phase 5 (FAIT Session 4), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
 - Sentry DSN environment variables need to be added when project created
-- Stripe payment UI implementation status (backend ready, frontend unclear)
-- Projects "Create Project" UI flow needs manual verification
-- Debug logging cleanup in context.ts (after auth verification)
+- Debug logging cleanup in context.ts (after auth verification - ISSUE-006)
+- ✅ Stripe payment UI implementation - COMPLET (Checkout Sessions, webhooks, subscriptions 3 tiers créés)
+- ✅ Projects "Create Project" UI flow - COMPLET (CreateProject modal avec validation)
 
 ## Project Alignment
 

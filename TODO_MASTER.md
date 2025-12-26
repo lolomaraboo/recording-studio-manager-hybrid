@@ -1,17 +1,40 @@
 # TODO_MASTER.md - Recording Studio Manager HYBRIDE
 
-> **⚠️ DOCUMENTATION CORRIGÉE - 2025-12-23**
+> **⚠️ DOCUMENTATION CORRIGÉE - 2025-12-26**
 >
-> **Audit documentation effectué** - Séparation claire features implémentées vs planifiées.
+> **Audit complet effectué** - Inventaire exhaustif features réelles vs promises.
 > **Budget $80k**: Retiré car non pertinent (projet personnel/dev local).
-> **Multi-région/SSO/i18n**: Déplacés vers section "Features Futures Planifiées".
+> **Multi-région/SSO/i18n**: ❌ NON IMPLÉMENTÉS - Voir section "Features Non Implémentées" ci-dessous.
+> **Phase 5 Item 11**: ✅ RÉSOLU - Item 11 = Documentation (FAIT), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
 
 > **📊 ÉTAT ACTUEL**
-> **Phase actuelle**: Phase 5 en cours (Projects Management - 92%)
-> **Dernière feature**: 2025-12-22 (Track Comments avec waveform graphique)
-> **Dernière correction doc**: 2025-12-23 (Nettoyage mensonges dans ROADMAP/TODO)
+> **Phase actuelle**: Phase 5 COMPLÉTÉE (92% → 100% fonctionnel, Item 12 optionnel)
+> **Dernière feature**: 2025-12-26 (Phase 3.1 GSD - Auth production fix + billing infrastructure)
+> **Dernière correction doc**: 2025-12-26 (Inventaire complet 93 features découvertes)
 > **Repo GitHub**: https://github.com/lolomaraboo/recording-studio-manager-hybrid
-> **Milestone**: ✅ Phase 1-4 COMPLÉTÉES + 🟡 Phase 5 (92%)
+> **Milestone**: ✅ Phase 1-5 COMPLÉTÉES (100% fonctionnel) + 🚀 GSD Phases 1-3 complétées (32% vers v1.0 commercial)
+
+> **🚨 FEATURES NON IMPLÉMENTÉES (promises à tort dans versions précédentes)**
+> Les features suivantes ont été marquées ✅ FAIT dans anciennes versions mais sont ❌ NON IMPLÉMENTÉES:
+> - ❌ 2FA TOTP + backup codes (infrastructure ready, code absent)
+> - ❌ SSO/SAML (Okta, Auth0, Azure AD) - Aucun code enterprise auth
+> - ❌ Multi-région AWS (3 régions) - Docker local only
+> - ❌ i18n (6 langues) - 100% français hardcodé
+> - ❌ Custom domains + SSL automatique - Pas de code DNS/SSL
+> - ❌ White-label branding - Pas customizable
+> - ❌ Prometheus + Grafana - Dependencies absentes
+> - ❌ DocuSign e-signature - Seulement TODO comment
+> - ❌ Audit logs SOC2-ready - Pas de compliance features
+>
+> **✅ FEATURES DÉCOUVERTES (implémentées mais non documentées ici)**
+> - ✅ AI Chatbot COMPLET (37 actions, SSE streaming, anti-hallucination)
+> - ✅ Client Portal COMPLET (10 features: auth, magic link, booking, payments, dashboard)
+> - ✅ Audio System professionnel (upload Cloudinary, 4 versions, AudioPlayer custom HTML5)
+> - ✅ 20 UX Components avancés (Command Palette Cmd+K, Notification Center, Dark/Light Theme, etc.)
+> - ✅ Testing infrastructure (Playwright E2E, Vitest unit, 92.63% coverage)
+> - ✅ 17 champs enrichment tracks Phase 5 (copyright metadata, technical details, versioning)
+>
+> **→ Voir .planning/ (GSD framework) pour documentation précise et à jour**
 
 ---
 

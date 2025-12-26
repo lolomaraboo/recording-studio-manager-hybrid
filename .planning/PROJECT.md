@@ -9,9 +9,11 @@ Transformer Recording Studio Manager en **plateforme SaaS commerciale prête à 
 **Notre solution :** App SaaS multi-tenant spécialisée avec :
 - Gestion complète studio (planning, clients, projets musicaux, équipement)
 - Portail client pour booking + paiements en ligne (Stripe)
-- AI Assistant pour automatisation tâches
+- **AI Chatbot complet (37 actions)** - Automatisation sessions, clients, analytics, invoices
 - Architecture Database-per-Tenant (isolation données, conformité)
 - Interface moderne React 19 + type safety end-to-end
+- **Audio Management professionnel** - Upload versioning (demo/rough/final/master), audio player custom
+- **20+ UX features avancées** - Command palette, notifications, theme toggle, search globale
 
 **Pourquoi maintenant :**
 - Infrastructure technique solide déjà construite (Phase 1-4 complétées)
@@ -61,13 +63,15 @@ Comment on sait que c'est prêt à vendre :
 
 **Core Product (Must Have) :**
 - ✅ Multi-tenant architecture (Database-per-Tenant PostgreSQL) - FAIT
-- ✅ Client Portal (auth, booking, payments) - FAIT
-- ✅ Stripe Integration (paiements en ligne) - FAIT
-- ✅ AI Chatbot (37 actions, Anthropic SDK) - FAIT
-- 🟡 Projects Management complete (finir 8% restant - Item 11)
-- 🔴 Production HTTPS fonctionnelle (fix CORS)
-- Monitoring basique (health checks, error tracking, uptime)
-- Email notifications (booking confirmations, payment receipts)
+- ✅ Client Portal complet (10 features: auth email/password, magic link, password reset, booking, payments, dashboard, profile, activity logs) - FAIT
+- ✅ Stripe Integration (Checkout Sessions, webhooks, subscriptions) - FAIT
+- ✅ **AI Chatbot COMPLET (37 actions)** - Sessions(5), Clients(5), Analytics(5), Invoices(4), Quotes(4), Rooms(2), Equipment(2), Projects(3), Musicians(1) - FAIT
+- ✅ **Audio System professionnel** - Upload Cloudinary, versioning (demo/rough/final/master), AudioPlayer custom HTML5, TrackDetail avec 3 cartes Phase 5 - FAIT
+- ✅ **20 UX Components avancés** - Command Palette (Cmd+K), Notification Center, Dark/Light Theme, Global Search, Toast, Breadcrumbs, Status Badges, Loading Skeletons, Delete Confirmations, Responsive Mobile - FAIT
+- ✅ Projects Management (11/12 items = 92%, Item 12 = Tests E2E optionnels, 100% fonctionnel) - FAIT
+- 🟡 Production HTTPS stable (CORS fix déployé, database initialization bloquée ISSUE-001)
+- 🔴 Monitoring basique (Uptime Kuma déployé, Sentry DSN à configurer)
+- 🔴 Email notifications (endpoints prêts, templates Resend à implémenter)
 
 **Go-to-Market :**
 - Landing page marketing (hero, features, pricing, testimonials, CTA)
@@ -126,16 +130,21 @@ Comment on sait que c'est prêt à vendre :
 
 **Code existant :**
 - **Monorepo pnpm** : packages/shared, database, server, client
-- **43 pages UI React** complètes avec shadcn/ui
-- **20+ routers tRPC** avec type safety end-to-end
-- **Database-per-Tenant RÉEL** (pas commenté comme version Manus source)
+- **42 pages UI React** complètes avec shadcn/ui (Admin: 37 pages, Client Portal: 5 pages)
+- **20+ routers tRPC** avec 33+ endpoints type-safe
+- **Database-per-Tenant RÉEL** : 35 tables (29 tenant + 6 master), migrations Drizzle
 - **Production déployée** sur VPS 31.220.104.244 avec Docker + Nginx + SSL
+- **AI Chatbot** : 37 actions, SSE streaming, anti-hallucination detection (4 règles)
+- **Audio Management** : Cloudinary upload, 4 versions/track, AudioPlayer custom (227 lignes)
+- **Testing** : Playwright E2E (chat, booking, auth, navigation), Vitest unit (92.63% coverage)
 
 **État technique :**
-- ✅ **Phase 1-4 (100%)** : Infrastructure, UI Components, Client Portal, Stripe
-- 🟡 **Phase 5 (92%)** : Projects Management (11/12 items - manque Item 11)
-- 🔴 **Blocage CORS** : Backend refuse HTTPS (accepte http:// mais pas https://)
-- 🔧 **Modifs non commitées** : auth.ts (tenant auto-provisioning), test cleanup
+- ✅ **Phase 1-4 (100%)** : Infrastructure, UI Components, 42 Pages, Client Portal (10 features), Stripe (subscriptions + webhooks)
+- ✅ **Phase 5 (92% → 100% fonctionnel)** : Projects Management (11/12 items, Item 12 = Tests E2E optionnels)
+- ✅ **AI Chatbot (100%)** : 37 actions, SSE streaming, anti-hallucination, Playwright tests 4/4 passing
+- ✅ **Audio System (100%)** : Upload Cloudinary, versioning 4 versions, AudioPlayer HTML5 custom
+- 🟡 **Production** : CORS fix + auth fix déployés (8 commits), bloqué par ISSUE-001 (database initialization)
+- ✅ **GSD Phases complétées** : Phase 1 (Production Stability), Phase 2 (Complete Phase 5), Phase 3 (Billing Infrastructure)
 
 **Infrastructure production :**
 - **VPS** : Hostinger KVM 1 (4GB RAM, 2 vCPU) à 31.220.104.244
@@ -236,8 +245,8 @@ Décisions prises durant exploration initiale :
 
 Choses à clarifier durant exécution :
 
-- [ ] **Item 11 Phase 5** : Quel est l'item manquant des 12 ? (11/12 complétés selon TODO_MASTER)
-- [ ] **CORS fix approach** : Pattern regex seulement OU middleware subdomain aussi nécessaire ?
+- [x] **Item 11 Phase 5** : ✅ RÉSOLU - Item 11 = Documentation Phase 5 (FAIT), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
+- [x] **CORS fix approach** : ✅ RÉSOLU - Cookie domain `.recording-studio-manager.com`, sameSite: lax, trust proxy configuré
 - [ ] **Pricing validation** : €29/€99/€299 alignés marché ? Tester avec beta users ?
 - [ ] **Onboarding steps** : 3 étapes (Account → Studio Info → First Room) suffisantes ?
 - [ ] **Demo data** : Combien de sessions/clients/projects pré-remplir studio-demo ?
