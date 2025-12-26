@@ -4,11 +4,13 @@ import cors from 'cors';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import Redis from 'ioredis';
+import * as Sentry from '@sentry/node';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index.js';
 import { createContext } from './_core/context.js';
 import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
 import uploadRouter from './routes/upload.js';
+import healthRouter from './routes/health.js';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -21,6 +23,18 @@ import uploadRouter from './routes/upload.js';
  */
 
 const PORT = process.env.PORT || 3001;
+
+// Initialize Sentry error tracking
+if (process.env.SENTRY_DSN_BACKEND) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN_BACKEND,
+    environment: process.env.NODE_ENV || 'production',
+    tracesSampleRate: 0.1, // 10% performance monitoring (free tier limit)
+  });
+  console.log('✅ Sentry error tracking initialized');
+} else {
+  console.warn('⚠️  SENTRY_DSN_BACKEND not set - error tracking disabled');
+}
 
 async function main() {
   const app = express();
@@ -85,14 +99,8 @@ async function main() {
     })
   );
 
-  // Health check
-  app.get('/health', (_req, res) => {
-    res.json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      service: 'recording-studio-manager-api',
-    });
-  });
+  // Health check routes (public, no auth required)
+  app.use('/api', healthRouter);
 
   // Upload routes (before tRPC to handle multipart/form-data)
   app.use('/api/upload', uploadRouter);
@@ -135,6 +143,11 @@ async function main() {
   app.use((_req, res) => {
     res.status(404).json({ error: 'Not found' });
   });
+
+  // Sentry error handler (MUST be after all routes)
+  if (process.env.SENTRY_DSN_BACKEND) {
+    app.use(Sentry.Handlers.errorHandler());
+  }
 
   // Start server
   app.listen(PORT, () => {

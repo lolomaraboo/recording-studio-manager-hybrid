@@ -17,6 +17,7 @@
     "@anthropic-ai/sdk": "^0.71.2",
     "@rsm/database": "workspace:*",
     "@rsm/shared": "workspace:*",
+    "@sentry/node": "^10.32.1",
     "@trpc/server": "^11.0.0-rc.663",
     "@types/bcryptjs": "^3.0.0",
     "@types/express-session": "^1.18.2",
