@@ -82,6 +82,13 @@ async function main() {
   );
 
   app.use(express.json());
+
+  // Enable trust proxy for secure cookies behind Nginx reverse proxy
+  app.set('trust proxy', 1);
+  if (process.env.NODE_ENV === 'production') {
+    console.log('✅ Express trust proxy enabled for production');
+  }
+
   app.use(
     session({
       store: new RedisStore({
@@ -95,6 +102,8 @@ async function main() {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        domain: process.env.NODE_ENV === 'production' ? '.recording-studio-manager.com' : undefined,
+        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
       },
     })
   );

@@ -57,6 +57,13 @@ export async function createContext(
     // Get user from session
     const session = opts.req.session as any;
 
+    // Debug: Log session state (REMOVE after fix verified)
+    if (process.env.NODE_ENV === 'production') {
+      console.log('[Auth Debug] Session ID:', opts.req.sessionID);
+      console.log('[Auth Debug] Session data:', { userId: session.userId, organizationId: session.organizationId });
+      console.log('[Auth Debug] Cookie header:', opts.req.headers.cookie);
+    }
+
     if (session.userId && session.organizationId) {
       // User is authenticated via session
       user = {
@@ -72,7 +79,7 @@ export async function createContext(
     }
   } catch (error) {
     // Auth is optional for publicProcedure
-    console.error('Auth error:', error);
+    console.error('[Auth Error]:', error);
     user = null;
     organizationId = null;
     tenantDb = null;
