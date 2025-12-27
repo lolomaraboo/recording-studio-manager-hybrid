@@ -169,12 +169,19 @@ Plans:
 Plans:
 - [x] 3.4-01: Create test matrix (~600 items) and MCP Chrome DevTools protocol (Completed 2025-12-27 - 8 min)
 - [x] 3.4-02: Test first 10 main Admin pages with MCP Chrome DevTools (Completed 2025-12-27 - 6 min, found 1 P1 + 5 P3 errors)
-- [ ] 3.4-03: Continue testing remaining 37 Admin pages + 5 Client Portal pages + workflows
-- [ ] 3.4-04: Analyze all errors found, prioritize (P0/P1/P2/P3), create fixes roadmap
-- [ ] 3.4-05: Fix P0/P1 Critical errors
-- [ ] 3.4-06: Validation & regression testing (verify all fixes work)
+- [x] 3.4-03: Analyze errors and create fixes roadmap (Completed 2025-12-27)
+- [ ] 3.4-04: Fix P1 Critical error #4 - API limit validation bug (1 error, ~1h)
+- [ ] 3.4-05: Validation & regression testing (~30min)
 
-**Status**: 🔄 In Progress (2/6 plans complete - 10 pages tested, 1 P1 error found, user chose to continue)
+**Status**: 🔄 In Progress (3/5 plans complete - Analysis done, 1 P1 fix required before Phase 4)
+
+**Errors Found Summary:**
+- P0 (Blocker): 0 ✅
+- P1 (Critical): 1 ⚠️ (API limit bug - blocks client revenue/sessions)
+- P2 (Important): 0
+- P3 (Polish): 5 (post-launch backlog)
+
+**Pre-launch requirement:** Phase 3.4-04 and 3.4-05 must complete before Phase 4 (Marketing)
 
 **Rationale**: Avant le lancement marketing (Phase 4), valider EXHAUSTIVEMENT que toutes les fonctionnalités du site fonctionnent. Tester systématiquement : Admin Dashboard (47 pages), Client Portal (5 pages), tous les workflows (signup, booking, payment, projects, AI chatbot), toutes les interactions utilisateur, tous les edge cases. Approche : documenter d'abord TOUTES les erreurs, planifier les fixes, puis coder. Garantit qualité production avant ouverture au public.
 
@@ -290,14 +297,14 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.1. Fix Production Auth (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
 | 3.2. End-to-End Testing (INSERTED) | 2/2 | ✅ Complete | 2025-12-26 |
 | 3.3. Fix Registration Session (INSERTED) | 0/? | 🔴 BLOCKER - Not planned | - |
-| 3.4. Comprehensive Site Testing (INSERTED) | 1/6 | 🔄 In Progress | - |
-| 4. Marketing Foundation | 0/3 | Not started | - |
+| 3.4. Comprehensive Site Testing (INSERTED) | 3/5 | 🔄 In Progress | - |
+| 4. Marketing Foundation | 0/3 | 🔴 Blocked (pending 3.4-04/05) | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 13/33 plans complete (39.4%) - Phase 3.2 complete, Phase 3.3 complete, Phase 3.4 in progress (2/6)
+**Total**: 14/34 plans complete (41.2%) - Phase 3.4 in progress (3/5), 1 P1 error blocks Phase 4
 
 ---
 
