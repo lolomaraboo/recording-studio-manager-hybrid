@@ -8,14 +8,15 @@
 
 ## Summary
 
-**Total Errors Found:** 1 P0 + 6 P1 (previously) + 5 P3 (previously) = **12 errors total**
+**Total Errors Found:** 1 P0 + 1 P1 (new) + 6 P1 (previously) + 5 P3 (previously) = **13 errors total**
 
 **New in This Session:**
-- 1 P0 (Critical Blocker)
+- 1 P0 (Critical Blocker) - Client Detail page blank
+- 1 P1 (Critical) - Command Palette not functional
 
 **By Priority:**
 - **P0 (Blocker):** 1 error - Completely broken functionality
-- **P1 (Critical):** 6 errors - Major UX degradation (from Phase 3.4-02)
+- **P1 (Critical):** 7 errors - Major UX degradation (1 new + 6 from Phase 3.4-02)
 - **P2 (Important):** 0 errors
 - **P3 (Polish):** 5 errors - Minor issues (from Phase 3.4-02)
 
@@ -104,6 +105,103 @@ Response:
 - P0 because page is completely non-functional
 - Core admin functionality completely broken
 - No workaround available
+
+---
+
+### Error #15: Command Palette Search Not Functional
+
+**Feature:** Command Palette (Global Search)
+**Keyboard Shortcut:** Cmd+K / Ctrl+K
+**URL:** All pages (global feature)
+**Severity:** **P1 (CRITICAL)**
+**Type:** Frontend Search Bug
+**Discovery Date:** 2025-12-27
+
+**Steps to Reproduce:**
+1. Press Ctrl+K (or Cmd+K) from any page
+2. Command Palette dialog opens
+3. Type any search query (e.g., "test", "session", "Studio")
+4. Observe: "Aucun résultat trouvé" message appears
+5. Check Network tab: No API search requests sent
+
+**Expected Behavior:**
+- User types search query (minimum 2 characters)
+- API search request sent to backend
+- Results displayed for matching:
+  - Clients
+  - Sessions
+  - Factures (Invoices)
+  - Équipements (Equipment)
+  - Talents
+- User can navigate results with ↑↓ arrows
+- User can select result with Enter key
+- Dialog closes and navigates to selected item
+
+**Actual Behavior:**
+- Dialog opens correctly with Ctrl+K ✅
+- Search input accepts text ✅
+- Placeholder text displays correctly ✅
+- **NO API requests sent** ❌
+- Always shows "Aucun résultat trouvé" ❌
+- Keyboard navigation instructions visible but unusable ❌
+- Esc key closes dialog correctly ✅
+
+**Network Evidence:**
+```
+# Before test
+GET /api/trpc/auth.me [200]
+GET /api/trpc/notifications.list [200]
+
+# During search typing "test", "session", "Studio"
+<no search requests sent>
+
+# Expected (NOT happening)
+GET /api/trpc/search.global?input={"query":"test"}
+GET /api/trpc/search.clients?input={"query":"session"}
+GET /api/trpc/search.equipment?input={"query":"Studio"}
+```
+
+**Console Errors:**
+```
+<no console messages found>
+```
+
+**Root Cause:**
+- Search input onChange handler not triggering API calls
+- Possible causes:
+  1. Missing search API endpoint integration
+  2. Debounce function blocking all requests
+  3. Search state not updating properly
+  4. API call conditional logic broken (e.g., minimum characters check failing)
+
+**UI Evidence:**
+- Dialog UI: Fully functional
+- Search input: Accepts text input
+- Helper text: "Tapez au moins 2 caractères pour rechercher"
+- Empty state: "Aucun résultat trouvé" (incorrectly shown for all queries)
+- Keyboard shortcuts display: "↑↓ Naviguer, Enter Sélectionner, Esc Fermer"
+
+**Impact:**
+- **MAJOR UX DEGRADATION** - Users cannot use global search
+- No quick navigation between entities
+- Forces users to manually navigate via sidebar menus
+- Significantly slows down workflow for power users
+- Feature completely non-functional despite UI working
+
+**Affected Users:** All admin users
+
+**Priority Justification:**
+- P1 (not P0) because:
+  - Workaround exists: manual sidebar navigation
+  - Not blocking core CRUD operations
+  - UI indicates feature should exist, creating user confusion
+- Command Palette is a major productivity feature
+- Common pattern in modern SaaS apps (Notion, Linear, etc.)
+- Users expect Cmd+K to work
+
+**Related Features:**
+- Global search bar in sidebar (uid=3 "Rechercher... ⌘ K")
+- May indicate broader search infrastructure issues
 
 ---
 
@@ -233,15 +331,18 @@ Response:
 - ✅ AI Chatbot - SSE streaming working
 - ✅ AI Chatbot - Message send/receive
 - ✅ AI Chatbot - Input enable/disable states
+- ❌ Command Palette (Cmd+K) - Error #15 (P1 - search not functional)
+- ✅ Theme Toggle - Mode sombre/clair switching works
+- ✅ Notifications Center - Opens correctly, displays empty state
 
 **Total Test Coverage:**
 - **Pages:** ~18/47 Admin pages (38%) - Added: Tracks, Contracts, Expenses, Talents
 - **CRUD Operations:** ~9/132 (7%) - Added: Talents CREATE
-- **UI Interactions:** ~2/200 (1%) - Modals, Forms tested
-- **Advanced Features:** ~1/50 (2%) - AI Chatbot SSE tested
+- **UI Interactions:** ~3/200 (1.5%) - Modals, Forms, Theme toggle tested
+- **Advanced Features:** ~4/50 (8%) - AI Chatbot, Command Palette, Theme, Notifications tested
 - **Client Portal:** ~0/30 (0%)
 
-**Estimated Remaining:** ~550 test items (out of ~600 total)
+**Estimated Remaining:** ~546 test items (out of ~600 total)
 
 ---
 
@@ -290,12 +391,15 @@ Response:
    - Search/filters
 
 6. **Test Advanced Features:**
-   - AI Chatbot (SSE streaming, actions)
-   - Command Palette (Cmd+K)
-   - Global Search
-   - Audio Player
-   - Notifications Center
-   - Theme Toggle
+   - ✅ AI Chatbot (SSE streaming, actions) - WORKING
+   - ❌ Command Palette (Cmd+K) - Error #15 NOT WORKING
+   - ✅ Theme Toggle - WORKING
+   - ✅ Notifications Center - WORKING
+   - ⏳ Global Search (sidebar search bar)
+   - ⏳ Audio Player
+   - ⏳ Analytics Dashboard widgets
+   - ⏳ Calendar view
+   - ⏳ Financial Reports generation
 
 7. **Test Client Portal:**
    - Client login
@@ -325,7 +429,12 @@ Testing has revealed **1 new P0 blocker** (Client Detail page completely blank).
 **Summary of this testing session:**
 - 18 Admin pages tested (List pages functional, 1 Detail page broken)
 - 9 CRUD operations verified working
-- 1 P0 BLOCKER found: Client Detail page completely blank
-- AI Chatbot SSE streaming confirmed working
+- **NEW ERRORS FOUND:**
+  - 1 P0 BLOCKER: Client Detail page completely blank (Error #14)
+  - 1 P1 CRITICAL: Command Palette search not functional (Error #15)
+- **Advanced Features:**
+  - ✅ AI Chatbot SSE streaming confirmed working
+  - ✅ Theme Toggle (dark/light mode) working
+  - ✅ Notifications Center working (empty state)
+  - ❌ Command Palette search broken (no API calls)
 - Talents CREATE modal + form working correctly
-- No new P1/P2/P3 errors found
