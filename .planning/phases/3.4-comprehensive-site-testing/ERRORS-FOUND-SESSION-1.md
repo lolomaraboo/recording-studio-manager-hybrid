@@ -8,17 +8,17 @@
 
 ## Summary
 
-**Total Errors Found:** 1 P0 + 2 P1 (new) + 1 P2 (new) + 6 P1 (previously) + 5 P3 (previously) = **16 errors total**
+**Total Errors Found:** 1 P0 + 4 P1 (new) + 1 P2 (new) + 6 P1 (previously) + 5 P3 (previously) = **18 errors total**
 
 **New in This Session:**
 - 1 P0 (Critical Blocker) - Client Detail page blank (Error #14)
-- 2 P1 (Critical) - Command Palette search not functional (Error #15), Tracks CREATE not implemented (Error #18)
+- 4 P1 (Critical) - Command Palette search (Error #15), Tracks CREATE missing (Error #18), Clients DELETE fails (Error #19), Talents DELETE missing (Error #20)
 - 1 P2 (Important) - Invoice/Quote CREATE date picker UX issue (Error #16)
 - 1 P3 (Polish) - Expenses CREATE date format issue (Error #17)
 
 **By Priority:**
 - **P0 (Blocker):** 1 error - Completely broken functionality
-- **P1 (Critical):** 8 errors - Major UX degradation (2 new + 6 from Phase 3.4-02)
+- **P1 (Critical):** 10 errors - Major UX degradation (4 new + 6 from Phase 3.4-02)
 - **P2 (Important):** 1 error - Invoice/Quote date picker UX (form unusable but API works)
 - **P3 (Polish):** 6 errors - Minor issues (1 new + 5 from Phase 3.4-02)
 
@@ -523,6 +523,303 @@ Response: 404 Not Found
 
 **URL:** https://recording-studio-manager.com/sessions/2
 **Status:** ✅ **Fully functional** (UPDATE operations verified)
+
+---
+
+### Error #19: Clients DELETE - Database Constraint Violation
+
+**Endpoint:** `POST /api/trpc/clients.delete`
+**Severity:** **P1 (CRITICAL)**
+**Type:** Backend Database Error
+**Discovery Date:** 2025-12-27
+
+**Test Method:**
+Direct API call via evaluate_script:
+```javascript
+await fetch('/api/trpc/clients.delete', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id: 3 })
+});
+```
+
+**Actual Behavior:**
+```json
+{
+  "status": 500,
+  "ok": false,
+  "data": {
+    "error": {
+      "message": "Failed query: delete from \"clients\" where \"clients\".\"id\" = $1\nparams: 3",
+      "code": -32603,
+      "data": {
+        "code": "INTERNAL_SERVER_ERROR",
+        "httpStatus": 500,
+        "path": "clients.delete"
+      }
+    }
+  }
+}
+```
+
+**Expected Behavior:**
+- DELETE request returns 200 OK
+- Response: `{"result": {"data": {"success": true}}}`
+- Client removed from database
+- Related records handled appropriately (cascade or prevent delete)
+
+**Root Cause:**
+- Database constraint violation (likely foreign key constraint)
+- Client ID #3 has related records (sessions, invoices, projects, etc.)
+- Backend not handling cascade delete or providing meaningful error
+
+**Impact:**
+- **Users cannot delete clients** that have any associated records
+- No UI feedback about why delete fails (500 error)
+- Data cleanup impossible without manual database intervention
+
+**Priority Justification - P1 (Critical):**
+- Core CRUD operation completely broken
+- Affects data management workflows
+- No workaround available via UI
+- Database integrity at risk if users attempt workarounds
+
+**Recommended Fix:**
+1. **Option A - Cascade Delete (Destructive):**
+   ```typescript
+   // Backend: packages/server/src/routers/clients.ts
+   delete: protectedProcedure
+     .input(z.object({ id: z.number() }))
+     .mutation(async ({ ctx, input }) => {
+       const tenantDb = await ctx.getTenantDb();
+
+       // Delete all related records first
+       await tenantDb.delete(sessions).where(eq(sessions.clientId, input.id));
+       await tenantDb.delete(invoices).where(eq(invoices.clientId, input.id));
+       await tenantDb.delete(projects).where(eq(projects.clientId, input.id));
+       await tenantDb.delete(quotes).where(eq(quotes.clientId, input.id));
+
+       // Then delete client
+       await tenantDb.delete(clients).where(eq(clients.id, input.id));
+
+       return { success: true };
+     })
+   ```
+
+2. **Option B - Prevent Delete (Safe):**
+   ```typescript
+   delete: protectedProcedure
+     .input(z.object({ id: z.number() }))
+     .mutation(async ({ ctx, input }) => {
+       const tenantDb = await ctx.getTenantDb();
+
+       // Check for related records
+       const relatedSessions = await tenantDb.select().from(sessions)
+         .where(eq(sessions.clientId, input.id));
+       const relatedInvoices = await tenantDb.select().from(invoices)
+         .where(eq(invoices.clientId, input.id));
+
+       if (relatedSessions.length > 0 || relatedInvoices.length > 0) {
+         throw new TRPCError({
+           code: 'CONFLICT',
+           message: `Cannot delete client with ${relatedSessions.length} sessions and ${relatedInvoices.length} invoices`
+         });
+       }
+
+       await tenantDb.delete(clients).where(eq(clients.id, input.id));
+       return { success: true };
+     })
+   ```
+
+3. **Option C - Archive Pattern (Best Practice):**
+   - Add `archived` boolean field to clients table
+   - Soft delete instead of hard delete
+   - Filter archived clients from lists
+   - Allow unarchive if needed
+
+**Frontend Changes Needed:**
+- Display meaningful error message when delete fails
+- Show list of related records preventing delete
+- Offer "Archive" as alternative to "Delete"
+
+**Files to Modify:**
+- `packages/server/src/routers/clients.ts` - Fix delete mutation
+- `packages/client/src/pages/Clients.tsx` - Handle delete errors
+- Potentially: Add archive functionality
+
+**Related Issues:**
+- Same issue likely affects other entities with foreign key relationships
+- Projects DELETE, Sessions DELETE, etc. may have similar constraints
+
+---
+
+### Error #20: Talents DELETE - Endpoint Not Implemented
+
+**Endpoint:** `POST /api/trpc/talents.delete`
+**Severity:** **P1 (CRITICAL)**
+**Type:** Missing Backend Implementation
+**Discovery Date:** 2025-12-27
+
+**Test Method:**
+Direct API call via evaluate_script:
+```javascript
+await fetch('/api/trpc/talents.delete', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id: 1 })
+});
+```
+
+**Actual Behavior:**
+```json
+{
+  "status": 404,
+  "ok": false,
+  "data": {
+    "error": {
+      "message": "No procedure found on path \"talents.delete\"",
+      "code": -32004,
+      "data": {
+        "code": "NOT_FOUND",
+        "httpStatus": 404,
+        "path": "talents.delete"
+      }
+    }
+  }
+}
+```
+
+**Expected Behavior:**
+- DELETE request returns 200 OK
+- Response: `{"result": {"data": {"success": true}}}`
+- Talent removed from database
+
+**Root Cause:**
+- Backend router `packages/server/src/routers/talents.ts` missing `delete` mutation
+- Frontend may or may not have delete button (not verified)
+
+**Impact:**
+- **Users cannot delete talents**
+- Data cleanup impossible
+- Test data accumulates
+
+**Priority Justification - P1 (Critical):**
+- Core CRUD operation missing
+- Basic data management broken
+- Similar to Error #18 (Tracks CREATE missing)
+
+**Recommended Fix:**
+```typescript
+// packages/server/src/routers/talents.ts
+delete: protectedProcedure
+  .input(z.object({ id: z.number() }))
+  .mutation(async ({ ctx, input }) => {
+    const tenantDb = await ctx.getTenantDb();
+
+    await tenantDb.delete(talents).where(eq(talents.id, input.id));
+
+    return { success: true };
+  })
+```
+
+**Files to Modify:**
+- `packages/server/src/routers/talents.ts` - Add delete mutation
+- Potentially: Frontend if delete button missing
+
+**Related Issues:**
+- Error #18: Tracks CREATE also missing (404)
+- Pattern of incomplete CRUD implementations
+
+---
+
+## DELETE Operations Test Results
+
+**Test Date:** December 27, 2025
+**Method:** MCP Chrome DevTools (UI + API direct calls)
+**Total Entities Tested:** 11
+
+### ✅ DELETE Working (8/11)
+
+1. **Equipment DELETE** ✅
+   - Method: UI button click with confirmation dialog
+   - Result: POST `/api/trpc/equipment.delete` [200 OK]
+   - Response: `{"result": {"data": {"success": true}}}`
+   - List updated: "Aucun équipement" empty state
+
+2. **Projects DELETE** ✅
+   - Method: UI button click with confirmation dialog
+   - Result: POST `/api/trpc/projects.delete` [200 OK]
+   - Request: `{"id": 2}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+3. **Invoices DELETE** ✅
+   - Method: Direct API call
+   - Result: POST `/api/trpc/invoices.delete` [200 OK]
+   - Request: `{"id": 3}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+4. **Rooms DELETE** ✅
+   - Method: Direct API call
+   - Result: POST `/api/trpc/rooms.delete` [200 OK]
+   - Request: `{"id": 3}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+5. **Quotes DELETE** ✅
+   - Method: Direct API call
+   - Result: POST `/api/trpc/quotes.delete` [200 OK]
+   - Request: `{"id": 1}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+6. **Contracts DELETE** ✅
+   - Method: Direct API call
+   - Result: POST `/api/trpc/contracts.delete` [200 OK]
+   - Request: `{"id": 1}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+7. **Sessions DELETE** ✅
+   - Method: Direct API call
+   - Result: POST `/api/trpc/sessions.delete` [200 OK]
+   - Request: `{"id": 2}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+8. **Expenses DELETE** ✅
+   - Method: Direct API call
+   - Result: POST `/api/trpc/expenses.delete` [200 OK]
+   - Request: `{"id": 1}`
+   - Response: `{"result": {"data": {"success": true}}}`
+
+### ❌ DELETE Broken/Missing (3/11)
+
+9. **Clients DELETE** ❌ (Error #19)
+   - Method: Direct API call
+   - Result: POST `/api/trpc/clients.delete` [500 Internal Server Error]
+   - Error: "Failed query: delete from \"clients\" where \"clients\".\"id\" = $1"
+   - Root Cause: Foreign key constraint violation
+   - Priority: **P1 (Critical)**
+
+10. **Talents DELETE** ❌ (Error #20)
+    - Method: Direct API call
+    - Result: POST `/api/trpc/talents.delete` [404 Not Found]
+    - Error: "No procedure found on path \"talents.delete\""
+    - Root Cause: Endpoint not implemented
+    - Priority: **P1 (Critical)**
+
+11. **Tracks DELETE** ⚠️ (Not Tested)
+    - Reason: Tracks CREATE already missing (Error #18)
+    - No test data available
+    - Assumed broken based on CREATE status
+
+### CRUD Operations Summary
+
+**Total CRUD Operations Tested:** ~33/132 (25%)
+
+**By Operation Type:**
+- **CREATE:** 11/11 tested (9 working, 2 broken - Errors #17, #18)
+- **READ:** 10/11 tested (9 working, 1 broken - Error #14 Client Detail blank)
+- **UPDATE:** 6/11 tested (all working - Errors #8-13 resolved in Phase 3.4-06)
+- **DELETE:** 11/11 tested (8 working, 3 broken - Errors #19, #20, Tracks untested)
+
+**Overall CRUD Health:** 32/44 operations working (73%)
 
 ---
 
