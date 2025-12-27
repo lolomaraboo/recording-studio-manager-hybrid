@@ -8,19 +8,19 @@
 
 ## Summary
 
-**Total Errors Found:** 1 P0 + 4 P1 (new) + 1 P2 (new) + 6 P1 (previously) + 5 P3 (previously) = **18 errors total**
+**Total Errors Found:** 1 P0 + 4 P1 (new) + 2 P2 (new) + 6 P1 (previously) + 6 P3 (new) + 5 P3 (previously) = **20 errors total**
 
 **New in This Session:**
 - 1 P0 (Critical Blocker) - Client Detail page blank (Error #14)
 - 4 P1 (Critical) - Command Palette search (Error #15), Tracks CREATE missing (Error #18), Clients DELETE fails (Error #19), Talents DELETE missing (Error #20)
-- 1 P2 (Important) - Invoice/Quote CREATE date picker UX issue (Error #16)
-- 1 P3 (Polish) - Expenses CREATE date format issue (Error #17)
+- 2 P2 (Important) - Invoice/Quote CREATE date picker UX issue (Error #16), Date range filters missing (Error #22)
+- 2 P3 (Polish) - Expenses CREATE date format issue (Error #17), Excel export not implemented (Error #21)
 
 **By Priority:**
 - **P0 (Blocker):** 1 error - Completely broken functionality
 - **P1 (Critical):** 10 errors - Major UX degradation (4 new + 6 from Phase 3.4-02)
-- **P2 (Important):** 1 error - Invoice/Quote date picker UX (form unusable but API works)
-- **P3 (Polish):** 6 errors - Minor issues (1 new + 5 from Phase 3.4-02)
+- **P2 (Important):** 2 errors - Invoice/Quote date picker + Date range filters
+- **P3 (Polish):** 7 errors - Minor issues (2 new + 5 from Phase 3.4-02)
 
 ---
 
@@ -1129,3 +1129,120 @@ Testing has revealed **1 new P0 blocker** (Client Detail page completely blank).
   - ✅ Projects CREATE - Modal dialog, creates project, success toast, appears in list
   - ✅ Talents CREATE - Modal form working (tested session 1)
 - **Important Discovery:** Client Detail /clients/3 displays correctly, confirming Error #14 is specific to client ID #2 only
+
+---
+
+### Error #21: Excel Export Not Implemented
+
+**Page:** `/clients`
+**Feature:** Excel export button
+**Severity:** **P3 (POLISH)**
+**Type:** Missing Feature
+**Discovery Date:** 2025-12-27
+
+**Steps to Reproduce:**
+1. Navigate to https://recording-studio-manager.com/clients
+2. Observe "Exporter Excel" button in page header
+3. Click "Exporter Excel" button
+4. Observe toast notification
+
+**Expected Behavior:**
+- File download should be triggered
+- .xlsx file containing table data should be downloaded
+- Filename format: clients_export_YYYY-MM-DD.xlsx
+
+**Actual Behavior:**
+- ❌ No file download occurs
+- ❌ Toast notification appears: "Export Excel - À implémenter"
+- ❌ No network request sent (verified in Network tab)
+- ✅ Button exists and is clickable
+
+**Root Cause:**
+- Button is a UI placeholder only
+- No backend export functionality implemented
+- Frontend shows "À implémenter" (To be implemented) message
+
+**Impact Assessment:**
+- **User Impact:** Users cannot export table data to Excel
+- **Business Impact:** Reduced productivity for users who need to analyze data in Excel
+- **Workaround:** Manual copy-paste of table data
+- **Severity Justification:** P3 - Nice-to-have feature, not critical for core functionality
+
+**Recommended Fix:**
+1. Implement backend Excel generation (use library like `xlsx` or `exceljs`)
+2. Add export endpoint: `GET /api/export/clients?format=xlsx`
+3. Wire frontend button to trigger download
+4. Include all visible columns and filtered data
+
+**Additional Notes:**
+- Same placeholder button likely exists on other entity pages (Invoices, Projects, Sessions)
+- Should implement consistent export functionality across all entity lists
+- Consider adding CSV export as alternative format
+
+---
+
+### Error #22: Date Range Filters Missing
+
+**Pages:** `/invoices`, `/sessions`, `/expenses`
+**Feature:** Date range filtering
+**Severity:** **P2 (IMPORTANT)**
+**Type:** Missing Feature
+**Discovery Date:** 2025-12-27
+
+**Steps to Reproduce:**
+1. Navigate to https://recording-studio-manager.com/invoices
+2. Observe filter section (has search + status dropdown)
+3. Look for date range filter inputs
+4. Attempt to filter invoices by date range
+
+**Expected Behavior:**
+- Date range filter section with two date pickers:
+  - "Date de début" (Start date)
+  - "Date de fin" (End date)
+- Ability to filter records by date range
+- Example use case: "Show all invoices from January 2025"
+
+**Actual Behavior:**
+- ❌ No date input fields present
+- ❌ No date picker components
+- ❌ No date range filter UI elements
+- ✅ Search and status dropdown work correctly
+
+**Impact Assessment:**
+- **User Impact:** Users cannot filter historical data by time period
+- **Business Impact:** Significant UX limitation - users cannot:
+  - View invoices for a specific month/quarter
+  - Filter sessions by date range
+  - Analyze expenses over time periods
+  - Generate time-based reports
+- **Workaround:** Scroll through all records manually
+- **Severity Justification:** P2 - Important missing feature that limits production usability
+
+**Pages Affected:**
+1. `/invoices` - Has "Date" and "Échéance" columns, no date filter
+2. `/sessions` - Has session start/end dates, no date filter
+3. `/expenses` - Has expense date field, no date filter
+4. Any other entity with date fields
+
+**Recommended Fix:**
+1. Add date range filter component to all pages with date data
+2. Implement frontend date picker (use existing date input component)
+3. Add backend filtering support to list endpoints
+4. Support common presets: "This month", "Last 30 days", "This quarter", "This year"
+
+**Technical Notes:**
+```javascript
+// DOM inspection confirmed no date inputs
+{
+  "dateInputsCount": 0,
+  "hasDateFilter": false
+}
+```
+
+**Additional Considerations:**
+- Essential for financial reporting (invoices, expenses)
+- Critical for scheduling (sessions)
+- Industry standard feature in admin dashboards
+- Should include preset quick filters for better UX
+
+---
