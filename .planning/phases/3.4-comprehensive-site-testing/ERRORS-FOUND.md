@@ -24,9 +24,9 @@
 - Console Error: 2
 
 **Status:**
-- Open: 6
+- Open: 5
 - In Progress: 0
-- Fixed: 0
+- Fixed: 1
 - Won't Fix: 0
 
 ---
@@ -59,13 +59,15 @@
 
 ---
 
-## Error #4: API validation bug - limit parameter mismatch (CRITICAL)
+## Error #4: API validation bug - limit parameter mismatch (CRITICAL) ✅ FIXED
 
 **Page:** /clients, /calendar (affects multiple pages)
 **Severity:** P1
 **Type:** API Error
-**Status:** Open
+**Status:** Fixed
 **Found Date:** 2025-12-27
+**Fixed Date:** 2025-12-27
+**Fix Commit:** b548443
 
 **Steps to reproduce:**
 1. Navigate to https://recording-studio-manager.com/clients
@@ -128,12 +130,23 @@ Change frontend limit from 1000 to 100 in:
 - `packages/client/src/pages/Clients.tsx` (or similar)
 - `packages/client/src/pages/Calendar.tsx` (or similar)
 
-**Fix verification:**
-1. Navigate to /clients
-2. Check network tab - all API calls should return 200 OK
-3. Verify client table shows correct session counts and revenue totals
-4. Navigate to /calendar
-5. Verify calendar loads sessions without 400 errors
+**Fix Applied:**
+Changed `limit` parameter from 1000 to 100 in 3 files:
+- `packages/client/src/pages/Clients.tsx` (lines 19-20: sessions.list and invoices.list)
+- `packages/client/src/pages/Calendar.tsx` (line 53: sessions.list)
+- `packages/client/src/pages/ClientDetail.tsx` (lines 52-53: sessions.list and invoices.list)
+
+**Fix verification (PASSED):**
+1. ✅ Navigated to https://recording-studio-manager.com/clients
+2. ✅ Checked network tab - all API calls return 200 OK:
+   - `sessions.list?input={"limit":100}` → 200 OK
+   - `invoices.list?input={"limit":100}` → 200 OK
+3. ✅ Client table displays session counts and revenue correctly
+4. ✅ Navigated to https://recording-studio-manager.com/calendar
+5. ✅ Calendar loads sessions without 400 errors:
+   - `sessions.list?input={"limit":100}` → 200 OK
+
+**Production validation:** Tested live at https://recording-studio-manager.com on 2025-12-27. Both pages now load data successfully with no console errors.
 
 ---
 
