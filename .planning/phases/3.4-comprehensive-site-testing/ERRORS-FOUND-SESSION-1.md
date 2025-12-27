@@ -8,16 +8,17 @@
 
 ## Summary
 
-**Total Errors Found:** 1 P0 + 1 P1 (new) + 6 P1 (previously) + 5 P3 (previously) = **13 errors total**
+**Total Errors Found:** 1 P0 + 1 P1 (new) + 1 P2 (new) + 6 P1 (previously) + 5 P3 (previously) = **14 errors total**
 
 **New in This Session:**
-- 1 P0 (Critical Blocker) - Client Detail page blank
-- 1 P1 (Critical) - Command Palette not functional
+- 1 P0 (Critical Blocker) - Client Detail page blank (Error #14)
+- 1 P1 (Critical) - Command Palette search not functional (Error #15)
+- 1 P2 (Important) - Invoice CREATE date picker UX issue (Error #16)
 
 **By Priority:**
 - **P0 (Blocker):** 1 error - Completely broken functionality
 - **P1 (Critical):** 7 errors - Major UX degradation (1 new + 6 from Phase 3.4-02)
-- **P2 (Important):** 0 errors
+- **P2 (Important):** 1 error - Invoice date picker UX (form unusable but API works)
 - **P3 (Polish):** 5 errors - Minor issues (from Phase 3.4-02)
 
 ---
@@ -205,6 +206,112 @@ GET /api/trpc/search.equipment?input={"query":"Studio"}
 
 ---
 
+### Error #16: Invoice CREATE Date Picker UX Issue
+
+**Page:** `/invoices/new`
+**URL:** https://recording-studio-manager.com/invoices/new
+**Severity:** **P2 (IMPORTANT)**
+**Type:** UX / Form Usability Bug
+**Discovery Date:** 2025-12-27
+
+**Steps to Reproduce:**
+1. Navigate to https://recording-studio-manager.com/invoices/new
+2. Fill client, invoice number, subtotal fields
+3. Attempt to fill "Date d'émission" required field
+4. Click on date picker button
+5. Calendar opens but clicking "Aujourd'hui" button fails with error
+6. Clicking on specific calendar dates (StaticText elements) also fails
+7. Spinbutton fields show value="0" (invalid)
+8. Cannot submit form due to invalid date
+
+**Expected Behavior:**
+- Date picker calendar should allow selecting dates via click
+- "Aujourd'hui" button should set current date
+- Spinbutton fields should accept manual numeric input
+- Form should submit successfully with valid dates
+
+**Actual Behavior:**
+- Calendar opens correctly ✅
+- "Aujourd'hui" button click fails with error: `Cannot read properties of null (reading 'nodeType')` ❌
+- Calendar date clicks don't work (StaticText not clickable) ❌
+- Spinbuttons remain at value="0" (invalid) ❌
+- Form validation blocks submission ❌
+- Date field marked `invalid="true"` ❌
+
+**Console Errors:**
+```
+Cannot read properties of null (reading 'nodeType')
+```
+
+**Workaround - API Direct Call:**
+```javascript
+// Invoice CREATE works perfectly via direct API call
+POST /api/trpc/invoices.create [200 OK]
+
+Request: {
+  clientId: 3,
+  invoiceNumber: "INV-TEST-CREATE-001",
+  issueDate: "2025-12-27T00:00:00.000Z",
+  dueDate: "2026-01-27T00:00:00.000Z",
+  status: "draft",
+  subtotal: "150.00",
+  taxRate: "20.00",
+  taxAmount: "30.00",
+  total: "180.00"
+}
+
+Response: {
+  "result": {
+    "data": {
+      "id": 3,
+      "invoiceNumber": "INV-TEST-CREATE-001",
+      ...
+    }
+  }
+}
+```
+
+**Root Cause:**
+- Date picker component (shadcn/ui Date component) has interaction bugs
+- Calendar buttons (Aujourd'hui, date cells) not properly connected to form state
+- Spinbutton accessibility elements non-functional for manual input
+- Possible React event handler issue or component mounting problem
+
+**UI Evidence:**
+- Date picker shows: `uid=330_116 grid focusable focused`
+- Calendar displays correctly with all days (1-31)
+- Buttons visible: "Aujourd'hui", "Effacer", month navigation
+- But interactions fail silently or with errors
+
+**Impact:**
+- **UX DEGRADATION** - Users cannot create invoices via form UI
+- Forces users to skip date fields or use alternative methods
+- Form appears broken to end users
+- Affects: Invoices CREATE, potentially Quotes CREATE (similar date fields)
+
+**Affected Users:** All admin users trying to create invoices
+
+**Priority Justification:**
+- P2 (not P1) because:
+  - Workaround exists: API works correctly
+  - Backend validation working (200 OK)
+  - Not blocking core functionality (invoices can be created via API/other means)
+  - UI/UX issue, not data corruption
+- However: Seriously impacts user experience
+- Common user frustration: "Form doesn't work"
+
+**Related Components:**
+- Likely affects all forms with Date fields:
+  - Quotes CREATE (`validUntil` date)
+  - Sessions CREATE (datetime fields - already known complex, see SESSION-TEST-RESULTS.md)
+  - Contracts CREATE (potential date fields)
+
+**Testing Result:**
+- ✅ **Invoice CREATE API:** WORKING (200 OK, Invoice ID #3 created)
+- ❌ **Invoice CREATE Form:** NOT WORKING (date picker blocks submission)
+
+---
+
 ## COMPARISON: Working vs Broken Detail Pages
 
 ### ✅ Project Detail (/projects/2) - WORKING
@@ -323,6 +430,7 @@ GET /api/trpc/search.equipment?input={"query":"Studio"}
 - ✅ Talents CREATE - Working (modal form + 200 OK)
 - ✅ **Clients CREATE** - Working (form page, POST 200 OK, redirect to /clients/3)
 - ✅ **Projects CREATE** - Working (modal dialog, success toast, appears in list)
+- ✅ **Invoices CREATE** - API Working (200 OK, Invoice ID #3), Form has date picker UX issue (Error #16)
 
 **UI Interactions Tested:**
 - ✅ Modal open/close (Talents CREATE modal)
@@ -339,13 +447,13 @@ GET /api/trpc/search.equipment?input={"query":"Studio"}
 
 **Total Test Coverage:**
 - **Pages:** ~18/47 Admin pages (38%) - Added: Tracks, Contracts, Expenses, Talents
-- **CRUD Operations:** ~11/132 (8%) - Added: Talents CREATE, Clients CREATE, Projects CREATE
+- **CRUD Operations:** ~12/132 (9%) - Added: Talents CREATE, Clients CREATE, Projects CREATE, Invoices CREATE
 - **UI Interactions:** ~3/200 (1.5%) - Modals, Forms, Theme toggle tested
 - **Advanced Features:** ~4/50 (8%) - AI Chatbot, Command Palette, Theme, Notifications tested
 - **Client Portal:** ~0/30 (0%)
 
-**Total Tests Completed:** ~60/600 (10%)
-**Estimated Remaining:** ~540 test items (out of ~600 total)
+**Total Tests Completed:** ~61/600 (10.2%)
+**Estimated Remaining:** ~539 test items (out of ~600 total)
 
 ---
 
