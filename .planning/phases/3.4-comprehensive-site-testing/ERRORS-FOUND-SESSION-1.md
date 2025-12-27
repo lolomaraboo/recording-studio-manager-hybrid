@@ -8,18 +8,19 @@
 
 ## Summary
 
-**Total Errors Found:** 1 P0 + 1 P1 (new) + 1 P2 (new) + 6 P1 (previously) + 5 P3 (previously) = **14 errors total**
+**Total Errors Found:** 1 P0 + 2 P1 (new) + 1 P2 (new) + 6 P1 (previously) + 5 P3 (previously) = **16 errors total**
 
 **New in This Session:**
 - 1 P0 (Critical Blocker) - Client Detail page blank (Error #14)
-- 1 P1 (Critical) - Command Palette search not functional (Error #15)
-- 1 P2 (Important) - Invoice CREATE date picker UX issue (Error #16)
+- 2 P1 (Critical) - Command Palette search not functional (Error #15), Tracks CREATE not implemented (Error #18)
+- 1 P2 (Important) - Invoice/Quote CREATE date picker UX issue (Error #16)
+- 1 P3 (Polish) - Expenses CREATE date format issue (Error #17)
 
 **By Priority:**
 - **P0 (Blocker):** 1 error - Completely broken functionality
-- **P1 (Critical):** 7 errors - Major UX degradation (1 new + 6 from Phase 3.4-02)
-- **P2 (Important):** 1 error - Invoice date picker UX (form unusable but API works)
-- **P3 (Polish):** 5 errors - Minor issues (from Phase 3.4-02)
+- **P1 (Critical):** 8 errors - Major UX degradation (2 new + 6 from Phase 3.4-02)
+- **P2 (Important):** 1 error - Invoice/Quote date picker UX (form unusable but API works)
+- **P3 (Polish):** 6 errors - Minor issues (1 new + 5 from Phase 3.4-02)
 
 ---
 
@@ -309,6 +310,178 @@ Response: {
 **Testing Result:**
 - ✅ **Invoice CREATE API:** WORKING (200 OK, Invoice ID #3 created)
 - ❌ **Invoice CREATE Form:** NOT WORKING (date picker blocks submission)
+
+---
+
+### Error #17: Expenses CREATE - Date Format Validation Issue
+
+**Page:** `/expenses/new`
+**URL:** https://recording-studio-manager.com/expenses/new
+**Severity:** **P3 (POLISH)**
+**Type:** API Validation Bug
+**Discovery Date:** 2025-12-27
+
+**Steps to Reproduce:**
+1. Navigate to https://recording-studio-manager.com/expenses/new
+2. Attempt to create expense via API with ISO date string
+3. Backend returns 400 error
+
+**Expected Behavior:**
+- Backend accepts ISO date string format (standard JSON serialization)
+- Expense created successfully with expenseDate field
+
+**Actual Behavior:**
+- Backend validation error: "Expected date, received string"
+- API requires specific date format (not ISO string)
+- Form likely has same date picker UX issue as Invoices/Quotes
+
+**API Evidence:**
+```javascript
+// Attempt 1: ISO string
+POST /api/trpc/expenses.create
+Request: {
+  expenseDate: "2025-12-27T00:00:00.000Z",
+  description: "Test Expense",
+  category: "equipment",
+  amount: "250.00",
+  vendor: "Test Vendor"
+}
+
+Response: 400 Bad Request
+{
+  "error": {
+    "message": "Expected date, received string",
+    "path": ["expenseDate"]
+  }
+}
+
+// Attempt 2: Date object serialized
+POST /api/trpc/expenses.create
+Request: {
+  expenseDate: new Date('2025-12-27'),  // Serializes to ISO string via JSON.stringify
+  ...
+}
+
+Response: 400 Bad Request (same error)
+```
+
+**Root Cause:**
+- Backend Zod schema expects raw Date object, not serialized string
+- JSON.stringify converts Date objects to ISO strings automatically
+- tRPC date handling mismatch between client/server
+- Need to investigate correct tRPC date serialization pattern
+
+**Impact:**
+- **MINOR** - Expenses cannot be created via direct API calls
+- Form likely has same date picker UX issue (not tested in detail)
+- Workaround: Use form if date picker works, or fix backend validation
+
+**Affected Users:** Developers testing API, potentially all users via form
+
+**Priority Justification:**
+- P3 (not higher) because:
+  - Low-priority feature (expense tracking vs core booking/invoicing)
+  - Form may still work (not tested due to time)
+  - Backend fix straightforward (use z.coerce.date() like Quotes)
+- No immediate user impact if form works
+
+**Related:**
+- Similar to Error #11 (Quotes date validation) - FIXED with z.coerce.date()
+- Suggests Expenses router needs same fix
+
+**Recommended Fix:**
+Apply same pattern as Quotes fix (commit 5a85766):
+```typescript
+// packages/server/src/routers/expenses.ts
+expenseDate: z.coerce.date()  // Instead of z.date()
+```
+
+---
+
+### Error #18: Tracks CREATE - Endpoint Not Implemented
+
+**Page:** `/tracks`
+**URL:** https://recording-studio-manager.com/tracks
+**Severity:** **P1 (CRITICAL)**
+**Type:** Missing Feature / Backend Not Implemented
+**Discovery Date:** 2025-12-27
+
+**Steps to Reproduce:**
+1. Navigate to https://recording-studio-manager.com/tracks
+2. Click "Nouvelle Track" button
+3. No modal or form opens
+4. Attempt to create track via API
+
+**Expected Behavior:**
+- Button click opens Track CREATE modal or navigates to form
+- API endpoint exists at `/api/trpc/tracks.create`
+- User can create tracks for projects
+
+**Actual Behavior:**
+- Button click does nothing (no UI change)
+- API returns 404: "No procedure found on path tracks.create"
+- Tracks CREATE functionality completely missing
+
+**API Evidence:**
+```javascript
+POST /api/trpc/tracks.create
+Request: {
+  projectId: 2,
+  title: "Test Track",
+  trackNumber: 1,
+  duration: "3:45",
+  status: "recording"
+}
+
+Response: 404 Not Found
+{
+  "error": {
+    "message": "No procedure found on path \"tracks.create\"",
+    "code": -32004,
+    "data": {
+      "code": "NOT_FOUND",
+      "httpStatus": 404,
+      "path": "tracks.create"
+    }
+  }
+}
+```
+
+**Root Cause:**
+- Backend router `packages/server/src/routers/tracks.ts` missing `create` mutation
+- Frontend button exists but no handler/modal implemented
+- Feature planned but not completed
+
+**Impact:**
+- **CRITICAL UX DEGRADATION** - Users cannot create tracks for projects
+- Breaks project management workflow
+- Empty state on /tracks page with no way to add data
+- Feature appears to exist (button visible) but is non-functional
+- "Commencez par créer votre première track" → clicking button does nothing
+
+**Affected Users:** All admin users managing projects with tracks
+
+**Priority Justification:**
+- P1 (Critical, not P0) because:
+  - Feature completely non-functional
+  - UI misleading (button exists → implies feature works)
+  - Blocks core project management workflow
+  - Not P0 because: Projects still work without tracks (tracks are sub-items)
+
+**Related Features:**
+- Tracks list page exists and loads correctly
+- Tracks are child entities of Projects
+- Projects can be created (Error-free) but cannot add tracks
+
+**Recommended Fix:**
+1. **Backend:** Implement `tracks.create` mutation in `packages/server/src/routers/tracks.ts`
+2. **Frontend:** Add Track CREATE modal/form triggered by "Nouvelle Track" button
+3. **Pattern:** Follow Projects CREATE (modal dialog) or Clients CREATE (full page)
+
+**Files to Create/Modify:**
+- `packages/server/src/routers/tracks.ts` - Add `create: protectedProcedure.input(...).mutation(...)`
+- `packages/client/src/pages/Tracks.tsx` - Add modal state + form component
+- Potentially: `packages/client/src/components/TrackCreateModal.tsx`
 
 ---
 
