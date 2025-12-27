@@ -117,9 +117,16 @@ export const projectsRouter = router({
 
       const { id, ...updateData } = input;
 
+      // Transform empty strings to null for numeric fields
+      const sanitizedData = {
+        ...updateData,
+        budget: updateData.budget === '' ? null : updateData.budget,
+        totalCost: updateData.totalCost === '' ? null : updateData.totalCost,
+      };
+
       const updated = await ctx.tenantDb
         .update(projects)
-        .set(updateData)
+        .set(sanitizedData)
         .where(eq(projects.id, id))
         .returning();
 

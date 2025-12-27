@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,7 +74,7 @@ export default function SessionDetail() {
   });
 
   // Update form when session loads
-  useState(() => {
+  useEffect(() => {
     if (session) {
       setFormData({
         title: session.title,
@@ -88,7 +88,7 @@ export default function SessionDetail() {
         notes: session.notes || "",
       });
     }
-  });
+  }, [session]);
 
   const handleSave = () => {
     updateMutation.mutate({

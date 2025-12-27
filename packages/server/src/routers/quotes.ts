@@ -53,7 +53,7 @@ export const quotesRouter = router({
         quoteNumber: z.string().max(100),
         clientId: z.number(),
         projectId: z.number().optional(),
-        validUntil: z.date(),
+        validUntil: z.coerce.date(),
         title: z.string().max(255).optional(),
         description: z.string().optional(),
         subtotal: z.string(),
@@ -82,7 +82,7 @@ export const quotesRouter = router({
       z.object({
         id: z.number(),
         status: z.enum(["draft", "sent", "accepted", "rejected", "expired", "converted"]).optional(),
-        validUntil: z.date().optional(),
+        validUntil: z.coerce.date().optional(),
         title: z.string().max(255).optional(),
         description: z.string().optional(),
         subtotal: z.string().optional(),

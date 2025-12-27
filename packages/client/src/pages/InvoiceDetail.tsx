@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -86,7 +86,7 @@ export default function InvoiceDetail() {
   });
 
   // Update form when invoice loads
-  useState(() => {
+  useEffect(() => {
     if (invoice) {
       setFormData({
         invoiceNumber: invoice.invoiceNumber,
@@ -101,7 +101,7 @@ export default function InvoiceDetail() {
         notes: invoice.notes || "",
       });
     }
-  });
+  }, [invoice]);
 
   const handleSave = () => {
     updateMutation.mutate({
@@ -113,6 +113,9 @@ export default function InvoiceDetail() {
         dueDate: new Date(formData.dueDate).toISOString(),
         status: formData.status as "draft" | "sent" | "paid" | "overdue" | "cancelled",
         subtotal: formData.subtotal,
+        taxRate: formData.taxRate,
+        taxAmount: formData.taxAmount,
+        total: formData.total,
         notes: formData.notes,
       },
     });
