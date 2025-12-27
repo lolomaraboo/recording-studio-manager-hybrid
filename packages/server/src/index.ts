@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
-import Redis from 'ioredis';
+import { createClient } from 'redis';
 import * as Sentry from '@sentry/node';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './routers/index.js';
@@ -40,7 +40,9 @@ async function main() {
   const app = express();
 
   // Initialize Redis client for session storage
-  const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  const redis = createClient({
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
+  });
 
   redis.on('connect', () => {
     console.log('✅ Redis connected for session storage');
@@ -49,6 +51,9 @@ async function main() {
   redis.on('error', (err) => {
     console.error('❌ Redis connection error:', err);
   });
+
+  // Connect to Redis (required for redis v4+)
+  await redis.connect();
 
   // Middleware
   app.use(

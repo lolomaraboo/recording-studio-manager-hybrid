@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getMasterDb } from '@rsm/database/connection';
-import Redis from 'ioredis';
+import { createClient } from 'redis';
 
 /**
  * Health Check Routes
@@ -55,9 +55,12 @@ router.get('/health/db', async (_req, res) => {
  * Checks: Redis connection with ping
  */
 router.get('/health/redis', async (_req, res) => {
-  const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  const redis = createClient({
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
+  });
 
   try {
+    await redis.connect();
     const pong = await redis.ping();
 
     if (pong === 'PONG') {
@@ -105,8 +108,11 @@ router.get('/health/full', async (_req, res) => {
   }
 
   // Check Redis
-  const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  const redis = createClient({
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
+  });
   try {
+    await redis.connect();
     const pong = await redis.ping();
 
     if (pong === 'PONG') {

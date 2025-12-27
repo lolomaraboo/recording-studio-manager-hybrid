@@ -25,12 +25,12 @@
 
 ## Current Position
 
-Phase: 3.2 of 8 (End-to-End Testing) [INSERTED]
-Plan: 2 of 2 in current phase
-Status: Phase complete - Backend registration fixed, E2E infrastructure validated
-Last activity: 2025-12-26 - Completed 3.2-02 (PostgreSQL schema migration for Stripe columns)
+Phase: 3.3 of 8 (Fix Registration Session Persistence) [INSERTED - URGENT BLOCKER]
+Plan: Not planned yet (0 of ?)
+Status: CRITICAL BUG - Registration succeeds but session not persisted, all protected endpoints return 401
+Last activity: 2025-12-26 - Discovered via MCP Chrome DevTools testing, Phase 3.3 inserted
 
-Progress: ███████████ 44.0% (11/25 plans complete) - Phase 3.2 complete
+Progress: ███████████░ 40.7% (11/27+ plans complete) - Phase 3.2 complete, Phase 3.3 BLOCKER
 
 ## Performance Metrics
 
@@ -129,6 +129,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Impact: Comprehensive E2E tests ensure production quality before driving traffic
   - Scope: Signup → Dashboard → Booking → Payment → Project → Track upload → AI chatbot
   - Priority: Quality gate before Phase 4 (Marketing Foundation)
+- **2025-12-26:** Phase 3.3 inserted after Phase 3.2 - "Fix Registration Session Persistence" (URGENT BLOCKER)
+  - Reason: MCP Chrome DevTools testing revealed session not persisted after registration
+  - Impact: After successful registration (200 OK), auth.me returns null, all protected endpoints return 401
+  - Symptoms: 29 console errors "401 Unauthorized", user appears logged in visually but session invalid
+  - Root Cause: auth.register endpoint creates user but doesn't persist session in Redis/req.session
+  - Affected: All protected tRPC endpoints (notifications, organizations, clients, rooms, equipment, projects, sessions, invoices)
+  - Priority: CRITICAL BLOCKER - Application completely non-functional after registration
 
 ### Blockers/Concerns Carried Forward
 

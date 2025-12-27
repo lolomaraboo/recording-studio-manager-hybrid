@@ -121,14 +121,39 @@ Plans:
 
 **Research**: Unlikely (Playwright already configured, tests patterns established)
 
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
-- [ ] 3.2-01: Comprehensive E2E test suite - consolidate 13 existing tests, fill coverage gaps (booking, payment, client portal), organize into e2e/ directory
+- [x] 3.2-01: Comprehensive E2E test suite - consolidate 13 existing tests, fill coverage gaps (booking, payment, client portal), organize into e2e/ directory (Completed 2025-12-26)
+- [x] 3.2-02: Fix Backend Registration TRPC Error - PostgreSQL schema migration for Stripe columns (Completed 2025-12-26 - 25 min)
 
-**Status**: 📋 Ready to execute
+**Status**: ✅ Complete (E2E infrastructure validated, 96% pass rate)
 
 **Rationale**: Before launching marketing (Phase 4), validate entire application works end-to-end in production. Critical flows: signup → dashboard → booking → payment → project creation → track upload → AI chatbot. Ensures production quality before driving traffic.
+
+---
+
+### Phase 3.3: Fix Registration Session Persistence (INSERTED)
+**Goal**: Fix critical bug where user session is not persisted after registration, causing all protected endpoints to return 401 Unauthorized
+
+**Depends on**: Phase 3.2 (E2E testing revealed the bug)
+
+**Research**: Likely (Express session middleware, cookie persistence, tRPC context)
+
+**Research topics**:
+- Express session configuration after registration
+- Cookie serialization and deserialization
+- tRPC context population from session
+- Session store (Redis) persistence verification
+
+**Plans**: TBD (run /gsd:plan-phase 3.3 to break down)
+
+Plans:
+- [ ] TBD
+
+**Status**: 📋 Not planned yet (URGENT BLOCKER)
+
+**Rationale**: MCP Chrome DevTools testing (2025-12-26) revealed that after successful registration (200 OK), auth.me returns null and all protected endpoints (notifications, organizations, clients, rooms, equipment, projects, sessions, invoices) return 401 Unauthorized. User appears logged in visually but session is not actually persisted. This blocks ALL functionality after registration - CRITICAL production blocker.
 
 ---
 
@@ -232,7 +257,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -240,14 +265,15 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 2. Complete Phase 5 | 2/2 | ✅ Complete | 2025-12-26 |
 | 3. Billing Infrastructure | 3/3 | ✅ Complete | 2025-12-26 |
 | 3.1. Fix Production Auth (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
-| 3.2. End-to-End Testing (INSERTED) | 0/? | 📋 Not planned | - |
+| 3.2. End-to-End Testing (INSERTED) | 2/2 | ✅ Complete | 2025-12-26 |
+| 3.3. Fix Registration Session (INSERTED) | 0/? | 🔴 BLOCKER - Not planned | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 9/25 plans complete (36.0%) - Phase 3.1 complete, ready for Phase 4
+**Total**: 11/27+ plans complete (40.7%) - Phase 3.2 complete, Phase 3.3 URGENT BLOCKER
 
 ---
 
