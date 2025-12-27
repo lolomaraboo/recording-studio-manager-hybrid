@@ -85,10 +85,22 @@ export const quotesRouter = router({
         validUntil: z.coerce.date().optional(),
         title: z.string().max(255).optional(),
         description: z.string().optional(),
-        subtotal: z.string().optional(),
-        taxRate: z.string().optional(),
-        taxAmount: z.string().optional(),
-        total: z.string().optional(),
+        subtotal: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
+        taxRate: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
+        taxAmount: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
+        total: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
         terms: z.string().optional(),
         notes: z.string().optional(),
       })

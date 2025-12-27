@@ -123,7 +123,10 @@ export const sessionsRouter = router({
           startTime: z.string().optional(),
           endTime: z.string().optional(),
           status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled']).optional(),
-          totalAmount: z.string().optional(),
+          totalAmount: z
+            .string()
+            .optional()
+            .transform((val) => (val === "" || val === undefined ? undefined : val)),
           notes: z.string().optional(),
         }),
       })
