@@ -103,8 +103,14 @@ export const projectsRouter = router({
           .optional(),
         targetDeliveryDate: z.date().optional(),
         actualDeliveryDate: z.date().optional(),
-        budget: z.string().optional(),
-        totalCost: z.string().optional(),
+        budget: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
+        totalCost: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
         label: z.string().max(200).optional(),
         coverArtUrl: z.string().max(500).optional(),
         notes: z.string().optional(),
@@ -117,16 +123,11 @@ export const projectsRouter = router({
 
       const { id, ...updateData } = input;
 
-      // Transform empty strings to null for numeric fields
-      const sanitizedData = {
-        ...updateData,
-        budget: updateData.budget === '' ? null : updateData.budget,
-        totalCost: updateData.totalCost === '' ? null : updateData.totalCost,
-      };
-
+      // Zod transformation above converts empty strings to undefined
+      // Drizzle will skip undefined fields in UPDATE (won't modify them)
       const updated = await ctx.tenantDb
         .update(projects)
-        .set(sanitizedData)
+        .set(updateData)
         .where(eq(projects.id, id))
         .returning();
 
