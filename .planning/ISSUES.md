@@ -1,6 +1,6 @@
 # Project Issues & Deferred Work
 
-**Last updated:** 2025-12-26
+**Last updated:** 2025-12-27
 
 ---
 
@@ -65,8 +65,67 @@
 
 ## ⚠️ Deferred Issues (Non-blocking)
 
+### ISSUE-011 (P1): SSE Notifications Endpoint Missing - 404 Error
+**Status:** ✅ RESOLVED (2025-12-27)
+**Created:** 2025-12-27
+**Phase:** Production Stability
+
+**Problem:**
+- Frontend (NotificationCenter.tsx) attempting to connect to `/api/notifications/stream` via EventSource
+- Backend endpoint returned 404 Not Found
+- Polling fallback caused excessive server load (1532 requests, every 10s)
+- Console error: `[SSE] Connection error, retrying...`
+
+**Root Cause:**
+- SSE streaming endpoint not implemented in backend
+- NotificationCenter.tsx:57 had EventSource connection code but no server-side handler
+- Polling continued as fallback mechanism
+
+**Resolution:**
+1. Created `/packages/server/src/lib/notificationBroadcaster.ts`
+   - Singleton SSE connection manager
+   - Methods: `addClient()`, `removeClient()`, `sendToUser()`, `sendToOrganization()`
+   - Tracks connected clients in Map<clientId, Response>
+
+2. Added SSE endpoint in `/packages/server/src/index.ts:171-208`
+   - `GET /api/notifications/stream`
+   - Session authentication required (userId + organizationId)
+   - Headers: `Content-Type: text/event-stream`, `Cache-Control: no-cache`, `X-Accel-Buffering: no`
+   - Keep-alive ping every 30 seconds
+   - Automatic cleanup on client disconnect
+
+3. Enhanced `/packages/server/src/routers/notifications.ts`
+   - Added `create` mutation for creating notifications
+   - Automatic broadcast via `notificationBroadcaster.sendToUser()`
+   - Real-time push to connected SSE clients
+
+**Verification:**
+- ✅ Endpoint responds 200 OK (was 404)
+- ✅ SSE headers correct (`text/event-stream`)
+- ✅ Client connection logs: `[SSE] Client connected: 26-21-1766811521775 (total: 1)`
+- ✅ Graceful disconnect handling
+- ✅ Keep-alive mechanism active
+- ✅ Polling reduced from 10s to 30s as fallback
+
+**Impact:**
+- Real-time notifications now functional
+- Server load reduced (SSE vs polling)
+- Better UX (instant notification delivery)
+
+**Files Modified:**
+- `packages/server/src/index.ts` (packages/server/src/index.ts:171-208)
+- `packages/server/src/lib/notificationBroadcaster.ts` (new file)
+- `packages/server/src/routers/notifications.ts` (packages/server/src/routers/notifications.ts:131-170)
+
+**Deployment:**
+- Production deployed 2025-12-27 04:58 UTC
+- Docker image rebuilt with new SSE code
+- Verified via Chrome DevTools MCP
+
+---
+
 ### ISSUE-001 (P0): Production database not initialized
-**Status:** ✅ RESOLVED (2025-12-26)  
+**Status:** ✅ RESOLVED (2025-12-26)
 **Resolution:** Migrations run, database operational
 
 ### ISSUE-006 (P3): Debug logging in context.ts

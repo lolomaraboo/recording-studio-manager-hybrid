@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { eq, desc, and } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
 import { notifications } from '@rsm/database/tenant';
+import { notificationBroadcaster } from '../lib/notificationBroadcaster.js';
 
 /**
  * Notifications Router
@@ -125,5 +126,45 @@ export const notificationsRouter = router({
         .where(eq(notifications.id, input.notificationId));
 
       return { success: true };
+    }),
+
+  /**
+   * Create a new notification and broadcast it via SSE
+   */
+  create: protectedProcedure
+    .input(
+      z.object({
+        type: z.string(),
+        title: z.string(),
+        message: z.string(),
+        actionUrl: z.string().optional(),
+        userId: z.number().optional(), // If omitted, notification is for current user
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await ctx.getTenantDb();
+      const targetUserId = input.userId || ctx.session.userId;
+
+      const [notification] = await db
+        .insert(notifications)
+        .values({
+          type: input.type,
+          title: input.title,
+          message: input.message,
+          actionUrl: input.actionUrl || null,
+          isRead: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+
+      // Broadcast notification to connected SSE clients
+      notificationBroadcaster.sendToUser(
+        targetUserId,
+        ctx.session.organizationId,
+        notification
+      );
+
+      return notification;
     }),
 });

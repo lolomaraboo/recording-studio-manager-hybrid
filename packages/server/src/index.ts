@@ -11,6 +11,7 @@ import { createContext } from './_core/context.js';
 import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
 import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
+import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -165,6 +166,45 @@ async function main() {
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
+  });
+
+  // SSE Streaming endpoint for real-time notifications
+  app.get('/api/notifications/stream', async (req, res) => {
+    // Check authentication via session
+    if (!req.session || !req.session.userId || !req.session.organizationId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const userId = req.session.userId;
+    const organizationId = req.session.organizationId;
+
+    // Setup SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable Nginx buffering
+
+    // Register client with broadcaster
+    const clientId = notificationBroadcaster.addClient(userId, organizationId, res);
+
+    // Send initial connection confirmation
+    res.write(`data: ${JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() })}\n\n`);
+
+    // Keep-alive ping every 30 seconds to prevent connection timeout
+    const keepAliveInterval = setInterval(() => {
+      try {
+        res.write(`:keep-alive ${new Date().toISOString()}\n\n`);
+      } catch (error) {
+        clearInterval(keepAliveInterval);
+        notificationBroadcaster.removeClient(clientId);
+      }
+    }, 30000);
+
+    // Cleanup on client disconnect
+    req.on('close', () => {
+      clearInterval(keepAliveInterval);
+      notificationBroadcaster.removeClient(clientId);
+    });
   });
 
   // 404 handler
