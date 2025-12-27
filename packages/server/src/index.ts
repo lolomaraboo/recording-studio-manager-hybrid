@@ -114,12 +114,26 @@ async function main() {
   // Upload routes (before tRPC to handle multipart/form-data)
   app.use('/api/upload', uploadRouter);
 
+  // Debug logging for TRPC requests
+  app.use('/api/trpc', (req, res, next) => {
+    console.log('[TRPC Debug] Request:', {
+      method: req.method,
+      path: req.path,
+      url: req.url,
+      body: req.body,
+    });
+    next();
+  });
+
   // tRPC middleware
   app.use(
     '/api/trpc',
     createExpressMiddleware({
       router: appRouter,
       createContext,
+      onError: ({ error, type, path }) => {
+        console.error('[TRPC Error]', { type, path, error: error.message });
+      },
     })
   );
 

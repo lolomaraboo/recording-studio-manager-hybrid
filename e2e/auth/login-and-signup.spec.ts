@@ -25,15 +25,17 @@ test.describe('Staff Authentication', () => {
     console.log('\n🔐 Testing Staff Login');
 
     await page.goto(`${BASE_URL}/login`);
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
 
-    // Fill login form
-    await page.fill('input[type="email"], input[name="email"], #email', 'test@example.com');
-    await page.fill('input[type="password"], input[name="password"], #password', 'password123');
+    // Use E2E test user credentials
+    await page.fill('input[type="email"], input[name="email"], #email', 'e2e-test-user@example.com');
+    await page.fill('input[type="password"], input[name="password"], #password', 'E2ETestPass123!');
 
     // Submit
     await page.click('button[type="submit"]');
-    await page.waitForTimeout(5000);
+
+    // Wait for redirect away from login page
+    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 15000 });
 
     // Verify redirect to dashboard
     const currentUrl = page.url();
@@ -78,29 +80,57 @@ test.describe('Staff Authentication', () => {
   test('Can register new staff account', async ({ page }) => {
     console.log('\n🔐 Testing Staff Registration');
 
+    // Capture console errors
+    const consoleErrors: string[] = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
     const email = generateEmail('staff');
     const studioName = generateStudioName();
 
     await page.goto(`${BASE_URL}/register`);
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
 
-    // Fill registration form
+    // Fill registration form with flexible selectors
     await page.fill('#name, input[name="name"]', 'Test Studio Owner');
     await page.fill('#email, input[name="email"]', email);
     await page.fill('#password, input[name="password"]', 'StrongPass123!');
-    await page.fill('#organizationName, input[name="organizationName"]', studioName);
+    await page.fill('#organizationName, input[name="organizationName"], input[name="studioName"]', studioName);
 
     console.log(`  Email: ${email}`);
     console.log(`  Studio: ${studioName}`);
 
-    // Submit
+    // Take screenshot before submit
+    await takeFullPageScreenshot(page, 'auth-register-before-submit');
+
+    // Check for validation errors before submit
+    const errorsBeforeSubmit = await page.locator('[class*="error"]').count();
+    console.log(`  Validation errors before submit: ${errorsBeforeSubmit}`);
+
+    // Submit and wait for navigation or error
     await page.click('button[type="submit"]');
-    await page.waitForTimeout(10000); // Registration can take time
+    await page.waitForTimeout(15000); // Registration + tenant provisioning can take time
 
     const currentUrl = page.url();
     console.log(`  Current URL: ${currentUrl}`);
 
-    await takeFullPageScreenshot(page, 'auth-register-success');
+    // Take screenshot after submit
+    await takeFullPageScreenshot(page, 'auth-register-after-submit');
+
+    // Check for console errors
+    if (consoleErrors.length > 0) {
+      console.log(`  ⚠️ Console errors: ${consoleErrors.join(', ')}`);
+    }
+
+    // Check for validation errors on page
+    const errorsAfterSubmit = await page.locator('[class*="error"], [role="alert"]').count();
+    if (errorsAfterSubmit > 0) {
+      const errorTexts = await page.locator('[class*="error"], [role="alert"]').allTextContents();
+      console.log(`  ⚠️ Validation errors: ${errorTexts.join(', ')}`);
+    }
 
     // Should redirect to dashboard or login
     const registered = !currentUrl.includes('/register');
@@ -120,7 +150,10 @@ test.describe('Staff Authentication', () => {
     await page.waitForTimeout(1000);
 
     // Should show validation errors
-    const validationMessages = page.locator('[class*="error"], [role="alert"], text=/required|obligatoire/i');
+    // Split into separate locators and combine (Playwright doesn't allow mixing CSS + text selectors)
+    const errorClasses = page.locator('[class*="error"], [role="alert"]');
+    const errorText = page.locator('text=/required|obligatoire/i');
+    const validationMessages = errorClasses.or(errorText);
     const errorCount = await validationMessages.count();
 
     console.log(`  ✓ Validation errors displayed: ${errorCount}`);

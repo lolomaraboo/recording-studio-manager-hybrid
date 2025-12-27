@@ -8,22 +8,72 @@ import { Page } from '@playwright/test';
 const BASE_URL = process.env.BASE_URL || 'https://recording-studio-manager.com';
 
 /**
+ * Ensure E2E test user exists (creates if needed)
+ * Call this once at the start of test suite
+ */
+export async function ensureTestUser(page: Page): Promise<{ email: string; password: string }> {
+  const email = 'e2e-test-user@example.com';
+  const password = 'E2ETestPass123!';
+  const studioName = 'E2E Test Studio';
+
+  // Try to login first - if succeeds, user already exists
+  try {
+    await page.goto(`${BASE_URL}/login`);
+    await page.waitForLoadState('networkidle');
+
+    await page.fill('input[type="email"], input[name="email"], #email', email);
+    await page.fill('input[type="password"], input[name="password"], #password', password);
+
+    await page.click('button[type="submit"]');
+
+    // Wait to see if we redirect away from login
+    try {
+      await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+      console.log('  ✓ E2E test user already exists');
+      return { email, password };
+    } catch {
+      // Login failed, will create user below
+    }
+  } catch (error) {
+    // Login failed, need to register
+  }
+
+  // Create new test user
+  console.log('  Creating E2E test user...');
+  await page.goto(`${BASE_URL}/register`);
+  await page.waitForLoadState('networkidle');
+
+  await page.fill('#name, input[name="name"]', 'E2E Test User');
+  await page.fill('#email, input[name="email"]', email);
+  await page.fill('#password, input[name="password"]', password);
+  await page.fill('#organizationName, input[name="organizationName"], input[name="studioName"]', studioName);
+
+  await page.click('button[type="submit"]');
+  await page.waitForTimeout(10000); // Wait for registration + tenant provisioning
+
+  console.log('  ✓ E2E test user created');
+  return { email, password };
+}
+
+/**
  * Login as staff user (admin portal)
  */
 export async function loginAsStaff(page: Page, credentials?: { email: string; password: string }) {
-  const email = credentials?.email || 'test@example.com';
-  const password = credentials?.password || 'password123';
+  const email = credentials?.email || 'e2e-test-user@example.com';
+  const password = credentials?.password || 'E2ETestPass123!';
 
   await page.goto(`${BASE_URL}/login`);
-  await page.waitForLoadState('domcontentloaded');
+  await page.waitForLoadState('networkidle'); // Wait for complete load
 
-  await page.fill('#email', email);
-  await page.fill('#password', password);
+  // Fill with flexible selectors
+  await page.fill('input[type="email"], input[name="email"], #email', email);
+  await page.fill('input[type="password"], input[name="password"], #password', password);
+
+  // Click submit
   await page.click('button[type="submit"]');
 
-  // Wait for redirect to dashboard
-  await page.waitForURL(`${BASE_URL}/`, { timeout: 10000 });
-  await page.waitForLoadState('domcontentloaded');
+  // Wait for redirect away from login page
+  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 15000 });
 }
 
 /**

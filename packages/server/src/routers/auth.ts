@@ -80,9 +80,22 @@ export const authRouter = router({
 
       console.log(`[Register] Tenant database created successfully for org ${orgId}`);
 
-      // Set session
+      // Set session and save it to Redis
       (ctx.req.session as any).userId = userId;
       (ctx.req.session as any).organizationId = orgId;
+      (ctx.req.session as any).email = input.email;
+      (ctx.req.session as any).name = input.name;
+      (ctx.req.session as any).role = "admin";
+
+      // Explicitly save session to ensure it's written to Redis
+      await new Promise<void>((resolve, reject) => {
+        ctx.req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      console.log('[Register] Session saved to Redis');
 
       return {
         user: {
@@ -166,9 +179,22 @@ export const authRouter = router({
 
       const org = orgList[0];
 
-      // Set session
+      // Set session and save it to Redis
       (ctx.req.session as any).userId = user.id;
       (ctx.req.session as any).organizationId = org.id;
+      (ctx.req.session as any).email = user.email;
+      (ctx.req.session as any).name = user.name;
+      (ctx.req.session as any).role = user.role;
+
+      // Explicitly save session to ensure it's written to Redis
+      await new Promise<void>((resolve, reject) => {
+        ctx.req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      console.log('[Login] Session saved to Redis');
 
       return {
         user: {
