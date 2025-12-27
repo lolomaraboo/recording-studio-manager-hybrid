@@ -157,6 +157,29 @@ Plans:
 
 ---
 
+### Phase 3.4: Comprehensive Site Testing (INSERTED)
+**Goal**: Test l'intégralité du site - chaque fonction, chaque clic, chaque workflow - documenter toutes les erreurs avant de coder les fixes
+
+**Depends on**: Phase 3.3 (session persistence fixed)
+
+**Research**: Unlikely (testing methodology, existing Playwright infrastructure)
+
+**Plans**: 3+ plans (testing planning, execution, error reporting, fixes planning)
+
+Plans:
+- [x] 3.4-01: Create test matrix (~600 items) and MCP Chrome DevTools protocol (Completed 2025-12-27 - 8 min)
+- [ ] 3.4-02: Execute exhaustive testing with MCP Chrome DevTools (47 Admin pages + 5 Client Portal pages + all interactions)
+- [ ] 3.4-03: Analyze all errors found, prioritize (P0/P1/P2/P3), create fixes roadmap
+- [ ] 3.4-04: Fix P0 Blocker errors (if any found)
+- [ ] 3.4-05: Fix P1 Critical errors (if any found)
+- [ ] 3.4-06: Validation & regression testing (verify all fixes work)
+
+**Status**: 🔄 In Progress (1/6 plans complete - test infrastructure ready, execution next)
+
+**Rationale**: Avant le lancement marketing (Phase 4), valider EXHAUSTIVEMENT que toutes les fonctionnalités du site fonctionnent. Tester systématiquement : Admin Dashboard (47 pages), Client Portal (5 pages), tous les workflows (signup, booking, payment, projects, AI chatbot), toutes les interactions utilisateur, tous les edge cases. Approche : documenter d'abord TOUTES les erreurs, planifier les fixes, puis coder. Garantit qualité production avant ouverture au public.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -257,7 +280,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -267,13 +290,14 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.1. Fix Production Auth (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
 | 3.2. End-to-End Testing (INSERTED) | 2/2 | ✅ Complete | 2025-12-26 |
 | 3.3. Fix Registration Session (INSERTED) | 0/? | 🔴 BLOCKER - Not planned | - |
+| 3.4. Comprehensive Site Testing (INSERTED) | 1/6 | 🔄 In Progress | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 11/27+ plans complete (40.7%) - Phase 3.2 complete, Phase 3.3 URGENT BLOCKER
+**Total**: 12/33 plans complete (36.4%) - Phase 3.2 complete, Phase 3.3 URGENT BLOCKER, Phase 3.4 in progress (1/6)
 
 ---
 
