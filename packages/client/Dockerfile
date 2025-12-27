@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 
 # Build-time environment variables
-ARG VITE_API_URL=/api
+ARG VITE_API_URL=/api/trpc
 ENV VITE_API_URL=${VITE_API_URL}
 
 WORKDIR /app
