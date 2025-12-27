@@ -50,7 +50,7 @@ export default function Calendar() {
   const utils = trpc.useUtils();
 
   const { data: sessions, isLoading } = trpc.sessions.list.useQuery({
-    limit: 1000,
+    limit: 100,
   });
 
   const events: CalendarEvent[] = useMemo(() => {

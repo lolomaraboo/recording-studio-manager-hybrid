@@ -16,8 +16,8 @@ export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery({ limit: 100 });
-  const { data: sessions } = trpc.sessions.list.useQuery({ limit: 1000 });
-  const { data: invoices } = trpc.invoices.list.useQuery({ limit: 1000 });
+  const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
+  const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
 
   // Calculate stats per client
   const clientsWithStats = useMemo(() => {

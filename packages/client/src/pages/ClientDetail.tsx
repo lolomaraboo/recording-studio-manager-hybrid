@@ -49,8 +49,8 @@ export default function ClientDetail() {
   );
 
   // Fetch related data for history
-  const { data: sessions } = trpc.sessions.list.useQuery({ limit: 1000 });
-  const { data: invoices } = trpc.invoices.list.useQuery({ limit: 1000 });
+  const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
+  const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
   const { data: rooms } = trpc.rooms.list.useQuery();
 
   // Filter data by client
