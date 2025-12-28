@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -111,16 +111,16 @@ export default function ClientDetail() {
 
   // Form state
   const [formData, setFormData] = useState({
-    name: client?.name || "",
-    email: client?.email || "",
-    phone: client?.phone || "",
-    artistName: client?.artistName || "",
-    address: client?.address || "",
-    notes: client?.notes || "",
+    name: "",
+    email: "",
+    phone: "",
+    artistName: "",
+    address: "",
+    notes: "",
   });
 
   // Update form when client loads
-  useState(() => {
+  useEffect(() => {
     if (client) {
       setFormData({
         name: client.name,
@@ -131,7 +131,7 @@ export default function ClientDetail() {
         notes: client.notes || "",
       });
     }
-  });
+  }, [client]);
 
   const handleSave = () => {
     updateMutation.mutate({
