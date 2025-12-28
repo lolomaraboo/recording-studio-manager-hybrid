@@ -52,12 +52,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Music, Plus, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 type TrackStatus = "recording" | "editing" | "mixing" | "mastering" | "completed";
 
 export default function Tracks() {
-  const { toast } = useToast();
   const utils = trpc.useUtils();
 
   const [projectFilter, setProjectFilter] = useState<string>("all");
@@ -91,19 +89,8 @@ export default function Tracks() {
     onSuccess: () => {
       utils.projects.tracks.listAll.invalidate();
       utils.projects.tracks.getStats.invalidate();
-      toast({
-        title: "Track créée",
-        description: "La track a été créée avec succès",
-      });
       setIsCreateDialogOpen(false);
       resetForm();
-    },
-    onError: (error) => {
-      toast({
-        title: "Erreur",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
