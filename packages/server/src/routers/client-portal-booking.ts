@@ -28,25 +28,29 @@ function getOrganizationIdFromHostname(hostname: string | undefined): number {
 
   // Fallback if hostname not available
   if (!hostname) {
-    console.warn('[Multi-Tenant] No hostname provided, defaulting to organizationId=1');
-    return 1;
+    console.warn('[Multi-Tenant] No hostname provided, defaulting to organizationId=22');
+    return 22;
   }
 
   // Development mode: localhost has no subdomain
   if (hostname === 'localhost' || hostname.startsWith('localhost:')) {
-    return 1; // Default to org 1 in development
+    return 22; // Demo Studio for development
   }
 
-  // Production: Extract subdomain
+  // Production: Map known hostnames
+  if (hostname === 'recording-studio-manager.com') {
+    console.log('[Multi-Tenant] Production hostname → organizationId=22 (Demo Studio)');
+    return 22;
+  }
+
+  // Production: Extract subdomain for multi-tenant routing
   // Example: "studio1.myapp.com" → "studio1"
   const subdomain = hostname.split('.')[0];
 
   // TODO: Query master database to map subdomain → organizationId
-  // For now, assume subdomain = slug and hardcode mapping
-  // In real implementation: SELECT id FROM organizations WHERE slug = subdomain
-
-  console.warn(`[Multi-Tenant] TODO: Map subdomain "${subdomain}" to organizationId`);
-  return 1; // Fallback for now
+  // For now, fallback to Demo Studio (org 22)
+  console.warn(`[Multi-Tenant] Unknown subdomain "${subdomain}", defaulting to organizationId=22`);
+  return 22;
 }
 
 /**
