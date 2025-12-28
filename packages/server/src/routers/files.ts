@@ -141,6 +141,34 @@ export const filesRouter = router({
     }),
 
   /**
+   * Update file metadata (mock - only updates mock array)
+   */
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        fileName: z.string().optional(),
+        category: z.enum(["raw", "mixed", "mastered", "reference", "other"]).optional(),
+        description: z.string().optional(),
+        version: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const index = mockFiles.findIndex((f) => f.id === input.id);
+      if (index === -1) {
+        throw new Error("File not found");
+      }
+
+      const { id, ...updateData } = input;
+      mockFiles[index] = {
+        ...mockFiles[index],
+        ...updateData,
+      };
+
+      return mockFiles[index];
+    }),
+
+  /**
    * Delete a file (mock - no actual S3 deletion)
    */
   delete: protectedProcedure

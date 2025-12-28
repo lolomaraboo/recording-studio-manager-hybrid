@@ -27,16 +27,24 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Plus, Download, Trash2, FileAudio, ArrowLeft } from "lucide-react";
+import { Plus, Download, Trash2, FileAudio, ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { AudioUploader } from "@/components/AudioUploader";
 import { Link } from "react-router-dom";
 
 export default function AudioFiles() {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [editingFile, setEditingFile] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState({
+    fileName: "",
+    category: "",
+    version: "",
+    description: "",
+  });
 
   const { data: files, refetch } = trpc.files.list.useQuery({
     category: categoryFilter === "all" ? undefined : (categoryFilter as any),
@@ -56,10 +64,45 @@ export default function AudioFiles() {
     },
   });
 
+  const updateMutation = trpc.files.update.useMutation({
+    onSuccess: () => {
+      toast.success("Fichier mis à jour");
+      refetch();
+      setIsEditDialogOpen(false);
+      setEditingFile(null);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const { refetch: getDownloadUrl } = trpc.files.getDownloadUrl.useQuery(
     { id: 0 },
     { enabled: false }
   );
+
+  const handleEdit = (file: any) => {
+    setEditingFile(file);
+    setEditFormData({
+      fileName: file.fileName,
+      category: file.category,
+      version: file.version || "",
+      description: file.description || "",
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateFile = () => {
+    if (!editingFile) return;
+
+    updateMutation.mutate({
+      id: editingFile.id,
+      fileName: editFormData.fileName,
+      category: editFormData.category as any,
+      version: editFormData.version || undefined,
+      description: editFormData.description || undefined,
+    });
+  };
 
   const handleDelete = (id: number) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce fichier ?")) {
@@ -235,6 +278,13 @@ export default function AudioFiles() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => handleEdit(file)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() =>
                               handleDownload(file.id, file.fileName)
                             }
@@ -309,6 +359,102 @@ export default function AudioFiles() {
                 }}
               />
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Modifier le fichier audio</DialogTitle>
+            <DialogDescription>
+              Modifiez les métadonnées du fichier
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="fileName">Nom du fichier *</Label>
+              <Input
+                id="fileName"
+                value={editFormData.fileName}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, fileName: e.target.value })
+                }
+                placeholder="ex: vocals_final.wav"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="category">Catégorie *</Label>
+              <Select
+                value={editFormData.category}
+                onValueChange={(value) =>
+                  setEditFormData({ ...editFormData, category: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="raw">Brut</SelectItem>
+                  <SelectItem value="mixed">Mixé</SelectItem>
+                  <SelectItem value="mastered">Masterisé</SelectItem>
+                  <SelectItem value="reference">Référence</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="version">Version</Label>
+              <Input
+                id="version"
+                value={editFormData.version}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, version: e.target.value })
+                }
+                placeholder="ex: v1, final, draft..."
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                value={editFormData.description}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Notes sur ce fichier..."
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                setEditingFile(null);
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleUpdateFile}
+              disabled={
+                !editFormData.fileName ||
+                !editFormData.category ||
+                updateMutation.isPending
+              }
+            >
+              {updateMutation.isPending ? "Mise à jour..." : "Enregistrer"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

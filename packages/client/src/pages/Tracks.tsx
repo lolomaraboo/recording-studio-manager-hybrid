@@ -24,6 +24,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -39,16 +47,37 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Music, Plus, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 type TrackStatus = "recording" | "editing" | "mixing" | "mastering" | "completed";
 
 export default function Tracks() {
+  const { toast } = useToast();
+  const utils = trpc.useUtils();
+
   const [projectFilter, setProjectFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Dialog state
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newTrack, setNewTrack] = useState({
+    projectId: "",
+    title: "",
+    trackNumber: "",
+    status: "recording" as TrackStatus,
+    duration: "",
+    bpm: "",
+    key: "",
+    isrc: "",
+    lyrics: "",
+    notes: "",
+  });
 
   // Queries tRPC (endpoints implémentés!)
   const { data: allTracks } = trpc.projects.tracks.listAll.useQuery({});
@@ -56,6 +85,60 @@ export default function Tracks() {
 
   // Liste des projets pour le dropdown
   const { data: projects } = trpc.projects.list.useQuery();
+
+  // Create mutation
+  const createTrackMutation = trpc.projects.tracks.create.useMutation({
+    onSuccess: () => {
+      utils.projects.tracks.listAll.invalidate();
+      utils.projects.tracks.getStats.invalidate();
+      toast({
+        title: "Track créée",
+        description: "La track a été créée avec succès",
+      });
+      setIsCreateDialogOpen(false);
+      resetForm();
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setNewTrack({
+      projectId: "",
+      title: "",
+      trackNumber: "",
+      status: "recording",
+      duration: "",
+      bpm: "",
+      key: "",
+      isrc: "",
+      lyrics: "",
+      notes: "",
+    });
+  };
+
+  const handleCreateTrack = () => {
+    const payload: any = {
+      projectId: parseInt(newTrack.projectId),
+      title: newTrack.title,
+      status: newTrack.status,
+    };
+
+    if (newTrack.trackNumber) payload.trackNumber = parseInt(newTrack.trackNumber);
+    if (newTrack.duration) payload.duration = parseInt(newTrack.duration);
+    if (newTrack.bpm) payload.bpm = parseInt(newTrack.bpm);
+    if (newTrack.key) payload.key = newTrack.key;
+    if (newTrack.isrc) payload.isrc = newTrack.isrc;
+    if (newTrack.lyrics) payload.lyrics = newTrack.lyrics;
+    if (newTrack.notes) payload.notes = newTrack.notes;
+
+    createTrackMutation.mutate(payload);
+  };
 
   // Stats avec valeurs par défaut
   const stats = statsData || {
@@ -107,7 +190,7 @@ export default function Tracks() {
             <Music className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-semibold">Tracks</h1>
           </div>
-          <Button>
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Nouvelle Track
           </Button>
@@ -282,6 +365,192 @@ export default function Tracks() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Create Track Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Nouvelle Track</DialogTitle>
+            <DialogDescription>
+              Ajoutez une nouvelle track à un projet
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {/* Projet (required) */}
+            <div className="grid gap-2">
+              <Label htmlFor="projectId">Projet *</Label>
+              <Select
+                value={newTrack.projectId}
+                onValueChange={(value) =>
+                  setNewTrack({ ...newTrack, projectId: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un projet" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects?.map((p: any) => (
+                    <SelectItem key={p.id} value={p.id.toString()}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Title (required) */}
+            <div className="grid gap-2">
+              <Label htmlFor="title">Titre *</Label>
+              <Input
+                id="title"
+                value={newTrack.title}
+                onChange={(e) =>
+                  setNewTrack({ ...newTrack, title: e.target.value })
+                }
+                placeholder="ex: Intro, Verse 1, Chorus..."
+              />
+            </div>
+
+            {/* Track Number & Status */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="trackNumber">Numéro de track</Label>
+                <Input
+                  id="trackNumber"
+                  type="number"
+                  value={newTrack.trackNumber}
+                  onChange={(e) =>
+                    setNewTrack({ ...newTrack, trackNumber: e.target.value })
+                  }
+                  placeholder="1"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={newTrack.status}
+                  onValueChange={(value) =>
+                    setNewTrack({ ...newTrack, status: value as TrackStatus })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recording">Recording</SelectItem>
+                    <SelectItem value="editing">Editing</SelectItem>
+                    <SelectItem value="mixing">Mixing</SelectItem>
+                    <SelectItem value="mastering">Mastering</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Duration, BPM, Key */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="duration">Durée (secondes)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  value={newTrack.duration}
+                  onChange={(e) =>
+                    setNewTrack({ ...newTrack, duration: e.target.value })
+                  }
+                  placeholder="180"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="bpm">BPM</Label>
+                <Input
+                  id="bpm"
+                  type="number"
+                  value={newTrack.bpm}
+                  onChange={(e) =>
+                    setNewTrack({ ...newTrack, bpm: e.target.value })
+                  }
+                  placeholder="120"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="key">Tonalité</Label>
+                <Input
+                  id="key"
+                  value={newTrack.key}
+                  onChange={(e) =>
+                    setNewTrack({ ...newTrack, key: e.target.value })
+                  }
+                  placeholder="C Major"
+                />
+              </div>
+            </div>
+
+            {/* ISRC */}
+            <div className="grid gap-2">
+              <Label htmlFor="isrc">ISRC</Label>
+              <Input
+                id="isrc"
+                value={newTrack.isrc}
+                onChange={(e) =>
+                  setNewTrack({ ...newTrack, isrc: e.target.value })
+                }
+                placeholder="ex: USRC17607839"
+              />
+            </div>
+
+            {/* Lyrics */}
+            <div className="grid gap-2">
+              <Label htmlFor="lyrics">Paroles</Label>
+              <Textarea
+                id="lyrics"
+                value={newTrack.lyrics}
+                onChange={(e) =>
+                  setNewTrack({ ...newTrack, lyrics: e.target.value })
+                }
+                placeholder="Paroles de la chanson..."
+                rows={4}
+              />
+            </div>
+
+            {/* Notes */}
+            <div className="grid gap-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={newTrack.notes}
+                onChange={(e) =>
+                  setNewTrack({ ...newTrack, notes: e.target.value })
+                }
+                placeholder="Notes techniques, idées..."
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsCreateDialogOpen(false);
+                resetForm();
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleCreateTrack}
+              disabled={!newTrack.projectId || !newTrack.title || createTrackMutation.isPending}
+            >
+              {createTrackMutation.isPending ? "Création..." : "Créer la track"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

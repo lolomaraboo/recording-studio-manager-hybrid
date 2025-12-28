@@ -13,6 +13,7 @@ import { contractsRouter } from './contracts.js';
 import { expensesRouter } from './expenses.js';
 import { notificationsRouter } from './notifications.js';
 import { filesRouter } from './files.js';
+import { sharesRouter } from './shares.js';
 import { aiRouter } from './ai.js';
 import { searchRouter } from './search.js';
 import { clientPortalAuthRouter } from './client-portal-auth.js';
@@ -68,6 +69,7 @@ export const appRouter = router({
   expenses: expensesRouter,
   notifications: notificationsRouter,
   files: filesRouter,
+  shares: sharesRouter,
   ai: aiRouter,
   search: searchRouter,
   clientPortalAuth: clientPortalAuthRouter,

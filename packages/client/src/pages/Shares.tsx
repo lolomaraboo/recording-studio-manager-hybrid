@@ -40,61 +40,141 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 interface Share {
   id: number;
   projectName: string;
-  trackName?: string;
+  trackName?: string | null;
   recipientEmail: string;
   shareLink: string;
   expiresAt: Date;
   accessCount: number;
-  maxAccess?: number;
+  maxAccess?: number | null;
   status: "active" | "expired" | "revoked";
   createdAt: Date;
 }
 
 export default function Shares() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
+  const [editingShare, setEditingShare] = useState<Share | null>(null);
 
-  // Mock data
-  const shares: Share[] = [
-    {
-      id: 1,
-      projectName: "Album Jazz 2025",
-      trackName: "Blue Notes",
-      recipientEmail: "marie.dubois@email.com",
-      shareLink: "https://rsm.studio/share/abc123def456",
-      expiresAt: new Date(2026, 0, 15),
-      accessCount: 5,
-      maxAccess: 10,
-      status: "active",
-      createdAt: new Date(2025, 11, 20),
+  // Form state for create
+  const [createFormData, setCreateFormData] = useState({
+    projectId: "",
+    trackId: "",
+    recipientEmail: "",
+    expiresInDays: "7",
+    maxAccess: "unlimited",
+  });
+
+  // Form state for edit
+  const [editFormData, setEditFormData] = useState({
+    recipientEmail: "",
+    expiresAt: "",
+    maxAccess: "",
+  });
+
+  // Fetch shares from backend
+  const { data: shares = [], refetch } = trpc.shares.list.useQuery();
+  const { data: projects } = trpc.projects.list.useQuery();
+
+  // Mutations
+  const createMutation = trpc.shares.create.useMutation({
+    onSuccess: () => {
+      toast.success("Partage créé avec succès");
+      refetch();
+      setIsCreateDialogOpen(false);
+      resetCreateForm();
     },
-    {
-      id: 2,
-      projectName: "Podcast Episode 12",
-      recipientEmail: "thomas.martin@email.com",
-      shareLink: "https://rsm.studio/share/xyz789ghi012",
-      expiresAt: new Date(2026, 0, 1),
-      accessCount: 12,
-      status: "active",
-      createdAt: new Date(2025, 11, 15),
+    onError: (error) => {
+      toast.error(error.message);
     },
-    {
-      id: 3,
-      projectName: "Démo Rock Band",
-      trackName: "Thunder Road",
-      recipientEmail: "sophie.bernard@email.com",
-      shareLink: "https://rsm.studio/share/jkl345mno678",
-      expiresAt: new Date(2025, 11, 10),
-      accessCount: 3,
-      maxAccess: 5,
-      status: "expired",
-      createdAt: new Date(2025, 10, 25),
+  });
+
+  const updateMutation = trpc.shares.update.useMutation({
+    onSuccess: () => {
+      toast.success("Partage mis à jour");
+      refetch();
+      setIsEditDialogOpen(false);
+      setEditingShare(null);
     },
-  ];
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const revokeMutation = trpc.shares.revoke.useMutation({
+    onSuccess: () => {
+      toast.success("Partage révoqué");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const resetCreateForm = () => {
+    setCreateFormData({
+      projectId: "",
+      trackId: "",
+      recipientEmail: "",
+      expiresInDays: "7",
+      maxAccess: "unlimited",
+    });
+  };
+
+  const handleCreateShare = () => {
+    const payload: any = {
+      projectId: parseInt(createFormData.projectId),
+      recipientEmail: createFormData.recipientEmail,
+    };
+
+    if (createFormData.trackId) {
+      payload.trackId = parseInt(createFormData.trackId);
+    }
+
+    if (createFormData.expiresInDays !== "never") {
+      payload.expiresInDays = parseInt(createFormData.expiresInDays);
+    }
+
+    if (createFormData.maxAccess !== "unlimited") {
+      payload.maxAccess = parseInt(createFormData.maxAccess);
+    }
+
+    createMutation.mutate(payload);
+  };
+
+  const handleEditShare = (share: Share) => {
+    setEditingShare(share);
+    setEditFormData({
+      recipientEmail: share.recipientEmail,
+      expiresAt: share.expiresAt.toISOString().split("T")[0],
+      maxAccess: share.maxAccess?.toString() || "",
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateShare = () => {
+    if (!editingShare) return;
+
+    const payload: any = {
+      id: editingShare.id,
+      recipientEmail: editFormData.recipientEmail,
+    };
+
+    if (editFormData.expiresAt) {
+      payload.expiresAt = new Date(editFormData.expiresAt);
+    }
+
+    if (editFormData.maxAccess) {
+      payload.maxAccess = parseInt(editFormData.maxAccess);
+    }
+
+    updateMutation.mutate(payload);
+  };
 
   const copyToClipboard = (link: string, id: number) => {
     navigator.clipboard.writeText(link);
@@ -104,8 +184,9 @@ export default function Shares() {
   };
 
   const revokeShare = (id: number) => {
-    // TODO: Implement revoke logic
-    toast.success("Partage révoqué");
+    if (confirm("Êtes-vous sûr de vouloir révoquer ce partage ?")) {
+      revokeMutation.mutate({ id });
+    }
   };
 
   const getStatusBadge = (status: Share["status"]) => {
@@ -150,28 +231,39 @@ export default function Shares() {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="project">Projet *</Label>
-                <Select>
+                <Select
+                  value={createFormData.projectId}
+                  onValueChange={(value) =>
+                    setCreateFormData({ ...createFormData, projectId: value })
+                  }
+                >
                   <SelectTrigger id="project">
                     <SelectValue placeholder="Sélectionner un projet" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Album Jazz 2025</SelectItem>
-                    <SelectItem value="2">Podcast Episode 12</SelectItem>
-                    <SelectItem value="3">Démo Rock Band</SelectItem>
+                    {projects?.map((project) => (
+                      <SelectItem key={project.id} value={project.id.toString()}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="track">Track (optionnel)</Label>
-                <Select>
+                <Select
+                  value={createFormData.trackId}
+                  onValueChange={(value) =>
+                    setCreateFormData({ ...createFormData, trackId: value })
+                  }
+                >
                   <SelectTrigger id="track">
                     <SelectValue placeholder="Projet entier ou track spécifique" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Projet entier</SelectItem>
-                    <SelectItem value="1">Blue Notes</SelectItem>
-                    <SelectItem value="2">Midnight Jazz</SelectItem>
+                    <SelectItem value="">Projet entier</SelectItem>
+                    {/* TODO: Load tracks from selected project */}
                   </SelectContent>
                 </Select>
               </div>
@@ -182,13 +274,28 @@ export default function Shares() {
                   id="email"
                   type="email"
                   placeholder="client@example.com"
+                  value={createFormData.recipientEmail}
+                  onChange={(e) =>
+                    setCreateFormData({
+                      ...createFormData,
+                      recipientEmail: e.target.value,
+                    })
+                  }
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="expires">Expiration</Label>
-                  <Select defaultValue="7">
+                  <Select
+                    value={createFormData.expiresInDays}
+                    onValueChange={(value) =>
+                      setCreateFormData({
+                        ...createFormData,
+                        expiresInDays: value,
+                      })
+                    }
+                  >
                     <SelectTrigger id="expires">
                       <SelectValue />
                     </SelectTrigger>
@@ -203,7 +310,12 @@ export default function Shares() {
 
                 <div className="space-y-2">
                   <Label htmlFor="maxAccess">Accès maximum</Label>
-                  <Select defaultValue="unlimited">
+                  <Select
+                    value={createFormData.maxAccess}
+                    onValueChange={(value) =>
+                      setCreateFormData({ ...createFormData, maxAccess: value })
+                    }
+                  >
                     <SelectTrigger id="maxAccess">
                       <SelectValue />
                     </SelectTrigger>
@@ -228,14 +340,24 @@ export default function Shares() {
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsCreateDialogOpen(false);
+                  resetCreateForm();
+                }}
+              >
                 Annuler
               </Button>
-              <Button onClick={() => {
-                toast.success("Partage créé avec succès");
-                setIsCreateDialogOpen(false);
-              }}>
-                Créer le partage
+              <Button
+                onClick={handleCreateShare}
+                disabled={
+                  !createFormData.projectId ||
+                  !createFormData.recipientEmail ||
+                  createMutation.isPending
+                }
+              >
+                {createMutation.isPending ? "Création..." : "Créer le partage"}
               </Button>
             </div>
           </DialogContent>
@@ -342,7 +464,11 @@ export default function Shares() {
                       <TableCell>{getStatusBadge(share.status)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditShare(share)}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button
@@ -445,7 +571,11 @@ export default function Shares() {
                       </TableCell>
                       <TableCell>{getStatusBadge(share.status)}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditShare(share)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -457,6 +587,97 @@ export default function Shares() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Share Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Modifier le partage</DialogTitle>
+            <DialogDescription>
+              Modifiez les paramètres de ce partage
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email du destinataire *</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editFormData.recipientEmail}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    recipientEmail: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-expires">Date d'expiration</Label>
+              <Input
+                id="edit-expires"
+                type="date"
+                value={editFormData.expiresAt}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, expiresAt: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-maxAccess">Accès maximum</Label>
+              <Input
+                id="edit-maxAccess"
+                type="number"
+                value={editFormData.maxAccess}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    maxAccess: e.target.value,
+                  })
+                }
+                placeholder="Laisser vide pour illimité"
+              />
+            </div>
+
+            {editingShare && (
+              <div className="space-y-2 p-4 bg-muted rounded-lg">
+                <p className="text-sm font-medium">Informations actuelles:</p>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Projet: {editingShare.projectName}</li>
+                  {editingShare.trackName && (
+                    <li>• Track: {editingShare.trackName}</li>
+                  )}
+                  <li>• Accès: {editingShare.accessCount} fois</li>
+                  <li>• Lien: {editingShare.shareLink}</li>
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                setEditingShare(null);
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleUpdateShare}
+              disabled={
+                !editFormData.recipientEmail || updateMutation.isPending
+              }
+            >
+              {updateMutation.isPending ? "Mise à jour..." : "Enregistrer"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
