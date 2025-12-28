@@ -150,7 +150,9 @@ export default function Shares() {
     setEditingShare(share);
     setEditFormData({
       recipientEmail: share.recipientEmail,
-      expiresAt: share.expiresAt.toISOString().split("T")[0],
+      expiresAt: share.expiresAt instanceof Date
+        ? share.expiresAt.toISOString().split("T")[0]
+        : new Date(share.expiresAt).toISOString().split("T")[0],
       maxAccess: share.maxAccess?.toString() || "",
     });
     setIsEditDialogOpen(true);
