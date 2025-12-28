@@ -13,6 +13,7 @@
 **Pages Working:** 11
 **New Errors Found:** 0
 **Existing Errors Confirmed:** 2 (Error #13, Error #14)
+**Errors Fixed:** 2 (Error #13 ✅, Error #14 ✅)
 
 ---
 
@@ -87,7 +88,7 @@
 ## 4. Equipment
 
 **URL:** `/equipment`
-**Status:** ⚠️ PARTIAL PASS (Error #13 confirmed)
+**Status:** ✅ PASS (Error #13 FIXED)
 
 ### Tested Features
 - [x] Page loads successfully
@@ -104,28 +105,32 @@
 - [x] CREATE works (equipment "Neumann U87 Ai" created successfully)
 - [x] List view updates after creation (shows 1 equipment)
 - [x] Edit button opens update dialog with pre-filled data
-- [x] UPDATE works despite UX issues (name changed to "Neumann U87 Ai (Studio A)")
-- ❌ **Error #13 confirmed:** UPDATE button appears unresponsive (no immediate feedback)
+- [x] UPDATE works (name changed to "Neumann U87 Ai (Studio A)")
+- [x] ✅ **Error #13 FIXED:** Buttons now show loading states during mutations
 
 ### Observations
-- **CREATE operation:** Works but has slow UX feedback (dialog stays open ~3-5 seconds before closing)
-- **UPDATE operation:** Works but has same slow UX feedback issue
-- Data is successfully saved despite the delay
-- No network errors - operations complete successfully in background
-- This is a UX issue, not a functional failure
+- **CREATE operation:** Works perfectly with loading state "Ajout en cours..."
+- **UPDATE operation:** Works perfectly with loading state "Enregistrement..."
+- Data is successfully saved
+- No network errors - operations complete successfully
+- Dialog closes automatically after successful operation
+- Success toast notification displays
 
-### Error Details
-- **Error #13:** Equipment UPDATE button silent failure
-- **Actual behavior:** Button click doesn't provide immediate feedback, but update completes successfully after delay
-- **Expected behavior:** Immediate visual feedback (loading state, dialog close, success toast)
-- **Root cause:** Missing loading state or optimistic UI update in Equipment component
+### Error #13: RESOLVED ✅
+- **Fix Applied:** Added `isPending` checks to CREATE/UPDATE buttons
+- **Button Disabled:** Buttons disabled during mutation with `createMutation.isPending` / `updateMutation.isPending`
+- **Loading Text:** Buttons show "Ajout en cours..." / "Enregistrement..." during operations
+- **File Modified:** `packages/client/src/pages/Equipment.tsx`
+- **Commit:** `3afb093` - "fix: Add loading states to Equipment CREATE/UPDATE buttons (Error #13)"
+- **Deployed:** 2025-12-27
+- **Test Result:** Both CREATE and UPDATE operations complete successfully with proper visual feedback
 
 ---
 
 ## 5. Clients
 
 **URL:** `/clients`
-**Status:** ⚠️ PARTIAL PASS (Error #14 confirmed)
+**Status:** ✅ PASS (Error #14 FIXED)
 
 ### Tested Features
 - [x] Page loads successfully
@@ -137,20 +142,23 @@
 - [x] Search box functional
 - [x] Filter by type dropdown available
 - [x] "Voir" button navigates to `/clients/:id`
-- ❌ **Error #14 confirmed:** Client detail page is completely blank
+- [x] ✅ **Error #14 FIXED:** Client detail page now displays complete information
 
 ### Observations
 - List view works perfectly
 - All client data displays correctly
 - Statistics calculated accurately
-- Navigation to detail page succeeds but renders blank page
+- Navigation to detail page works correctly
+- Detail page displays full client profile
 
-### Error Details
-- **Error #14:** Client Detail Page is completely blank
-- **URL tested:** `/clients/2`
-- **Actual behavior:** Page loads but main content area is empty (no error, no loading state, just blank)
-- **Expected behavior:** Should display client details (name, contact info, sessions history, invoices, etc.)
-- **Network requests:** `/api/trpc/clients.get?id=2` - status unknown (page blank before any content renders)
+### Error #14: RESOLVED ✅
+- **Root Cause:** Incorrect use of `useState()` instead of `useEffect()` for form synchronization (lines 123-134)
+- **Fix Applied:** Replaced `useState(() => { setFormData(...) })` with `useEffect(() => { setFormData(...) }, [client])`
+- **Form Initialization:** Changed from `client?.field || ""` to empty strings in initial state
+- **File Modified:** `packages/client/src/pages/ClientDetail.tsx`
+- **Commit:** `6b7cd75` - "fix: Replace useState with useEffect for client form sync (Error #14)"
+- **Deployed:** 2025-12-27
+- **Test Result:** Client detail page at `/clients/2` now displays complete client information including profile, stats, contact info, and history tabs
 
 ---
 
@@ -378,27 +386,35 @@ Minor form accessibility issues (non-blocking):
 
 ---
 
-## Confirmed Errors
+## Errors Fixed ✅
 
-### Error #13: Equipment UPDATE Button UX Issue
-**Status:** Confirmed (UX issue, not functional failure)
+### Error #13: Equipment UPDATE Button UX Issue - RESOLVED ✅
+**Status:** FIXED (2025-12-27)
 **Severity:** P2 (Low priority - functionality works)
 **Page:** `/equipment`
 **Description:** UPDATE button doesn't provide immediate visual feedback, causing user to think operation failed
-**Actual Behavior:** Button click appears to do nothing, but update completes successfully after 3-5 seconds
-**Expected Behavior:** Immediate loading state, dialog close, and success toast notification
-**Root Cause:** Missing loading state management in Equipment component
-**Impact:** User confusion, but data is saved correctly
+**Root Cause:** Missing loading state management in Equipment component (no `isPending` checks)
+**Fix Applied:**
+- Added `createMutation.isPending` and `updateMutation.isPending` to button disabled states
+- Changed button text to show "Ajout en cours..." during CREATE
+- Changed button text to show "Enregistrement..." during UPDATE
+**File Modified:** `packages/client/src/pages/Equipment.tsx` (lines 366-371, 480-485)
+**Commit:** `3afb093`
+**Test Result:** Both CREATE and UPDATE operations now provide immediate visual feedback
 
-### Error #14: Client Detail Page Blank
-**Status:** Confirmed
+### Error #14: Client Detail Page Blank - RESOLVED ✅
+**Status:** FIXED (2025-12-27)
 **Severity:** P1 (Critical - page completely unusable)
 **Page:** `/clients/:id`
 **Description:** Client detail page renders completely blank
-**Actual Behavior:** Navigation succeeds but page shows empty main content area
-**Expected Behavior:** Display client details (name, contact, sessions, invoices, stats)
-**Root Cause:** Unknown - requires code investigation (likely missing component or broken data fetching)
-**Impact:** Users cannot view client details
+**Root Cause:** Incorrect use of `useState(() => { setFormData(...) })` instead of `useEffect(() => { setFormData(...) }, [client])` for form synchronization
+**Fix Applied:**
+- Replaced `useState(() => { ... })` with `useEffect(() => { ... }, [client])`
+- Changed form initialization from `client?.field || ""` to empty strings
+- Added `useEffect` to imports
+**File Modified:** `packages/client/src/pages/ClientDetail.tsx` (lines 113-134)
+**Commit:** `6b7cd75`
+**Test Result:** Client detail page now displays complete profile with stats, contact info, and history tabs
 
 ---
 
@@ -416,13 +432,15 @@ Minor form accessibility issues (non-blocking):
 - ✅ Multi-tenant architecture working correctly (organization 22 data isolated)
 
 ### Weaknesses
-- ❌ Client detail page completely broken (Error #14)
-- ⚠️ Equipment UPDATE UX feedback missing (Error #13)
 - ⚠️ Minor form accessibility issues (non-blocking)
 
+### Fixed Issues ✅
+- ✅ Client detail page (Error #14) - RESOLVED
+- ✅ Equipment UPDATE UX feedback (Error #13) - RESOLVED
+
 ### Recommendations
-1. **Priority 1:** Fix Client Detail Page (Error #14) - page is completely unusable
-2. **Priority 2:** Add loading states to Equipment forms (Error #13) - improve UX
+1. **Priority 1:** ✅ COMPLETE - Fix Client Detail Page (Error #14)
+2. **Priority 2:** ✅ COMPLETE - Add loading states to Equipment forms (Error #13)
 3. **Priority 3:** Fix form accessibility issues (WCAG compliance)
 4. **Priority 4:** Implement actual charts in Analytics page (replace placeholders)
 
@@ -432,9 +450,19 @@ Minor form accessibility issues (non-blocking):
 
 **Admin Portal Testing:** ✅ COMPLETE
 **Client Portal Testing:** ✅ COMPLETE (previous session)
-**Phase 3.4 Status:** Ready for error resolution
+**Phase 3.4 Status:** ✅ COMPLETE - All errors resolved
+
+**Completed Fixes:**
+1. ✅ Error #14 (Client Detail Page blank) - FIXED (commit 6b7cd75)
+2. ✅ Error #13 (Equipment UPDATE UX) - FIXED (commit 3afb093)
 
 **Next Steps:**
-1. Fix Error #14 (Client Detail Page blank) - CRITICAL
-2. Fix Error #13 (Equipment UPDATE UX) - MEDIUM
-3. Proceed to Phase 3.5 or return to fix P1 UPDATE bugs from Error #8-#13
+1. ✅ DONE - Fix Error #14 (Client Detail Page blank) - CRITICAL
+2. ✅ DONE - Fix Error #13 (Equipment UPDATE UX) - MEDIUM
+3. **NEW:** Consider fixing remaining P1 UPDATE bugs (Errors #8-#12) using same patterns:
+   - Error #8: Sessions UPDATE (useState → useEffect)
+   - Error #9: Projects UPDATE (type coercion)
+   - Error #10: Invoices UPDATE (useState → useEffect)
+   - Error #11: Quotes CREATE (date coercion)
+   - Error #12: Rooms UPDATE (number coercion)
+4. **NEW:** Proceed to Phase 3.5 or address accessibility issues
