@@ -54,6 +54,9 @@ import ClientDashboard from './pages/client-portal/ClientDashboard';
 import Bookings from './pages/client-portal/Bookings';
 import BookingDetail from './pages/client-portal/BookingDetail';
 import Profile from './pages/client-portal/Profile';
+import ClientProjects from './pages/client-portal/ClientProjects';
+import ClientInvoices from './pages/client-portal/ClientInvoices';
+import PaymentHistory from './pages/client-portal/PaymentHistory';
 import MagicLinkVerify from './pages/auth/MagicLinkVerify';
 import {
   ClientPortalAuthProvider,
@@ -85,8 +88,10 @@ function App() {
             <Route index element={<ClientDashboard />} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="bookings/:id" element={<BookingDetail />} />
+            <Route path="projects" element={<ClientProjects />} />
+            <Route path="invoices" element={<ClientInvoices />} />
+            <Route path="payments" element={<PaymentHistory />} />
             <Route path="profile" element={<Profile />} />
-            {/* TODO: Add more client portal routes (invoices, projects, payments) */}
           </Route>
 
           {/* Staff Portal - Protected routes */}
