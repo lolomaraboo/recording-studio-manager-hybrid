@@ -126,7 +126,7 @@ export const sharesRouter = router({
       z.object({
         id: z.number(),
         recipientEmail: z.string().email().optional(),
-        expiresAt: z.date().optional(),
+        expiresAt: z.coerce.date().optional(),
         maxAccess: z.number().optional(),
       })
     )
