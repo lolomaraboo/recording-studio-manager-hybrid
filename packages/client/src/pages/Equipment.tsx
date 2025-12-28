@@ -363,8 +363,11 @@ export default function Equipment() {
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Annuler
             </Button>
-            <Button onClick={handleAdd} disabled={!formData.name || !formData.category}>
-              Ajouter
+            <Button
+              onClick={handleAdd}
+              disabled={!formData.name || !formData.category || createMutation.isPending}
+            >
+              {createMutation.isPending ? "Ajout en cours..." : "Ajouter"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -474,8 +477,11 @@ export default function Equipment() {
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Annuler
             </Button>
-            <Button onClick={handleEdit} disabled={!formData.name || !formData.category}>
-              Enregistrer
+            <Button
+              onClick={handleEdit}
+              disabled={!formData.name || !formData.category || updateMutation.isPending}
+            >
+              {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
             </Button>
           </DialogFooter>
         </DialogContent>
