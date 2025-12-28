@@ -96,7 +96,10 @@ export const contractsRouter = router({
         startDate: z.date().optional(),
         endDate: z.date().optional(),
         signedAt: z.date().optional(),
-        value: z.string().optional(),
+        value: z
+          .string()
+          .optional()
+          .transform((val) => (val === "" || val === undefined ? undefined : val)),
         documentUrl: z.string().max(500).optional(),
         signedDocumentUrl: z.string().max(500).optional(),
         signatureRequestId: z.string().max(255).optional(),
