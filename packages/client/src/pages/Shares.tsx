@@ -362,7 +362,6 @@ export default function Shares() {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
