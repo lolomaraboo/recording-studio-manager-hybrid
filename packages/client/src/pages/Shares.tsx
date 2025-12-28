@@ -131,7 +131,7 @@ export default function Shares() {
       recipientEmail: createFormData.recipientEmail,
     };
 
-    if (createFormData.trackId) {
+    if (createFormData.trackId && createFormData.trackId !== "0") {
       payload.trackId = parseInt(createFormData.trackId);
     }
 
@@ -262,7 +262,7 @@ export default function Shares() {
                     <SelectValue placeholder="Projet entier ou track spécifique" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Projet entier</SelectItem>
+                    <SelectItem value="0">Projet entier</SelectItem>
                     {/* TODO: Load tracks from selected project */}
                   </SelectContent>
                 </Select>
