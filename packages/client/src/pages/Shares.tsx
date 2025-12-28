@@ -458,7 +458,7 @@ export default function Shares() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          {share.expiresAt.toLocaleDateString("fr-FR")}
+                          {new Date(share.expiresAt).toLocaleDateString("fr-FR")}
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(share.status)}</TableCell>
@@ -517,7 +517,7 @@ export default function Shares() {
                       <TableCell>{share.recipientEmail}</TableCell>
                       <TableCell>{share.accessCount}</TableCell>
                       <TableCell>
-                        {share.expiresAt.toLocaleDateString("fr-FR")}
+                        {new Date(share.expiresAt).toLocaleDateString("fr-FR")}
                       </TableCell>
                       <TableCell>{getStatusBadge(share.status)}</TableCell>
                     </TableRow>
@@ -567,7 +567,7 @@ export default function Shares() {
                         {share.maxAccess && ` / ${share.maxAccess}`}
                       </TableCell>
                       <TableCell>
-                        {share.expiresAt.toLocaleDateString("fr-FR")}
+                        {new Date(share.expiresAt).toLocaleDateString("fr-FR")}
                       </TableCell>
                       <TableCell>{getStatusBadge(share.status)}</TableCell>
                       <TableCell className="text-right">
