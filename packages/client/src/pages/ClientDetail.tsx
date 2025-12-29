@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
+import { NotesHistory } from "@/components/NotesHistory";
 import {
   ArrowLeft,
   Edit,
@@ -116,7 +117,6 @@ export default function ClientDetail() {
     phone: "",
     artistName: "",
     address: "",
-    notes: "",
   });
 
   // Update form when client loads
@@ -128,7 +128,6 @@ export default function ClientDetail() {
         phone: client.phone || "",
         artistName: client.artistName || "",
         address: client.address || "",
-        notes: client.notes || "",
       });
     }
   }, [client]);
@@ -142,7 +141,6 @@ export default function ClientDetail() {
         phone: formData.phone || undefined,
         artistName: formData.artistName || undefined,
         address: formData.address || undefined,
-        notes: formData.notes || undefined,
       },
     });
   };
@@ -454,23 +452,14 @@ export default function ClientDetail() {
                 </CardContent>
               </Card>
 
-              {/* Notes Card */}
+              {/* Notes History */}
               <Card>
                 <CardHeader>
                   <CardTitle>Notes</CardTitle>
-                  <CardDescription>Notes et commentaires sur le client</CardDescription>
+                  <CardDescription>Historique daté des notes sur le client</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {isEditing ? (
-                    <Textarea
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      rows={6}
-                      placeholder="Ajoutez des notes..."
-                    />
-                  ) : (
-                    <p className="text-sm whitespace-pre-wrap">{client.notes || "Aucune note"}</p>
-                  )}
+                  <NotesHistory clientId={client.id} />
                 </CardContent>
               </Card>
 

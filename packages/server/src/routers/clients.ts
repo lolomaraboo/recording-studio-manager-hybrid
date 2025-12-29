@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq, desc, sql } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
-import { clients, clientNotes } from '@rsm/database/tenant';
+import { clients } from '@rsm/database/tenant';
 
 /**
  * Clients Router
