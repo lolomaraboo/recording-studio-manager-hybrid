@@ -245,6 +245,99 @@ Plans:
 
 ---
 
+### Phase 3.8: Vérifier Chatbot Mémoire (INSERTED)
+**Goal**: Vérifier que le chatbot ne perd pas la mémoire au fil de la discussion - ensure conversation context is maintained
+
+**Depends on**: Phase 3.7 (chatbot cache invalidation complete)
+
+**Research**: Unlikely (current implementation already manages conversation history in DB, just needs verification)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 3.8-01: Multi-turn conversation memory validation (MCP Chrome DevTools testing + DB verification)
+
+**Status**: ⏳ Planned (Ready to execute)
+
+**Details**:
+Phase 3.8-01 plan validates chatbot memory persistence across 10-turn conversation:
+- Tests: Create clients, schedule sessions, test memory recall
+- Verifies: sessionId persistence, DB storage, Claude API context management
+- Database validation: SQL queries confirm conversation history storage
+- Checkpoint: Human verification of chatbot responses and memory behavior
+
+**Rationale**: Before marketing launch (Phase 4), validate that AI chatbot maintains conversation context throughout multi-turn discussions. Critical for user experience - chatbot must remember previous messages, entities created, and conversation flow. If context is lost, chatbot becomes frustrating and unhelpful. Must test with realistic conversations (10+ messages) and verify conversation history persistence.
+
+---
+
+### Phase 3.8.1: Fix Chatbot SessionId Persistence Bug (INSERTED)
+
+**Goal:** Fix critical frontend bug where sessionId is not persisted between messages, causing complete chatbot memory loss
+
+**Depends on:** Phase 3.8 (memory verification testing revealed the bug)
+
+**Research:** Unlikely (simple React state management fix)
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 3.8.1 to break down)
+
+**Details:**
+Phase 3.8 testing discovered CRITICAL P0 BUG - chatbot creates new session for each message because frontend never sends sessionId to backend. Testing stopped at Turn 2 when memory failure was confirmed.
+
+**Bug Summary:**
+- Frontend AIAssistant.tsx (line 152-154) sends only `message` to backend
+- Backend returns `sessionId` in response but frontend never stores it
+- Each message creates brand new session = complete memory loss
+- Turn 2 test: "What was the name I just mentioned?" → "You didn't mention any specific name"
+
+**Fix Required:**
+1. Add state: `const [sessionId, setSessionId] = useState<string | null>(null)`
+2. Send sessionId in request: `sessionId: sessionId || undefined`
+3. Store sessionId from response: `setSessionId(response.sessionId)`
+
+**Estimated Effort:** 15-20 minutes (simple state management)
+
+**Impact:** CRITICAL BLOCKER - Marketing launch cannot proceed until chatbot memory works
+
+**Rationale:** Phase 3.8 memory validation testing discovered that chatbot memory is completely non-functional. Every message creates a new session, causing the chatbot to "forget" all previous context. This is a critical UX failure that would cause immediate negative reviews if launched. Must fix before proceeding to Phase 4 (Marketing Foundation). Backend implementation is correct - it expects sessionId and loads conversation history when provided. Bug is purely frontend: missing state management for sessionId persistence.
+
+---
+
+### Phase 3.8.2: Persist Chatbot SessionId in LocalStorage (INSERTED)
+
+**Goal:** Persist chatbot sessionId across page refreshes to maintain conversation history
+
+**Depends on:** Phase 3.8.1 (sessionId state management fixed)
+
+**Research:** Unlikely (standard localStorage pattern)
+
+**Plans:** 1 plan
+
+Plans:
+- [x] 3.8.2-01: Add localStorage persistence for sessionId (Completed 2025-12-29 - 7 min)
+
+**Status:** ✅ Complete (Completed 2025-12-29 - 7 min)
+
+**Details:**
+Phase 3.8.2-01 successfully implemented localStorage persistence for chatbot sessionId:
+- Added useEffect to load sessionId from localStorage on component mount (lines 40-45)
+- Added localStorage.setItem when storing sessionId from backend response (line 178)
+- Added startNewConversation function (ready for future UI integration - lines 233-237)
+- Deployed to production via Docker rebuild workflow
+- **Validation**: 3-turn conversation test with page refresh between Turn 2 and Turn 3
+  - Turn 1: "Create client Alice Smith" → ✅ Client created, sessionId saved to localStorage
+  - Turn 2: "What was the name I just mentioned?" → ✅ "Alice Smith" (memory works in session)
+  - **PAGE REFRESH PERFORMED**
+  - Turn 3: "What was the first client name?" → ✅ **"Alice Smith"** (localStorage persistence works!)
+- DevTools verification: chatbot_sessionId present in localStorage, consistent across network requests
+- Zero console errors, zero regressions
+
+**Rationale:** User reported chatbot loses conversation when page is refreshed. Phase 3.8.1 fixed sessionId persistence *between messages* (React state), but page refresh cleared state causing memory loss. Phase 3.8.2 extends persistence to *survive page refreshes* using localStorage. Minimal code (3 additions) ensures chatbot conversations survive accidental refreshes, improving UX before marketing launch (Phase 4). **Phase 3.8 fully complete** - chatbot now production-ready with full conversation memory across messages AND page refreshes.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -345,7 +438,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -357,14 +450,17 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.3. Fix Registration Session (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
 | 3.4. Comprehensive Site Testing (INSERTED) | 6/6 | ✅ Complete | 2025-12-27 |
 | 3.5. Password Confirmation Field (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
-| 3.6. Breadcrumb Navigation (INSERTED) | 0/1 | 🟢 Ready to start | - |
+| 3.6. Breadcrumb Navigation (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
+| 3.7. AI Chatbot Cache Invalidation (INSERTED) | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8. Vérifier Chatbot Mémoire (INSERTED) | 0/1 | ⏳ Planned | - |
+| 3.8.1. Fix Chatbot SessionId Bug (URGENT) | 0/0 | ⏳ Not planned | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 19/40 plans complete (47.5%) - Phase 3.6 ready to start
+**Total**: 20/42 plans complete (47.6%) - Phase 3.8 ready to execute
 
 ---
 

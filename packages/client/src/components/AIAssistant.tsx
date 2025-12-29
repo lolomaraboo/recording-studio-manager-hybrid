@@ -36,6 +36,14 @@ export function AIAssistant() {
   const chatMutation = trpc.ai.chat.useMutation();
   const utils = trpc.useUtils();
 
+  // Load sessionId from localStorage on component mount
+  useEffect(() => {
+    const savedSessionId = localStorage.getItem('chatbot_sessionId');
+    if (savedSessionId) {
+      setSessionId(savedSessionId);
+    }
+  }, []);
+
   // Handle mouse down on header (start dragging) - only in floating mode and not fullscreen
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isFloating || isFullscreen) return;
@@ -167,6 +175,7 @@ export function AIAssistant() {
       // Store sessionId from response for subsequent messages
       if (response.sessionId) {
         setSessionId(response.sessionId);
+        localStorage.setItem('chatbot_sessionId', response.sessionId);
       }
 
       // Invalidate tRPC caches based on actions performed by the chatbot
@@ -218,6 +227,13 @@ export function AIAssistant() {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  // Clear conversation and start fresh
+  const startNewConversation = () => {
+    setSessionId(null);
+    localStorage.removeItem('chatbot_sessionId');
+    setMessages([]);
   };
 
   if (!assistantOpen || !isOpen) {
