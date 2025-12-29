@@ -22,6 +22,7 @@ import { clientPortalBookingRouter } from './client-portal-booking.js';
 import { clientPortalStripeRouter } from './client-portal-stripe.js';
 import { adminRouter } from './admin.js';
 import { subscriptionsRouter } from './subscriptions.js';
+import { superadminRouter } from './superadmin.js';
 
 /**
  * Main App Router
@@ -57,6 +58,7 @@ export const appRouter = router({
   organizations: organizationsRouter,
   admin: adminRouter,
   subscriptions: subscriptionsRouter,
+  superadmin: superadminRouter,
   sessions: sessionsRouter,
   clients: clientsRouter,
   invoices: invoicesRouter,
