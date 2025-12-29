@@ -86,11 +86,6 @@ const navSections: NavSection[] = [
         icon: <Users className="h-5 w-5" />,
       },
       {
-        title: "Équipe",
-        href: "/team",
-        icon: <UserPlus className="h-5 w-5" />,
-      },
-      {
         title: "Talents",
         href: "/talents",
         icon: <Users className="h-5 w-5" />,
@@ -110,6 +105,11 @@ const navSections: NavSection[] = [
         title: "Équipement",
         href: "/equipment",
         icon: <Package className="h-5 w-5" />,
+      },
+      {
+        title: "Équipe",
+        href: "/team",
+        icon: <UserPlus className="h-5 w-5" />,
       },
     ],
   },
