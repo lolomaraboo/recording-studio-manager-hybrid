@@ -374,11 +374,12 @@ Plans:
 - Hybrid search (vector + metadata filtering)
 - Memory retention policies (time-based, importance-based)
 
-**Plans:** 1+ plans (infrastructure deployed, embedding integration pending)
+**Plans:** 3 plans
 
 Plans:
 - [x] 3.8.4-01: Qdrant Infrastructure Setup (Completed 2025-12-29 - 14 min)
-- [ ] 3.8.4-02+: TBD (Embedding service, vector storage, hybrid retrieval)
+- [x] 3.8.4-02: RAG Pipeline Components (Completed 2025-12-29 - 3 min)
+- [ ] 3.8.4-03: Integrate RAG retrieval into chatbot endpoint
 
 **Details:**
 [To be added during planning]
@@ -537,7 +538,7 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 24/42 plans complete (57.1%) - Phase 3.8.4 in progress (infrastructure deployed)
+**Total**: 25/42 plans complete (59.5%) - Phase 3.8.4 in progress (RAG pipeline built)
 
 ---
 

@@ -26,17 +26,17 @@
 ## Current Position
 
 Phase: 3.8.4 of 8 (Implement RAG with Qdrant for Chatbot Long-Term Memory) [INSERTED]
-Plan: 1 of 1 in current phase
-Status: ✅ COMPLETE - Qdrant infrastructure deployed, collection configured for multi-tenant RAG
-Last activity: 2025-12-29 - Phase 3.8.4-01 complete (Qdrant Docker + collection ready for embeddings)
+Plan: 2 of 3 in current phase
+Status: In progress
+Last activity: 2025-12-29 - Completed 3.8.4-02-PLAN.md (RAG pipeline components)
 
-Progress: █████████████████ 57.1% (24/42 plans complete) - Qdrant infrastructure ready, chatbot scalable memory foundation established
+Progress: ████████████████░ 59.5% (25/42 plans complete) - RAG pipeline built (embeddings, chunking, vector storage), ready for chatbot integration
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
-- Average duration: 34.8 min (Phase 3.1 skewed by infrastructure debugging)
+- Total plans completed: 25
+- Average duration: 33.0 min (Phase 3.1 skewed by infrastructure debugging)
 - Total execution time: 13.8 hours
 
 **By Phase:**
@@ -54,11 +54,11 @@ Progress: █████████████████ 57.1% (24/42 plans
 | 3.8.1 | 1/1 | 65 min | 65 min |
 | 3.8.2 | 1/1 | 7 min | 7 min |
 | 3.8.3 | 1/1 | 33 min | 33 min |
-| 3.8.4 | 1/1 | 14 min | 14 min |
+| 3.8.4 | 2/3 | 17 min | 8.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [70 min, 65 min, 7 min, 33 min, 14 min]
-- Trend: Infrastructure setup (Qdrant) ~14 min, Date/timezone ~33 min, Quick localStorage fix ~7 min, deployment debugging ~65-70 min
+- Last 5 plans: [65 min, 7 min, 33 min, 14 min, 3 min]
+- Trend: RAG components fast (3-14 min), localStorage fix quick (7 min), Date/timezone ~33 min, deployment debugging slow (65+ min)
 
 ## Accumulated Context
 
@@ -256,18 +256,17 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-29T06:04:33Z
-Stopped at: Phase 3.8.4-01 complete - Qdrant infrastructure deployed successfully
+Last session: 2025-12-29T06:13:34Z
+Stopped at: Completed 3.8.4-02-PLAN.md
 Resume context:
-  - Executed Phase 3.8.4-01: Qdrant Infrastructure Setup
-  - Discovered existing Qdrant container (running 6+ weeks, shared with mem0-api)
-  - Installed 6 RAG dependencies (@qdrant/js-client-rest, @langchain/qdrant, @langchain/openai, @langchain/core, langchain, tiktoken)
-  - Created singleton Qdrant client wrapper (packages/server/src/lib/rag/qdrantClient.ts)
-  - Implemented collection initialization (packages/server/src/lib/rag/index.ts)
-  - Collection "chatbot_memory" created: 1536 dimensions, Cosine distance, HNSW indexing
-  - Payload indexes: organizationId (integer), timestamp (datetime) for multi-tenant filtering
-  - Server startup integrated Qdrant initialization (graceful error handling if unavailable)
-  - Commit: c22ca64b32c13e4bf4fe4b93b807660df69729fb
-  - Duration: 14 min (fast execution, infrastructure mostly existed)
-  - Next: Ready for Phase 3.8.4 Plan 2 (implement embedding service + vector storage)
-Resume file: None (phase incomplete - 1 plan completed, more work needed for full RAG integration)
+  - Executed Phase 3.8.4-02: RAG Pipeline Components (3 min)
+  - Created embedding service (OpenAI text-embedding-3-small, 1536 dimensions, $0.02/M tokens)
+  - Implemented conversation chunker (RecursiveCharacterTextSplitter, 400-token chunks, 50-token overlap, tiktoken counting)
+  - Built vector store integration (QdrantVectorStore wrapper, semantic retrieval, mandatory tenant filtering)
+  - Installed @langchain/textsplitters package (LangChain v1 modular architecture)
+  - Fixed API compatibility (retriever.invoke() instead of getRelevantDocuments())
+  - All RAG pipeline components ready for chatbot integration
+  - Files: embeddingService.ts, conversationChunker.ts, vectorStore.ts
+  - Commit: [pending]
+  - Next: Ready for Phase 3.8.4 Plan 3 (integrate RAG retrieval into chatbot endpoint)
+Resume file: None (phase incomplete - 2/3 plans completed)
