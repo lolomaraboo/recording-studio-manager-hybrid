@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 3.7 of 8 (AI Chatbot Cache Invalidation) [INSERTED]
+Phase: 3.8.1 of 8 (Fix Chatbot SessionId Persistence Bug) [URGENT]
 Plan: 1 of 1 in current phase
-Status: Planning complete - Ready to execute
-Last activity: 2025-12-28 - Created 3.7-01-PLAN.md (fix chatbot cache invalidation)
+Status: ✅ COMPLETE - SessionId persistence fixed and validated in production
+Last activity: 2025-12-29 - Phase 3.8.1-01 complete (chatbot memory restored)
 
-Progress: ████████████████ 50% (20/40 plans complete) - Phase 3.7 plan ready
+Progress: ████████████████ 50.0% (21/42 plans complete) - Phase 3.8.1 complete, ready to re-run Phase 3.8
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 37.1 min (Phase 3.1 skewed by infrastructure debugging)
-- Total execution time: 12.4 hours
+- Total plans completed: 21
+- Average duration: 38.6 min (Phase 3.1 skewed by infrastructure debugging)
+- Total execution time: 13.5 hours
 
 **By Phase:**
 
@@ -51,10 +51,11 @@ Progress: ████████████████ 50% (20/40 plans comp
 | 3.4 | 6/6 | 98 min | 16.3 min |
 | 3.5 | 1/1 | 20 min | 20 min |
 | 3.6 | 1/1 | 70 min | 70 min |
+| 3.8.1 | 1/1 | 65 min | 65 min |
 
 **Recent Trend:**
-- Last 5 plans: [8 min, 6 min, 5 min, 20 min, 70 min]
-- Trend: Quick UX improvements ~20 min, testing phases ~6 min avg, deployment debugging can take longer (~70 min with caching issues)
+- Last 5 plans: [6 min, 5 min, 20 min, 70 min, 65 min]
+- Trend: Quick UX improvements ~20 min, testing phases ~6 min avg, deployment debugging with Docker rebuilds ~65-70 min
 
 ## Accumulated Context
 
@@ -107,6 +108,7 @@ Progress: ████████████████ 50% (20/40 plans comp
 | 3.1 | Direct tsx command in Dockerfile | Avoid pnpm wrapper to prevent runtime DNS lookups. Workaround for VPS systemd-resolved issues where containers can't resolve DNS via 127.0.0.53. |
 | 3.1 | Port 3002 vs debugging 3001 | Changed production port instead of debugging orphaned docker-proxy processes. Pragmatic choice - faster deployment, equally effective. |
 | 3.1 | Google DNS in daemon.json | Use 8.8.8.8 instead of host resolver for container DNS. systemd-resolved (127.0.0.53) doesn't work inside Docker containers on Ubuntu 24.04. |
+| 3.8.1 | Docker rebuild deployment strategy | Client container builds from source (not pre-built dist/), so deployment requires: rsync source → rebuild image → restart container. Discovered after attempting dist/ rsync (files not served due to baked-in image). |
 
 ### Deferred Issues
 
@@ -165,6 +167,19 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Solution: Add `trpc.useUtils()` and invalidate appropriate queries based on action type
   - Duration: ~20-30 min (standard tRPC pattern)
   - Priority: Critical UX bug before marketing launch (Phase 4)
+- **2025-12-29:** Phase 3.8 inserted after Phase 3.7 - "Vérifier Chatbot Mémoire" (INSERTED - URGENT)
+  - Reason: Need to verify AI chatbot maintains conversation context throughout multi-turn discussions
+  - Impact: Critical UX concern - if chatbot loses context, becomes frustrating and unhelpful to users
+  - Scope: Test conversation history persistence, Claude API context management, token limits
+  - Priority: URGENT - Must validate before marketing launch (Phase 4) as chatbot is core differentiating feature
+  - Research needed: Anthropic Claude API conversation management, session storage patterns
+- **2025-12-29:** Phase 3.8.1 inserted after Phase 3.8 - "Fix Chatbot SessionId Persistence Bug" (URGENT - CRITICAL BLOCKER)
+  - Reason: Phase 3.8 testing discovered CRITICAL P0 BUG - chatbot creates new session for each message, complete memory loss
+  - Impact: Chatbot memory completely non-functional, makes feature nearly useless, would cause immediate negative reviews
+  - Root cause: Frontend AIAssistant.tsx never sends sessionId to backend, backend creates new session every time
+  - Fix: Simple React state management (15-20 min) - add sessionId state, send in requests, store from responses
+  - Priority: CRITICAL BLOCKER - Marketing launch cannot proceed until chatbot memory works
+  - Testing: Phase 3.8 stopped at Turn 2 when memory failure confirmed, must re-run after fix
 
 ### Blockers/Concerns Carried Forward
 
@@ -215,15 +230,19 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-28T19:06:00Z
-Stopped at: Completed Phase 3.6-01 - Breadcrumb navigation added to 12 pages, deployed, and verified successfully
+Last session: 2025-12-29T02:31:28Z
+Stopped at: Phase 3.8.1 inserted - Critical chatbot bug discovered during Phase 3.8 testing
 Resume context:
-  - Added breadcrumb navigation (back arrow to Dashboard) to 12 pages (Talents, Team, Rooms, Equipment, FinancialReports, Analytics, Reports, Projects, Tracks, Shares, Chat, Notifications)
-  - Replicated consistent pattern: ArrowLeft icon + ghost button + Link to /dashboard
-  - Encountered Docker caching issue during deployment (resolved with --no-cache rebuild)
-  - Deployed to production and verified with MCP Chrome DevTools
-  - Tests passed: breadcrumb visible and functional on Tracks, Talents, Analytics pages
-  - Commit: feat(3.6-01): Add breadcrumb navigation to 12 pages (238dcce)
-  - Phase 3.6 complete (1/1 plans) - Ready for Phase 4 (Marketing Foundation)
-  - Next: Phase 4 - Marketing Foundation (landing page, pricing, demo studio)
-Resume file: .planning/phases/3.6-breadcrumb-navigation/3.6-01-SUMMARY.md
+  - Executed Phase 3.8-01 (chatbot memory verification) - testing stopped at Turn 2
+  - CRITICAL BUG DISCOVERED: Chatbot creates new session for each message (complete memory loss)
+  - Root cause identified: Frontend AIAssistant.tsx never sends sessionId to backend
+  - Turn 1: Created client "John Smith" (sessionId: session_1766975522813_6c7oygc34)
+  - Turn 2: Asked "What was the name I just mentioned?" → New session created (session_1766975657754_e8y9f2hfk)
+  - Response: "You didn't mention any specific name" - MEMORY FAILURE CONFIRMED
+  - Created Phase 3.8.1 to fix sessionId persistence bug (15-20 min fix)
+  - Summary documented: .planning/phases/3.8-verifier-chatbot-memoire/3.8-01-SUMMARY.md
+  - Screenshot captured: turn-2-memory-failure.png
+  - Network analysis completed (confirmed sessionId missing from requests)
+  - Phase 3.8.1 inserted (0/0 plans) - Ready to plan
+  - Next: /gsd:plan-phase 3.8.1
+Resume file: .planning/phases/3.8.1-fix-chatbot-sessionid-persistence-bug/

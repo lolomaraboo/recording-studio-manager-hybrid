@@ -31,6 +31,7 @@ export function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const chatMutation = trpc.ai.chat.useMutation();
   const utils = trpc.useUtils();
@@ -151,6 +152,7 @@ export function AIAssistant() {
     try {
       const response = await chatMutation.mutateAsync({
         message: userMessage.content,
+        sessionId: sessionId || undefined,
       });
 
       const assistantMessage: Message = {
@@ -161,6 +163,11 @@ export function AIAssistant() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Store sessionId from response for subsequent messages
+      if (response.sessionId) {
+        setSessionId(response.sessionId);
+      }
 
       // Invalidate tRPC caches based on actions performed by the chatbot
       if (response.actionsCalled && response.actionsCalled.length > 0) {
