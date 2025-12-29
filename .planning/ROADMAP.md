@@ -237,11 +237,11 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 3.7-01: Add tRPC cache invalidation after chatbot actions
+- [x] 3.7-01: Add tRPC cache invalidation after chatbot actions (Completed 2025-12-29 - 13 min)
 
-**Status**: 🟢 Ready to start
+**Status**: ✅ Complete (Completed 2025-12-29 - 13 min)
 
-**Rationale**: User discovered UX bug - after creating client via chatbot, must refresh page to see it in list. This is broken UX before marketing launch (Phase 4). Simple fix (~20-30 min): add `trpc.useUtils()` to invalidate caches after chatbot mutations. Standard pattern used throughout the app.
+**Rationale**: User discovered UX bug - after creating client via chatbot, must refresh page to see it in list. This was broken UX before marketing launch (Phase 4). Fix implemented: added `trpc.useUtils()` to invalidate caches after chatbot mutations based on action types. Tested successfully - creating client via chatbot now updates list automatically without page refresh. Standard tRPC pattern now working throughout the app.
 
 ---
 

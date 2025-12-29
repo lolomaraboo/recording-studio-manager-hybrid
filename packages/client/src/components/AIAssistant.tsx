@@ -33,6 +33,7 @@ export function AIAssistant() {
   const [isLoading, setIsLoading] = useState(false);
 
   const chatMutation = trpc.ai.chat.useMutation();
+  const utils = trpc.useUtils();
 
   // Handle mouse down on header (start dragging) - only in floating mode and not fullscreen
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -160,6 +161,36 @@ export function AIAssistant() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Invalidate tRPC caches based on actions performed by the chatbot
+      if (response.actionsCalled && response.actionsCalled.length > 0) {
+        for (const action of response.actionsCalled) {
+          // Client actions
+          if (action.includes('client')) {
+            utils.clients.list.invalidate();
+          }
+          // Session actions
+          if (action.includes('session')) {
+            utils.sessions.list.invalidate();
+          }
+          // Invoice actions
+          if (action.includes('invoice')) {
+            utils.invoices.list.invalidate();
+          }
+          // Room actions
+          if (action.includes('room')) {
+            utils.rooms.list.invalidate();
+          }
+          // Equipment actions
+          if (action.includes('equipment')) {
+            utils.equipment.list.invalidate();
+          }
+          // Project actions
+          if (action.includes('project')) {
+            utils.projects.list.invalidate();
+          }
+        }
+      }
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage: Message = {
