@@ -129,7 +129,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
 
   // ============================================================================
-  // CLIENTS TOOLS (5)
+  // CLIENTS TOOLS (8)
   // ============================================================================
   {
     name: "get_all_clients",
@@ -234,6 +234,56 @@ export const AI_TOOLS: ToolDefinition[] = [
         },
       },
       required: ["client_id"],
+    },
+  },
+  {
+    name: "get_client_notes",
+    description: "Récupère l'historique daté des notes pour un client spécifique. Retourne les notes en ordre chronologique inversé (plus récentes d'abord).",
+    input_schema: {
+      type: "object",
+      properties: {
+        client_id: {
+          type: "number",
+          description: "ID du client",
+        },
+        limit: {
+          type: "number",
+          description: "Nombre maximum de notes à retourner (défaut: 10)",
+        },
+      },
+      required: ["client_id"],
+    },
+  },
+  {
+    name: "add_client_note",
+    description: "Ajoute une nouvelle note datée pour un client. La note sera horodatée automatiquement.",
+    input_schema: {
+      type: "object",
+      properties: {
+        client_id: {
+          type: "number",
+          description: "ID du client",
+        },
+        note: {
+          type: "string",
+          description: "Contenu de la note (max 2000 caractères)",
+        },
+      },
+      required: ["client_id", "note"],
+    },
+  },
+  {
+    name: "delete_client_note",
+    description: "Supprime une note spécifique par son ID.",
+    input_schema: {
+      type: "object",
+      properties: {
+        note_id: {
+          type: "number",
+          description: "ID de la note à supprimer",
+        },
+      },
+      required: ["note_id"],
     },
   },
 

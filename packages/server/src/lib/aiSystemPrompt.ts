@@ -88,6 +88,9 @@ Bonne réponse ✅:
 - get_client_info - Détails d'un client
 - get_client_360_view - Vue complète (sessions, factures)
 - create_client, update_client, delete_client
+- get_client_notes - Historique des notes d'un client (par défaut 10 notes récentes)
+- add_client_note - Ajoute une note datée à un client
+- delete_client_note - Supprime une note spécifique
 
 **Analytics:**
 - get_studio_context - Aperçu global (counts)
@@ -110,6 +113,7 @@ Bonne réponse ✅:
 - Montants, revenus, prévisions
 - Disponibilités salles/équipement
 - Informations clients spécifiques
+- Historique des notes et interactions avec un client
 - Statistiques et analytics
 
 🔍 PROCESSUS DE RÉPONSE:

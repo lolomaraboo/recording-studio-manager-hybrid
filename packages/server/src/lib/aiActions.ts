@@ -4,6 +4,7 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import {
   sessions,
   clients,
+  clientNotes,
   invoices,
   quotes,
   rooms,
@@ -88,6 +89,15 @@ export class AIActionExecutor {
           break;
         case "delete_client":
           result = await this.delete_client(params as any);
+          break;
+        case "get_client_notes":
+          result = await this.get_client_notes(params as any);
+          break;
+        case "add_client_note":
+          result = await this.add_client_note(params as any);
+          break;
+        case "delete_client_note":
+          result = await this.delete_client_note(params as any);
           break;
 
         // Analytics
@@ -486,6 +496,53 @@ export class AIActionExecutor {
     }
 
     return { deleted: true, id: client_id };
+  }
+
+  /**
+   * Get client notes history
+   */
+  async get_client_notes(params: { client_id: number; limit?: number }) {
+    const { client_id, limit = 10 } = params;
+
+    const notes = await this.db
+      .select()
+      .from(clientNotes)
+      .where(eq(clientNotes.clientId, client_id))
+      .orderBy(desc(clientNotes.createdAt))
+      .limit(limit);
+
+    return notes;
+  }
+
+  /**
+   * Add client note
+   */
+  async add_client_note(params: { client_id: number; note: string }) {
+    const { client_id, note } = params;
+
+    const [newNote] = await this.db
+      .insert(clientNotes)
+      .values({
+        clientId: client_id,
+        note: note,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    return newNote;
+  }
+
+  /**
+   * Delete client note
+   */
+  async delete_client_note(params: { note_id: number }) {
+    const { note_id } = params;
+
+    await this.db
+      .delete(clientNotes)
+      .where(eq(clientNotes.id, note_id));
+
+    return { success: true, id: note_id };
   }
 
   // ============================================================================
