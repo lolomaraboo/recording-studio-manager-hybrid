@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   TrendingUp,
   TrendingDown,
@@ -22,6 +23,7 @@ import {
   Users,
   Target,
   PieChart,
+  ArrowLeft,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -68,11 +70,18 @@ export default function FinancialReports() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Rapports Financiers</h2>
-          <p className="text-muted-foreground">
-            Analyse financière et indicateurs de performance
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Rapports Financiers</h2>
+            <p className="text-muted-foreground">
+              Analyse financière et indicateurs de performance
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Select value={period} onValueChange={(v: any) => setPeriod(v)}>

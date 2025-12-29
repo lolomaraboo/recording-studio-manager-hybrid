@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import {
   MessageSquare,
   Send,
@@ -12,6 +13,7 @@ import {
   MoreVertical,
   Phone,
   Video,
+  ArrowLeft,
 } from "lucide-react";
 
 interface Message {
@@ -120,11 +122,18 @@ export default function Chat() {
   return (
     <div className="h-[calc(100vh-4rem)]">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Messages</h2>
-          <p className="text-muted-foreground">
-            Communiquez avec vos clients et collaborateurs
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Messages</h2>
+            <p className="text-muted-foreground">
+              Communiquez avec vos clients et collaborateurs
+            </p>
+          </div>
         </div>
       </div>
 

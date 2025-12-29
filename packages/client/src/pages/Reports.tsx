@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   FileText,
   Download,
@@ -16,6 +16,7 @@ import {
   BarChart3,
   PieChart,
   Activity,
+  ArrowLeft,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -173,11 +174,18 @@ export default function Reports() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Rapports</h2>
-          <p className="text-muted-foreground">
-            Génération et consultation de rapports d'activité
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Rapports</h2>
+            <p className="text-muted-foreground">
+              Génération et consultation de rapports d'activité
+            </p>
+          </div>
         </div>
         <Button>
           <Download className="mr-2 h-4 w-4" />

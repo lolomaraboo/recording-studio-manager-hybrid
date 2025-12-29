@@ -35,8 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-
-import { Plus, Pencil, Trash2, DoorOpen, CheckCircle2, XCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, Pencil, Trash2, DoorOpen, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 
 type RoomFormData = {
   name: string;
@@ -158,11 +158,18 @@ export default function Rooms() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Salles</h1>
-          <p className="text-muted-foreground">
-            Gérez vos salles d'enregistrement et leurs caractéristiques
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Salles</h1>
+            <p className="text-muted-foreground">
+              Gérez vos salles d'enregistrement et leurs caractéristiques
+            </p>
+          </div>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />

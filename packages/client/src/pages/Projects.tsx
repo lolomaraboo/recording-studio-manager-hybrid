@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 import {
   Music,
   Plus,
@@ -36,6 +37,7 @@ import {
   Edit,
   Trash2,
   Upload,
+  ArrowLeft,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -102,6 +104,11 @@ export default function Projects() {
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
             <div className="flex items-center gap-2">
               <Music className="h-6 w-6 text-primary" />
               <h1 className="text-xl font-semibold">Projets Musicaux</h1>

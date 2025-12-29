@@ -50,8 +50,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Music, Plus, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Music, Plus, Search, Filter, ArrowLeft } from "lucide-react";
 
 type TrackStatus = "recording" | "editing" | "mixing" | "mastering" | "completed";
 
@@ -173,9 +173,16 @@ export default function Tracks() {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Music className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-semibold">Tracks</h1>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <div className="flex items-center gap-2">
+              <Music className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-semibold">Tracks</h1>
+            </div>
           </div>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />

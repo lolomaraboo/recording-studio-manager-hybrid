@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 import {
   Bell,
   Check,
@@ -13,6 +14,7 @@ import {
   AlertCircle,
   Info,
   CheckCircle,
+  ArrowLeft,
 } from "lucide-react";
 
 interface Notification {
@@ -133,16 +135,23 @@ export default function Notifications() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-3xl font-bold tracking-tight">Notifications</h2>
-            {unreadCount > 0 && (
-              <Badge variant="default">{unreadCount} non lues</Badge>
-            )}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-3xl font-bold tracking-tight">Notifications</h2>
+              {unreadCount > 0 && (
+                <Badge variant="default">{unreadCount} non lues</Badge>
+              )}
+            </div>
+            <p className="text-muted-foreground">
+              Gérez vos notifications et alertes
+            </p>
           </div>
-          <p className="text-muted-foreground">
-            Gérez vos notifications et alertes
-          </p>
         </div>
         <Button onClick={markAllAsRead} variant="outline">
           <Check className="mr-2 h-4 w-4" />

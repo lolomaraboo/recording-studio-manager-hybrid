@@ -28,8 +28,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Link } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Music, Mail, Phone, Globe } from "lucide-react";
+import { Plus, Edit, Trash2, Music, Mail, Phone, Globe, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { TALENT_TYPES, TALENT_TYPE_LABELS, type TalentType } from "@rsm/shared";
 
@@ -82,11 +83,18 @@ export default function Talents() {
   return (
     <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Talents</h1>
-          <p className="text-muted-foreground">
-            Gérez votre base de données de talents (musiciens, artistes, etc.)
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Talents</h1>
+            <p className="text-muted-foreground">
+              Gérez votre base de données de talents (musiciens, artistes, etc.)
+            </p>
+          </div>
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />

@@ -33,8 +33,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
-import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Equipment() {
@@ -169,11 +170,18 @@ export default function Equipment() {
   return (
     <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Équipement</h1>
-          <p className="text-muted-foreground mt-2">
-            Gérez votre inventaire d'équipement de studio
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Équipement</h1>
+            <p className="text-muted-foreground mt-2">
+              Gérez votre inventaire d'équipement de studio
+            </p>
+          </div>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />

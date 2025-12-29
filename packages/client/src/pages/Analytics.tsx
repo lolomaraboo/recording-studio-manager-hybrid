@@ -7,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import {
   BarChart3,
   TrendingUp,
@@ -14,6 +16,7 @@ import {
   Users,
   Calendar,
   FileText,
+  ArrowLeft,
 } from "lucide-react";
 
 export default function Analytics() {
@@ -21,11 +24,18 @@ export default function Analytics() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
-          <p className="text-muted-foreground">
-            Analyses approfondies de votre activité
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+            <p className="text-muted-foreground">
+              Analyses approfondies de votre activité
+            </p>
+          </div>
         </div>
         <Select defaultValue="30">
           <SelectTrigger className="w-[180px]">

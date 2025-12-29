@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Users,
   UserPlus,
@@ -42,6 +43,7 @@ import {
   Edit,
   Trash2,
   Ban,
+  ArrowLeft,
 } from "lucide-react";
 
 // Mock team data
@@ -132,11 +134,18 @@ export default function Team() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Équipe</h2>
-          <p className="text-muted-foreground">
-            Gérez les membres de votre studio et leurs permissions
-          </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Équipe</h2>
+            <p className="text-muted-foreground">
+              Gérez les membres de votre studio et leurs permissions
+            </p>
+          </div>
         </div>
         <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
           <DialogTrigger asChild>
