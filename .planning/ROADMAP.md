@@ -191,6 +191,42 @@ Plans:
 
 ---
 
+### Phase 3.5: Password Confirmation Field (INSERTED)
+**Goal**: Add password confirmation field to registration page for improved UX and error prevention
+
+**Depends on**: Phase 3.4 (site testing complete)
+
+**Research**: Unlikely (standard form UX pattern, existing component patterns)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 3.5-01: Add password confirmation field with client-side validation
+
+**Status**: ✅ Complete (Completed 2025-12-28 - 20 min)
+
+**Rationale**: Before marketing launch (Phase 4), improve signup UX by preventing password typos. Standard best practice for account creation forms. Quick win (~20 min) that enhances user experience before driving increased traffic to registration page.
+
+---
+
+### Phase 3.6: Breadcrumb Navigation (INSERTED)
+**Goal**: Add breadcrumb navigation (back arrow to Dashboard) to 12 pages for consistent UX across all admin pages
+
+**Depends on**: Phase 3.5 (password confirmation complete)
+
+**Research**: Unlikely (simple pattern replication from existing pages)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 3.6-01: Add breadcrumb to 12 pages missing back arrow navigation
+
+**Status**: 🟢 Ready to start
+
+**Rationale**: User discovered inconsistent UX - some pages have back arrow to dashboard, others don't. Before marketing launch (Phase 4), ensure all admin pages have consistent navigation patterns. Simple pattern replication (~20 min) that improves discoverability and reduces user confusion.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -291,7 +327,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -302,13 +338,15 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.2. End-to-End Testing (INSERTED) | 2/2 | ✅ Complete | 2025-12-26 |
 | 3.3. Fix Registration Session (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
 | 3.4. Comprehensive Site Testing (INSERTED) | 6/6 | ✅ Complete | 2025-12-27 |
-| 4. Marketing Foundation | 0/3 | 🟢 Ready to start | - |
+| 3.5. Password Confirmation Field (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
+| 3.6. Breadcrumb Navigation (INSERTED) | 0/1 | 🟢 Ready to start | - |
+| 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 18/38 plans complete (47.4%) - All testing phases complete, Phase 4 ready to start
+**Total**: 19/40 plans complete (47.5%) - Phase 3.6 ready to start
 
 ---
 

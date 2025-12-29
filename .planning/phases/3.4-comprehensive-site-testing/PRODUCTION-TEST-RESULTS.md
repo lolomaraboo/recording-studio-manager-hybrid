@@ -1,264 +1,176 @@
-# Production Test Results - UPDATE Operations Backend Fixes
+# Production Testing Results - Phase 3.4
 
-**Test Date:** December 27, 2025
-**Test Environment:** Production (https://recording-studio-manager.com)
-**Server:** VPS (167.99.254.57:3002)
-**Objective:** Verify all backend UPDATE fixes work correctly in production
-
-## Summary
-
-**Overall Status:** ✅ **ALL BACKEND FIXES VERIFIED WORKING**
-
-All backend UPDATE operation fixes have been successfully tested and verified working in production. The Zod transformation pattern (`z.string().optional().transform(...)`) successfully prevents empty string to numeric field conversion errors across all tested routers.
-
-## Fix Applied
-
-**Pattern Used:**
-```typescript
-fieldName: z
-  .string()
-  .optional()
-  .transform((val) => (val === "" || val === undefined ? undefined : val))
-```
-
-**Why It Works:**
-1. Frontend sends `""` for empty numeric fields
-2. Zod `.transform()` converts `""` → `undefined`
-3. Drizzle ORM skips `undefined` fields in UPDATE query
-4. PostgreSQL never receives invalid empty strings
-5. NULL values stored correctly in database
-
-## Test Results by Router
-
-### 1. Projects Router ✅ VERIFIED
-
-**File:** `packages/server/src/routers/projects.ts`
-**Commit:** e3a80b1
-**Fields Fixed:** budget, totalCost
-
-**Test Case:** Update project with empty budget and totalCost
-**Test URL:** https://recording-studio-manager.com/projects/1
-
-**Request:**
-```json
-POST /api/trpc/projects.update
-{
-  "id": 1,
-  "name": "Test Project",
-  "budget": "",
-  "totalCost": ""
-}
-```
-
-**Response:** ✅ **200 OK**
-```json
-{
-  "result": {
-    "data": {
-      "id": 1,
-      "budget": null,
-      "totalCost": null,
-      ...
-    }
-  }
-}
-```
-
-**Database Verification:**
-- `budget` column: `NULL` (not empty string or 0)
-- `totalCost` column: `NULL` (not empty string or 0)
-
-**Previous Behavior:** ❌ 500 Internal Server Error
-**Current Behavior:** ✅ 200 OK with NULL values
-
-**Verdict:** ✅ **FIX CONFIRMED WORKING**
+**Date:** 2025-12-27
+**Environment:** Production (https://recording-studio-manager.com)
+**Status:** ⚠️ MIXED RESULTS - Critical bug found
 
 ---
 
-### 2. Rooms Router ✅ VERIFIED
+## Executive Summary
 
-**File:** `packages/server/src/routers/rooms.ts`
-**Status:** Already correct (uses `z.coerce.number()`)
-**Fields:** hourlyRate, halfDayRate, fullDayRate
+**Objective:** Empirically validate in production that previously reported button timeout errors are actually fixed.
 
-**Test Case:** Update room name and rates
-**Test URL:** https://recording-studio-manager.com/rooms (Room ID: 1)
-
-**Request:**
-```json
-POST /api/trpc/rooms.update
-{
-  "id": 1,
-  "name": "Studio A - Updated",
-  "hourlyRate": "0.00",
-  "halfDayRate": "0.00",
-  "fullDayRate": "0.00",
-  "capacity": 1,
-  ...
-}
-```
-
-**Response:** ✅ **200 OK**
-```json
-{
-  "result": {
-    "data": {
-      "id": 1,
-      "name": "Studio A - Updated",
-      "hourlyRate": "0.00",
-      "halfDayRate": "0.00",
-      "fullDayRate": "0.00",
-      ...
-    }
-  }
-}
-```
-
-**Verdict:** ✅ **FIX CONFIRMED WORKING**
-
-**Note:** Rooms router already used `z.coerce.number()` which automatically handles string-to-number conversion. No Zod transform fix was needed.
+**Key Finding:** Code review was misleading. While most operations work correctly, **Equipment UPDATE (Error #13) returns 500 error** in production despite appearing correct in code.
 
 ---
 
-### 3. Invoices Router ✅ DEPLOYED (Not Tested)
+## Tests Completed
 
-**File:** `packages/server/src/routers/invoices.ts`
-**Commit:** 5a85766
-**Fields Fixed:** subtotal, taxRate, taxAmount, total
+### ✅ Test 1: Rooms CREATE
+- ✅ Room #1 created successfully
+- ✅ All data saved correctly
+- ✅ Dialog closed automatically
 
-**Status:** ✅ Fix deployed to production
-**Testing Status:** ⚠️ Not tested due to frontend form issues (Error #10)
+### ✅ Test 2: Projects CREATE
+- ✅ Project #1 created successfully
+- ✅ Redirect to detail page worked
+- ✅ All fields populated correctly
 
-**Frontend Issue:** Invoice UPDATE button doesn't send requests (useState vs useEffect issue - separate concern)
+### ✅ Test 3: Projects UPDATE (Error #9) ⭐ CRITICAL
+- ✅ Edit mode activated successfully
+- ✅ Modified project name
+- ✅ UPDATE mutation executed
+- ✅ **Title changed from "Projet Test UPDATE" → "Projet Test UPDATE - MODIFIÉ"**
+- ✅ Page exited edit mode cleanly
+- ✅ **Error #9 VERIFIED FIXED in production**
 
-**Backend Protection:** ✅ Backend is protected against empty string errors regardless of frontend behavior
+### ✅ Test 4: Rooms UPDATE (Error #12) ⭐ CRITICAL
+- ✅ Edit mode activated successfully
+- ✅ Modified hourly rate: 50€ → 55€
+- ✅ UPDATE mutation executed successfully
+- ✅ Page exited edit mode cleanly
+- ✅ **Rate updated from "50.00 €" → "55.00 €"**
+- ✅ z.coerce.number() transformation working correctly
+- ✅ **Error #12 VERIFIED FIXED in production**
 
-**Verdict:** ✅ **FIX DEPLOYED AND PROTECTED**
+### ✅ Test 5: Equipment CREATE
+- ✅ Equipment #1 "Microphone Test UPDATE" created successfully
+- ✅ Redirect to detail page worked
+- ✅ All fields populated correctly (Neumann U87, SN123456)
+
+### ❌ Test 6: Equipment UPDATE (Error #13) ⭐ CRITICAL FAILURE
+- ✅ Edit mode activated successfully
+- ✅ Modified equipment name: "Microphone Test UPDATE" → "Microphone Test UPDATE - MODIFIÉ"
+- ❌ **UPDATE mutation FAILED with 500 Internal Server Error**
+- ❌ Page remained in edit mode (mutation didn't execute)
+- ❌ **Error #13 NOT FIXED - Active bug in production**
+- **Network:** `POST /api/trpc/equipment.update` returned 500
+- **Console:** "Failed to load resource: the server responded with a status of 500"
+
+### ✅ Test 7: Tracks CREATE (Error #27) ⭐ CRITICAL
+- ✅ Dialog opened successfully
+- ✅ Selected project "Projet Test UPDATE - MODIFIÉ"
+- ✅ Filled track title "Track Test"
+- ✅ CREATE mutation executed successfully
+- ✅ Dialog closed automatically
+- ✅ **Track appeared in list (Total Tracks: 0 → 1)**
+- ✅ Status correctly set to "Recording"
+- ✅ **Error #27 VERIFIED FIXED in production**
 
 ---
 
-### 4. Quotes Router ✅ DEPLOYED (Not Tested)
+## Tests Blocked
 
-**File:** `packages/server/src/routers/quotes.ts`
-**Commit:** 5a85766
-**Fields Fixed:** subtotal, taxRate, taxAmount, total
+### ⚠️ Sessions CREATE/UPDATE - Datetime Component Issue
+**Blocker:** Custom datetime spinbutton component cannot be filled via browser automation tools
+**Impact:** Cannot test Error #8 (Sessions UPDATE) in automated testing
+**Workaround:** Tested other UPDATE operations (Projects, Rooms) instead
+**Note:** This is a testing limitation, not a production bug
 
-**Status:** ✅ Fix deployed to production
-**Testing Status:** ⚠️ Not tested due to date picker validation issues
+### ⚠️ Quotes CREATE - Datetime Component Issue
+**Blocker:** "Valide jusqu'au" field uses datetime spinbutton component
+**Impact:** Cannot test Error #11 (Quotes z.coerce.date()) in automated testing
+**Note:** This is a testing limitation, not a production bug
 
-**Frontend Issue:** Quote CREATE form requires valid date, date picker has UI issues preventing test data creation
+### ⚠️ Invoices CREATE/UPDATE - Not tested
+**Reason:** Requires client selection, would need complex setup
+**Impact:** Error #10 (Invoices UPDATE) not validated in production
+**Status:** Deferred
 
-**Backend Protection:** ✅ Backend is protected against empty string errors
-
-**Verdict:** ✅ **FIX DEPLOYED AND PROTECTED**
-
----
-
-### 5. Sessions Router ✅ DEPLOYED (Not Tested)
-
-**File:** `packages/server/src/routers/sessions.ts`
-**Commit:** 5a85766
-**Fields Fixed:** totalAmount
-
-**Status:** ✅ Fix deployed to production
-**Testing Status:** ⚠️ Not tested (no test session data available)
-
-**Backend Protection:** ✅ Backend is protected against empty string errors
-
-**Verdict:** ✅ **FIX DEPLOYED AND PROTECTED**
+### ⚠️ AI Chatbot Send - Not tested
+**Reason:** Deferred to focus on CRUD validation
+**Impact:** Error #14 not validated in production
+**Status:** Deferred
 
 ---
 
-## Deployment Status
+## Key Findings
 
-### Backend Commits
-- ✅ **e3a80b1** - Projects router fix (tested & verified)
-- ✅ **5a85766** - Invoices, Quotes, Sessions routers fix (deployed)
+1. **Critical Discovery: Equipment UPDATE is broken**
+   - **Error #13 returns 500 Internal Server Error in production**
+   - Code review claimed it was fixed (useEffect pattern present)
+   - But actual UPDATE mutation fails with 500
+   - This contradicts BUTTON-ERRORS-RESOLUTION.md claims
 
-### Server Status
-- ✅ Server operational on port 3002
-- ✅ All containers running (server, postgres, redis, client)
-- ✅ Docker networking resolved
-- ✅ Health checks passing
+2. **Successfully fixed operations (verified in production):**
+   - ✅ Error #9 (Projects UPDATE) - Empty string transformation works
+   - ✅ Error #12 (Rooms UPDATE) - z.coerce.number() works
+   - ✅ Error #27 (Tracks CREATE) - onClick handlers work
 
-### Production Deployment
-- ✅ All backend fixes deployed to production
-- ✅ No 500 errors observed during testing
-- ✅ NULL values stored correctly in database
+3. **CREATE operations working perfectly:**
+   - ✅ Rooms CREATE
+   - ✅ Projects CREATE
+   - ✅ Equipment CREATE
+   - ✅ Tracks CREATE
 
-## Known Frontend Issues (Separate Concerns)
+4. **Code review was misleading:**
+   - Equipment UPDATE appeared correct in code (useEffect present)
+   - But production testing revealed 500 error
+   - **Lesson: Code review alone is insufficient - need empirical testing**
 
-These frontend issues exist but **do not affect backend fix effectiveness**:
+5. **Testing limitations identified:**
+   - Custom datetime spinbutton components cannot be automated
+   - Blocks testing of Sessions, Quotes, and other date-heavy forms
+   - Manual testing would be required for these
 
-### 1. Invoice Detail Form (Error #10)
-**Issue:** UPDATE button doesn't send request
-**Root Cause:** `useState()` instead of `useEffect()` for form sync
-**Impact:** Cannot test Invoice UPDATE in UI
-**Backend:** Protected against empty strings regardless
+6. **Production data created:**
+   - Room #1: "Studio A - Test" (hourly rate 55€)
+   - Project #1: "Projet Test UPDATE - MODIFIÉ"
+   - Equipment #1: "Microphone Test UPDATE" (Neumann U87, SN123456)
+   - Track #1: "Track Test" (project #1, status Recording)
 
-### 2. Quote CREATE Form
-**Issue:** Date picker validation prevents form submission
-**Root Cause:** Date field required, UI has interaction issues
-**Impact:** Cannot create test quote data
-**Backend:** Protected against empty strings regardless
-
-### 3. Session Detail Form (Error #8)
-**Issue:** UPDATE button doesn't send request
-**Root Cause:** `useState()` instead of `useEffect()` for form sync
-**Impact:** Cannot test Session UPDATE in UI
-**Backend:** Protected against empty strings regardless
-
-**Note:** These frontend issues require separate fixes (replacing `useState` with `useEffect` in form components). They are documented in the original PLAN.md but are independent of the backend fixes.
+---
 
 ## Conclusion
 
-### Success Criteria - All Met ✅
+**Production testing revealed critical discrepancy between code review and actual behavior.**
 
-- ✅ All routers with numeric optional fields have Zod transform or coerce
-- ✅ Projects UPDATE returns 200 OK (verified in production)
-- ✅ Rooms UPDATE returns 200 OK (verified in production)
-- ✅ No 500 errors for empty string numeric fields
-- ✅ Database stores NULL correctly (not empty strings)
-- ✅ All changes committed and documented
-- ✅ All changes deployed to production
-- ✅ Server operational (port 3002)
+### Test Results Summary
+- ✅ **6/7 completed tests passed (86% success rate)**
+- ❌ **1/7 tests failed (Equipment UPDATE - 500 error)**
+- ✅ Error #9 (Projects UPDATE) verified fixed
+- ✅ Error #12 (Rooms UPDATE) verified fixed
+- ✅ Error #27 (Tracks CREATE) verified fixed
+- ❌ **Error #13 (Equipment UPDATE) ACTIVE BUG - not fixed**
 
-### Impact
+### Production Readiness Assessment
 
-**Problems Solved:**
-- ✅ Error #9 (Projects UPDATE) - Verified working
-- ✅ Error #11 (Quotes CREATE/UPDATE) - Backend protected
-- ✅ Error #12 (Rooms UPDATE) - Verified working
+**✅ Safe to use:**
+- All CREATE operations (Rooms, Projects, Equipment, Tracks)
+- Projects UPDATE
+- Rooms UPDATE
+- Tracks CREATE
 
-**Remaining Frontend Issues (Separate):**
-- Error #8 (Sessions UPDATE) - Frontend form issue
-- Error #10 (Invoices UPDATE) - Frontend form issue
-- Error #13 (Equipment UPDATE) - Frontend form issue
+**❌ BROKEN in production:**
+- **Equipment UPDATE** - Returns 500 error, must be fixed before using Equipment detail pages for updates
 
-### Recommendation
+**⚠️ Not validated (automation blocked):**
+- Sessions CREATE/UPDATE (datetime components)
+- Quotes CREATE (datetime components)
+- Invoices CREATE/UPDATE (not tested)
+- AI Chatbot Send (deferred)
 
-**Backend UPDATE fixes are complete and production-ready.**
+### Critical Issue
 
-Frontend form issues (useState vs useEffect) should be addressed in a separate task. The backend is now fully protected against empty string to numeric field conversion errors, ensuring UPDATE operations will succeed when frontend forms are fixed.
+**Equipment UPDATE (Error #13) must be fixed before Phase 4.**
 
-## Files Modified
+The code review incorrectly concluded this was fixed based on the presence of useEffect pattern in EquipmentDetail.tsx. However, empirical testing shows the UPDATE mutation returns 500 Internal Server Error.
 
-**Backend (4 files):**
-- `packages/server/src/routers/projects.ts` - Lines 106-113
-- `packages/server/src/routers/invoices.ts` - Lines 123-138
-- `packages/server/src/routers/quotes.ts` - Lines 88-103
-- `packages/server/src/routers/sessions.ts` - Lines 126-129
+**Root cause unknown** - requires backend investigation of `/api/trpc/equipment.update` endpoint.
 
-**Infrastructure (2 files):**
-- `/root/recording-studio-manager-hybrid/docker-compose.yml` - Port 3001→3002
-- `/root/recording-studio-manager-hybrid/packages/server/Dockerfile` - EXPOSE 3002
+**Recommendation:** **FIX Error #13 before proceeding to Phase 4**
 
-## Next Steps
+---
 
-**Backend work complete.** If frontend testing is desired:
-
-1. Fix frontend form issues (useState → useEffect in detail pages)
-2. Test Invoices, Quotes, Sessions UPDATE operations
-3. Verify all 6 routers working end-to-end
-
-However, **backend fixes are independently verified and production-ready** regardless of frontend testing status.
+**Session Date:** 2025-12-27
+**Testing Tool:** MCP Chrome DevTools (live production testing)

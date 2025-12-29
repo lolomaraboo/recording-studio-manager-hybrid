@@ -25,12 +25,12 @@
 
 ## Current Position
 
-Phase: 3.5 of 8 (Password Confirmation Field) [INSERTED]
+Phase: 3.6 of 8 (Breadcrumb Navigation) [INSERTED]
 Plan: 1 of 1 in current phase
-Status: Complete - UX improvement deployed and tested
-Last activity: 2025-12-28 - Completed 3.5-01-PLAN.md (password confirmation field added and verified)
+Status: Planning complete - Ready to execute
+Last activity: 2025-12-28 - Created 3.6-01-PLAN.md (breadcrumb navigation for 12 pages)
 
-Progress: ███████████████░ 48.7% (19/39 plans complete) - Phase 3.5 complete (1/1)
+Progress: ███████████████░ 47.5% (19/40 plans complete) - Phase 3.6 plan ready
 
 ## Performance Metrics
 
@@ -146,6 +146,17 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Priority: Quality gate ensuring production-ready before public launch (Phase 4)
   - Plans: 3.4-01 (test matrix) → 3.4-02 (execute tests) → 3.4-03 (document errors) → 3.4-04+ (fix critical errors)
   - **Update 2025-12-27:** 3.4-01 complete - Created 600+ item test coverage matrix, MCP Chrome DevTools protocol, error tracking system
+- **2025-12-28:** Phase 3.5 inserted after Phase 3.4 - "Password Confirmation Field" (INSERTED)
+  - Reason: UX improvement to prevent password typos during registration
+  - Impact: Standard best practice for account creation forms
+  - Duration: ~20 min (client-side validation, quick deployment)
+  - Priority: Pre-launch UX polish before marketing (Phase 4)
+- **2025-12-28:** Phase 3.6 inserted after Phase 3.5 - "Breadcrumb Navigation" (INSERTED)
+  - Reason: User discovered inconsistent UX - some pages have back arrow to dashboard, others don't
+  - Impact: 12 pages missing breadcrumb navigation (Talents, Team, Rooms, Equipment, FinancialReports, Analytics, Reports, Projects, Tracks, Shares, Chat, Notifications)
+  - Approach: Replicate breadcrumb pattern from Clients.tsx to all 12 pages
+  - Duration: ~20 min (simple pattern replication)
+  - Priority: Pre-launch UX consistency before marketing (Phase 4)
 
 ### Blockers/Concerns Carried Forward
 
