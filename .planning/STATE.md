@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 3.8.3 of 8 (Fix Chatbot Date Awareness - Add Current Date to System Context) [URGENT]
+Phase: 3.8.4 of 8 (Implement RAG with Qdrant for Chatbot Long-Term Memory) [INSERTED]
 Plan: 1 of 1 in current phase
-Status: ✅ COMPLETE - Date+time+timezone awareness added, chatbot has full temporal context
-Last activity: 2025-12-29 - Phase 3.8.3-01 complete (chatbot knows date, time, and user timezone)
+Status: ✅ COMPLETE - Qdrant infrastructure deployed, collection configured for multi-tenant RAG
+Last activity: 2025-12-29 - Phase 3.8.4-01 complete (Qdrant Docker + collection ready for embeddings)
 
-Progress: ████████████████░ 54.8% (23/42 plans complete) - Phase 3.8.3 complete, chatbot fully production-ready
+Progress: █████████████████ 57.1% (24/42 plans complete) - Qdrant infrastructure ready, chatbot scalable memory foundation established
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
-- Average duration: 36.0 min (Phase 3.1 skewed by infrastructure debugging)
-- Total execution time: 13.6 hours
+- Total plans completed: 24
+- Average duration: 34.8 min (Phase 3.1 skewed by infrastructure debugging)
+- Total execution time: 13.8 hours
 
 **By Phase:**
 
@@ -54,10 +54,11 @@ Progress: ████████████████░ 54.8% (23/42 plans
 | 3.8.1 | 1/1 | 65 min | 65 min |
 | 3.8.2 | 1/1 | 7 min | 7 min |
 | 3.8.3 | 1/1 | 33 min | 33 min |
+| 3.8.4 | 1/1 | 14 min | 14 min |
 
 **Recent Trend:**
-- Last 5 plans: [20 min, 70 min, 65 min, 7 min, 33 min]
-- Trend: Date/timezone enhancement ~33 min, Quick localStorage fix ~7 min, UX improvements ~20 min, deployment debugging with Docker rebuilds ~65-70 min
+- Last 5 plans: [70 min, 65 min, 7 min, 33 min, 14 min]
+- Trend: Infrastructure setup (Qdrant) ~14 min, Date/timezone ~33 min, Quick localStorage fix ~7 min, deployment debugging ~65-70 min
 
 ## Accumulated Context
 
@@ -111,6 +112,9 @@ Progress: ████████████████░ 54.8% (23/42 plans
 | 3.1 | Port 3002 vs debugging 3001 | Changed production port instead of debugging orphaned docker-proxy processes. Pragmatic choice - faster deployment, equally effective. |
 | 3.1 | Google DNS in daemon.json | Use 8.8.8.8 instead of host resolver for container DNS. systemd-resolved (127.0.0.53) doesn't work inside Docker containers on Ubuntu 24.04. |
 | 3.8.1 | Docker rebuild deployment strategy | Client container builds from source (not pre-built dist/), so deployment requires: rsync source → rebuild image → restart container. Discovered after attempting dist/ rsync (files not served due to baked-in image). |
+| 3.8.4 | Shared Qdrant infrastructure | Reused existing Qdrant Docker container (running for 6 weeks, shared with mem0-api) instead of creating dedicated instance. Payload-based multi-tenancy via organizationId filtering ensures secure isolation. |
+| 3.8.4 | OpenAI text-embedding-3-small | Selected for 5x cost efficiency ($0.02 vs $0.10/M tokens) compared to ada-002, same quality at 1536 dimensions. |
+| 3.8.4 | Payload-based multi-tenancy | Official Qdrant best practice - single collection with organizationId filters instead of separate collections per tenant. Better performance and simpler management. |
 
 ### Deferred Issues
 
@@ -193,6 +197,15 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Impact: Chatbot unable to answer "schedule for tomorrow", "this week", or provide date-aware responses
   - Solution: Add current date to Claude API system prompt in backend (e.g., "Today is 2025-12-29")
   - Priority: URGENT - UX issue affecting chatbot utility before marketing launch (Phase 4)
+- **2025-12-29:** Phase 3.8.4 inserted after Phase 3.8.3 - "Implement RAG with Qdrant for Chatbot Long-Term Memory" (INSERTED)
+  - Reason: User requested RAG implementation to enable scalable long-term memory for chatbot
+  - Impact: Replace full conversation history loading with semantic search for 500+ message conversations
+  - Current limitation: Context window approach loads ALL messages, doesn't scale beyond 50-100 messages
+  - Proposed solution: Qdrant vector database + embeddings for semantic retrieval of relevant messages
+  - Benefits: Cross-session memory, token efficiency, better context relevance
+  - Trade-offs: Infrastructure complexity (self-host Docker on VPS = €0 OR Qdrant Cloud free tier 1GB), development time (3-5 days)
+  - Infrastructure options: (1) Self-hosted Docker on existing VPS Hostinger (€0 extra), (2) Qdrant Cloud free tier (1GB, ~1M vectors)
+  - Priority: ENHANCEMENT - Evaluate necessity before marketing launch (Phase 4)
 
 ### Blockers/Concerns Carried Forward
 
@@ -243,19 +256,18 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-29T02:31:28Z
-Stopped at: Phase 3.8.1 inserted - Critical chatbot bug discovered during Phase 3.8 testing
+Last session: 2025-12-29T06:04:33Z
+Stopped at: Phase 3.8.4-01 complete - Qdrant infrastructure deployed successfully
 Resume context:
-  - Executed Phase 3.8-01 (chatbot memory verification) - testing stopped at Turn 2
-  - CRITICAL BUG DISCOVERED: Chatbot creates new session for each message (complete memory loss)
-  - Root cause identified: Frontend AIAssistant.tsx never sends sessionId to backend
-  - Turn 1: Created client "John Smith" (sessionId: session_1766975522813_6c7oygc34)
-  - Turn 2: Asked "What was the name I just mentioned?" → New session created (session_1766975657754_e8y9f2hfk)
-  - Response: "You didn't mention any specific name" - MEMORY FAILURE CONFIRMED
-  - Created Phase 3.8.1 to fix sessionId persistence bug (15-20 min fix)
-  - Summary documented: .planning/phases/3.8-verifier-chatbot-memoire/3.8-01-SUMMARY.md
-  - Screenshot captured: turn-2-memory-failure.png
-  - Network analysis completed (confirmed sessionId missing from requests)
-  - Phase 3.8.1 inserted (0/0 plans) - Ready to plan
-  - Next: /gsd:plan-phase 3.8.1
-Resume file: .planning/phases/3.8.1-fix-chatbot-sessionid-persistence-bug/
+  - Executed Phase 3.8.4-01: Qdrant Infrastructure Setup
+  - Discovered existing Qdrant container (running 6+ weeks, shared with mem0-api)
+  - Installed 6 RAG dependencies (@qdrant/js-client-rest, @langchain/qdrant, @langchain/openai, @langchain/core, langchain, tiktoken)
+  - Created singleton Qdrant client wrapper (packages/server/src/lib/rag/qdrantClient.ts)
+  - Implemented collection initialization (packages/server/src/lib/rag/index.ts)
+  - Collection "chatbot_memory" created: 1536 dimensions, Cosine distance, HNSW indexing
+  - Payload indexes: organizationId (integer), timestamp (datetime) for multi-tenant filtering
+  - Server startup integrated Qdrant initialization (graceful error handling if unavailable)
+  - Commit: c22ca64b32c13e4bf4fe4b93b807660df69729fb
+  - Duration: 14 min (fast execution, infrastructure mostly existed)
+  - Next: Ready for Phase 3.8.4 Plan 2 (implement embedding service + vector storage)
+Resume file: None (phase incomplete - 1 plan completed, more work needed for full RAG integration)

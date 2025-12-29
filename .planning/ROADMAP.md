@@ -357,6 +357,61 @@ Plans:
 
 ---
 
+### Phase 3.8.4: Implement RAG with Qdrant for Chatbot Long-Term Memory (INSERTED)
+
+**Goal:** Replace full conversation history loading with RAG (Retrieval-Augmented Generation) using Qdrant vector database for scalable long-term memory
+
+**Depends on:** Phase 3.8.3 (date awareness complete)
+
+**Research:** Likely (Qdrant vector database integration, embedding generation, semantic search patterns)
+
+**Research topics:**
+- Qdrant deployment: Self-hosted Docker on VPS vs Cloud free tier (1GB)
+- Qdrant client library for TypeScript/Node.js
+- Embedding models (OpenAI text-embedding-ada-002 vs Anthropic vs open-source)
+- Vector similarity search strategies (cosine vs dot product)
+- Conversation chunking strategies (message-level vs turn-level)
+- Hybrid search (vector + metadata filtering)
+- Memory retention policies (time-based, importance-based)
+
+**Plans:** 1+ plans (infrastructure deployed, embedding integration pending)
+
+Plans:
+- [x] 3.8.4-01: Qdrant Infrastructure Setup (Completed 2025-12-29 - 14 min)
+- [ ] 3.8.4-02+: TBD (Embedding service, vector storage, hybrid retrieval)
+
+**Details:**
+[To be added during planning]
+
+**Current Architecture (Context Window Approach):**
+- Loads ALL conversation messages from PostgreSQL (ai.ts:67-79)
+- Sends complete history to Claude API (ai.ts:88-92)
+- No embeddings or semantic search
+- Scalability limit: ~50-100 messages per conversation
+
+**Proposed RAG Architecture:**
+- Store message embeddings in Qdrant vector database
+- Semantic search retrieves top-k relevant messages (not all)
+- Reduces token usage for long conversations
+- Enables cross-session memory (search across ALL past conversations)
+- Supports long-term preferences and context retention
+
+**Benefits:**
+- Scalability: Handle 500+ message conversations efficiently
+- Token efficiency: Retrieve only relevant context (5-10 messages vs full history)
+- Cross-session memory: "Remember my preferences from last month"
+- Better context: Semantic relevance vs chronological order
+
+**Trade-offs:**
+- Added complexity: Vector database, embedding generation
+- Infrastructure: Self-host on existing VPS (€0 extra) OR use Qdrant Cloud free tier (1GB)
+- Development time: 3-5 days vs current zero-cost approach
+- Latency: Embedding + search adds ~200-500ms per request
+
+**Rationale:** Current chatbot loads entire conversation history (Phase 3.8.2), which works for short conversations but doesn't scale beyond 50-100 messages. RAG enables true long-term memory: chatbot can recall preferences from months ago, search across all past sessions, and handle extended conversations without token limits. Critical for power users who have 100+ message conversations or want persistent preferences across sessions. Before marketing launch (Phase 4), evaluate if RAG complexity is justified vs current simple approach.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -457,7 +512,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -471,15 +526,18 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.5. Password Confirmation Field (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
 | 3.6. Breadcrumb Navigation (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
 | 3.7. AI Chatbot Cache Invalidation (INSERTED) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8. Vérifier Chatbot Mémoire (INSERTED) | 0/1 | ⏳ Planned | - |
-| 3.8.1. Fix Chatbot SessionId Bug (URGENT) | 0/0 | ⏳ Not planned | - |
+| 3.8. Vérifier Chatbot Mémoire (INSERTED) | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.1. Fix Chatbot SessionId Bug (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.2. Persist SessionId localStorage (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.3. Fix Chatbot Date Awareness (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.4. Implement RAG with Qdrant (INSERTED) | 1/1+ | 🔄 In progress | 2025-12-29 |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 20/42 plans complete (47.6%) - Phase 3.8 ready to execute
+**Total**: 24/42 plans complete (57.1%) - Phase 3.8.4 in progress (infrastructure deployed)
 
 ---
 
