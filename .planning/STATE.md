@@ -25,12 +25,12 @@
 
 ## Current Position
 
-Phase: 3.6 of 8 (Breadcrumb Navigation) [INSERTED] - COMPLETE
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase 3.6 complete - Ready for Phase 4 (Marketing Foundation)
-Last activity: 2025-12-28 - Completed 3.6-01 (breadcrumb navigation deployed and verified)
+Phase: 3.7 of 8 (AI Chatbot Cache Invalidation) [INSERTED]
+Plan: 1 of 1 in current phase
+Status: Planning complete - Ready to execute
+Last activity: 2025-12-28 - Created 3.7-01-PLAN.md (fix chatbot cache invalidation)
 
-Progress: ████████████████ 50% (20/40 plans complete) - Phase 3.6 complete
+Progress: ████████████████ 50% (20/40 plans complete) - Phase 3.7 plan ready
 
 ## Performance Metrics
 
@@ -158,6 +158,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Approach: Replicate breadcrumb pattern from Clients.tsx to all 12 pages
   - Duration: ~20 min (simple pattern replication)
   - Priority: Pre-launch UX consistency before marketing (Phase 4)
+- **2025-12-28:** Phase 3.7 inserted after Phase 3.6 - "AI Chatbot Cache Invalidation" (INSERTED)
+  - Reason: User discovered UX bug - after creating client via chatbot, must refresh page to see it in list
+  - Impact: All chatbot mutations (create/update/delete clients, sessions, invoices, etc.) don't update UI automatically
+  - Root cause: AIAssistant.tsx doesn't invalidate tRPC caches after chatbot actions
+  - Solution: Add `trpc.useUtils()` and invalidate appropriate queries based on action type
+  - Duration: ~20-30 min (standard tRPC pattern)
+  - Priority: Critical UX bug before marketing launch (Phase 4)
 
 ### Blockers/Concerns Carried Forward
 
