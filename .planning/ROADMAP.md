@@ -470,6 +470,49 @@ Plans:
 
 ---
 
+### Phase 3.9.1: Notes avec historique daté pour clients (INSERTED)
+
+**Goal:** Transform client notes from simple textarea to dated history system with timestamped entries
+
+**Depends on:** Phase 3.9 (Super Admin Dashboard complete)
+
+**Research:** Unlikely (standard CRUD pattern with timestamps, UI component patterns)
+
+**Plans:** 2 plans
+
+Plans:
+- [x] 3.9.1-01: Backend infrastructure (client_notes table, tRPC router, migration) (Completed 2025-12-29 - 8 min)
+- [ ] 3.9.1-02: Frontend UI (notes timeline, creation form, deletion)
+
+**Details:**
+
+**Current Implementation:**
+- Single `notes` text field in clients table (ClientDetail.tsx:119, 131, 145, 472)
+- Simple textarea that overwrites previous note on each save
+- No timestamps, no history, no audit trail
+
+**Proposed Enhancement:**
+- New `client_notes` table with schema:
+  - id (primary key)
+  - clientId (foreign key to clients)
+  - note (text content)
+  - createdAt (timestamp)
+  - createdBy (userId - future proofing for multi-user)
+- UI showing chronological list of all notes with dates
+- Add new note input field + save button
+- Display notes in reverse chronological order (newest first)
+- Keep existing notes field for backward compatibility during migration
+
+**Benefits:**
+- Track when communication/decisions were made
+- Full audit trail of client interactions
+- Better client relationship management
+- Professional client detail page
+
+**Rationale:** Before marketing launch (Phase 4), improve client management UX. Current single-note field loses historical context when updated. Sales teams and studio managers need to track conversation history over time. Dated notes = professional CRM feature that differentiates from basic contact management.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -570,7 +613,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 3.9 (INSERTED) → 3.9.1 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -588,14 +631,16 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.8.1. Fix Chatbot SessionId Bug (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
 | 3.8.2. Persist SessionId localStorage (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
 | 3.8.3. Fix Chatbot Date Awareness (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8.4. Implement RAG with Qdrant (INSERTED) | 1/1+ | 🔄 In progress | 2025-12-29 |
+| 3.8.4. Implement RAG with Qdrant (INSERTED) | 2/3 | 🔄 In progress | 2025-12-29 |
+| 3.9. Super Admin Dashboard (INSERTED) | 2/2 | ✅ Complete | 2025-12-29 |
+| 3.9.1. Notes avec historique daté (INSERTED) | 1/2 | ⏳ In progress | 2025-12-29 |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 25/42 plans complete (59.5%) - Phase 3.8.4 in progress (RAG pipeline built)
+**Total**: 28/45+ plans complete (62.2%) - Phase 3.9 complete, Phase 3.9.1 to be planned
 
 ---
 

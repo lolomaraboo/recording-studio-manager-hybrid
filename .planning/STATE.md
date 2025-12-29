@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 3.9 of 8 (Super Admin Dashboard - Monitoring Services et Gestion Base de Données) [INSERTED]
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2025-12-29 - Completed 3.9-02-PLAN.md (Frontend Dashboard UI)
+Phase: 3.9.1 of 8 (Notes avec historique daté pour clients) [INSERTED]
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2025-12-29 - Completed 3.9.1-01-PLAN.md (Backend notes infrastructure)
 
-Progress: ██████████████████░ 66.7% (28/42 plans complete) - SuperAdmin Dashboard complete - dedicated sidebar, Services/Database/Logs pages deployed
+Progress: ██████████████████░ 69.0% (29/42 plans complete) - Client notes history backend complete, ready for frontend UI
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 28
-- Average duration: 36.4 min (Phase 3.1 skewed by infrastructure debugging)
-- Total execution time: 16.5 hours
+- Total plans completed: 29
+- Average duration: 35.2 min
+- Total execution time: 17.0 hours
 
 **By Phase:**
 
@@ -56,10 +56,11 @@ Progress: ██████████████████░ 66.7% (28/42
 | 3.8.3 | 1/1 | 33 min | 33 min |
 | 3.8.4 | 3/3 | 26 min | 8.7 min |
 | 3.9 | 2/2 | 157 min | 78.5 min |
+| 3.9.1 | 1/2 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: [14 min, 3 min, 9 min, 7 min, 150 min]
-- Trend: SuperAdmin frontend took 2h30min including deployment troubleshooting and architecture restructuring per user feedback
+- Last 5 plans: [3 min, 9 min, 7 min, 150 min, 8 min]
+- Trend: Backend infrastructure plans remain efficient (8-14 min), frontend deployment plans slower (70-150 min) due to Docker rebuild workflow
 
 ## Accumulated Context
 
@@ -213,6 +214,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Trade-offs: Infrastructure complexity (self-host Docker on VPS = €0 OR Qdrant Cloud free tier 1GB), development time (3-5 days)
   - Infrastructure options: (1) Self-hosted Docker on existing VPS Hostinger (€0 extra), (2) Qdrant Cloud free tier (1GB, ~1M vectors)
   - Priority: ENHANCEMENT - Evaluate necessity before marketing launch (Phase 4)
+- **2025-12-29:** Phase 3.9.1 inserted after Phase 3.9 - "Notes avec historique daté pour clients" (INSERTED)
+  - Reason: User requested dated notes history feature - "je voudrais qu'on puisse prendre une note la sauvegarder, et ainsi avoir un historique daté de toutes les notes"
+  - Impact: Transform single notes field into timestamped history system for better client relationship management
+  - Current limitation: Single textarea overwrites previous notes, no history, no timestamps
+  - Proposed solution: New client_notes table with timestamps, chronological display, audit trail
+  - Benefits: Track communication history, professional CRM feature, better client management
+  - Priority: UX ENHANCEMENT - Professional feature before marketing launch (Phase 4)
 
 ### Blockers/Concerns Carried Forward
 
@@ -263,17 +271,15 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-29T09:51:46Z
-Stopped at: Completed 3.9-02-PLAN.md (Phase 3.9 COMPLETE)
+Last session: 2025-12-29T18:12:45Z
+Stopped at: Completed 3.9.1-01-PLAN.md (Backend notes infrastructure)
 Resume context:
-  - Executed Phase 3.9-02: Frontend SuperAdmin Dashboard UI (150 min)
-  - Created SuperAdminLayout.tsx with dedicated sidebar (per user request)
-  - Split into 3 separate pages: Services.tsx, Database.tsx, Logs.tsx
-  - Implemented SuperAdminRoute for access control (VITE_SUPERADMIN_EMAIL check)
-  - Deployed to production: https://recording-studio-manager.com/superadmin
-  - Fixed missing SUPERADMIN_EMAIL env var in docker-compose.yml
-  - Database tab fully functional (orgs, users, tenant stats)
-  - Services/Logs tabs UI ready (data pending Docker socket access)
-  - Commits: 2c55a9f (frontend), files synced from VPS
-  - Next: Phase 3.9 COMPLETE - ready for next phase in roadmap
+  - Executed Phase 3.9.1-01: Backend API for dated client notes history (8 min)
+  - Created client_notes table with timestamps and audit trail
+  - Built tRPC router with create/list/delete operations (packages/server/src/routers/clientNotes.ts)
+  - Enhanced clients router to include notes metadata (notesCount, lastNoteDate)
+  - Applied migration to production: tenant_org_1, tenant_2, tenant_3
+  - Migration file: drizzle/migrations/0007_calm_songbird.sql
+  - Commit: 81b0cd8 (backend infrastructure)
+  - Next: 3.9.1-02-PLAN.md (Frontend UI Implementation - notes timeline, creation form, deletion)
 Resume file: None
