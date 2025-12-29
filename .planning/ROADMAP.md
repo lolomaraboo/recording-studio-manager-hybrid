@@ -338,6 +338,25 @@ Phase 3.8.2-01 successfully implemented localStorage persistence for chatbot ses
 
 ---
 
+### Phase 3.8.3: Fix Chatbot Date Awareness - Add Current Date to System Context (INSERTED)
+
+**Goal:** Add current date+time with user timezone to chatbot system context for full temporal awareness in scheduling queries
+
+**Depends on:** Phase 3.8.2 (chatbot persistence complete)
+
+**Research:** Unlikely (backend modification to inject date/time into Claude API system prompt)
+
+**Plans:** 1 plan
+
+Plans:
+- [x] 3.8.3-01: Add date+time+timezone awareness to system prompt (Completed 2025-12-29)
+
+**Status**: ✅ Complete (Completed 2025-12-29 - 33 min)
+
+**Rationale**: User reported chatbot doesn't know today's date. Enhanced implementation to include not just date but also time and user's timezone from organization settings. Chatbot now understands "quelle heure est-il", "dans 2 heures", "demain matin à 10h", etc. Critical for scheduling-related queries before marketing launch (Phase 4).
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 

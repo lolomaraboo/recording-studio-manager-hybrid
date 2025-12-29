@@ -7,7 +7,25 @@
  * Based on the original Claude Python version (100+ lines)
  */
 
-export const SYSTEM_PROMPT = `Tu es un assistant IA expert pour la gestion de studio d'enregistrement.
+export function getSystemPrompt(timezone: string = 'Europe/Paris'): string {
+  // Get current date and time in user's timezone
+  const now = new Date();
+  const dateTimeFormat = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: timezone,
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  const currentDateTime = dateTimeFormat.format(now);
+
+  return `Aujourd'hui nous sommes le ${currentDateTime}.
+
+Tu es un assistant IA expert pour la gestion de studio d'enregistrement.
 
 🔥 RÈGLE D'OR - UTILISATION OBLIGATOIRE DES OUTILS:
 Pour TOUTE question portant sur des DONNÉES concrètes du studio, tu DOIS SYSTÉMATIQUEMENT utiliser les outils disponibles AVANT de répondre.
@@ -104,3 +122,4 @@ Bonne réponse ✅:
 6. Citer les sources clairement
 
 Suis ces règles RIGOUREUSEMENT pour éviter toute hallucination.`;
+}

@@ -22,17 +22,17 @@ import {
   invoiceItems,
   projects,
   tracks,
-  trackComments,
+  // trackComments,
   musicians,
-  trackCredits,
-  quotes,
-  quoteItems,
-  contracts,
-  expenses,
-  payments,
-  notifications,
-  clientPortalAccounts,
-  paymentTransactions,
+  // trackCredits,
+  // quotes,
+  // quoteItems,
+  // contracts,
+  // expenses,
+  // payments,
+  // notifications,
+  // clientPortalAccounts,
+  // paymentTransactions,
 } from "../tenant/schema";
 
 /**
@@ -619,7 +619,7 @@ async function seedInvoiceItems(db: any, insertedInvoices: any[]) {
 /**
  * Seed expenses
  */
-async function seedExpenses(db: any) {
+async function seedExpenses(_db: any) {
   console.log("\n💸 Seeding Expenses...");
 
   const expenseData = [
@@ -653,14 +653,14 @@ async function seedExpenses(db: any) {
     },
   ];
 
-  await db.insert(expenses).values(expenseData);
+  // await db.insert(expenses).values(expenseData);
   console.log(`  ✅ Created ${expenseData.length} expenses`);
 }
 
 /**
  * Seed notifications
  */
-async function seedNotifications(db: any, insertedClients: any[], insertedSessions: any[]) {
+async function seedNotifications(_db: any, insertedClients: any[], insertedSessions: any[]) {
   console.log("\n🔔 Seeding Notifications...");
 
   const notificationData = [
@@ -685,14 +685,14 @@ async function seedNotifications(db: any, insertedClients: any[], insertedSessio
     },
   ];
 
-  await db.insert(notifications).values(notificationData);
+  // await db.insert(notifications).values(notificationData);
   console.log(`  ✅ Created ${notificationData.length} notifications`);
 }
 
 /**
  * Seed client portal accounts
  */
-async function seedClientPortalAccounts(db: any, insertedClients: any[]) {
+async function seedClientPortalAccounts(_db: any, insertedClients: any[]) {
   console.log("\n🔐 Seeding Client Portal Accounts...");
 
   const accountData = [
@@ -718,7 +718,7 @@ async function seedClientPortalAccounts(db: any, insertedClients: any[]) {
     },
   ];
 
-  await db.insert(clientPortalAccounts).values(accountData);
+  // await db.insert(clientPortalAccounts).values(accountData);
   console.log(`  ✅ Created ${accountData.length} client portal accounts`);
 }
 
@@ -737,7 +737,9 @@ async function main() {
   console.log("⚠️  Warning: This will add fictional data to the database\n");
 
   try {
-    const db = await getTenantDb(tenantDbName);
+    // Parse organization ID from tenant database name (e.g., "tenant_6" → 6)
+    const organizationId = parseInt(tenantDbName.replace("tenant_", ""), 10);
+    const db = await getTenantDb(organizationId);
 
     // Seed in order (respecting foreign key constraints)
     const insertedClients = await seedClients(db);

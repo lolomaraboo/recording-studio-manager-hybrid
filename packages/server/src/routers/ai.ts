@@ -2,11 +2,13 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../_core/trpc";
 import { aiConversations, aiActionLogs } from "@rsm/database/tenant";
+import { organizations } from "@rsm/database/master";
 import { eq, desc } from "drizzle-orm";
+import { getMasterDb } from "@rsm/database/connection";
 import { getLLMProvider } from "../lib/llmProvider";
 import { AIActionExecutor } from "../lib/aiActions";
 import { AI_TOOLS } from "../lib/aiTools";
-import { SYSTEM_PROMPT } from "../lib/aiSystemPrompt";
+import { getSystemPrompt } from "../lib/aiSystemPrompt";
 import { HallucinationDetector } from "../lib/hallucinationDetector";
 
 /**
@@ -46,6 +48,16 @@ export const aiRouter = router({
       // Generate or reuse session ID
       const sessionId = inputSessionId || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+      // Load organization to get user's timezone
+      const masterDb = await getMasterDb();
+      const organization = await masterDb
+        .select()
+        .from(organizations)
+        .where(eq(organizations.id, ctx.organizationId!))
+        .limit(1);
+
+      const userTimezone = organization[0]?.timezone || 'Europe/Paris';
+
       // Get LLM provider
       const llm = getLLMProvider();
 
@@ -80,10 +92,10 @@ export const aiRouter = router({
       }));
 
       try {
-        // Call LLM with tools
+        // Call LLM with tools (using user's timezone for date/time context)
         const llmResponse = await llm.chatCompletion({
           messages: llmMessages,
-          systemPrompt: SYSTEM_PROMPT,
+          systemPrompt: getSystemPrompt(userTimezone),
           temperature: 0.7,
           maxTokens: 4096,
           tools: AI_TOOLS,
@@ -157,7 +169,7 @@ export const aiRouter = router({
 
             const followUpResponse = await llm.chatCompletion({
               messages: followUpMessages,
-              systemPrompt: SYSTEM_PROMPT,
+              systemPrompt: getSystemPrompt(userTimezone),
               temperature: 0.7,
               maxTokens: 4096,
             });
