@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -215,8 +215,10 @@ export function Clients() {
                             )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link to={`/clients/${client.id}`}>Voir</Link>
+                            <Button variant="ghost" size="icon" asChild>
+                              <Link to={`/clients/${client.id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
                             </Button>
                           </TableCell>
                         </TableRow>
