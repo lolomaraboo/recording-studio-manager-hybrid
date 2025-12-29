@@ -10,6 +10,9 @@ import { AIActionExecutor } from "../lib/aiActions";
 import { AI_TOOLS } from "../lib/aiTools";
 import { getSystemPrompt } from "../lib/aiSystemPrompt";
 import { HallucinationDetector } from "../lib/hallucinationDetector";
+import { retrieveConversationContext } from "../lib/rag/memoryRetriever";
+import { chunkConversation } from "../lib/rag/conversationChunker";
+import { storeConversationChunks } from "../lib/rag/vectorStore";
 
 /**
  * AI Chatbot Router
@@ -64,18 +67,17 @@ export const aiRouter = router({
       // Create AI action executor with tenant DB
       const actionExecutor = new AIActionExecutor(tenantDb);
 
-      // Load conversation history if session exists
+      // Load conversation context with conditional RAG strategy
+      // - Recent context (15 messages) always loaded
+      // - RAG retrieval added only if memory keywords detected
       let conversationHistory: any[] = [];
       if (inputSessionId) {
-        const existingConversations = await tenantDb
-          .select()
-          .from(aiConversations)
-          .where(eq(aiConversations.sessionId, inputSessionId))
-          .limit(1);
-
-        if (existingConversations.length > 0) {
-          conversationHistory = JSON.parse(existingConversations[0].messages || "[]");
-        }
+        conversationHistory = await retrieveConversationContext(
+          inputSessionId,
+          message,
+          ctx.organizationId!,
+          tenantDb
+        );
       }
 
       // Add user message to history
@@ -239,6 +241,25 @@ export const aiRouter = router({
             actionsCalled: actionsCalled.length > 0 ? JSON.stringify(actionsCalled) : null,
           });
         }
+
+        // Store in Qdrant asynchronously (don't block chatbot response)
+        // Only store last 2 messages (user + assistant from this turn)
+        const newMessages = conversationHistory.slice(-2).map((m, i) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+          timestamp: m.timestamp || new Date().toISOString(),
+        }));
+
+        // Fire-and-forget: store in background (don't await)
+        chunkConversation(newMessages, sessionId, ctx.organizationId!)
+          .then((chunks) => storeConversationChunks(chunks))
+          .then((count) => {
+            console.log(`[Chatbot] Stored ${count} chunks in Qdrant for session ${sessionId}`);
+          })
+          .catch((error) => {
+            console.error("[Chatbot] Failed to store in Qdrant:", error);
+            // Don't throw - vector storage is non-critical, PostgreSQL is source of truth
+          });
 
         // Return response
         return {

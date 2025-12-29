@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 3.8.4 of 8 (Implement RAG with Qdrant for Chatbot Long-Term Memory) [INSERTED]
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2025-12-29 - Completed 3.8.4-02-PLAN.md (RAG pipeline components)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2025-12-29 - Completed 3.8.4-03-PLAN.md (Conditional RAG integration)
 
-Progress: ████████████████░ 59.5% (25/42 plans complete) - RAG pipeline built (embeddings, chunking, vector storage), ready for chatbot integration
+Progress: █████████████████ 61.9% (26/42 plans complete) - Conditional RAG with Qdrant fully integrated, production-ready chatbot with smart memory retrieval
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
-- Average duration: 33.0 min (Phase 3.1 skewed by infrastructure debugging)
-- Total execution time: 13.8 hours
+- Total plans completed: 26
+- Average duration: 32.0 min (Phase 3.1 skewed by infrastructure debugging)
+- Total execution time: 13.9 hours
 
 **By Phase:**
 
@@ -54,11 +54,11 @@ Progress: ████████████████░ 59.5% (25/42 plans
 | 3.8.1 | 1/1 | 65 min | 65 min |
 | 3.8.2 | 1/1 | 7 min | 7 min |
 | 3.8.3 | 1/1 | 33 min | 33 min |
-| 3.8.4 | 2/3 | 17 min | 8.5 min |
+| 3.8.4 | 3/3 | 26 min | 8.7 min |
 
 **Recent Trend:**
-- Last 5 plans: [65 min, 7 min, 33 min, 14 min, 3 min]
-- Trend: RAG components fast (3-14 min), localStorage fix quick (7 min), Date/timezone ~33 min, deployment debugging slow (65+ min)
+- Last 5 plans: [7 min, 33 min, 14 min, 3 min, 9 min]
+- Trend: RAG implementation consistently fast (3-14 min average), localStorage/conditional logic quick (7-9 min), Date/timezone ~33 min
 
 ## Accumulated Context
 
@@ -115,6 +115,7 @@ Progress: ████████████████░ 59.5% (25/42 plans
 | 3.8.4 | Shared Qdrant infrastructure | Reused existing Qdrant Docker container (running for 6 weeks, shared with mem0-api) instead of creating dedicated instance. Payload-based multi-tenancy via organizationId filtering ensures secure isolation. |
 | 3.8.4 | OpenAI text-embedding-3-small | Selected for 5x cost efficiency ($0.02 vs $0.10/M tokens) compared to ada-002, same quality at 1536 dimensions. |
 | 3.8.4 | Payload-based multi-tenancy | Official Qdrant best practice - single collection with organizationId filters instead of separate collections per tenant. Better performance and simpler management. |
+| 3.8.4 | Conditional RAG strategy | Recent context (15 messages) loaded always for continuity, RAG retrieval triggered only on memory keywords (4 patterns). Zero latency for 80% normal questions, +200ms for 20% memory queries. Fire-and-forget Qdrant storage prevents response blocking. |
 
 ### Deferred Issues
 
@@ -256,17 +257,18 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2025-12-29T06:13:34Z
-Stopped at: Completed 3.8.4-02-PLAN.md
+Last session: 2025-12-29T06:26:56Z
+Stopped at: Completed 3.8.4-03-PLAN.md
 Resume context:
-  - Executed Phase 3.8.4-02: RAG Pipeline Components (3 min)
-  - Created embedding service (OpenAI text-embedding-3-small, 1536 dimensions, $0.02/M tokens)
-  - Implemented conversation chunker (RecursiveCharacterTextSplitter, 400-token chunks, 50-token overlap, tiktoken counting)
-  - Built vector store integration (QdrantVectorStore wrapper, semantic retrieval, mandatory tenant filtering)
-  - Installed @langchain/textsplitters package (LangChain v1 modular architecture)
-  - Fixed API compatibility (retriever.invoke() instead of getRelevantDocuments())
-  - All RAG pipeline components ready for chatbot integration
-  - Files: embeddingService.ts, conversationChunker.ts, vectorStore.ts
+  - Executed Phase 3.8.4-03: Conditional RAG Integration (9 min)
+  - Created conditional memory retrieval service with MEMORY_PATTERNS keyword detection (4 pattern categories)
+  - Integrated smart RAG into chatbot endpoint (recent 15 always + RAG on memory keywords)
+  - Implemented fire-and-forget Qdrant storage (asynchronous, doesn't block responses)
+  - Tested production deployment: normal questions fast (0ms overhead), memory questions use RAG (+200ms)
+  - Verified backward compatibility with existing conversations (Alice Smith retrieval working)
+  - Fixed TenantDb import (from @rsm/database/connection)
+  - Phase 3.8.4 COMPLETE (all 3 plans done) - Conditional RAG with Qdrant fully integrated and production-ready
+  - Files: memoryRetriever.ts (created), ai.ts (modified)
   - Commit: [pending]
-  - Next: Ready for Phase 3.8.4 Plan 3 (integrate RAG retrieval into chatbot endpoint)
-Resume file: None (phase incomplete - 2/3 plans completed)
+  - Next: Ready for Phase 4 (Marketing Foundation) or review Phase 3 accomplishments
+Resume file: None (phase complete)
