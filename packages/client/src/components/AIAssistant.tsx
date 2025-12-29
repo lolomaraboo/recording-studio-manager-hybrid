@@ -165,20 +165,13 @@ export function AIAssistant() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Auto-focus input after sending a message and when chatbot opens
+  // Auto-focus input ONLY when chatbot first opens (not on every state change)
   useEffect(() => {
-    if (!isMinimized && isOpen) {
-      // Focus immediately
+    if (isOpen && !isMinimized) {
+      // Only focus on initial open, not continuously
       inputRef.current?.focus();
     }
-  }, [isMinimized, isOpen]);
-
-  // Re-focus after bot response completes
-  useEffect(() => {
-    if (!isLoading && !isMinimized && isOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isLoading]);
+  }, [isOpen]); // Removed isMinimized to only trigger on open state change
 
   // Handle send message
   const handleSendMessage = async () => {
@@ -443,14 +436,6 @@ export function AIAssistant() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
-                onBlur={() => {
-                  // Re-focus immediately if lost (unless clicking button)
-                  setTimeout(() => {
-                    if (!isLoading && document.activeElement?.tagName !== 'BUTTON') {
-                      inputRef.current?.focus();
-                    }
-                  }, 0);
-                }}
                 placeholder="Tapez votre message..."
                 disabled={isLoading}
                 className="flex-1"
