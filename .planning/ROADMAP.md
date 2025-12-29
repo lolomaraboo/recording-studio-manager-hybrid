@@ -413,6 +413,61 @@ Plans:
 
 ---
 
+### Phase 3.9: Super Admin Dashboard - Monitoring Services et Gestion Base de Données (INSERTED)
+
+**Goal:** Create super admin interface for system monitoring, service health checks, and database management
+
+**Depends on:** Phase 3.8.4 (RAG implementation complete)
+
+**Research:** Unlikely (standard admin UI patterns, Docker API, PostgreSQL queries)
+
+**Plans:** 2 plans
+
+Plans:
+- [x] 3.9-01: Backend infrastructure (dockerode, superadmin middleware, Docker/DB/health endpoints) - 7 min
+- [ ] 3.9-02: Frontend dashboard UI (Services, Database, Logs tabs with monitoring/management)
+
+**Details:**
+
+**Proposed Features:**
+1. **Service Monitoring Dashboard**
+   - Docker containers status (rsm-client, rsm-server, rsm-postgres, rsm-redis, qdrant)
+   - Health check endpoints aggregation
+   - Uptime/downtime visualization
+   - Resource usage (CPU, memory, disk)
+
+2. **Database Management**
+   - Read-only database browser for master DB
+   - Organization list with stats (users, tenant DBs, subscription tiers)
+   - User management (view, delete, reset password)
+   - Tenant database stats (size, table counts)
+
+3. **System Logs Viewer**
+   - Recent Docker logs by container
+   - Application errors (Sentry integration)
+   - API request logs (slow queries, 4xx/5xx errors)
+
+4. **Quick Actions**
+   - Restart containers
+   - Clear Redis cache
+   - Run database migrations
+   - Export organization data (GDPR compliance)
+
+**Access Control:**
+- Super admin role required
+- Separate route `/superadmin` (not in tenant context)
+- Environment variable `SUPERADMIN_EMAIL` for authorized users
+
+**Benefits:**
+- No more SSH + psql for database operations
+- Visual monitoring replaces manual Docker commands
+- Faster troubleshooting during incidents
+- Self-service admin tools before launch
+
+**Rationale:** Before marketing launch (Phase 4), need robust admin tools to manage production system. Currently all administration requires SSH + manual commands (docker ps, psql, docker logs). Super admin dashboard enables quick troubleshooting, user management, and system monitoring without terminal access. Critical for maintaining production quality as user base grows.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
