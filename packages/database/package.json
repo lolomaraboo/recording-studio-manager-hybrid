@@ -41,6 +41,7 @@
     "db:studio": "drizzle-kit studio",
     "db:init": "tsx src/scripts/init.ts",
     "seed:plans": "tsx src/scripts/seed-subscription-plans.ts",
+    "seed:tenant": "tsx src/scripts/seed-tenant-data.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
