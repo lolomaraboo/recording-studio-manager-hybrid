@@ -26,6 +26,7 @@ export function AIAssistant() {
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,12 +37,34 @@ export function AIAssistant() {
   const chatMutation = trpc.ai.chat.useMutation();
   const utils = trpc.useUtils();
 
-  // Load sessionId from localStorage on component mount
+  // Load sessionId and conversation history from localStorage/DB on component mount
   useEffect(() => {
-    const savedSessionId = localStorage.getItem('chatbot_sessionId');
-    if (savedSessionId) {
-      setSessionId(savedSessionId);
-    }
+    const loadConversationHistory = async () => {
+      const savedSessionId = localStorage.getItem('chatbot_sessionId');
+      if (savedSessionId) {
+        setSessionId(savedSessionId);
+
+        // Load conversation history from backend
+        try {
+          const response = await utils.ai.getHistory.fetch({ sessionId: savedSessionId });
+          if (response && response.messages && response.messages.length > 0) {
+            // Convert DB messages to UI Message format
+            const loadedMessages: Message[] = response.messages.map((msg: any, index: number) => ({
+              id: `${Date.now()}_${index}`,
+              role: msg.role,
+              content: msg.content,
+              timestamp: new Date(msg.timestamp),
+            }));
+            setMessages(loadedMessages);
+          }
+        } catch (error) {
+          console.error('Failed to load conversation history:', error);
+          // If history fails to load, keep sessionId but start with empty messages
+        }
+      }
+    };
+
+    loadConversationHistory();
   }, []);
 
   // Handle mouse down on header (start dragging) - only in floating mode and not fullscreen
@@ -141,6 +164,21 @@ export function AIAssistant() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Auto-focus input after sending a message and when chatbot opens
+  useEffect(() => {
+    if (!isMinimized && isOpen) {
+      // Focus immediately
+      inputRef.current?.focus();
+    }
+  }, [isMinimized, isOpen]);
+
+  // Re-focus after bot response completes
+  useEffect(() => {
+    if (!isLoading && !isMinimized && isOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isLoading]);
 
   // Handle send message
   const handleSendMessage = async () => {
@@ -400,9 +438,19 @@ export function AIAssistant() {
           <div className="border-t border-border p-4 shrink-0">
             <div className="flex gap-2">
               <Input
+                ref={inputRef}
+                autoFocus
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
+                onBlur={() => {
+                  // Re-focus immediately if lost (unless clicking button)
+                  setTimeout(() => {
+                    if (!isLoading && document.activeElement?.tagName !== 'BUTTON') {
+                      inputRef.current?.focus();
+                    }
+                  }, 0);
+                }}
                 placeholder="Tapez votre message..."
                 disabled={isLoading}
                 className="flex-1"
