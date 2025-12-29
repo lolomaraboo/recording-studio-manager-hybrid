@@ -3,7 +3,9 @@ FROM node:20-alpine AS builder
 
 # Build-time environment variables
 ARG VITE_API_URL=/api/trpc
+ARG VITE_SUPERADMIN_EMAIL=admin@recording-studio-manager.com
 ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_SUPERADMIN_EMAIL=${VITE_SUPERADMIN_EMAIL}
 
 WORKDIR /app
 
@@ -21,6 +23,7 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY packages/shared ./packages/shared
 COPY packages/client ./packages/client
+COPY packages/client/.env.production ./packages/client/.env.production
 COPY tsconfig.json ./
 
 # Build packages in order

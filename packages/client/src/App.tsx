@@ -62,6 +62,11 @@ import {
   ClientPortalAuthProvider,
   ProtectedClientRoute,
 } from './contexts/ClientPortalAuthContext';
+import { SuperAdminLayout } from './components/layout/SuperAdminLayout';
+import { SuperAdminRoute } from './components/SuperAdminRoute';
+import SuperAdminServices from './pages/superadmin/Services';
+import SuperAdminDatabase from './pages/superadmin/Database';
+import SuperAdminLogs from './pages/superadmin/Logs';
 
 function App() {
   return (
@@ -71,6 +76,23 @@ function App() {
           {/* Staff Portal - Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Super Admin Portal - Protected routes */}
+          <Route
+            path="/superadmin"
+            element={
+              <ProtectedRoute>
+                <SuperAdminRoute>
+                  <SuperAdminLayout />
+                </SuperAdminRoute>
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/superadmin/services" replace />} />
+            <Route path="services" element={<SuperAdminServices />} />
+            <Route path="database" element={<SuperAdminDatabase />} />
+            <Route path="logs" element={<SuperAdminLogs />} />
+          </Route>
 
           {/* Client Portal - Public routes */}
           <Route path="/client-portal/login" element={<ClientLogin />} />
