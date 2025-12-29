@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { eq } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
-import { clients } from '@rsm/database/tenant';
+import { clients, clientNotes } from '@rsm/database/tenant';
 
 /**
  * Clients Router
@@ -33,9 +33,31 @@ export const clientsRouter = router({
       const tenantDb = await ctx.getTenantDb();
       const { limit = 50, offset = 0 } = input || {};
 
+      // Get clients with notes metadata
       const clientsList = await tenantDb
-        .select()
+        .select({
+          id: clients.id,
+          userId: clients.userId,
+          name: clients.name,
+          artistName: clients.artistName,
+          email: clients.email,
+          phone: clients.phone,
+          type: clients.type,
+          address: clients.address,
+          city: clients.city,
+          country: clients.country,
+          notes: clients.notes,
+          isVip: clients.isVip,
+          isActive: clients.isActive,
+          portalAccess: clients.portalAccess,
+          createdAt: clients.createdAt,
+          updatedAt: clients.updatedAt,
+          notesCount: sql<number>`CAST(COUNT(${clientNotes.id}) AS INTEGER)`,
+          lastNoteDate: sql<Date | null>`MAX(${clientNotes.createdAt})`,
+        })
         .from(clients)
+        .leftJoin(clientNotes, eq(clients.id, clientNotes.clientId))
+        .groupBy(clients.id)
         .limit(limit)
         .offset(offset);
 
@@ -43,7 +65,7 @@ export const clientsRouter = router({
     }),
 
   /**
-   * Get client by ID
+   * Get client by ID with recent notes
    */
   get: protectedProcedure
     .input(z.object({ id: z.number() }))
@@ -61,7 +83,18 @@ export const clientsRouter = router({
         });
       }
 
-      return client;
+      // Get the 10 most recent notes for this client
+      const recentNotes = await tenantDb
+        .select()
+        .from(clientNotes)
+        .where(eq(clientNotes.clientId, input.id))
+        .orderBy(desc(clientNotes.createdAt))
+        .limit(10);
+
+      return {
+        ...client,
+        clientNotes: recentNotes,
+      };
     }),
 
   /**

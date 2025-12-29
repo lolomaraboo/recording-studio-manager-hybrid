@@ -38,6 +38,21 @@ export type Client = typeof clients.$inferSelect;
 export type InsertClient = typeof clients.$inferInsert;
 
 /**
+ * Client Notes table (Tenant DB)
+ * Timestamped history of notes for each client
+ */
+export const clientNotes = pgTable("client_notes", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  note: text("note").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdBy: integer("created_by"), // Optional FK to master.users for future multi-user
+});
+
+export type ClientNote = typeof clientNotes.$inferSelect;
+export type InsertClientNote = typeof clientNotes.$inferInsert;
+
+/**
  * Rooms table (Tenant DB)
  * Studio rooms/spaces for recording, mixing, mastering, etc.
  */

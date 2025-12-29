@@ -23,6 +23,7 @@ import { clientPortalStripeRouter } from './client-portal-stripe.js';
 import { adminRouter } from './admin.js';
 import { subscriptionsRouter } from './subscriptions.js';
 import { superadminRouter } from './superadmin.js';
+import { clientNotesRouter } from './clientNotes.js';
 
 /**
  * Main App Router
@@ -35,6 +36,7 @@ import { superadminRouter } from './superadmin.js';
  *
  * **Tenant DB:**
  * - clients: Clients CRUD
+ * - clientNotes: Client notes history CRUD
  * - sessions: Recording sessions CRUD
  * - rooms: Studio rooms/spaces CRUD
  * - equipment: Equipment & gear CRUD
@@ -61,6 +63,7 @@ export const appRouter = router({
   superadmin: superadminRouter,
   sessions: sessionsRouter,
   clients: clientsRouter,
+  clientNotes: clientNotesRouter,
   invoices: invoicesRouter,
   rooms: roomsRouter,
   equipment: equipmentRouter,
