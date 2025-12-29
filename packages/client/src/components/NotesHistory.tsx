@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,6 +22,36 @@ export function NotesHistory({ clientId, className }: NotesHistoryProps) {
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
 
   const utils = trpc.useUtils();
+
+  // Listen for SSE notifications about notes updates from AI chatbot
+  useEffect(() => {
+    const eventSource = new EventSource('/api/notifications/stream');
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        // Check if this is a notes update notification for this client
+        if (data.type === 'notification' &&
+            data.data.type === 'notes_updated' &&
+            data.data.clientId === clientId) {
+          console.log('[NotesHistory] AI chatbot updated notes, refreshing...', data.data);
+          // Invalidate the query to trigger a refetch
+          utils.clientNotes.list.invalidate({ clientId });
+        }
+      } catch (error) {
+        console.error('[NotesHistory] Failed to parse SSE message:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('[NotesHistory] SSE connection error:', error);
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [clientId, utils]);
 
   // Queries
   const { data: notes = [], isLoading, error } = trpc.clientNotes.list.useQuery({ clientId });

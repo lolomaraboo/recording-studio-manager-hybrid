@@ -13,6 +13,7 @@ import { HallucinationDetector } from "../lib/hallucinationDetector";
 import { retrieveConversationContext } from "../lib/rag/memoryRetriever";
 import { chunkConversation } from "../lib/rag/conversationChunker";
 import { storeConversationChunks } from "../lib/rag/vectorStore";
+import { notificationBroadcaster } from "../lib/notificationBroadcaster";
 
 /**
  * AI Chatbot Router
@@ -135,6 +136,20 @@ export const aiRouter = router({
               });
 
               actionsCalled.push(toolCall.name);
+
+              // Send SSE notification for client notes updates
+              if (toolCall.name === "add_client_note" || toolCall.name === "delete_client_note") {
+                const clientId = toolCall.input.client_id || toolCall.input.note_id;
+                notificationBroadcaster.sendToUser(
+                  ctx.user!.id,
+                  ctx.organizationId!,
+                  {
+                    type: "notes_updated",
+                    clientId: toolCall.input.client_id,
+                    action: toolCall.name,
+                  }
+                );
+              }
             } catch (error: any) {
               // Log error
               await tenantDb.insert(aiActionLogs).values({
