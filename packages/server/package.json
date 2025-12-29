@@ -15,6 +15,10 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@langchain/core": "^1.1.8",
+    "@langchain/openai": "^1.2.0",
+    "@langchain/qdrant": "^1.0.1",
+    "@qdrant/js-client-rest": "^1.16.2",
     "@rsm/database": "workspace:*",
     "@rsm/shared": "workspace:*",
     "@sentry/node": "^10.32.1",
@@ -30,12 +34,14 @@
     "drizzle-orm": "^0.44.5",
     "express": "^4.21.2",
     "express-session": "^1.18.2",
+    "langchain": "^1.2.3",
     "multer": "^2.0.2",
     "openai": "^6.15.0",
     "postgres": "^3.4.4",
     "redis": "^5.10.0",
     "resend": "^6.6.0",
     "stripe": "^20.1.0",
+    "tiktoken": "^1.0.22",
     "zod": "^3.24.1"
   },
   "devDependencies": {

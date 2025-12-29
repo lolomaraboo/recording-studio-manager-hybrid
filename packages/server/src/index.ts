@@ -12,6 +12,7 @@ import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
 import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
 import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
+import { initializeQdrantCollection } from './lib/rag/index.js';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -55,6 +56,14 @@ async function main() {
 
   // Connect to Redis (required for redis v4+)
   await redis.connect();
+
+  // Initialize Qdrant collection for chatbot RAG
+  try {
+    await initializeQdrantCollection();
+  } catch (error) {
+    console.error('⚠️  Failed to initialize Qdrant collection:', error);
+    console.warn('⚠️  Server will continue without RAG functionality');
+  }
 
   // Middleware
   app.use(
