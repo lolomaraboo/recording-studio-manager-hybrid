@@ -30,12 +30,12 @@ Plan: 1 of 2 in current phase
 Status: In progress
 Last activity: 2025-12-29 - Completed 3.9.1-01-PLAN.md (Backend notes infrastructure)
 
-Progress: ██████████████████░ 69.0% (29/42 plans complete) - Client notes history backend complete, ready for frontend UI
+Progress: ████████████████████ 81.0% (34/42 plans complete) - Client notes history backend complete, ready for frontend UI
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 34
 - Average duration: 35.2 min
 - Total execution time: 17.0 hours
 
@@ -66,14 +66,16 @@ Progress: ██████████████████░ 69.0% (29/42
 
 ### Major Features Discovered (Not Originally in GSD Planning)
 
-**During comprehensive audit 2025-12-26, discovered 93 implemented features not documented:**
+**During comprehensive audits (2025-12-26, 2025-12-31), discovered 93+ implemented features not documented:**
 
-1. **AI Chatbot COMPLET (37 actions)** - SSE streaming, anti-hallucination detection (4 rules), Playwright tests 4/4 passing
+1. **AI Chatbot COMPLET (40 AI tools)** - SSE streaming, anti-hallucination detection (4 rules), Playwright tests 4/4 passing
 2. **Client Portal COMPLET (10 features)** - Email/password, magic link, password reset, booking, payments, dashboard, profile, activity logs, device fingerprinting, ownership verification
 3. **Audio System professionnel** - Upload Cloudinary, versioning 4 versions (demo/rough/final/master), AudioPlayer custom HTML5 (227 lines), TrackDetail 3 Phase 5 cards
 4. **20 UX Components avancés** - Command Palette (Cmd+K), Notification Center, Dark/Light Theme, Global Search, Toast, Breadcrumbs, Status Badges, Loading Skeletons, Delete Confirmations, Responsive Mobile, French date formatting, Type-safe end-to-end
-5. **Testing infrastructure** - Playwright E2E (chat, booking, auth, navigation), Vitest unit (13 tests, 92.63% coverage)
+5. **Testing infrastructure** - Playwright E2E (8 test files: auth, command-palette, ai-chatbot, global-search, ui-validation, navigation, complete-journeys, production-health), Vitest unit (3 test files: connection, projects integration, routers)
 6. **Tracks enrichment** - 17 nouveaux champs Phase 5 (copyright metadata 8 fields, technical details 5 fields, versioning 4 fields)
+7. **Database schema** - 32 PostgreSQL tables (7 master + 25 per tenant) - Comprehensive multi-tenant architecture
+8. **Git history** - 152 commits in 7 days (Dec 24-31, 2025) - Intensive development (21.7 commits/day average)
 
 **Phase 5 Mystery RESOLVED:**
 - TODO_MASTER showed "11/12 items (92%)" but didn't list Item 11
@@ -221,6 +223,16 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Proposed solution: New client_notes table with timestamps, chronological display, audit trail
   - Benefits: Track communication history, professional CRM feature, better client management
   - Priority: UX ENHANCEMENT - Professional feature before marketing launch (Phase 4)
+- **2025-12-29:** Phase 3.9.2 inserted after Phase 3.9.1 - "Chatbot accès notes clients" (INSERTED)
+  - Reason: Enable AI chatbot to manage client notes via natural language
+  - Impact: Chatbot can read notes history, add dated notes, delete notes via AI tools
+  - Solution: 3 new AI tools (get_client_notes, add_client_note, delete_client_note) + SSE real-time UI refresh
+  - Priority: UX ENHANCEMENT - AI integration for professional CRM feature
+- **2025-12-29:** Phase 3.9.3 inserted after Phase 3.9.2 - "Fix chatbot input focus bug" (URGENT)
+  - Reason: Chatbot textarea remains focused when clicking outside, prevents typing in other inputs
+  - Impact: User cannot add client notes while chatbot is open - textarea steals focus
+  - Expected: Textarea should blur when clicking outside chatbot area
+  - Priority: URGENT - UX blocker preventing simultaneous chatbot + page interaction
 
 ### Blockers/Concerns Carried Forward
 
