@@ -106,26 +106,87 @@ export const clientsRouter = router({
   create: protectedProcedure
     .input(
       z.object({
+        // Basic fields (existing)
         name: z.string().min(2).max(200),
         email: z.string().email().optional(),
         phone: z.string().optional(),
-        company: z.string().optional(),
         address: z.string().optional(),
         notes: z.string().optional(),
+
+        // NEW: vCard enriched fields
+        type: z.enum(['individual', 'company']).default('individual'),
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+        middleName: z.string().optional(),
+        prefix: z.string().optional(),
+        suffix: z.string().optional(),
+        artistName: z.string().optional(),
+
+        // Contact arrays
+        phones: z.array(z.object({ type: z.string(), number: z.string() })).optional(),
+        emails: z.array(z.object({ type: z.string(), email: z.string() })).optional(),
+        websites: z.array(z.object({ type: z.string(), url: z.string() })).optional(),
+
+        // Address details
+        street: z.string().optional(),
+        city: z.string().optional(),
+        postalCode: z.string().optional(),
+        region: z.string().optional(),
+        country: z.string().optional(),
+
+        // Additional info
+        birthday: z.string().optional(), // ISO date string
+        gender: z.string().optional(),
+        customFields: z.array(z.object({ label: z.string(), type: z.string(), value: z.any() })).optional(),
+
+        // File URLs (from upload endpoints)
+        avatarUrl: z.string().optional(),
+        logoUrl: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
-      // Map form data to client schema (excluding company field that doesn't exist)
+      // Map ALL provided fields (no exclusions)
       const clientData: any = {
         name: input.name,
+        type: input.type || 'individual',
       };
 
+      // Add optional basic fields
       if (input.email) clientData.email = input.email;
       if (input.phone) clientData.phone = input.phone;
       if (input.address) clientData.address = input.address;
       if (input.notes) clientData.notes = input.notes;
+
+      // Add enriched structured name fields
+      if (input.firstName) clientData.firstName = input.firstName;
+      if (input.lastName) clientData.lastName = input.lastName;
+      if (input.middleName) clientData.middleName = input.middleName;
+      if (input.prefix) clientData.prefix = input.prefix;
+      if (input.suffix) clientData.suffix = input.suffix;
+      if (input.artistName) clientData.artistName = input.artistName;
+
+      // Add contact arrays (set to empty array if not provided to match schema defaults)
+      if (input.phones && input.phones.length > 0) clientData.phones = input.phones;
+      if (input.emails && input.emails.length > 0) clientData.emails = input.emails;
+      if (input.websites && input.websites.length > 0) clientData.websites = input.websites;
+
+      // Add address details
+      if (input.street) clientData.street = input.street;
+      if (input.city) clientData.city = input.city;
+      if (input.postalCode) clientData.postalCode = input.postalCode;
+      if (input.region) clientData.region = input.region;
+      if (input.country) clientData.country = input.country;
+
+      // Add additional info
+      if (input.birthday) clientData.birthday = input.birthday;
+      if (input.gender) clientData.gender = input.gender;
+      if (input.customFields && input.customFields.length > 0) clientData.customFields = input.customFields;
+
+      // Add file URLs
+      if (input.avatarUrl) clientData.avatarUrl = input.avatarUrl;
+      if (input.logoUrl) clientData.logoUrl = input.logoUrl;
 
       const [client] = await tenantDb
         .insert(clients)
