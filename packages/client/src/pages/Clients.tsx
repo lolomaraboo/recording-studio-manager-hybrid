@@ -5,19 +5,35 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, Eye } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { ImportClientsDialog } from "@/components/ImportClientsDialog";
 
 export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importFormat, setImportFormat] = useState<'vcard' | 'excel' | 'csv'>('vcard');
 
-  const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery({ limit: 100 });
+  const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
+
+  // Export mutations
+  const exportVCard = trpc.clients.exportVCard.useMutation();
+  const exportExcel = trpc.clients.exportExcel.useMutation();
+  const exportCSV = trpc.clients.exportCSV.useMutation();
+  const { data: templateData } = trpc.clients.downloadExcelTemplate.useQuery();
 
   // Calculate stats per client
   const clientsWithStats = useMemo(() => {
@@ -56,9 +72,73 @@ export function Clients() {
     );
   }, [clientsWithStats, searchQuery]);
 
-  const handleExportExcel = () => {
-    // TODO: Implement Excel export when backend supports it
-    toast.info("Export Excel - À implémenter");
+  // Export handlers
+  const handleExport = async (format: 'vcard' | 'excel' | 'csv') => {
+    try {
+      let result;
+      if (format === 'vcard') {
+        result = await exportVCard.mutateAsync({});
+      } else if (format === 'excel') {
+        result = await exportExcel.mutateAsync({});
+      } else {
+        result = await exportCSV.mutateAsync({});
+      }
+
+      // Download file
+      let blob;
+      if (format === 'excel') {
+        // Decode base64 for Excel
+        const binaryString = atob(result.content);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        blob = new Blob([bytes], { type: result.mimeType });
+      } else {
+        blob = new Blob([result.content], { type: result.mimeType });
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success(`Export ${format.toUpperCase()} réussi`);
+    } catch (error) {
+      toast.error('Erreur lors de l\'export');
+      console.error(error);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    if (!templateData) {
+      toast.error('Template non disponible');
+      return;
+    }
+
+    try {
+      // Decode base64
+      const binaryString = atob(templateData.content);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: templateData.mimeType });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = templateData.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success('Template téléchargé');
+    } catch (error) {
+      toast.error('Erreur lors du téléchargement');
+      console.error(error);
+    }
   };
 
   const _getTypeLabel = (type: string) => {
@@ -95,10 +175,68 @@ export function Clients() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleExportExcel}>
-              <FileDown className="mr-2 h-4 w-4" />
-              Exporter Excel
-            </Button>
+            {/* Export Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Exporter
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleExport('vcard')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  vCard (.vcf)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('excel')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Excel (.xlsx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('csv')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  CSV (.csv)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Import Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <FileUp className="mr-2 h-4 w-4" />
+                  Importer
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => {
+                  setImportFormat('vcard');
+                  setShowImportDialog(true);
+                }}>
+                  <FileUp className="mr-2 h-4 w-4" />
+                  vCard (.vcf)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  setImportFormat('excel');
+                  setShowImportDialog(true);
+                }}>
+                  <FileUp className="mr-2 h-4 w-4" />
+                  Excel (.xlsx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  setImportFormat('csv');
+                  setShowImportDialog(true);
+                }}>
+                  <FileUp className="mr-2 h-4 w-4" />
+                  CSV (.csv)
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleDownloadTemplate}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger template Excel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button asChild>
               <Link to="/clients/new">
                 <Plus className="mr-2 h-4 w-4" />
@@ -243,6 +381,17 @@ export function Clients() {
           </Card>
         </div>
       </main>
+
+      {/* Import Dialog */}
+      <ImportClientsDialog
+        open={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        format={importFormat}
+        onImportComplete={() => {
+          setShowImportDialog(false);
+          refetch();
+        }}
+      />
     </div>
   );
 }

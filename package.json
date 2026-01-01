@@ -37,6 +37,10 @@
   "packageManager": "pnpm@9.14.4",
   "dependencies": {
     "@types/bcrypt": "^6.0.0",
-    "bcrypt": "^6.0.0"
+    "bcrypt": "^6.0.0",
+    "csv-parse": "^6.1.0",
+    "csv-stringify": "^6.6.0",
+    "exceljs": "^4.4.0",
+    "vcard4": "^4.0.4"
   }
 }

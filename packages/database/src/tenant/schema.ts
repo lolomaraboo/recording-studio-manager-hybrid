@@ -10,7 +10,7 @@
  * - projects: Projects and tracks
  */
 
-import { pgTable, serial, varchar, text, timestamp, integer, boolean, decimal } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean, decimal, date, jsonb } from "drizzle-orm/pg-core";
 
 /**
  * Clients table (Tenant DB)
@@ -30,6 +30,25 @@ export const clients = pgTable("clients", {
   isVip: boolean("is_vip").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
   portalAccess: boolean("portal_access").notNull().default(false),
+
+  // NEW: vCard 4.0 compatible fields
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  middleName: varchar("middle_name", { length: 100 }),
+  prefix: varchar("prefix", { length: 20 }), // Mr., Mrs., Dr., etc.
+  suffix: varchar("suffix", { length: 20 }), // Jr., III, etc.
+  avatarUrl: varchar("avatar_url", { length: 500 }), // For individuals
+  logoUrl: varchar("logo_url", { length: 500 }), // For companies
+  phones: jsonb("phones").$type<Array<{type: string; number: string}>>().default([]),
+  emails: jsonb("emails").$type<Array<{type: string; email: string}>>().default([]),
+  websites: jsonb("websites").$type<Array<{type: string; url: string}>>().default([]),
+  street: varchar("street", { length: 255 }),
+  postalCode: varchar("postal_code", { length: 20 }),
+  region: varchar("region", { length: 100 }),
+  birthday: date("birthday"),
+  gender: varchar("gender", { length: 20 }),
+  customFields: jsonb("custom_fields").$type<Array<{label: string; type: string; value: any}>>().default([]),
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -51,6 +70,26 @@ export const clientNotes = pgTable("client_notes", {
 
 export type ClientNote = typeof clientNotes.$inferSelect;
 export type InsertClientNote = typeof clientNotes.$inferInsert;
+
+/**
+ * Client Contacts table (Tenant DB)
+ * Multiple contacts for company/group clients
+ */
+export const clientContacts = pgTable("client_contacts", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  firstName: varchar("first_name", { length: 100 }).notNull(),
+  lastName: varchar("last_name", { length: 100 }).notNull(),
+  title: varchar("title", { length: 100 }), // Job title
+  email: varchar("email", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  isPrimary: boolean("is_primary").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type ClientContact = typeof clientContacts.$inferSelect;
+export type InsertClientContact = typeof clientContacts.$inferInsert;
 
 /**
  * Rooms table (Tenant DB)

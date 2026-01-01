@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { eq, desc, sql } from 'drizzle-orm';
+import { eq, desc, sql, inArray } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
-import { clients, clientNotes } from '@rsm/database/tenant';
+import { clients, clientNotes, clientContacts } from '@rsm/database/tenant';
+import { clientToVCard, parseVCardFile } from '../utils/vcard-service';
+import { clientsToExcel, excelToClients, generateExcelTemplate } from '../utils/excel-service';
+import { clientsToCSV, csvToClients } from '../utils/csv-service';
 
 /**
  * Clients Router
@@ -123,19 +126,44 @@ export const clientsRouter = router({
     }),
 
   /**
-   * Update client
+   * Update client (with vCard fields)
    */
   update: protectedProcedure
     .input(
       z.object({
         id: z.number(),
         data: z.object({
+          // Existing fields
           name: z.string().min(2).max(200).optional(),
+          artistName: z.string().optional(),
           email: z.string().email().optional(),
           phone: z.string().optional(),
-          company: z.string().optional(),
+          type: z.enum(['individual', 'company']).optional(),
           address: z.string().optional(),
+          city: z.string().optional(),
+          country: z.string().optional(),
           notes: z.string().optional(),
+          isVip: z.boolean().optional(),
+          isActive: z.boolean().optional(),
+          portalAccess: z.boolean().optional(),
+
+          // NEW vCard fields
+          firstName: z.string().optional(),
+          lastName: z.string().optional(),
+          middleName: z.string().optional(),
+          prefix: z.string().optional(),
+          suffix: z.string().optional(),
+          avatarUrl: z.string().optional(),
+          logoUrl: z.string().optional(),
+          phones: z.array(z.object({ type: z.string(), number: z.string() })).optional(),
+          emails: z.array(z.object({ type: z.string(), email: z.string() })).optional(),
+          websites: z.array(z.object({ type: z.string(), url: z.string() })).optional(),
+          street: z.string().optional(),
+          postalCode: z.string().optional(),
+          region: z.string().optional(),
+          birthday: z.string().optional(),
+          gender: z.string().optional(),
+          customFields: z.array(z.object({ label: z.string(), type: z.string(), value: z.any() })).optional(),
         }),
       })
     )
@@ -144,7 +172,10 @@ export const clientsRouter = router({
 
       const [updated] = await tenantDb
         .update(clients)
-        .set(input.data)
+        .set({
+          ...input.data,
+          updatedAt: new Date(),
+        })
         .where(eq(clients.id, input.id))
         .returning();
 
@@ -169,5 +200,322 @@ export const clientsRouter = router({
       await tenantDb.delete(clients).where(eq(clients.id, input.id));
 
       return { success: true };
+    }),
+
+  /**
+   * Get client with contacts (for company clients)
+   */
+  getWithContacts: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const client = await tenantDb.query.clients.findFirst({
+        where: eq(clients.id, input.id),
+      });
+
+      if (!client) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Client not found',
+        });
+      }
+
+      const contacts = await tenantDb
+        .select()
+        .from(clientContacts)
+        .where(eq(clientContacts.clientId, input.id))
+        .orderBy(desc(clientContacts.isPrimary), desc(clientContacts.createdAt));
+
+      return {
+        ...client,
+        contacts,
+      };
+    }),
+
+  /**
+   * Add contact to client
+   */
+  addContact: protectedProcedure
+    .input(
+      z.object({
+        clientId: z.number(),
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
+        title: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        isPrimary: z.boolean().default(false),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const [newContact] = await tenantDb
+        .insert(clientContacts)
+        .values({
+          clientId: input.clientId,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          title: input.title,
+          email: input.email,
+          phone: input.phone,
+          isPrimary: input.isPrimary,
+        })
+        .returning();
+
+      return newContact;
+    }),
+
+  /**
+   * Update contact
+   */
+  updateContact: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+        title: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        isPrimary: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+      const { id, ...data } = input;
+
+      const [updated] = await tenantDb
+        .update(clientContacts)
+        .set({
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(clientContacts.id, id))
+        .returning();
+
+      if (!updated) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Contact not found',
+        });
+      }
+
+      return updated;
+    }),
+
+  /**
+   * Delete contact
+   */
+  deleteContact: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      await tenantDb.delete(clientContacts).where(eq(clientContacts.id, input.id));
+
+      return { success: true };
+    }),
+
+  /**
+   * Export clients as vCard
+   */
+  exportVCard: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()).optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get clients to export
+      const query = input.ids
+        ? tenantDb.select().from(clients).where(inArray(clients.id, input.ids))
+        : tenantDb.select().from(clients);
+
+      const clientsToExport = await query;
+
+      // Generate vCards
+      const vcards = await Promise.all(
+        clientsToExport.map(async (client) => {
+          // Get contacts for this client
+          const contacts = await tenantDb
+            .select()
+            .from(clientContacts)
+            .where(eq(clientContacts.clientId, client.id));
+
+          return clientToVCard(client, contacts);
+        })
+      );
+
+      // Combine all vCards
+      const vcardContent = vcards.join('\n');
+
+      return {
+        content: vcardContent,
+        filename: `clients_${Date.now()}.vcf`,
+        mimeType: 'text/vcard',
+      };
+    }),
+
+  /**
+   * Import vCard file
+   */
+  importVCard: protectedProcedure
+    .input(z.object({ content: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Parse vCard file
+      const parsedClients = parseVCardFile(input.content);
+
+      // Preview first 5
+      const preview = parsedClients.slice(0, 5);
+
+      // Import all
+      const imported = await Promise.all(
+        parsedClients.map(async (clientData) => {
+          const [newClient] = await tenantDb
+            .insert(clients)
+            .values({
+              ...clientData,
+              isActive: true,
+              portalAccess: false,
+            } as any)
+            .returning();
+
+          return newClient;
+        })
+      );
+
+      return {
+        count: imported.length,
+        preview,
+      };
+    }),
+
+  /**
+   * Export Excel
+   */
+  exportExcel: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()).optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const query = input.ids
+        ? tenantDb.select().from(clients).where(inArray(clients.id, input.ids))
+        : tenantDb.select().from(clients);
+
+      const clientsToExport = await query;
+
+      const buffer = await clientsToExcel(clientsToExport);
+
+      return {
+        content: buffer.toString('base64'),
+        filename: `clients_${Date.now()}.xlsx`,
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      };
+    }),
+
+  /**
+   * Import Excel
+   */
+  importExcel: protectedProcedure
+    .input(z.object({ content: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const buffer = Buffer.from(input.content, 'base64');
+      const parsedClients = await excelToClients(buffer);
+
+      const preview = parsedClients.slice(0, 5);
+
+      const imported = await Promise.all(
+        parsedClients.map(async (clientData) => {
+          const [newClient] = await tenantDb
+            .insert(clients)
+            .values({
+              ...clientData,
+              isActive: true,
+              portalAccess: false,
+            } as any)
+            .returning();
+
+          return newClient;
+        })
+      );
+
+      return {
+        count: imported.length,
+        preview,
+      };
+    }),
+
+  /**
+   * Download Excel template
+   */
+  downloadExcelTemplate: protectedProcedure
+    .query(async () => {
+      const buffer = await generateExcelTemplate();
+
+      return {
+        content: buffer.toString('base64'),
+        filename: 'template_clients.xlsx',
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      };
+    }),
+
+  /**
+   * Export CSV
+   */
+  exportCSV: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()).optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const query = input.ids
+        ? tenantDb.select().from(clients).where(inArray(clients.id, input.ids))
+        : tenantDb.select().from(clients);
+
+      const clientsToExport = await query;
+
+      const csv = clientsToCSV(clientsToExport);
+
+      return {
+        content: csv,
+        filename: `clients_${Date.now()}.csv`,
+        mimeType: 'text/csv',
+      };
+    }),
+
+  /**
+   * Import CSV
+   */
+  importCSV: protectedProcedure
+    .input(z.object({ content: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const parsedClients = csvToClients(input.content);
+
+      const preview = parsedClients.slice(0, 5);
+
+      const imported = await Promise.all(
+        parsedClients.map(async (clientData) => {
+          const [newClient] = await tenantDb
+            .insert(clients)
+            .values({
+              ...clientData,
+              isActive: true,
+              portalAccess: false,
+            } as any)
+            .returning();
+
+          return newClient;
+        })
+      );
+
+      return {
+        count: imported.length,
+        preview,
+      };
     }),
 });
