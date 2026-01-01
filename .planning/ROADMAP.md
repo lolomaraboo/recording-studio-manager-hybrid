@@ -513,6 +513,45 @@ Plans:
 
 ---
 
+### Phase 3.9.2: Chatbot accès notes clients (INSERTED)
+
+**Goal:** Enable AI chatbot to read and manage client notes history via natural language
+
+**Depends on:** Phase 3.9.1 (Client notes backend complete)
+
+**Plans:** 1 plan
+
+Plans:
+- [x] 3.9.2-01: Add client notes AI tools (get_client_notes, add_client_note, delete_client_note) + real-time UI refresh (Completed 2025-12-29)
+
+**Details:**
+Integration of Phase 3.9.1 notes system with AI chatbot (40 tools total). Enables chatbot to read notes history, add dated notes, and delete specific notes via natural language queries. Includes SSE notification system for real-time UI updates when chatbot modifies notes.
+
+---
+
+### Phase 3.9.3: Fix chatbot input focus bug (INSERTED)
+
+**Goal:** Fix chatbot textarea focus - should only stay focused while chatting, lose focus when clicking elsewhere
+
+**Depends on:** Phase 3.9.2
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 3.9.3 to break down)
+
+**Details:**
+[To be added during planning]
+
+**Problem:** Chatbot textarea "Tapez votre message..." remains focused even when user clicks outside chatbot to interact with other page elements (e.g., adding client notes). This prevents typing in other input fields.
+
+**Expected behavior:**
+- Textarea should be focused when user is actively chatting
+- Textarea should lose focus (blur) when user clicks outside the chatbot area
+- This allows user to interact with page content while chatbot is open
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 

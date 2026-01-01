@@ -117,15 +117,19 @@ export const clientsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
-      // Map form data to client schema
-      const { company, ...restInput } = input;
+      // Map form data to client schema (excluding company field that doesn't exist)
+      const clientData: any = {
+        name: input.name,
+      };
+
+      if (input.email) clientData.email = input.email;
+      if (input.phone) clientData.phone = input.phone;
+      if (input.address) clientData.address = input.address;
+      if (input.notes) clientData.notes = input.notes;
 
       const [client] = await tenantDb
         .insert(clients)
-        .values({
-          ...restInput,
-          // company field doesn't exist in schema - it's handled by type field
-        })
+        .values(clientData)
         .returning();
 
       return client;

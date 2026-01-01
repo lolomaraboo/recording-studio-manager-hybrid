@@ -12,7 +12,6 @@ import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
 import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
 import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
-import { initializeQdrantCollection } from './lib/rag/index.js';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -59,18 +58,29 @@ async function main() {
 
   // Initialize Qdrant collection for chatbot RAG
   try {
-    await initializeQdrantCollection();
+    const { initializeQdrantCollection } = await import('./lib/rag/index.js').catch(() => ({ initializeQdrantCollection: null }));
+    if (initializeQdrantCollection) {
+      await initializeQdrantCollection();
+    } else {
+      console.warn('⚠️  RAG module not available, skipping Qdrant initialization');
+    }
   } catch (error) {
     console.error('⚠️  Failed to initialize Qdrant collection:', error);
     console.warn('⚠️  Server will continue without RAG functionality');
   }
 
   // Middleware
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
   app.use(
     cors({
       origin: (origin, callback) => {
         // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin) return callback(null, true);
+
+        // Check environment variable allowed origins first
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
 
         // Allow localhost for development
         const localhostPattern = /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+):\d+$/;

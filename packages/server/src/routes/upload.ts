@@ -235,4 +235,165 @@ router.post('/logo', uploadLogo.single('file'), async (req: MulterRequest, res) 
   }
 });
 
+/**
+ * Upload avatar/logo endpoint (LOCAL STORAGE - vCard support)
+ * POST /api/upload/avatar
+ * POST /api/upload/client-logo
+ *
+ * Body (multipart/form-data):
+ * - file: Image file (PNG, JPG, WebP)
+ *
+ * Returns: { success: true, data: { url, filePath, fileName, bytes } }
+ */
+const uploadAvatar = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedMimes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/webp',
+    ];
+
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type: ${file.mimetype}. Only images allowed.`));
+    }
+  },
+});
+
+router.post('/avatar', uploadAvatar.single('file'), async (req: any, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file provided' });
+    }
+
+    // Get user's tenant database name
+    const { getSessionUser } = await import('../lib/session');
+    const { db } = await import('@rsm/database');
+    const { tenantDatabases } = await import('@rsm/database/master/schema');
+    const { eq } = await import('drizzle-orm');
+
+    const user = await getSessionUser(req);
+    if (!user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const [tenant] = await db
+      .select()
+      .from(tenantDatabases)
+      .where(eq(tenantDatabases.organizationId, user.organizationId))
+      .limit(1);
+
+    if (!tenant) {
+      return res.status(403).json({ error: 'No tenant found' });
+    }
+
+    // Upload to local storage
+    const { uploadLocalFile } = await import('../utils/local-upload-service');
+    const result = await uploadLocalFile(
+      req.file.buffer,
+      req.file.originalname,
+      tenant.databaseName,
+      'avatars'
+    );
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    console.error('[Upload] Avatar upload failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Upload failed',
+    });
+  }
+});
+
+router.post('/client-logo', uploadAvatar.single('file'), async (req: any, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file provided' });
+    }
+
+    const { getSessionUser } = await import('../lib/session');
+    const { db } = await import('@rsm/database');
+    const { tenantDatabases } = await import('@rsm/database/master/schema');
+    const { eq } = await import('drizzle-orm');
+
+    const user = await getSessionUser(req);
+    if (!user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const [tenant] = await db
+      .select()
+      .from(tenantDatabases)
+      .where(eq(tenantDatabases.organizationId, user.organizationId))
+      .limit(1);
+
+    if (!tenant) {
+      return res.status(403).json({ error: 'No tenant found' });
+    }
+
+    const { uploadLocalFile } = await import('../utils/local-upload-service');
+    const result = await uploadLocalFile(
+      req.file.buffer,
+      req.file.originalname,
+      tenant.databaseName,
+      'logos'
+    );
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    console.error('[Upload] Logo upload failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Upload failed',
+    });
+  }
+});
+
+/**
+ * Secure file serving with tenant validation
+ * GET /api/upload/serve/tenant_X/{avatars|logos}/filename.jpg
+ */
+router.get('/serve/tenant_*', async (req, res) => {
+  try {
+    const { validateTenantFileAccess } = await import('../middleware/tenantFileAccess');
+
+    // Run validation middleware
+    await new Promise<void>((resolve, reject) => {
+      validateTenantFileAccess(req, res, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const UPLOADS_BASE = process.env.UPLOADS_PATH || '/var/www/recording-studio-manager/uploads';
+
+    // Remove /serve/ prefix from path
+    const filePath = req.path.replace('/serve/', '');
+    const absolutePath = path.join(UPLOADS_BASE, filePath);
+
+    // Check file exists
+    await fs.access(absolutePath);
+
+    // Serve file
+    res.sendFile(absolutePath);
+  } catch (error) {
+    res.status(404).json({ error: 'File not found' });
+  }
+});
+
 export default router;

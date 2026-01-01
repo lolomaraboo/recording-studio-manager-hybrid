@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { NotesHistory } from "@/components/NotesHistory";
+import { EnrichedClientInfo } from "@/components/EnrichedClientInfo";
 import {
   ArrowLeft,
   Edit,
@@ -45,6 +46,12 @@ export default function ClientDetail() {
 
   // Fetch client data
   const { data: client, isLoading, refetch } = trpc.clients.get.useQuery(
+    { id: Number(id) },
+    { enabled: !!id }
+  );
+
+  // Fetch client with contacts (for vCard tab)
+  const { data: clientWithContacts } = trpc.clients.getWithContacts.useQuery(
     { id: Number(id) },
     { enabled: !!id }
   );
@@ -110,13 +117,54 @@ export default function ClientDetail() {
     },
   });
 
+  // Contact mutations
+  const addContactMutation = trpc.clients.addContact.useMutation({
+    onSuccess: () => {
+      toast.success("Contact ajouté");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const deleteContactMutation = trpc.clients.deleteContact.useMutation({
+    onSuccess: () => {
+      toast.success("Contact supprimé");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
   // Form state
   const [formData, setFormData] = useState({
+    // Existing fields
     name: "",
     email: "",
     phone: "",
     artistName: "",
     address: "",
+
+    // NEW vCard fields
+    type: "individual" as "individual" | "company",
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    prefix: "",
+    suffix: "",
+    avatarUrl: "",
+    logoUrl: "",
+    phones: [] as Array<{type: string; number: string}>,
+    emails: [] as Array<{type: string; email: string}>,
+    websites: [] as Array<{type: string; url: string}>,
+    street: "",
+    postalCode: "",
+    region: "",
+    birthday: "",
+    gender: "",
+    customFields: [] as Array<{label: string; type: string; value: any}>,
   });
 
   // Update form when client loads
@@ -128,6 +176,23 @@ export default function ClientDetail() {
         phone: client.phone || "",
         artistName: client.artistName || "",
         address: client.address || "",
+        type: (client.type as "individual" | "company") || "individual",
+        firstName: client.firstName || "",
+        lastName: client.lastName || "",
+        middleName: client.middleName || "",
+        prefix: client.prefix || "",
+        suffix: client.suffix || "",
+        avatarUrl: client.avatarUrl || "",
+        logoUrl: client.logoUrl || "",
+        phones: client.phones || [],
+        emails: client.emails || [],
+        websites: client.websites || [],
+        street: client.street || "",
+        postalCode: client.postalCode || "",
+        region: client.region || "",
+        birthday: client.birthday || "",
+        gender: client.gender || "",
+        customFields: client.customFields || [],
       });
     }
   }, [client]);
@@ -135,14 +200,12 @@ export default function ClientDetail() {
   const handleSave = () => {
     updateMutation.mutate({
       id: Number(id),
-      data: {
-        name: formData.name,
-        email: formData.email || undefined,
-        phone: formData.phone || undefined,
-        artistName: formData.artistName || undefined,
-        address: formData.address || undefined,
-      },
+      data: formData,
     });
+  };
+
+  const handleUpdateField = (updates: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleDelete = () => {
@@ -471,12 +534,15 @@ export default function ClientDetail() {
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="sessions">
-                    <TabsList className="grid w-full grid-cols-2">
+                    <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="sessions">
                         Sessions ({clientSessions.length})
                       </TabsTrigger>
                       <TabsTrigger value="invoices">
                         Factures ({clientInvoices.length})
+                      </TabsTrigger>
+                      <TabsTrigger value="vcard">
+                        Informations enrichies
                       </TabsTrigger>
                     </TabsList>
 
@@ -598,6 +664,24 @@ export default function ClientDetail() {
                           <p className="text-muted-foreground">Aucune facture émise</p>
                         </div>
                       )}
+                    </TabsContent>
+
+                    <TabsContent value="vcard" className="mt-4">
+                      <EnrichedClientInfo
+                        client={formData}
+                        isEditing={isEditing}
+                        onUpdate={handleUpdateField}
+                        contacts={clientWithContacts?.contacts || []}
+                        onAddContact={(contact) => {
+                          addContactMutation.mutate({
+                            clientId: Number(id),
+                            ...contact,
+                          });
+                        }}
+                        onDeleteContact={(contactId) => {
+                          deleteContactMutation.mutate({ id: contactId });
+                        }}
+                      />
                     </TabsContent>
                   </Tabs>
                 </CardContent>

@@ -27,11 +27,18 @@ export const authRouter = router({
       const masterDb = await getMasterDb();
 
       // Check if user exists
-      const existingUser = await masterDb
-        .select()
-        .from(users)
-        .where(eq(users.email, input.email))
-        .limit(1);
+      let existingUser;
+      try {
+        existingUser = await masterDb
+          .select()
+          .from(users)
+          .where(eq(users.email, input.email))
+          .limit(1);
+      } catch (error) {
+        console.error('[Register] Error checking existing user:', error);
+        console.error('[Register] Error details:', JSON.stringify(error, null, 2));
+        throw error;
+      }
 
       if (existingUser.length > 0) {
         throw new Error("User already exists");

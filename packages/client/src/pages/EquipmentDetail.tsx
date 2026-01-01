@@ -153,10 +153,12 @@ export default function EquipmentDetail() {
     updateMutation.mutate({
       id: Number(id),
       ...formData,
-      purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
-      warrantyUntil: formData.warrantyUntil ? new Date(formData.warrantyUntil) : undefined,
-      lastMaintenanceAt: formData.lastMaintenanceAt ? new Date(formData.lastMaintenanceAt) : undefined,
-      nextMaintenanceAt: formData.nextMaintenanceAt ? new Date(formData.nextMaintenanceAt) : undefined,
+      purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : null,
+      warrantyUntil: formData.warrantyUntil ? new Date(formData.warrantyUntil) : null,
+      lastMaintenanceAt: formData.lastMaintenanceAt ? new Date(formData.lastMaintenanceAt) : null,
+      nextMaintenanceAt: formData.nextMaintenanceAt ? new Date(formData.nextMaintenanceAt) : null,
+      roomId: formData.roomId || null,
+      purchasePrice: formData.purchasePrice || null,
     });
   };
 
