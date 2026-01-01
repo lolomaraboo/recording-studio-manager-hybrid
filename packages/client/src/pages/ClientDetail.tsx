@@ -298,45 +298,18 @@ export default function ClientDetail() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/clients">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-semibold">{client.name}</h1>
-                {isVIP && <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />}
-              </div>
-              <p className="text-sm text-muted-foreground">Client #{client.id}</p>
+        <div className="container flex h-16 items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/clients">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-semibold">{client.name}</h1>
+              {isVIP && <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />}
             </div>
-          </div>
-          <div className="flex gap-2">
-            {!isEditing ? (
-              <>
-                <Button variant="outline" onClick={() => setIsEditing(true)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Modifier
-                </Button>
-                <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Supprimer
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  <X className="mr-2 h-4 w-4" />
-                  Annuler
-                </Button>
-                <Button onClick={handleSave} disabled={updateMutation.isPending}>
-                  <Save className="mr-2 h-4 w-4" />
-                  Enregistrer
-                </Button>
-              </>
-            )}
+            <p className="text-sm text-muted-foreground">Client #{client.id}</p>
           </div>
         </div>
       </header>
@@ -418,8 +391,38 @@ export default function ClientDetail() {
               {/* Profile Card */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Informations du client</CardTitle>
-                  <CardDescription>Coordonnées et informations de contact</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Informations du client</CardTitle>
+                      <CardDescription>Coordonnées et informations de contact</CardDescription>
+                    </div>
+                    {/* Actions rapides - V2 */}
+                    <div className="flex gap-2">
+                      {!isEditing ? (
+                        <>
+                          <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} title="Modifier les informations du client">
+                            <Edit className="mr-2 h-4 w-4" />
+                            Modifier
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Supprimer
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                            <X className="mr-2 h-4 w-4" />
+                            Annuler
+                          </Button>
+                          <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
+                            <Save className="mr-2 h-4 w-4" />
+                            Enregistrer
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {isEditing ? (
@@ -512,6 +515,26 @@ export default function ClientDetail() {
                       )}
                     </>
                   )}
+
+                  {/* Informations enrichies - déplacé depuis l'onglet Historique */}
+                  <div className="mt-6 pt-6 border-t">
+                    <h3 className="text-sm font-semibold mb-4">Informations enrichies</h3>
+                    <EnrichedClientInfo
+                      client={formData}
+                      isEditing={isEditing}
+                      onUpdate={handleUpdateField}
+                      contacts={clientWithContacts?.contacts || []}
+                      onAddContact={(contact) => {
+                        addContactMutation.mutate({
+                          clientId: Number(id),
+                          ...contact,
+                        });
+                      }}
+                      onDeleteContact={(contactId) => {
+                        deleteContactMutation.mutate({ id: contactId });
+                      }}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
@@ -534,15 +557,12 @@ export default function ClientDetail() {
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="sessions">
-                    <TabsList className="grid w-full grid-cols-3">
+                    <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="sessions">
                         Sessions ({clientSessions.length})
                       </TabsTrigger>
                       <TabsTrigger value="invoices">
                         Factures ({clientInvoices.length})
-                      </TabsTrigger>
-                      <TabsTrigger value="vcard">
-                        Informations enrichies
                       </TabsTrigger>
                     </TabsList>
 
@@ -664,24 +684,6 @@ export default function ClientDetail() {
                           <p className="text-muted-foreground">Aucune facture émise</p>
                         </div>
                       )}
-                    </TabsContent>
-
-                    <TabsContent value="vcard" className="mt-4">
-                      <EnrichedClientInfo
-                        client={formData}
-                        isEditing={isEditing}
-                        onUpdate={handleUpdateField}
-                        contacts={clientWithContacts?.contacts || []}
-                        onAddContact={(contact) => {
-                          addContactMutation.mutate({
-                            clientId: Number(id),
-                            ...contact,
-                          });
-                        }}
-                        onDeleteContact={(contactId) => {
-                          deleteContactMutation.mutate({ id: contactId });
-                        }}
-                      />
                     </TabsContent>
                   </Tabs>
                 </CardContent>

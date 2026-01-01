@@ -14,16 +14,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { ImportClientsDialog } from "@/components/ImportClientsDialog";
 
+type ViewMode = 'table' | 'grid' | 'kanban';
+
 export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importFormat, setImportFormat] = useState<'vcard' | 'excel' | 'csv'>('vcard');
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
 
   const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
@@ -271,8 +274,35 @@ export function Clients() {
           {/* Clients List */}
           <Card>
             <CardHeader>
-              <CardTitle>{filteredClients.length} client(s)</CardTitle>
-              <CardDescription>Gérez votre base de données clients</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>{filteredClients.length} client(s)</CardTitle>
+                  <CardDescription>Gérez votre base de données clients</CardDescription>
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    variant={viewMode === 'table' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('table')}
+                  >
+                    <TableIcon className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'kanban' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('kanban')}
+                  >
+                    <Columns className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {clientsLoading ? (
@@ -282,8 +312,11 @@ export function Clients() {
                   ))}
                 </div>
               ) : filteredClients.length > 0 ? (
-                <div className="rounded-md border">
-                  <Table>
+                <>
+                  {/* Table View */}
+                  {viewMode === 'table' && (
+                    <div className="rounded-md border">
+                      <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Client</TableHead>
@@ -363,7 +396,248 @@ export function Clients() {
                       ))}
                     </TableBody>
                   </Table>
-                </div>
+                    </div>
+                  )}
+
+                  {/* Grid View */}
+                  {viewMode === 'grid' && (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {filteredClients.map((client) => (
+                        <Card key={client.id} className="hover:shadow-md transition-shadow">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                  {client.name}
+                                  {client.revenue > 1000000 && (
+                                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                                  )}
+                                </CardTitle>
+                                {client.artistName && (
+                                  <CardDescription className="text-sm mt-1">
+                                    {client.artistName}
+                                  </CardDescription>
+                                )}
+                              </div>
+                              <Badge variant="outline" className="capitalize">
+                                {client.type === "company" ? "Entreprise" : "Particulier"}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {/* Contact Info enrichi */}
+                            <div className="space-y-2 text-sm">
+                              {/* Téléphones enrichis */}
+                              {client.phones && Array.isArray(client.phones) && client.phones.length > 0 ? (
+                                client.phones.map((phone: any, idx: number) => (
+                                  <div key={idx} className="flex items-center gap-2 text-muted-foreground">
+                                    <Phone className="h-3 w-3 flex-shrink-0" />
+                                    <span className="text-xs capitalize">{phone.type}:</span>
+                                    <span>{phone.number}</span>
+                                  </div>
+                                ))
+                              ) : client.phone ? (
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <Phone className="h-3 w-3 flex-shrink-0" />
+                                  <span>{client.phone}</span>
+                                </div>
+                              ) : null}
+
+                              {/* Emails enrichis */}
+                              {client.emails && Array.isArray(client.emails) && client.emails.length > 0 ? (
+                                client.emails.map((email: any, idx: number) => (
+                                  <div key={idx} className="flex items-center gap-2 text-muted-foreground">
+                                    <Mail className="h-3 w-3 flex-shrink-0" />
+                                    <span className="text-xs capitalize">{email.type}:</span>
+                                    <span className="truncate">{email.email}</span>
+                                  </div>
+                                ))
+                              ) : client.email ? (
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <Mail className="h-3 w-3 flex-shrink-0" />
+                                  <span className="truncate">{client.email}</span>
+                                </div>
+                              ) : null}
+
+                              {/* Adresse si présente */}
+                              {(client.city || client.address) && (
+                                <div className="flex items-start gap-2 text-muted-foreground">
+                                  <Phone className="h-3 w-3 flex-shrink-0 mt-0.5" />
+                                  <span className="text-xs">{client.city || client.address}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Actions */}
+                            <Button asChild variant="outline" size="sm" className="w-full">
+                              <Link to={`/clients/${client.id}`}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                Voir détails
+                              </Link>
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Kanban View */}
+                  {viewMode === 'kanban' && (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+                      {/* Particuliers Column */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                          <h3 className="font-semibold">Particuliers</h3>
+                          <Badge variant="secondary">
+                            {filteredClients.filter(c => c.type === 'individual').length}
+                          </Badge>
+                        </div>
+                        <div className="space-y-3">
+                          {filteredClients
+                            .filter(c => c.type === 'individual')
+                            .map((client) => (
+                              <Card key={client.id} className="hover:shadow-md transition-shadow">
+                                <CardHeader className="pb-2">
+                                  <div className="flex items-start justify-between">
+                                    <CardTitle className="text-sm flex items-center gap-2">
+                                      {client.name}
+                                      {client.revenue > 1000000 && (
+                                        <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                      )}
+                                    </CardTitle>
+                                  </div>
+                                  {client.artistName && (
+                                    <CardDescription className="text-xs">
+                                      {client.artistName}
+                                    </CardDescription>
+                                  )}
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                  <div className="space-y-1 text-xs">
+                                    {/* Afficher téléphones enrichis ou simple */}
+                                    {client.phones && Array.isArray(client.phones) && client.phones.length > 0 ? (
+                                      client.phones.slice(0, 2).map((phone: any, idx: number) => (
+                                        <div key={idx} className="flex items-center gap-1 text-muted-foreground">
+                                          <Phone className="h-3 w-3" />
+                                          <span className="capitalize">{phone.type}:</span>
+                                          <span>{phone.number}</span>
+                                        </div>
+                                      ))
+                                    ) : client.phone ? (
+                                      <div className="flex items-center gap-1 text-muted-foreground">
+                                        <Phone className="h-3 w-3" />
+                                        <span>{client.phone}</span>
+                                      </div>
+                                    ) : null}
+
+                                    {/* Afficher email principal */}
+                                    {client.emails && Array.isArray(client.emails) && client.emails.length > 0 ? (
+                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                                        <Mail className="h-3 w-3 flex-shrink-0" />
+                                        <span className="truncate">{client.emails[0].email}</span>
+                                      </div>
+                                    ) : client.email ? (
+                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                                        <Mail className="h-3 w-3 flex-shrink-0" />
+                                        <span className="truncate">{client.email}</span>
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                  <Button asChild variant="outline" size="sm" className="w-full mt-2">
+                                    <Link to={`/clients/${client.id}`}>
+                                      <Eye className="h-3 w-3 mr-2" />
+                                      Voir
+                                    </Link>
+                                  </Button>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          {filteredClients.filter(c => c.type === 'individual').length === 0 && (
+                            <p className="text-sm text-muted-foreground text-center py-8">
+                              Aucun particulier
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Entreprises Column */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                          <h3 className="font-semibold">Entreprises</h3>
+                          <Badge variant="secondary">
+                            {filteredClients.filter(c => c.type === 'company').length}
+                          </Badge>
+                        </div>
+                        <div className="space-y-3">
+                          {filteredClients
+                            .filter(c => c.type === 'company')
+                            .map((client) => (
+                              <Card key={client.id} className="hover:shadow-md transition-shadow">
+                                <CardHeader className="pb-2">
+                                  <div className="flex items-start justify-between">
+                                    <CardTitle className="text-sm flex items-center gap-2">
+                                      {client.name}
+                                      {client.revenue > 1000000 && (
+                                        <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                      )}
+                                    </CardTitle>
+                                  </div>
+                                  {client.artistName && (
+                                    <CardDescription className="text-xs">
+                                      {client.artistName}
+                                    </CardDescription>
+                                  )}
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                  <div className="space-y-1 text-xs">
+                                    {/* Afficher téléphones enrichis ou simple */}
+                                    {client.phones && Array.isArray(client.phones) && client.phones.length > 0 ? (
+                                      client.phones.slice(0, 2).map((phone: any, idx: number) => (
+                                        <div key={idx} className="flex items-center gap-1 text-muted-foreground">
+                                          <Phone className="h-3 w-3" />
+                                          <span className="capitalize">{phone.type}:</span>
+                                          <span>{phone.number}</span>
+                                        </div>
+                                      ))
+                                    ) : client.phone ? (
+                                      <div className="flex items-center gap-1 text-muted-foreground">
+                                        <Phone className="h-3 w-3" />
+                                        <span>{client.phone}</span>
+                                      </div>
+                                    ) : null}
+
+                                    {/* Afficher email principal */}
+                                    {client.emails && Array.isArray(client.emails) && client.emails.length > 0 ? (
+                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                                        <Mail className="h-3 w-3 flex-shrink-0" />
+                                        <span className="truncate">{client.emails[0].email}</span>
+                                      </div>
+                                    ) : client.email ? (
+                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                                        <Mail className="h-3 w-3 flex-shrink-0" />
+                                        <span className="truncate">{client.email}</span>
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                  <Button asChild variant="outline" size="sm" className="w-full mt-2">
+                                    <Link to={`/clients/${client.id}`}>
+                                      <Eye className="h-3 w-3 mr-2" />
+                                      Voir
+                                    </Link>
+                                  </Button>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          {filteredClients.filter(c => c.type === 'company').length === 0 && (
+                            <p className="text-sm text-muted-foreground text-center py-8">
+                              Aucune entreprise
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-12">
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
