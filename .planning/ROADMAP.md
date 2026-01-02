@@ -552,6 +552,64 @@ Plans:
 
 ---
 
+### Phase 3.9.4: Clients enrichis compatible vCard (INSERTED)
+**Goal**: Enrichir le système de contacts clients pour supporter le standard vCard 4.0 avec photos/avatars, logos, contacts multiples, et upload local sécurisé
+
+**Depends on:** Phase 3.9.3
+
+**Plans:** 2 plans
+
+Plans:
+- [x] 3.9.4-01: Schema vCard 4.0 + Upload Local Photos/Logos (Completed 2025-12-31 - 240 min)
+- [x] 3.9.4-02: Enriched Client Data Entry at Creation (Completed 2025-12-31 - 240 min)
+
+**Status**: ✅ Complete (2/2 plans finished - 480 min total)
+
+**Details:**
+Phase 3.9.4-01: Database migration (16 vCard fields), tenant-isolated local file upload (/uploads/tenant_X/), tRPC procedures (getWithContacts, addContact, updateContact, deleteContact), frontend EnrichedClientInfo component (515 lines), security middleware for cross-tenant access blocking.
+
+Phase 3.9.4-02: Extended clients.create mutation to accept enriched vCard fields at creation time, transformed ClientCreate.tsx into 4-tab interface (Identité/Contact/Adresse/Info additionnelles, 725 lines), integrated avatar/logo upload at creation, backward compatibility maintained (minimal name-only creation still works).
+
+**Rationale**: vCard 4.0 compliance enables professional CRM features (structured names, multiple contacts, custom fields), avatar/logo upload improves visual identity, tenant-isolated storage ensures data security. Critical for Phase 4 marketing positioning as professional studio management platform.
+
+---
+
+### Phase 3.10: Test Clients Enrichis vCard (INSERTED)
+**Goal**: Valider le formulaire de création enrichi et les fonctionnalités vCard 4.0 avant le lancement marketing
+
+**Depends on:** Phase 3.9.4
+
+**Plans:** 3 plans
+
+Plans:
+- [x] 3.10-01: Test formulaire création client enrichi (Completed 2026-01-02 - 12 min) ⚠️ CRITICAL BUG DISCOVERED
+- [ ] 3.10-02: Test edge cases et arrays dynamiques
+- [ ] 3.10-03: Validation affichage données enrichies complètes
+
+**Status**: ⚠️ BLOCKED - 1/3 plans complete - CRITICAL BUG blocking further testing
+
+**Critical Bug (BUG-001 - P0 BLOCKER):**
+- Contact tab in ClientCreate.tsx doesn't display when clicked
+- Stays on Info additionnelles tab, preventing phones/emails/websites testing
+- Blocks 50% of Phase 3.10 test coverage
+- Must be fixed before Phase 3.10-02 and 3.10-03 can proceed
+
+**Details:**
+Phase 3.10-01 achieved 50% test coverage (8/16 functionalities):
+- ✅ 4-tab interface displays correctly
+- ✅ Identité tab (7 structured name fields) works
+- ✅ Info additionnelles tab works
+- ✅ Client creation successful (tenant_8 PostgreSQL)
+- ✅ Backward compatibility validated (name-only creation)
+- ✅ Data persistence verified in database
+- ❌ Contact tab bug blocks phones/emails/websites testing
+- ❌ Address tab not tested due to Contact tab bug
+- ❌ Avatar/logo upload not tested (automation complexity)
+
+**Rationale**: Automated testing before marketing launch (Phase 4) ensures enriched client creation works flawlessly. 50% coverage shows core functionality working, but Contact tab bug is critical blocker requiring immediate fix before proceeding to Phase 4.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -679,7 +737,7 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 28/45+ plans complete (62.2%) - Phase 3.9 complete, Phase 3.9.1 to be planned
+**Total**: 37/42 plans complete (88.1%) - Phase 3.10-01 complete with critical bug, Phase 3.10-02/03 blocked
 
 ---
 
