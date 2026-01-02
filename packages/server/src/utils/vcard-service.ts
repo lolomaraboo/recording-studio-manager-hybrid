@@ -226,9 +226,9 @@ export function vCardToClient(vcardString: string): Partial<Client> {
     }
   }
 
-  // Ensure name is set
-  if (!client.name) {
-    client.name = 'Sans nom';
+  // Validation RFC 6350: FN (Formatted Name) est OBLIGATOIRE et ne peut pas être vide
+  if (!client.name || client.name.trim() === '') {
+    throw new Error('vCard invalide: champ FN (Formatted Name) requis selon RFC 6350');
   }
 
   return client;
@@ -243,13 +243,14 @@ export function parseVCardFile(fileContent: string): Partial<Client>[] {
   // Split by BEGIN:VCARD
   const vcards = fileContent.split(/BEGIN:VCARD/i).filter(s => s.trim());
 
-  vcards.forEach((vcardText) => {
+  vcards.forEach((vcardText, index) => {
     try {
       const fullVCard = 'BEGIN:VCARD' + vcardText;
       const client = vCardToClient(fullVCard);
       clients.push(client);
     } catch (error) {
-      console.error('[vCard] Parse error:', error);
+      // Log mais continue le parsing des autres vCards
+      console.warn(`[vCard] Parsing skipped for vCard #${index + 1}:`, error instanceof Error ? error.message : error);
     }
   });
 

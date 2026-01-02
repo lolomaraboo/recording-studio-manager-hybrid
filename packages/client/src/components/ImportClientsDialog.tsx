@@ -52,9 +52,16 @@ export function ImportClientsDialog({ open, onClose, format, onImportComplete }:
 
         setPreview(result.preview);
         toast.success(`${result.count} contacts trouvés`);
-      } catch (error) {
-        toast.error('Erreur lors de la lecture du fichier');
-        console.error(error);
+      } catch (error: any) {
+        // Display specific error message from server (e.g., validation errors)
+        console.error('Import error full object:', error);
+        console.error('Import error keys:', Object.keys(error || {}));
+        console.error('Import error.message:', error?.message);
+        console.error('Import error.data:', error?.data);
+        console.error('Import error.shape:', error?.shape);
+
+        const errorMessage = error?.message || error?.data?.message || error?.shape?.message || 'Erreur lors de la lecture du fichier';
+        toast.error(errorMessage);
       }
     };
 

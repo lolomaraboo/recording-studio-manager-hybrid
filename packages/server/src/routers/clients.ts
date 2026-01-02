@@ -402,11 +402,16 @@ export const clientsRouter = router({
         ? tenantDb.select().from(clients).where(inArray(clients.id, input.ids))
         : tenantDb.select().from(clients);
 
-      const clientsToExport = await query;
+      const allClients = await query;
 
-      // Generate vCards
+      // Filter out invalid clients (no name or empty name) before export
+      const validClients = allClients.filter(
+        (client) => client.name && client.name.trim() !== ''
+      );
+
+      // Generate vCards only for valid clients
       const vcards = await Promise.all(
-        clientsToExport.map(async (client) => {
+        validClients.map(async (client) => {
           // Get contacts for this client
           const contacts = await tenantDb
             .select()
@@ -435,8 +440,19 @@ export const clientsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
-      // Parse vCard file
+      // Parse vCard file (invalid vCards are automatically skipped)
       const parsedClients = parseVCardFile(input.content);
+
+      // Validation: reject if no valid clients found
+      if (parsedClients.length === 0) {
+        console.error('[importVCard] Validation failed: No valid clients found');
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Aucun client valide trouvé dans le fichier vCard. Vérifiez que le champ FN (nom) est présent et non vide.',
+        });
+      }
+
+      console.log(`[importVCard] Successfully parsed ${parsedClients.length} valid clients`);
 
       // Preview first 5
       const preview = parsedClients.slice(0, 5);
