@@ -1,0 +1,3364 @@
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Test vCard Client
+N:Doe;John;;;
+TEL;TYPE=mobile:+33612345678
+EMAIL;TYPE=work:john@work.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sophie Dubois
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Marc Lefebvre
+N:Lefebvre;Marc;;M.;
+NICKNAME:Marc L
+TEL;TYPE=mobile:+33 7 89 01 23 45
+EMAIL;TYPE=personal:marc.lefebvre@example.com
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Sans nom
+KIND:individual
+END:VCARD
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:1990-03-15
+GENDER:M
+KIND:individual
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD

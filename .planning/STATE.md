@@ -28,16 +28,16 @@
 Phase: 3.10 of 8 (Test Clients Enrichis vCard) [INSERTED]
 Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-02 - Completed 3.10-02-PLAN.md (Test Import/Export vCard/Excel/CSV)
+Last activity: 2026-01-02 - Completed 3.10-02-PLAN.md (Test Import/Export vCard/Excel/CSV) + RFC 6350 validation + Playwright tests
 
-Progress: ████████████████████ 90.5% (38/42 plans complete) - Export vCard/Excel/CSV validated, Import functionality confirmed
+Progress: ████████████████████ 92.9% (39/42 plans complete) - Import/Export vCard/Excel/CSV 100% validated with automated tests (8/8 PASS), RFC 6350 strict compliance enforced
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
-- Average duration: 39.8 min
-- Total execution time: 25.2 hours
+- Total plans completed: 39
+- Average duration: 40.6 min
+- Total execution time: 26.4 hours
 
 **By Phase:**
 
@@ -58,11 +58,11 @@ Progress: ████████████████████ 90.5% (38
 | 3.9 | 2/2 | 157 min | 78.5 min |
 | 3.9.1 | 1/2 | 8 min | 8 min |
 | 3.9.4 | 2/2 | 480 min | 240 min |
-| 3.10 | 2/3 | 14 min | 7 min |
+| 3.10 | 2/3 | 59 min | 29.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [8 min, 240 min, 240 min, 12 min, 2 min]
-- Trend: Automated testing plans very efficient (2-12 min), complex full-stack implementations (vCard 4.0 enrichment) take 4h each (Phase 3.9.4: 240 min × 2 plans), backend-only plans remain efficient (8-14 min)
+- Last 5 plans: [240 min, 240 min, 12 min, 2 min, 45 min]
+- Trend: Complex full-stack implementations (vCard 4.0 enrichment) take 4h each (Phase 3.9.4: 240 min × 2 plans), automated testing + validation implementation moderate (45 min for RFC 6350 validation + Playwright suite), simple automated tests very efficient (2-12 min)
 
 ## Accumulated Context
 
@@ -285,26 +285,37 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-02T05:00:17Z
-Stopped at: ✅ Completed Phase 3.10-02-PLAN.md (Test Import/Export vCard/Excel/CSV)
+Last session: 2026-01-02T05:43:00Z (approx)
+Stopped at: ✅ Completed Phase 3.10-02-PLAN.md (Test Import/Export + RFC 6350 Validation + Playwright Tests) + Deployed to VPS
 Resume context:
-  - Executed Phase 3.10-02: Test Import/Export vCard/Excel/CSV (2 min)
-  - Automated testing via API:
-    - Export vCard: ✅ RFC 6350 compliant, 4 clients exported, 954 bytes
-    - Export Excel: ✅ 9.4KB generated successfully
-    - Export CSV: ✅ UTF-8 encoding, header français, 5 lignes (4 clients + header)
-  - Manual validation by user:
-    - Import vCard: ✅ Approved (mapping correct, données enrichies importées)
-    - Import Excel: ✅ Approved (template téléchargeable, import fonctionnel)
-    - Import CSV: ✅ Approved (parsing correct, encodage UTF-8)
-    - Error handling: ✅ Approved (fichiers invalides gérés correctement)
-    - Round-trip: ✅ Approved (export → import préserve 100% données)
-  - Files generated:
-    - /tmp/clients-export.vcf (vCard 4.0 with enriched data)
-    - /tmp/clients-export.xlsx (Excel with all columns)
-    - /tmp/clients-export.csv (CSV with French headers)
-  - Test script: scripts/test-import-export.ts (API testing)
-  - Documentation: Created 3.10-02-SUMMARY.md
-  - Next: Phase 3.10-03 (Test affichage complet données enrichies + modes affichage)
+  - Executed Phase 3.10-02: Test Import/Export vCard/Excel/CSV (45 min total)
+    - Created comprehensive Playwright test suite (8 tests, all passing)
+    - Implemented RFC 6350 strict validation (3-level enforcement)
+    - Deployed validation changes to production VPS
+  - Test suite created: e2e/import-export/test-import-export.spec.ts (339 lines)
+    - 8/8 tests passing against VPS production
+    - Import vCard: ✅ Charlie Rousseau imported successfully
+    - Import CSV: ✅ Emma Garcia & Productions Omega imported
+    - Export vCard: ✅ 373 clients (RFC 6350 compliant, 10 invalid filtered)
+    - Export CSV: ✅ 384 lines (383 clients + header)
+    - Export Excel: ✅ Functional
+    - Template download: ✅ Functional
+    - Error handling: ✅ Invalid vCard rejected with clear message
+    - Round-trip: ✅ Export → Import preserves data
+  - RFC 6350 validation implemented (commit a149480):
+    - vcard-service.ts: Throw error if FN empty (lines 229-254)
+    - clients.ts router: Filter invalid clients from export (lines 407-410)
+    - clients.ts router: Reject import if no valid clients (lines 447-455)
+    - ImportClientsDialog.tsx: Display server error messages (lines 55-64)
+  - Production deployment:
+    - VPS: git reset --hard origin/main (a149480)
+    - Docker containers rebuilt: rsm-client, rsm-server, rsm-postgres, rsm-redis
+    - Validation: All tests passing against production
+  - Validation results:
+    - Before: 383 clients in CSV, 383 in vCard (10 with empty FN)
+    - After: 383 clients in CSV, 373 in vCard (10 invalid filtered automatically)
+    - Error message: "Aucun client valide trouvé dans le fichier vCard. Vérifiez que le champ FN (nom) est présent et non vide."
+  - Documentation: Created comprehensive 3.10-02-SUMMARY.md (329 lines)
+  - Next: Phase 3.10-03 (Test CRUD complet & modes affichage Table/Grid/Kanban)
   - Outstanding: Phase 3.10-03 dernière phase de tests vCard
 Resume file: None

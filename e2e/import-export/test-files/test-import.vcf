@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:4.0
+FN:Charlie Rousseau
+N:Rousseau;Charlie;Marie;;M.;
+TEL;TYPE=mobile:+33612345678
+TEL;TYPE=work:+33142424242
+EMAIL;TYPE=work:charlie@work.com
+EMAIL;TYPE=home:charlie@gmail.com
+ADR;TYPE=work:;;10 Rue de la Paix;Paris;Île-de-France;75002;France
+BDAY:19900315
+GENDER:M
+NOTE:Client import test vCard
+X-INSTAGRAM:@charlierocks
+END:VCARD

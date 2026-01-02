@@ -1,0 +1,3 @@
+name,type,firstName,lastName,phone,email,city,postalCode,country
+"Emma Garcia",individual,Emma,Garcia,+33687654321,emma@mail.com,Toulouse,31000,France
+"Productions Omega",company,,,+33467891234,info@omega.com,Montpellier,34000,France
