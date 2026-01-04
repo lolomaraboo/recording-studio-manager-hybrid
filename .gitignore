@@ -62,3 +62,6 @@ packages/database/drizzle/migrations/*
 !packages/database/drizzle/migrations/tenant/
 !packages/database/drizzle/migrations/.gitkeep
 .env.production.local
+
+# Auto Claude data directory
+.auto-claude/

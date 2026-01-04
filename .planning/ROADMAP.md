@@ -617,6 +617,27 @@ Plans:
 
 ---
 
+### Phase 3.11: Rangement et nettoyage du dossier (INSERTED)
+**Goal**: Organiser et nettoyer le dossier de projet avant le lancement marketing
+
+**Depends on**: Phase 3.10 (testing vCard complete)
+
+**Research**: Unlikely (file organization, code cleanup patterns)
+
+**Plans**: 1 plan (in progress)
+
+Plans:
+- [x] 3.11-01: File System Cleanup - Root directory, .worktrees/, Phase 3.4 bloat (Completed 2026-01-04 - 5 min)
+
+**Status**: 🔄 In progress (1/? plans complete)
+
+**Details**:
+Phase 3.11-01 complete: Removed 33 files from root directory (32 PNG screenshots + 1 log), cleaned .worktrees/ directory (2 git worktrees removed), reduced Phase 3.4 from 9.8MB to 908KB (~9MB freed), preserved 58 markdown documentation files.
+
+**Rationale**: Avant le lancement marketing (Phase 4), nettoyer et organiser le dossier de projet pour maintenir une codebase propre et professionnelle. Cela inclut: suppression de fichiers obsolètes, organisation de la documentation, nettoyage des fichiers temporaires, et validation de la structure du projet.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
@@ -717,7 +738,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 3.9 (INSERTED) → 3.9.1 (INSERTED) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 3.9 (INSERTED) → 3.9.1 (INSERTED) → 3.9.4 (INSERTED) → 3.10 (INSERTED) → 3.11 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -740,13 +761,14 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.9.1. Notes avec historique daté (INSERTED) | 1/2 | ⏳ In progress | 2025-12-29 |
 | 3.9.4. Clients enrichis compatible vCard (INSERTED) | 2/2 | ✅ Complete | 2025-12-31 |
 | 3.10. Test Clients Enrichis vCard (INSERTED) | 3/3 | ✅ Complete | 2026-01-02 |
+| 3.11. Rangement et nettoyage du dossier (INSERTED) | 1/? | 🔄 In progress | 2026-01-04 |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 40/42 plans complete (95.2%) - Phase 3.10 complete with 12/13 tests passing, CRITICAL BUG in CREATE enrichi documented
+**Total**: 41/42 plans complete (97.6%) - Phase 3.11-01 complete (file system cleanup), CRITICAL BUG in CREATE enrichi documented
 
 ---
 

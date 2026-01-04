@@ -25,12 +25,12 @@
 
 ## Current Position
 
-Phase: 3.10 of 8 (Test Clients Enrichis vCard) [INSERTED] - ✅ COMPLETED
-Plan: 3 of 3 in current phase
-Status: Phase complete - All 3 plans executed (CREATE/Import-Export/CRUD tests)
-Last activity: 2026-01-02 - Completed 3.10-03-PLAN.md (Test CRUD complet + modes affichage) - 4 Playwright tests (4/4 PASS), features manquantes documentées
+Phase: 3.11 of 8 (Rangement et nettoyage du dossier) [INSERTED] - 🔄 IN PROGRESS
+Plan: 1 of ? in current phase
+Status: In progress
+Last activity: 2026-01-04 - Completed 3.11-01-PLAN.md (File System Cleanup)
 
-Progress: ████████████████████ 95.2% (40/42 plans complete) - Phase 3.10 complete with 12/13 tests passing, CRITICAL BUG discovered in CREATE client enrichi
+Progress: ████████████████████ 97.6% (41/42 plans complete) - Phase 3.11-01 complete (32 PNG + 1 log removed, .worktrees/ cleaned, Phase 3.4 reduced 9MB)
 
 ## Performance Metrics
 
@@ -235,6 +235,11 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Impact: User cannot add client notes while chatbot is open - textarea steals focus
   - Expected: Textarea should blur when clicking outside chatbot area
   - Priority: URGENT - UX blocker preventing simultaneous chatbot + page interaction
+- **2026-01-04:** Phase 3.11 inserted after Phase 3.10 - "Rangement et nettoyage du dossier" (INSERTED)
+  - Reason: Organiser et nettoyer le dossier de projet avant le lancement marketing
+  - Impact: Maintenir une codebase propre et professionnelle, supprimer fichiers obsolètes, organiser documentation
+  - Scope: Suppression fichiers temporaires, organisation documentation, validation structure projet, nettoyage code mort
+  - Priority: ORGANISATION - Qualité et maintenabilité avant Phase 4 (Marketing Foundation)
 
 ### Blockers/Concerns Carried Forward
 
