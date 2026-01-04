@@ -1,0 +1,98 @@
+=== AUTO-BUILD PROGRESS ===
+
+Project: Recording Studio Manager - File Organization Audit
+Workspace: 001-verify-file-organization-and-correct-placement
+Started: 2026-01-02 08:59:17
+
+Workflow Type: investigation
+Rationale: Read-only exploratory task focused on analyzing and documenting the current state
+of codebase organization across all 4 packages (database, server, shared, client) and root
+directory. No code changes - only assessment and reporting.
+
+Session 1 (Planner):
+- Created implementation_plan.json
+- Phases: 4 (Inventory, Analyze, Detect Issues, Report)
+- Total subtasks: 14
+- Created init.sh
+- Created build-progress.txt
+
+Phase Summary:
+
+Phase 1 - Complete Directory Inventory (investigation):
+  - 3 subtasks, depends on []
+  - Generate directory tree, inventory root files, survey packages
+
+Phase 2 - File Location Analysis (investigation):
+  - 5 subtasks, depends on [phase-1-inventory]
+  - Identify misplaced tests, docs, images, scripts
+  - Check package structure compliance
+
+Phase 3 - Issue Detection (investigation):
+  - 4 subtasks, depends on [phase-2-analyze]
+  - Detect orphaned files, duplicates
+  - Check .gitignore and config locations
+
+Phase 4 - Generate Audit Report (implementation):
+  - 4 subtasks (1 to create report, 3 to populate)
+  - depends on [phase-3-detect-issues]
+  - Create comprehensive markdown report with findings
+
+Services Involved:
+- All services (project-wide audit)
+  - database: Drizzle ORM package
+  - server: Express API backend
+  - shared: Utility library
+  - client: React + Vite frontend
+
+Key Investigation Areas:
+- Root directory: ~100+ files (many test files, scripts, images at root)
+- Test files: 20+ .spec.ts, .mjs, .sh files scattered at root
+- Documentation: 13+ .md files (some should be in docs/)
+- Screenshots: Multiple .png files (should be in screenshots/)
+- Scripts: Various .mjs and .sh files (should be in scripts/)
+
+Parallelism Analysis:
+- Max parallel phases: 1
+- Recommended workers: 1
+- Sequential execution required
+- Reasoning: Investigation workflow requires sequential analysis:
+  inventory → analyze → detect issues → report generation
+
+Verification Strategy:
+- Risk level: trivial (read-only, zero code changes)
+- Skip validation: false (minimal mode enabled)
+- Manual checks only - verify report completeness
+- No tests, security scans, or deployments required
+
+=== STARTUP COMMAND ===
+
+To continue building this spec, run:
+
+  source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 001 --parallel 1
+
+Example with explicit spec number:
+
+  source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 001 --parallel 1
+
+=== EXPECTED OUTPUT ===
+
+Deliverable: file-organization-audit-report.md
+
+Report Sections:
+- Executive Summary: High-level assessment of organization health
+- Directory Structure Overview: Tree visualization
+- Findings: Well-organized areas + issues detected
+- Statistics: Total files, misplaced count, orphaned count
+- Recommendations: Prioritized action items
+
+=== CRITICAL CONSTRAINTS ===
+
+⚠️  READ-ONLY TASK - NO FILE MODIFICATIONS ALLOWED
+- Do not move, rename, or delete any files
+- Do not modify any configuration files
+- Only create the audit report file
+- Verify git working tree stays clean (except report)
+
+=== END SESSION 1 ===
+
+Next session will be: Coder Agent (Implementation)

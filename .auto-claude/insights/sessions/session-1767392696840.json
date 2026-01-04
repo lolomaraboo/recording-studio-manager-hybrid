@@ -1,0 +1,15 @@
+{
+  "id": "session-1767392696840",
+  "projectId": "6597d9fa-1377-44cd-a5a4-1f61bbaf80d5",
+  "title": "What is the architecture of this project?",
+  "messages": [
+    {
+      "id": "msg-1767392696842",
+      "role": "user",
+      "content": "What is the architecture of this project?",
+      "timestamp": "2026-01-02T22:24:56.842Z"
+    }
+  ],
+  "createdAt": "2026-01-02T22:24:56.840Z",
+  "updatedAt": "2026-01-02T22:24:56.842Z"
+}

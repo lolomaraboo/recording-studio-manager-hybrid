@@ -1,0 +1,823 @@
+{
+  "project_root": "/Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid",
+  "project_type": "monorepo",
+  "services": {
+    "database": {
+      "name": "database",
+      "path": "/Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid/packages/database",
+      "language": "TypeScript",
+      "framework": null,
+      "type": "unknown",
+      "package_manager": "npm",
+      "orm": "Drizzle",
+      "dev_command": "npm run dev",
+      "key_directories": {
+        "src": {
+          "path": "src",
+          "purpose": "Source code"
+        }
+      },
+      "entry_point": "src/index.ts",
+      "dependencies": [
+        "@rsm/shared",
+        "drizzle-orm",
+        "postgres",
+        "stripe"
+      ],
+      "dev_dependencies": [
+        "@vitest/coverage-v8",
+        "@vitest/ui",
+        "dotenv",
+        "drizzle-kit",
+        "tsx",
+        "typescript",
+        "vitest"
+      ],
+      "testing": "Vitest",
+      "environment": {
+        "variables": {
+          "DATABASE_URL": {
+            "value": "postgresql://postgres:password@localhost:5432/rsm_master",
+            "source": ".env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "DATABASE_URL_TENANT": {
+            "value": "postgresql://postgres:password@localhost:5432/tenant_1",
+            "source": ".env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          }
+        },
+        "required_count": 0,
+        "optional_count": 0,
+        "detected_count": 2
+      },
+      "database": {
+        "models": {
+          "clients": {
+            "table": "clients",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "clientNotes": {
+            "table": "client_notes",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "clientContacts": {
+            "table": "client_contacts",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "rooms": {
+            "table": "rooms",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "sessions": {
+            "table": "sessions",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "invoices": {
+            "table": "invoices",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "invoiceItems": {
+            "table": "invoice_items",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "equipment": {
+            "table": "equipment",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "projects": {
+            "table": "projects",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "tracks": {
+            "table": "tracks",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "trackComments": {
+            "table": "track_comments",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "musicians": {
+            "table": "musicians",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "trackCredits": {
+            "table": "track_credits",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "quotes": {
+            "table": "quotes",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "quoteItems": {
+            "table": "quote_items",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "contracts": {
+            "table": "contracts",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "expenses": {
+            "table": "expenses",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "payments": {
+            "table": "payments",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "notifications": {
+            "table": "notifications",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "aiConversations": {
+            "table": "ai_conversations",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "aiActionLogs": {
+            "table": "ai_action_logs",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "clientPortalAccounts": {
+            "table": "client_portal_accounts",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "clientPortalMagicLinks": {
+            "table": "client_portal_magic_links",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "clientPortalSessions": {
+            "table": "client_portal_sessions",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "clientPortalActivityLogs": {
+            "table": "client_portal_activity_logs",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "paymentTransactions": {
+            "table": "payment_transactions",
+            "fields": {},
+            "file": "src/tenant/schema.ts",
+            "orm": "Drizzle"
+          },
+          "users": {
+            "table": "users",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          },
+          "organizations": {
+            "table": "organizations",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          },
+          "tenantDatabases": {
+            "table": "tenant_databases",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          },
+          "organizationMembers": {
+            "table": "organization_members",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          },
+          "invitations": {
+            "table": "invitations",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          },
+          "subscriptionPlans": {
+            "table": "subscription_plans",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          },
+          "aiCredits": {
+            "table": "ai_credits",
+            "fields": {},
+            "file": "src/master/schema.ts",
+            "orm": "Drizzle"
+          }
+        },
+        "total_models": 33,
+        "model_names": [
+          "clients",
+          "clientNotes",
+          "clientContacts",
+          "rooms",
+          "sessions",
+          "invoices",
+          "invoiceItems",
+          "equipment",
+          "projects",
+          "tracks",
+          "trackComments",
+          "musicians",
+          "trackCredits",
+          "quotes",
+          "quoteItems",
+          "contracts",
+          "expenses",
+          "payments",
+          "notifications",
+          "aiConversations",
+          "aiActionLogs",
+          "clientPortalAccounts",
+          "clientPortalMagicLinks",
+          "clientPortalSessions",
+          "clientPortalActivityLogs",
+          "paymentTransactions",
+          "users",
+          "organizations",
+          "tenantDatabases",
+          "organizationMembers",
+          "invitations",
+          "subscriptionPlans",
+          "aiCredits"
+        ]
+      },
+      "services": {
+        "payments": [
+          {
+            "provider": "stripe",
+            "client": "stripe"
+          }
+        ]
+      }
+    },
+    "server": {
+      "name": "server",
+      "path": "/Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid/packages/server",
+      "language": "TypeScript",
+      "framework": "Express",
+      "type": "backend",
+      "package_manager": "npm",
+      "default_port": 3001,
+      "orm": "Drizzle",
+      "dev_command": "npm run dev",
+      "key_directories": {
+        "src": {
+          "path": "src",
+          "purpose": "Source code"
+        }
+      },
+      "entry_point": "src/index.ts",
+      "dependencies": [
+        "@anthropic-ai/sdk",
+        "@langchain/core",
+        "@langchain/openai",
+        "@langchain/qdrant",
+        "@langchain/textsplitters",
+        "@qdrant/js-client-rest",
+        "@rsm/database",
+        "@rsm/shared",
+        "@sentry/node",
+        "@trpc/server",
+        "@types/bcryptjs",
+        "@types/dockerode",
+        "@types/express-session",
+        "@types/multer",
+        "bcryptjs",
+        "cloudinary",
+        "connect-redis",
+        "cors",
+        "dockerode",
+        "dotenv"
+      ],
+      "dev_dependencies": [
+        "@types/cors",
+        "@types/express",
+        "@types/node",
+        "@vitest/coverage-v8",
+        "tsx",
+        "typescript",
+        "vitest"
+      ],
+      "testing": "Vitest",
+      "dockerfile": "Dockerfile",
+      "environment": {
+        "variables": {
+          "DATABASE_URL": {
+            "value": "postgresql://postgres:password@localhost:5432/rsm_master",
+            "source": ".env",
+            "type": "url",
+            "sensitive": false,
+            "required": true
+          },
+          "NODE_ENV": {
+            "value": "development",
+            "source": ".env",
+            "type": "string",
+            "sensitive": false,
+            "required": true
+          },
+          "PORT": {
+            "value": "3001",
+            "source": ".env",
+            "type": "number",
+            "sensitive": false,
+            "required": true
+          },
+          "JWT_SECRET": {
+            "value": "<REDACTED>",
+            "source": ".env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "SESSION_SECRET": {
+            "value": "<REDACTED>",
+            "source": ".env",
+            "type": "string",
+            "sensitive": true,
+            "required": true
+          },
+          "ALLOWED_ORIGINS": {
+            "value": "http://localhost:3000,http://localhost:5173,http://localhost:5174",
+            "source": ".env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "ENABLE_DEBUG_LOGS": {
+            "value": "true",
+            "source": ".env",
+            "type": "boolean",
+            "sensitive": false,
+            "required": false
+          },
+          "ANTHROPIC_API_KEY": {
+            "value": "<REDACTED>",
+            "source": ".env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "OPENAI_API_KEY": {
+            "value": "<REDACTED>",
+            "source": ".env",
+            "type": "string",
+            "sensitive": true,
+            "required": true
+          },
+          "REDIS_URL": {
+            "value": "redis://localhost:6379",
+            "source": ".env",
+            "type": "url",
+            "sensitive": false,
+            "required": true
+          },
+          "AI_CREDITS_TRIAL": {
+            "value": "100",
+            "source": ".env",
+            "type": "number",
+            "sensitive": false,
+            "required": false
+          },
+          "AI_CREDITS_PRO": {
+            "value": "1000",
+            "source": ".env",
+            "type": "number",
+            "sensitive": false,
+            "required": false
+          },
+          "AI_CREDITS_ENTERPRISE": {
+            "value": "10000",
+            "source": ".env",
+            "type": "number",
+            "sensitive": false,
+            "required": false
+          },
+          "QDRANT_URL": {
+            "value": null,
+            "source": ".env.example",
+            "type": "string",
+            "sensitive": false,
+            "required": true
+          },
+          "SENTRY_DSN_BACKEND": {
+            "value": null,
+            "source": ".env.example",
+            "type": "string",
+            "sensitive": false,
+            "required": true
+          },
+          "STRIPE_SECRET_KEY": {
+            "value": null,
+            "source": ".env.example",
+            "type": "string",
+            "sensitive": true,
+            "required": true
+          },
+          "STRIPE_WEBHOOK_SECRET": {
+            "value": null,
+            "source": ".env.example",
+            "type": "string",
+            "sensitive": true,
+            "required": true
+          }
+        },
+        "required_count": 10,
+        "optional_count": 0,
+        "detected_count": 17
+      },
+      "api": {
+        "routes": [
+          {
+            "path": "/api/webhooks/stripe",
+            "methods": [
+              "POST"
+            ],
+            "file": "dist/index.js",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/health",
+            "methods": [
+              "GET"
+            ],
+            "file": "dist/index.js",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/api/ai/stream",
+            "methods": [
+              "POST"
+            ],
+            "file": "dist/index.js",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/audio",
+            "methods": [
+              "POST"
+            ],
+            "file": "dist/routes/upload.js",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/audio/:publicId(*)",
+            "methods": [
+              "DELETE"
+            ],
+            "file": "dist/routes/upload.js",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/logo",
+            "methods": [
+              "POST"
+            ],
+            "file": "dist/routes/upload.js",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/api/ai/stream",
+            "methods": [
+              "POST"
+            ],
+            "file": "src/index.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/api/notifications/stream",
+            "methods": [
+              "GET"
+            ],
+            "file": "src/index.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/health",
+            "methods": [
+              "GET"
+            ],
+            "file": "src/routes/health.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/health/db",
+            "methods": [
+              "GET"
+            ],
+            "file": "src/routes/health.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/health/redis",
+            "methods": [
+              "GET"
+            ],
+            "file": "src/routes/health.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/health/full",
+            "methods": [
+              "GET"
+            ],
+            "file": "src/routes/health.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/audio",
+            "methods": [
+              "POST"
+            ],
+            "file": "src/routes/upload.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/audio/:publicId(*)",
+            "methods": [
+              "DELETE"
+            ],
+            "file": "src/routes/upload.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/logo",
+            "methods": [
+              "POST"
+            ],
+            "file": "src/routes/upload.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/avatar",
+            "methods": [
+              "POST"
+            ],
+            "file": "src/routes/upload.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/client-logo",
+            "methods": [
+              "POST"
+            ],
+            "file": "src/routes/upload.ts",
+            "framework": "Express",
+            "requires_auth": false
+          },
+          {
+            "path": "/serve/tenant_*",
+            "methods": [
+              "GET"
+            ],
+            "file": "src/routes/upload.ts",
+            "framework": "Express",
+            "requires_auth": false
+          }
+        ],
+        "total_routes": 18,
+        "methods": [
+          "DELETE",
+          "GET",
+          "POST"
+        ],
+        "protected_routes": []
+      },
+      "services": {
+        "databases": [
+          {
+            "type": "redis",
+            "client": "redis"
+          }
+        ],
+        "cache": [
+          {
+            "type": "redis"
+          }
+        ],
+        "payments": [
+          {
+            "provider": "stripe",
+            "client": "stripe"
+          }
+        ],
+        "monitoring": [
+          {
+            "type": "sentry",
+            "client": "@sentry/node"
+          }
+        ]
+      },
+      "auth": {
+        "strategies": [
+          "session"
+        ],
+        "libraries": [
+          "express-session"
+        ],
+        "user_model": null,
+        "middleware": []
+      },
+      "monitoring": {
+        "health_checks": [
+          "/health",
+          "/health",
+          "/health/db",
+          "/health/redis",
+          "/health/full"
+        ],
+        "apm_tools": [
+          "sentry"
+        ]
+      }
+    },
+    "shared": {
+      "name": "shared",
+      "path": "/Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid/packages/shared",
+      "language": "TypeScript",
+      "framework": null,
+      "type": "library",
+      "package_manager": "npm",
+      "dev_command": "npm run dev",
+      "key_directories": {
+        "src": {
+          "path": "src",
+          "purpose": "Source code"
+        }
+      },
+      "entry_point": "src/index.ts",
+      "dependencies": [
+        "zod"
+      ],
+      "dev_dependencies": [
+        "typescript"
+      ]
+    },
+    "client": {
+      "name": "client",
+      "path": "/Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid/packages/client",
+      "language": "TypeScript",
+      "framework": "React",
+      "type": "frontend",
+      "package_manager": "npm",
+      "default_port": 3000,
+      "build_tool": "Vite",
+      "styling": "Tailwind CSS",
+      "dev_command": "npm run dev",
+      "key_directories": {
+        "src": {
+          "path": "src",
+          "purpose": "Source code"
+        }
+      },
+      "entry_point": "src/App.tsx",
+      "dependencies": [
+        "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@dnd-kit/utilities",
+        "@radix-ui/react-avatar",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-label",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-progress",
+        "@radix-ui/react-scroll-area",
+        "@radix-ui/react-select",
+        "@radix-ui/react-separator",
+        "@radix-ui/react-slider",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-switch",
+        "@radix-ui/react-tabs",
+        "@rsm/shared",
+        "@sentry/react",
+        "@tanstack/react-query",
+        "@trpc/client"
+      ],
+      "dev_dependencies": [
+        "@tailwindcss/postcss",
+        "@types/react",
+        "@types/react-big-calendar",
+        "@types/react-dom",
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
+        "@vitejs/plugin-react-swc",
+        "autoprefixer",
+        "eslint",
+        "eslint-plugin-react-hooks"
+      ],
+      "dockerfile": "Dockerfile",
+      "environment": {
+        "variables": {
+          "VITE_API_URL": {
+            "value": "/api/trpc",
+            "source": ".env.production",
+            "type": "path",
+            "sensitive": false,
+            "required": true
+          },
+          "VITE_SUPERADMIN_EMAIL": {
+            "value": "admin@recording-studio-manager.com",
+            "source": ".env.production",
+            "type": "email",
+            "sensitive": false,
+            "required": false
+          },
+          "VITE_SENTRY_DSN_FRONTEND": {
+            "value": null,
+            "source": ".env.example",
+            "type": "string",
+            "sensitive": false,
+            "required": true
+          }
+        },
+        "required_count": 2,
+        "optional_count": 0,
+        "detected_count": 3
+      },
+      "consumes": [
+        "server.api"
+      ]
+    }
+  },
+  "infrastructure": {
+    "docker_compose": "docker-compose.yml",
+    "docker_services": [
+      "postgres",
+      "redis",
+      "server",
+      "client"
+    ]
+  },
+  "conventions": {
+    "typescript": true
+  },
+  "monorepo_tool": "pnpm-workspace"
+}

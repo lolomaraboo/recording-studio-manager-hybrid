@@ -1,0 +1,65 @@
+{
+  "complexity": "standard",
+  "workflow_type": "investigation",
+  "confidence": 0.85,
+  "reasoning": "Read-only audit task requiring systematic investigation across entire monorepo structure (4 services). While no code modifications are made, the scope of analysis is non-trivial and requires structured methodology to assess file organization across packages/database, packages/server, packages/client, and packages/shared.",
+
+  "analysis": {
+    "scope": {
+      "estimated_files": 0,
+      "estimated_services": 4,
+      "is_cross_cutting": true,
+      "notes": "Zero files will be modified (read-only audit). All 4 services (database, server, client, shared) need to be analyzed for organizational issues. One report file will be created."
+    },
+    "integrations": {
+      "external_services": [],
+      "new_dependencies": [],
+      "research_needed": false,
+      "notes": "No external integrations involved. Task is purely internal directory structure analysis."
+    },
+    "infrastructure": {
+      "docker_changes": false,
+      "database_changes": false,
+      "config_changes": false,
+      "notes": "No infrastructure modifications. Audit will check if Docker and config files are properly organized."
+    },
+    "knowledge": {
+      "patterns_exist": true,
+      "research_required": false,
+      "unfamiliar_tech": [],
+      "notes": "Standard monorepo conventions apply (pnpm-workspace). TypeScript project with clear package boundaries. No unfamiliar technologies to research."
+    },
+    "risk": {
+      "level": "trivial",
+      "concerns": [],
+      "notes": "Zero risk - read-only operation cannot break anything. User explicitly requested no file movements, only a report."
+    }
+  },
+
+  "recommended_phases": [
+    "discovery",
+    "requirements",
+    "context",
+    "spec_writing",
+    "planning",
+    "validation"
+  ],
+
+  "flags": {
+    "needs_research": false,
+    "needs_self_critique": false,
+    "needs_infrastructure_setup": false
+  },
+
+  "validation_recommendations": {
+    "risk_level": "trivial",
+    "skip_validation": false,
+    "minimal_mode": true,
+    "test_types_required": [],
+    "security_scan_required": false,
+    "staging_deployment_required": false,
+    "reasoning": "Read-only audit with zero code changes. Validation phase will review the report for completeness and accuracy, but no tests, security scans, or deployments are needed."
+  },
+
+  "created_at": "2026-01-02T00:00:00.000Z"
+}
