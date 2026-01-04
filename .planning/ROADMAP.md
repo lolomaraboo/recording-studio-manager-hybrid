@@ -617,25 +617,28 @@ Plans:
 
 ---
 
-### Phase 3.11: Rangement et nettoyage du dossier (INSERTED)
+### Phase 3.11: Rangement et nettoyage du dossier (INSERTED) - ✅ COMPLETE
 **Goal**: Organiser et nettoyer le dossier de projet avant le lancement marketing
 
 **Depends on**: Phase 3.10 (testing vCard complete)
 
 **Research**: Unlikely (file organization, code cleanup patterns)
 
-**Plans**: 1 plan (in progress)
+**Plans**: 3 plans (complete)
 
 Plans:
 - [x] 3.11-01: File System Cleanup - Root directory, .worktrees/, Phase 3.4 bloat (Completed 2026-01-04 - 25 min)
-- [x] 3.11-02: Git Housekeeping - Commit planning docs, validate .gitignore (Completed 2026-01-04 - 6 min)
+- [x] 3.11-02: Git Housekeeping - Commit planning docs, .gitignore validation (Completed 2026-01-04 - 6 min)
+- [x] 3.11-03: Documentation Organization - Resolve Phase 3.9.4 duplicate, validate .planning/ structure (Completed 2026-01-04 - 6 min)
 
-**Status**: 🔄 In progress (2/? plans complete)
+**Status**: ✅ Complete (3/3 plans complete)
 
 **Details**:
 Phase 3.11-01 complete: Removed 33 files from root directory (32 PNG screenshots + 1 log), cleaned .worktrees/ directory (2 git worktrees removed), reduced Phase 3.4 from 9.8MB to 908KB (~9MB freed), preserved 58 markdown documentation files.
 
 Phase 3.11-02 complete: Committed planning documentation (CLAUDE.md, .claude_settings.json, Phase 3.10-3.11 PLAN files - 7 files, 1,926 insertions), added .gitignore patterns for test screenshots (/test-*.png, /validation-*.png), validated .gitignore prevents future test artifact commits.
+
+Phase 3.11-03 complete: Resolved Phase 3.9.4 duplicate directory issue (consolidated vCard enrichment work, renumbered display modes to Phase 3.12), validated .planning/ structure (29 phase directories, 41 PLAN files, 53 SUMMARY files), established clean documentation baseline for Phase 4 (Marketing Foundation).
 
 **Rationale**: Avant le lancement marketing (Phase 4), nettoyer et organiser le dossier de projet pour maintenir une codebase propre et professionnelle. Cela inclut: suppression de fichiers obsolètes, organisation de la documentation, nettoyage des fichiers temporaires, et validation de la structure du projet.
 
@@ -771,7 +774,7 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 42/42 plans complete (100%) - Phase 3.11-02 complete (git housekeeping), CRITICAL BUG in CREATE enrichi documented
+**Total**: 43/43 plans complete (100%) - Phase 3.11 COMPLETE (cleanup, git housekeeping, documentation organized)
 
 ---
 
