@@ -627,12 +627,15 @@ Plans:
 **Plans**: 1 plan (in progress)
 
 Plans:
-- [x] 3.11-01: File System Cleanup - Root directory, .worktrees/, Phase 3.4 bloat (Completed 2026-01-04 - 5 min)
+- [x] 3.11-01: File System Cleanup - Root directory, .worktrees/, Phase 3.4 bloat (Completed 2026-01-04 - 25 min)
+- [x] 3.11-02: Git Housekeeping - Commit planning docs, validate .gitignore (Completed 2026-01-04 - 6 min)
 
-**Status**: 🔄 In progress (1/? plans complete)
+**Status**: 🔄 In progress (2/? plans complete)
 
 **Details**:
 Phase 3.11-01 complete: Removed 33 files from root directory (32 PNG screenshots + 1 log), cleaned .worktrees/ directory (2 git worktrees removed), reduced Phase 3.4 from 9.8MB to 908KB (~9MB freed), preserved 58 markdown documentation files.
+
+Phase 3.11-02 complete: Committed planning documentation (CLAUDE.md, .claude_settings.json, Phase 3.10-3.11 PLAN files - 7 files, 1,926 insertions), added .gitignore patterns for test screenshots (/test-*.png, /validation-*.png), validated .gitignore prevents future test artifact commits.
 
 **Rationale**: Avant le lancement marketing (Phase 4), nettoyer et organiser le dossier de projet pour maintenir une codebase propre et professionnelle. Cela inclut: suppression de fichiers obsolètes, organisation de la documentation, nettoyage des fichiers temporaires, et validation de la structure du projet.
 
@@ -768,7 +771,7 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 41/42 plans complete (97.6%) - Phase 3.11-01 complete (file system cleanup), CRITICAL BUG in CREATE enrichi documented
+**Total**: 42/42 plans complete (100%) - Phase 3.11-02 complete (git housekeeping), CRITICAL BUG in CREATE enrichi documented
 
 ---
 

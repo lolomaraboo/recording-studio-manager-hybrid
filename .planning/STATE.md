@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 3.11 of 8 (Rangement et nettoyage du dossier) [INSERTED] - 🔄 IN PROGRESS
-Plan: 1 of ? in current phase
+Plan: 2 of ? in current phase
 Status: In progress
-Last activity: 2026-01-04 - Completed 3.11-01-PLAN.md (File System Cleanup)
+Last activity: 2026-01-04 - Completed 3.11-02-PLAN.md (Git Housekeeping)
 
-Progress: ████████████████████ 97.6% (41/42 plans complete) - Phase 3.11-01 complete (32 PNG + 1 log removed, .worktrees/ cleaned, Phase 3.4 reduced 9MB)
+Progress: ████████████████████ 100% (42/42 plans complete) - Phase 3.11-02 complete (Planning docs committed, .gitignore validated)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
-- Average duration: 40.1 min
-- Total execution time: 26.7 hours
+- Total plans completed: 42
+- Average duration: 38.9 min
+- Total execution time: 27.2 hours
 
 **By Phase:**
 
@@ -59,10 +59,11 @@ Progress: ████████████████████ 97.6% (41
 | 3.9.1 | 1/2 | 8 min | 8 min |
 | 3.9.4 | 2/2 | 480 min | 240 min |
 | 3.10 | 3/3 | 84 min | 28 min |
+| 3.11 | 2/? | 31 min | 15.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [240 min, 12 min, 2 min, 45 min, 25 min]
-- Trend: Complex full-stack implementations (vCard 4.0 enrichment) take 4h each (Phase 3.9.4: 240 min × 2 plans), automated testing + validation implementation moderate (25-45 min for Playwright suites + validation), simple automated tests very efficient (2-12 min)
+- Last 5 plans: [2 min, 45 min, 25 min, 6 min, ? min]
+- Trend: Automated testing very efficient (2-6 min for simple validation), testing + validation implementation moderate (25-45 min for Playwright suites + validation), cleanup/housekeeping tasks very fast (6-25 min)
 
 ## Accumulated Context
 
@@ -290,37 +291,27 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-02T05:43:00Z (approx)
-Stopped at: ✅ Completed Phase 3.10-02-PLAN.md (Test Import/Export + RFC 6350 Validation + Playwright Tests) + Deployed to VPS
+Last session: 2026-01-04T10:31:00Z
+Stopped at: ✅ Completed Phase 3.11-02-PLAN.md (Git Housekeeping)
 Resume context:
-  - Executed Phase 3.10-02: Test Import/Export vCard/Excel/CSV (45 min total)
-    - Created comprehensive Playwright test suite (8 tests, all passing)
-    - Implemented RFC 6350 strict validation (3-level enforcement)
-    - Deployed validation changes to production VPS
-  - Test suite created: e2e/import-export/test-import-export.spec.ts (339 lines)
-    - 8/8 tests passing against VPS production
-    - Import vCard: ✅ Charlie Rousseau imported successfully
-    - Import CSV: ✅ Emma Garcia & Productions Omega imported
-    - Export vCard: ✅ 373 clients (RFC 6350 compliant, 10 invalid filtered)
-    - Export CSV: ✅ 384 lines (383 clients + header)
-    - Export Excel: ✅ Functional
-    - Template download: ✅ Functional
-    - Error handling: ✅ Invalid vCard rejected with clear message
-    - Round-trip: ✅ Export → Import preserves data
-  - RFC 6350 validation implemented (commit a149480):
-    - vcard-service.ts: Throw error if FN empty (lines 229-254)
-    - clients.ts router: Filter invalid clients from export (lines 407-410)
-    - clients.ts router: Reject import if no valid clients (lines 447-455)
-    - ImportClientsDialog.tsx: Display server error messages (lines 55-64)
-  - Production deployment:
-    - VPS: git reset --hard origin/main (a149480)
-    - Docker containers rebuilt: rsm-client, rsm-server, rsm-postgres, rsm-redis
-    - Validation: All tests passing against production
-  - Validation results:
-    - Before: 383 clients in CSV, 383 in vCard (10 with empty FN)
-    - After: 383 clients in CSV, 373 in vCard (10 invalid filtered automatically)
-    - Error message: "Aucun client valide trouvé dans le fichier vCard. Vérifiez que le champ FN (nom) est présent et non vide."
-  - Documentation: Created comprehensive 3.10-02-SUMMARY.md (329 lines)
-  - Next: Phase 3.10-03 (Test CRUD complet & modes affichage Table/Grid/Kanban)
-  - Outstanding: Phase 3.10-03 dernière phase de tests vCard
+  - Executed Phase 3.11-02: Git Housekeeping (6 min total)
+    - Committed planning documentation (7 files, 1,926 insertions)
+    - Updated .gitignore with test screenshot patterns
+    - Validated .gitignore prevents future test artifact commits
+  - Git commits created:
+    - caa5844: docs(planning): Add Phase 3.10-3.11 planning files and project instructions
+    - 9442470: chore(gitignore): Add test screenshot patterns
+  - Files committed:
+    - CLAUDE.md (project instructions for Claude Code)
+    - .claude_settings.json (Claude Code configuration)
+    - Phase 3.10 PLAN files (3 vCard testing plans: 01, 02, 03)
+    - Phase 3.11 PLAN files (2 cleanup plans: 02, 03)
+  - .gitignore patterns added:
+    - /test-*.png (root level only)
+    - /validation-*.png (root level only)
+    - Preserves legitimate PNGs in subdirectories (screenshots/, public/)
+  - Validation: Created dummy files, verified git ignores them, cleaned up
+  - Documentation: Created 3.11-02-SUMMARY.md
+  - Next: Phase 3.11-03 (Documentation Organization)
+  - Outstanding: Phase 3.11-03 dernière phase de rangement
 Resume file: None
