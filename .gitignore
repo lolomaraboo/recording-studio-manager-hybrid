@@ -66,5 +66,6 @@ packages/database/drizzle/migrations/*
 !packages/database/drizzle/migrations/.gitkeep
 .env.production.local
 
-# Auto Claude data directory
-.auto-claude/
+# Temporary test files (root level only)
+/test-*.mjs
+/test-*.spec.ts
