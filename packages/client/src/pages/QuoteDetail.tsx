@@ -192,9 +192,10 @@ export default function QuoteDetail() {
   const client = clients?.find((c: any) => c.id === quote.clientId);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link to="/quotes">
             <Button variant="ghost" size="icon">
@@ -275,10 +276,10 @@ export default function QuoteDetail() {
         <div className="lg:col-span-2 space-y-6">
           {/* Quote Info */}
           <Card>
-            <CardHeader>
-              <CardTitle>Informations du devis</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations du devis</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               {!isEditing ? (
                 <>
                   <div className="grid grid-cols-2 gap-4">
@@ -392,10 +393,10 @@ export default function QuoteDetail() {
 
           {/* Pricing */}
           <Card>
-            <CardHeader>
-              <CardTitle>Montants</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Montants</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Sous-total</span>
@@ -418,10 +419,10 @@ export default function QuoteDetail() {
           {/* Terms & Notes */}
           {(quote.terms || quote.notes) && (
             <Card>
-              <CardHeader>
-                <CardTitle>Conditions et notes</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Conditions et notes</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-0 space-y-4">
                 {quote.terms && (
                   <div>
                     <p className="text-sm font-medium mb-2">Conditions</p>
@@ -447,13 +448,13 @@ export default function QuoteDetail() {
         <div className="space-y-6">
           {/* Client Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
                 <User className="h-5 w-5" />
                 Client
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {client ? (
                 <div className="space-y-2">
                   <p className="font-medium">{client.name}</p>
@@ -477,13 +478,13 @@ export default function QuoteDetail() {
 
           {/* Metadata */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
                 Métadonnées
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="pt-0 space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Créé le</p>
                 <p className="text-sm font-medium">
@@ -532,6 +533,7 @@ export default function QuoteDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

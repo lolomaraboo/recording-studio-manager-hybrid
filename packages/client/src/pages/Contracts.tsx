@@ -103,20 +103,20 @@ export function Contracts() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <FileText className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Contrats</h1>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <FileText className="h-8 w-8 text-primary" />
+              Contrats
+            </h2>
           </div>
           <Button asChild>
             <Link to="/contracts/new">
@@ -125,20 +125,15 @@ export function Contracts() {
             </Link>
           </Button>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
-          {/* Stats */}
-          {contractsLoading ? (
-            <div className="grid gap-6 md:grid-cols-3">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-32 w-full" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-3">
+        {/* Stats */}
+        {contractsLoading ? (
+          <div className="grid gap-6 md:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-3">
               <Card>
                 <CardHeader className="pb-2">
                   <CardDescription>Total contrats</CardDescription>
@@ -169,16 +164,16 @@ export function Contracts() {
                     À signer ou brouillon
                   </p>
                 </CardContent>
-              </Card>
-            </div>
-          )}
+            </Card>
+          </div>
+        )}
 
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Filtres</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* Filters */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Filtres</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -224,26 +219,26 @@ export function Contracts() {
                       <SelectItem value="completed">Complété</SelectItem>
                       <SelectItem value="terminated">Résilié</SelectItem>
                     </SelectContent>
-                  </Select>
-                </div>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Contracts List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{filteredContracts.length} contrat(s)</CardTitle>
-              <CardDescription>Gérez vos contrats et accords commerciaux</CardDescription>
-            </CardHeader>
-            <CardContent>
+        {/* Contracts List */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">{filteredContracts.length} contrat(s)</CardTitle>
+            <CardDescription className="text-sm">Gérez vos contrats et accords commerciaux</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
               {contractsLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-20 w-full" />
-                  ))}
-                </div>
-              ) : filteredContracts.length > 0 ? (
+                  <Skeleton key={i} className="h-20 w-full" />
+                ))}
+              </div>
+            ) : filteredContracts.length > 0 ? (
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -279,28 +274,27 @@ export function Contracts() {
                           </TableCell>
                         </TableRow>
                       ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun contrat</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Commencez par créer votre premier contrat
-                  </p>
-                  <Button asChild>
-                    <Link to="/contracts/new">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Nouveau contrat
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <h3 className="text-sm font-medium mb-1">Aucun contrat</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Commencez par créer votre premier contrat
+                </p>
+                <Button asChild size="sm">
+                  <Link to="/contracts/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nouveau contrat
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

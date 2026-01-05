@@ -168,21 +168,25 @@ export default function ContractDetail() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-96 w-full" />
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!contract) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 gap-4">
-        <FileText className="h-12 w-12 text-muted-foreground" />
-        <p className="text-muted-foreground">Contrat introuvable</p>
-        <Link to="/contracts">
-          <Button variant="outline">Retour aux contrats</Button>
-        </Link>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="text-center py-6">
+          <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground mb-3">Contrat introuvable</p>
+          <Link to="/contracts">
+            <Button variant="outline" size="sm">Retour aux contrats</Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -190,7 +194,8 @@ export default function ContractDetail() {
   const client = clients?.find((c: any) => c.id === contract.clientId);
 
   return (
-    <div className="space-y-6">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -253,14 +258,14 @@ export default function ContractDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Contract Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informations du contrat</CardTitle>
-            </CardHeader>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-2">
+            {/* Contract Info */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations du contrat</CardTitle>
+              </CardHeader>
             <CardContent className="space-y-4">
               {!isEditing ? (
                 <>
@@ -422,11 +427,11 @@ export default function ContractDetail() {
             </CardContent>
           </Card>
 
-          {/* Terms */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Conditions contractuelles</CardTitle>
-            </CardHeader>
+            {/* Terms */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Conditions contractuelles</CardTitle>
+              </CardHeader>
             <CardContent>
               {!isEditing ? (
                 <p className="whitespace-pre-wrap text-sm">{contract.terms}</p>
@@ -439,19 +444,19 @@ export default function ContractDetail() {
                 />
               )}
             </CardContent>
-          </Card>
-        </div>
+            </Card>
+          </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Client Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Client
-              </CardTitle>
-            </CardHeader>
+          {/* Sidebar */}
+          <div className="space-y-2">
+            {/* Client Card */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Client
+                </CardTitle>
+              </CardHeader>
             <CardContent>
               {client ? (
                 <div className="space-y-2">
@@ -474,14 +479,14 @@ export default function ContractDetail() {
             </CardContent>
           </Card>
 
-          {/* Metadata */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Métadonnées
-              </CardTitle>
-            </CardHeader>
+            {/* Metadata */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Métadonnées
+                </CardTitle>
+              </CardHeader>
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Créé le</p>
@@ -507,11 +512,11 @@ export default function ContractDetail() {
                 </div>
               )}
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {/* Delete Dialog */}
+        {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -534,6 +539,7 @@ export default function ContractDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

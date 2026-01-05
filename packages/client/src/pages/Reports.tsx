@@ -171,30 +171,29 @@ export default function Reports() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/dashboard">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">Rapports</h2>
-            <p className="text-muted-foreground">
-              Génération et consultation de rapports d'activité
-            </p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <BarChart3 className="h-8 w-8 text-primary" />
+              Rapports
+            </h2>
           </div>
+          <Button>
+            <Download className="mr-2 h-4 w-4" />
+            Exporter tout
+          </Button>
         </div>
-        <Button>
-          <Download className="mr-2 h-4 w-4" />
-          Exporter tout
-        </Button>
-      </div>
 
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Quick Stats */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {quickStats.map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -219,9 +218,9 @@ export default function Reports() {
         ))}
       </div>
 
-      {/* Available Reports */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Rapports disponibles</h3>
+        {/* Available Reports */}
+        <div>
+          <h3 className="text-sm font-medium mb-2">Rapports disponibles</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {reports.map((report) => (
             <Card
@@ -248,146 +247,147 @@ export default function Reports() {
               </CardContent>
             </Card>
           ))}
-        </div>
-      </div>
-
-      {/* Custom Reports */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rapport personnalisé</CardTitle>
-          <CardDescription>
-            Créez un rapport sur mesure avec les données de votre choix
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <Button variant="outline" className="h-auto flex-col gap-2 p-4">
-              <BarChart3 className="h-8 w-8 text-muted-foreground" />
-              <div className="text-sm font-medium">Par période</div>
-              <div className="text-xs text-muted-foreground">
-                Choisir une plage de dates
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 p-4">
-              <PieChart className="h-8 w-8 text-muted-foreground" />
-              <div className="text-sm font-medium">Par catégorie</div>
-              <div className="text-xs text-muted-foreground">
-                Filtrer par type de données
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 p-4">
-              <FileText className="h-8 w-8 text-muted-foreground" />
-              <div className="text-sm font-medium">Modèle personnalisé</div>
-              <div className="text-xs text-muted-foreground">
-                Créer un nouveau modèle
-              </div>
-            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Recent Exports */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Exports récents</CardTitle>
-          <CardDescription>
-            Vos derniers rapports générés et téléchargés
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {recentExports.map((export_, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded">
-                    <FileText className="h-5 w-5 text-primary" />
+        {/* Custom Reports */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Rapport personnalisé</CardTitle>
+            <CardDescription>
+              Créez un rapport sur mesure avec les données de votre choix
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid gap-4 md:grid-cols-3">
+              <Button variant="outline" className="h-auto flex-col gap-2 p-4">
+                <BarChart3 className="h-8 w-8 text-muted-foreground" />
+                <div className="text-sm font-medium">Par période</div>
+                <div className="text-xs text-muted-foreground">
+                  Choisir une plage de dates
+                </div>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col gap-2 p-4">
+                <PieChart className="h-8 w-8 text-muted-foreground" />
+                <div className="text-sm font-medium">Par catégorie</div>
+                <div className="text-xs text-muted-foreground">
+                  Filtrer par type de données
+                </div>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col gap-2 p-4">
+                <FileText className="h-8 w-8 text-muted-foreground" />
+                <div className="text-sm font-medium">Modèle personnalisé</div>
+                <div className="text-xs text-muted-foreground">
+                  Créer un nouveau modèle
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Exports */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Exports récents</CardTitle>
+            <CardDescription>
+              Vos derniers rapports générés et téléchargés
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-4">
+              {recentExports.map((export_, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded">
+                      <FileText className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{export_.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(export_.date, "d MMMM yyyy à HH:mm", {
+                          locale: fr,
+                        })}{" "}
+                        · {export_.size}
+                      </p>
+                    </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">{export_.type}</Badge>
+                    <Button variant="ghost" size="icon">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Scheduled Reports */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base">Rapports programmés</CardTitle>
+                <CardDescription>
+                  Génération automatique et envoi par email
+                </CardDescription>
+              </div>
+              <Button variant="outline">
+                <Clock className="mr-2 h-4 w-4" />
+                Nouveau planning
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">{export_.name}</p>
+                    <p className="text-sm font-medium">
+                      Rapport financier mensuel
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {format(export_.date, "d MMMM yyyy à HH:mm", {
-                        locale: fr,
-                      })}{" "}
-                      · {export_.size}
+                      Chaque 1er du mois à 9h00
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">{export_.type}</Badge>
-                  <Button variant="ghost" size="icon">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Badge>Actif</Badge>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Scheduled Reports */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Rapports programmés</CardTitle>
-              <CardDescription>
-                Génération automatique et envoi par email
-              </CardDescription>
-            </div>
-            <Button variant="outline">
-              <Clock className="mr-2 h-4 w-4" />
-              Nouveau planning
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">
-                    Rapport financier mensuel
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Chaque 1er du mois à 9h00
-                  </p>
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">
+                      Synthèse hebdomadaire sessions
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Chaque lundi à 8h00
+                    </p>
+                  </div>
                 </div>
+                <Badge>Actif</Badge>
               </div>
-              <Badge>Actif</Badge>
-            </div>
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">
-                    Synthèse hebdomadaire sessions
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Chaque lundi à 8h00
-                  </p>
+              <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Bilan trimestriel</p>
+                    <p className="text-xs text-muted-foreground">
+                      Chaque 1er jour du trimestre
+                    </p>
+                  </div>
                 </div>
+                <Badge variant="secondary">Inactif</Badge>
               </div>
-              <Badge>Actif</Badge>
             </div>
-            <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Bilan trimestriel</p>
-                  <p className="text-xs text-muted-foreground">
-                    Chaque 1er jour du trimestre
-                  </p>
-                </div>
-              </div>
-              <Badge variant="secondary">Inactif</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

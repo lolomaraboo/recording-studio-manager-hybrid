@@ -89,20 +89,20 @@ export function Quotes() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <FileText className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Devis</h1>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <FileText className="h-8 w-8 text-primary" />
+              Devis
+            </h2>
           </div>
           <Button asChild>
             <Link to="/quotes/new">
@@ -111,20 +111,15 @@ export function Quotes() {
             </Link>
           </Button>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
-          {/* Stats */}
-          {quotesLoading ? (
-            <div className="grid gap-6 md:grid-cols-3">
+        {/* Stats */}
+        {quotesLoading ? (
+          <div className="grid gap-6 md:grid-cols-3">
               {[...Array(3)].map((_, i) => (
                 <Skeleton key={i} className="h-32 w-full" />
               ))}
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-3">
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-3">
               <Card>
                 <CardHeader className="pb-2">
                   <CardDescription>Total devis</CardDescription>
@@ -173,16 +168,16 @@ export function Quotes() {
                     {stats.acceptedCount} {stats.acceptedCount === 1 ? "devis" : "devis"}
                   </p>
                 </CardContent>
-              </Card>
-            </div>
-          )}
+            </Card>
+          </div>
+        )}
 
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Filtres</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* Filters */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Filtres</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -208,26 +203,26 @@ export function Quotes() {
                       <SelectItem value="rejected">Refusé</SelectItem>
                       <SelectItem value="expired">Expiré</SelectItem>
                     </SelectContent>
-                  </Select>
-                </div>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Quotes List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{filteredQuotes.length} devis</CardTitle>
-              <CardDescription>Gérez vos devis et propositions commerciales</CardDescription>
-            </CardHeader>
-            <CardContent>
+        {/* Quotes List */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">{filteredQuotes.length} devis</CardTitle>
+            <CardDescription className="text-sm">Gérez vos devis et propositions commerciales</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
               {quotesLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-20 w-full" />
-                  ))}
-                </div>
-              ) : filteredQuotes.length > 0 ? (
+                  <Skeleton key={i} className="h-20 w-full" />
+                ))}
+              </div>
+            ) : filteredQuotes.length > 0 ? (
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -273,28 +268,27 @@ export function Quotes() {
                           </TableCell>
                         </TableRow>
                       ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun devis</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Commencez par créer votre premier devis
-                  </p>
-                  <Button asChild>
-                    <Link to="/quotes/new">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Nouveau devis
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <h3 className="text-sm font-medium mb-1">Aucun devis</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Commencez par créer votre premier devis
+                </p>
+                <Button asChild size="sm">
+                  <Link to="/quotes/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nouveau devis
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

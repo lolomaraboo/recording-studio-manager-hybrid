@@ -169,29 +169,20 @@ export default function Tracks() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/dashboard">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2">
-              <Music className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Tracks</h1>
-            </div>
-          </div>
+    <>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold flex items-center gap-2">
+            <Music className="h-8 w-8 text-primary" />
+            Tracks
+          </h2>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Nouvelle Track
           </Button>
         </div>
-      </header>
-
-      <main className="container py-8">
         {/* Stats Globales */}
         <div className="grid grid-cols-5 gap-4 mb-6">
           <Card>
@@ -251,8 +242,11 @@ export default function Tracks() {
         </div>
 
         {/* Filtres */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Filtres</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <div className="flex gap-4">
               <Select value={projectFilter} onValueChange={setProjectFilter}>
                 <SelectTrigger className="w-64">
@@ -298,22 +292,20 @@ export default function Tracks() {
 
         {/* Table Tracks */}
         <Card>
-          <CardHeader>
-            <CardTitle>Liste des Tracks</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Liste des Tracks</CardTitle>
+            <CardDescription className="text-sm">
               {filteredTracks?.length || 0} track(s) affichée(s)
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!allTracks || allTracks.length === 0 ? (
-              <div className="text-center py-12 space-y-4">
-                <Music className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-                <div>
-                  <p className="font-semibold mb-1">Aucune track enregistrée</p>
-                  <p className="text-sm text-muted-foreground">
-                    Créez votre première track pour commencer
-                  </p>
-                </div>
+              <div className="text-center py-6">
+                <Music className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <h3 className="text-sm font-medium mb-1">Aucune track enregistrée</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Créez votre première track pour commencer
+                </p>
               </div>
             ) : (
               <Table>
@@ -358,10 +350,11 @@ export default function Tracks() {
             )}
           </CardContent>
         </Card>
-      </main>
+      </div>
+    </div>
 
-      {/* Create Track Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+    {/* Create Track Dialog */}
+    <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Nouvelle Track</DialogTitle>
@@ -545,6 +538,6 @@ export default function Tracks() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

@@ -87,30 +87,31 @@ export default function QuoteCreate() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/quotes">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Nouveau Devis</h1>
-            <p className="text-muted-foreground">Créer un nouveau devis client</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link to="/quotes">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold">Nouveau Devis</h1>
+              <p className="text-muted-foreground">Créer un nouveau devis client</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations du devis</CardTitle>
-            <CardDescription>Détails du devis commercial</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations du devis</CardTitle>
+              <CardDescription className="text-sm">Détails du devis commercial</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-6">
             {/* Row 1: Quote Number & Valid Until */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -282,11 +283,12 @@ export default function QuoteCreate() {
                 disabled={createMutation.isPending}
               >
                 Annuler
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </form>
+      </div>
     </div>
   );
 }

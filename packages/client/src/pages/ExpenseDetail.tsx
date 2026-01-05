@@ -167,27 +167,32 @@ export default function ExpenseDetail() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-96 w-full" />
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!expense) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 gap-4">
-        <Receipt className="h-12 w-12 text-muted-foreground" />
-        <p className="text-muted-foreground">Dépense introuvable</p>
-        <Link to="/expenses">
-          <Button variant="outline">Retour aux dépenses</Button>
-        </Link>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="text-center py-6">
+          <Receipt className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground mb-3">Dépense introuvable</p>
+          <Link to="/expenses">
+            <Button variant="outline" size="sm">Retour aux dépenses</Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -240,14 +245,14 @@ export default function ExpenseDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Expense Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informations de la dépense</CardTitle>
-            </CardHeader>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-2">
+            {/* Expense Info */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations de la dépense</CardTitle>
+              </CardHeader>
             <CardContent className="space-y-4">
               {!isEditing ? (
                 <>
@@ -393,14 +398,14 @@ export default function ExpenseDetail() {
             </CardContent>
           </Card>
 
-          {/* Payment Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Détails de paiement
-              </CardTitle>
-            </CardHeader>
+            {/* Payment Details */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Détails de paiement
+                </CardTitle>
+              </CardHeader>
             <CardContent>
               {!isEditing ? (
                 <div className="space-y-3">
@@ -490,19 +495,19 @@ export default function ExpenseDetail() {
                 </div>
               )}
             </CardContent>
-          </Card>
-        </div>
+            </Card>
+          </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Metadata */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Métadonnées
-              </CardTitle>
-            </CardHeader>
+          {/* Sidebar */}
+          <div className="space-y-2">
+            {/* Metadata */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Métadonnées
+                </CardTitle>
+              </CardHeader>
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Créé le</p>
@@ -524,11 +529,11 @@ export default function ExpenseDetail() {
                 </div>
               )}
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {/* Delete Dialog */}
+        {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -551,6 +556,7 @@ export default function ExpenseDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }
