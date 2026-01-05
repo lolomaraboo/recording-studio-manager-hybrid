@@ -710,34 +710,41 @@ Comprehensive Playwright E2E testing across all sections:
 ---
 
 ### Phase 3.14: Améliorations UI de Toutes les Pages (INSERTED)
-**Goal**: Polish UI/UX across all 58 pages with iterative user feedback
+**Goal**: Polish UI/UX across all 58 pages with systematic guideline-based harmonization
 
 **Depends on**: Phase 3.13 (UI validation complete, bugs fixed)
 
 **Research**: Unlikely (uses established TailwindCSS + shadcn/ui patterns)
 
-**Plans**: 1 plan
+**Plans**: 4 plans
 
 Plans:
-- [ ] 3.14-01: Interactive UI improvements across all pages (checkpoint: iterative decisions)
+- [x] 3.14-01: Interactive approach (archived - shifted to guideline-based)
+- [x] 3.14-02: Harmonize 20 Admin pages Part 1 (Completed 2026-01-05 - 90 min)
+- [x] 3.14-03: Harmonize 15 Admin pages Part 2 (Completed 2026-01-05 - 45 min)
+- [x] 3.14-04: Client Portal + SuperAdmin + Public + Validation (Completed 2026-01-05 - 35 min)
 
-**Status**: Not started
+**Status**: ✅ Complete (All 4 plans finished - 170 min total)
 
 **Details**:
-Systematic page-by-page UI polish with real-time user feedback:
-- **Admin Dashboard**: 44 pages (spacing, colors, alignment, consistency)
-- **Client Portal**: 7 pages (visual polish, user experience)
-- **Super Admin**: 3 pages (interface improvements)
-- **Public/Auth**: 4 pages (first impression polish)
+Systematic UI harmonization across all 58 pages using UI-DESIGN-GUIDELINES.md:
+- **Admin Dashboard**: 44 pages (container pt-2 pb-4 px-2, icons text-primary, cards pb-3)
+- **Client Portal**: 7 pages (simplified cohérente UI, same patterns)
+- **Super Admin**: 4 pages (monitoring widgets, compact layout)
+- **Public/Auth**: 4 pages (centered pt-6, card structure)
 
-**Approach**: Interactive workflow - for each page:
-1. Present current UI
-2. User specifies retouches (spacing, colors, layout, etc.)
-3. Apply changes immediately
-4. Verify rendering
-5. Next page
+**Patterns Applied**:
+1. Container structure: `pt-2 pb-4 px-2` (Admin), `pt-6` centered (Public)
+2. Icons: `text-primary` color on all titles (h-8 w-8)
+3. Cards: `pb-3` headers, `text-base` titles
+4. Empty states: `py-6` containers, `h-8` icons
+5. Remove `bg-background` wrappers
 
-**Estimated time**: 6-9 hours of iterative work
+**Validation**:
+- ✅ 48 pages with text-primary icons
+- ✅ 50 pages with pb-3 cards
+- ✅ Production build: SUCCESS (4.45s, 0 errors)
+- ✅ 58/58 pages harmonized
 
 **Rationale**: Phase 3.13 validated functionality (0 critical bugs). Phase 3.14 polishes visual design for professional marketing launch. Ensures consistent, high-quality UI across all pages before Phase 4 drives traffic.
 
