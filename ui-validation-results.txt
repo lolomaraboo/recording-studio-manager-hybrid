@@ -1,0 +1,88 @@
+
+🔧 Global Setup: Ensuring E2E test user exists...
+
+  ✅ E2E test user already exists
+
+
+Running 7 tests using 4 workers
+
+
+🎨 Testing Register Page UI
+
+🎨 Testing Homepage UI
+
+🎨 Testing UI Styling
+
+📱 Testing Mobile Viewport
+  ✓ Login form visible on mobile
+  ✓ Form width: 325px (fits in 375px viewport)
+  ✓ Login form elements visible
+  ✓ Register link visible
+  ✓ Page title: "Recording Studio Manager"
+  ✓ Stylesheets loaded: 2
+  ✓ Button styles: {
+  backgroundColor: [32m'oklch(0.55 0.22 25)'[39m,
+  color: [32m'oklch(1 0 0)'[39m,
+  padding: [32m'8px 16px'[39m,
+  borderRadius: [32m'8.4px'[39m
+}
+  ✓  3 [chromium] › e2e/ui-validation.spec.ts:119:3 › UI Validation - Public Pages › Responsive design - Mobile viewport (5.8s)
+  ✘  4 [chromium] › e2e/ui-validation.spec.ts:57:3 › UI Validation - Public Pages › Register page loads and displays form (5.8s)
+  ✓  2 [chromium] › e2e/ui-validation.spec.ts:86:3 › UI Validation - Public Pages › UI elements are styled correctly (no broken styles) (6.1s)
+
+📐 Testing Layout Stability
+  ⚠ Console errors found: 1
+
+🖱️ Testing Interactive Elements
+    - Failed to load resource: the server responded with a status of 404 (Not Found)
+  ✓  1 [chromium] › e2e/ui-validation.spec.ts:10:3 › UI Validation - Public Pages › Homepage/Login page loads and displays correctly (7.9s)
+
+⏱️ Testing Page Load Performance
+  ✓ Email input is clickable and focusable
+  ✓ Login button is enabled
+  ✓ Register link navigates correctly
+  ✓  5 [chromium] › e2e/ui-validation.spec.ts:151:3 › UI Validation - Public Pages › All interactive elements are clickable (6.9s)
+  ✓ Email input positioned at y=303px
+  ✓  6 [chromium] › e2e/ui-validation.spec.ts:203:3 › UI Validation - Loading States › No visible layout shifts (7.2s)
+  ✓ Page loaded in 2985ms
+  ✓ Good load time (< 3s)
+  ✓  7 [chromium] › e2e/ui-validation.spec.ts:183:3 › UI Validation - Loading States › Page loads within acceptable time (4.5s)
+
+
+  1) [chromium] › e2e/ui-validation.spec.ts:57:3 › UI Validation - Public Pages › Register page loads and displays form 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="password"]')
+    Expected: visible
+    Error: strict mode violation: locator('input[type="password"]') resolved to 2 elements:
+        1) <input value="" required="" id="password" minlength="8" type="password" placeholder="••••••••" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"/> aka getByRole('textbox', { name: 'Password', exact: true })
+        2) <input value="" required="" minlength="8" type="password" id="confirmPassword" placeholder="••••••••" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"/> aka getByRole('textbox', { name: 'Confirm Password' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="password"]')[22m
+
+
+      72 |
+      73 |     await expect(emailInput).toBeVisible();
+    > 74 |     await expect(passwordInput).toBeVisible();
+         |                                 ^
+      75 |     await expect(submitButton).toBeVisible();
+      76 |
+      77 |     console.log('  ✓ Registration form elements visible');
+        at /Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid/e2e/ui-validation.spec.ts:74:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-validation-UI-Validatio-36fd9-age-loads-and-displays-form-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ui-validation-UI-Validatio-36fd9-age-loads-and-displays-form-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-validation-UI-Validatio-36fd9-age-loads-and-displays-form-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/ui-validation.spec.ts:57:3 › UI Validation - Public Pages › Register page loads and displays form 
+  6 passed (23.3s)

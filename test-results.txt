@@ -1,0 +1,51 @@
+
+🔧 Global Setup: Ensuring E2E test user exists...
+
+  ℹ️  E2E test user not found, creating...
+  ✅ E2E test user created successfully
+
+
+Running 40 tests using 4 workers
+
+  ✓   1 [chromium] › e2e/navigation/all-pages.spec.ts:51:3 › Page Navigation - Staff Portal › Sessions list page loads (8.8s)
+  ✓   4 [chromium] › e2e/navigation/all-pages.spec.ts:74:3 › Page Navigation - Staff Portal › Clients list page loads (8.9s)
+  ✓   3 [chromium] › e2e/navigation/all-pages.spec.ts:30:3 › Page Navigation - Staff Portal › Dashboard page loads (9.2s)
+  ✓   2 [chromium] › e2e/navigation/all-pages.spec.ts:59:3 › Page Navigation - Staff Portal › Sessions create page loads (12.4s)
+  ✓   6 [chromium] › e2e/navigation/all-pages.spec.ts:94:3 › Page Navigation - Staff Portal › Invoices list page loads (10.5s)
+  ✓   7 [chromium] › e2e/navigation/all-pages.spec.ts:102:3 › Page Navigation - Staff Portal › Invoices create page loads (9.4s)
+  ✓   8 [chromium] › e2e/navigation/all-pages.spec.ts:114:3 › Page Navigation - Staff Portal › Rooms list page loads (8.5s)
+  ✓   5 [chromium] › e2e/navigation/all-pages.spec.ts:82:3 › Page Navigation - Staff Portal › Clients create page loads (13.8s)
+  ✓  11 [chromium] › e2e/navigation/all-pages.spec.ts:142:3 › Page Navigation - Staff Portal › Equipment create page loads (8.3s)
+  ✓   9 [chromium] › e2e/navigation/all-pages.spec.ts:122:3 › Page Navigation - Staff Portal › Rooms create page loads (9.8s)
+  ✓  10 [chromium] › e2e/navigation/all-pages.spec.ts:134:3 › Page Navigation - Staff Portal › Equipment list page loads (9.6s)
+  ✓  12 [chromium] › e2e/navigation/all-pages.spec.ts:154:3 › Page Navigation - Staff Portal › Projects list page loads (7.7s)
+  ✓  13 [chromium] › e2e/navigation/all-pages.spec.ts:162:3 › Page Navigation - Staff Portal › Projects create page loads (9.2s)
+  ✓  14 [chromium] › e2e/navigation/all-pages.spec.ts:174:3 › Page Navigation - Staff Portal › Tracks list page loads (9.2s)
+  ✓  15 [chromium] › e2e/navigation/all-pages.spec.ts:182:3 › Page Navigation - Staff Portal › Tracks create page loads (8.5s)
+  ✓  16 [chromium] › e2e/navigation/all-pages.spec.ts:194:3 › Page Navigation - Staff Portal › Talents list page loads (8.0s)
+  ✓  19 [chromium] › e2e/navigation/all-pages.spec.ts:222:3 › Page Navigation - Staff Portal › Quotes create page loads (7.9s)
+  ✓  17 [chromium] › e2e/navigation/all-pages.spec.ts:214:3 › Page Navigation - Staff Portal › Quotes list page loads (8.0s)
+  ✓  18 [chromium] › e2e/navigation/all-pages.spec.ts:202:3 › Page Navigation - Staff Portal › Talents create page loads (8.0s)
+  ✓  20 [chromium] › e2e/navigation/all-pages.spec.ts:234:3 › Page Navigation - Staff Portal › Contracts list page loads (8.0s)
+  ✓  21 [chromium] › e2e/navigation/all-pages.spec.ts:242:3 › Page Navigation - Staff Portal › Contracts create page loads (7.0s)
+  ✓  22 [chromium] › e2e/navigation/all-pages.spec.ts:254:3 › Page Navigation - Staff Portal › Expenses list page loads (7.1s)
+  ✓  23 [chromium] › e2e/navigation/all-pages.spec.ts:262:3 › Page Navigation - Staff Portal › Expenses create page loads (8.3s)
+  ✓  24 [chromium] › e2e/navigation/all-pages.spec.ts:274:3 › Page Navigation - Staff Portal › Calendar page loads (8.6s)
+  ✓  26 [chromium] › e2e/navigation/all-pages.spec.ts:290:3 › Page Navigation - Staff Portal › Financial Reports page loads (8.1s)
+  ✓  28 [chromium] › e2e/navigation/all-pages.spec.ts:306:3 › Page Navigation - Staff Portal › Analytics page loads (6.8s)
+  ✓  25 [chromium] › e2e/navigation/all-pages.spec.ts:282:3 › Page Navigation - Staff Portal › Audio Files page loads (8.6s)
+  ✓  27 [chromium] › e2e/navigation/all-pages.spec.ts:298:3 › Page Navigation - Staff Portal › Reports page loads (8.6s)
+  ✓  32 [chromium] › e2e/navigation/all-pages.spec.ts:338:3 › Page Navigation - Staff Portal › Settings page loads (7.0s)
+  ✓  29 [chromium] › e2e/navigation/all-pages.spec.ts:314:3 › Page Navigation - Staff Portal › Chat page loads (8.8s)
+  ✓  31 [chromium] › e2e/navigation/all-pages.spec.ts:330:3 › Page Navigation - Staff Portal › Shares page loads (8.5s)
+  ✓  30 [chromium] › e2e/navigation/all-pages.spec.ts:322:3 › Page Navigation - Staff Portal › Notifications page loads (8.7s)
+  ✓  36 [chromium] › e2e/navigation/all-pages.spec.ts:407:3 › Page Navigation - Auth Pages › Staff Register page loads (5.0s)
+  ✓  34 [chromium] › e2e/navigation/all-pages.spec.ts:363:3 › Page Navigation - Client Portal › Client Dashboard page loads (6.2s)
+  ✓  35 [chromium] › e2e/navigation/all-pages.spec.ts:385:3 › Page Navigation - Client Portal › Profile page loads for clients (6.3s)
+  ✓  33 [chromium] › e2e/navigation/all-pages.spec.ts:346:3 › Page Navigation - Staff Portal › Team page loads (7.2s)
+  ✓  39 [chromium] › e2e/navigation/all-pages.spec.ts:399:3 › Page Navigation - Auth Pages › Staff Login page loads (4.3s)
+  ✓  37 [chromium] › e2e/navigation/all-pages.spec.ts:415:3 › Page Navigation - Auth Pages › Client Login page loads (7.5s)
+  ✓  38 [chromium] › e2e/navigation/all-pages.spec.ts:376:3 › Page Navigation - Client Portal › Bookings list page loads for clients (6.9s)
+  ✓  40 [chromium] › e2e/navigation/all-pages.spec.ts:423:3 › Page Navigation - Auth Pages › Magic Link Verify page loads (11.0s)
+
+  40 passed (2.1m)

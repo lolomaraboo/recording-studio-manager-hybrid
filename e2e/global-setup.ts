@@ -47,6 +47,7 @@ async function globalSetup(config: FullConfig) {
     await page.fill('#name, input[name="name"]', 'E2E Test User');
     await page.fill('#email, input[name="email"]', email);
     await page.fill('#password, input[name="password"]', password);
+    await page.fill('#confirmPassword, input[name="confirmPassword"]', password);
     await page.fill('#organizationName, input[name="organizationName"], input[name="studioName"]', studioName);
 
     // Take screenshot before submit (for debugging)
