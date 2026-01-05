@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Music } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TalentCreate() {
@@ -65,7 +65,8 @@ export default function TalentCreate() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -75,8 +76,10 @@ export default function TalentCreate() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold">Nouveau Talent</h1>
-            <p className="text-muted-foreground">Ajouter un nouveau talent au studio</p>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Music className="h-8 w-8 text-primary" />
+              Nouveau Talent
+            </h1>
           </div>
         </div>
       </div>
@@ -84,9 +87,9 @@ export default function TalentCreate() {
       {/* Form */}
       <form onSubmit={handleSubmit}>
         <Card>
-          <CardHeader>
-            <CardTitle>Informations du talent</CardTitle>
-            <CardDescription>Profil du musicien ou acteur</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Informations du talent</CardTitle>
+            <CardDescription className="text-sm">Profil du musicien ou acteur</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Row 1: Name & Stage Name */}
@@ -248,6 +251,7 @@ export default function TalentCreate() {
           </CardContent>
         </Card>
       </form>
+      </div>
     </div>
   );
 }

@@ -131,7 +131,8 @@ export default function Team() {
   const pendingInvitations = 2; // Mock data
 
   return (
-    <div className="space-y-6">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -141,10 +142,10 @@ export default function Team() {
             </Link>
           </Button>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Équipe</h2>
-            <p className="text-muted-foreground">
-              Gérez les membres de votre studio et leurs permissions
-            </p>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Users className="h-8 w-8 text-primary" />
+              Équipe
+            </h2>
           </div>
         </div>
         <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
@@ -209,7 +210,7 @@ export default function Team() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium">Membres actifs</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -221,7 +222,7 @@ export default function Team() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium">
               Invitations en attente
             </CardTitle>
@@ -233,7 +234,7 @@ export default function Team() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium">Rôles</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -273,9 +274,9 @@ export default function Team() {
 
       {/* Team Members List */}
       <Card>
-        <CardHeader>
-          <CardTitle>Membres de l'équipe</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Membres de l'équipe</CardTitle>
+          <CardDescription className="text-sm">
             {filteredMembers.length} membre{filteredMembers.length > 1 ? "s" : ""}
           </CardDescription>
         </CardHeader>
@@ -378,9 +379,9 @@ export default function Team() {
 
       {/* Pending Invitations */}
       <Card>
-        <CardHeader>
-          <CardTitle>Invitations en attente</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Invitations en attente</CardTitle>
+          <CardDescription className="text-sm">
             Invitations envoyées en attente d'acceptation
           </CardDescription>
         </CardHeader>
@@ -438,9 +439,9 @@ export default function Team() {
 
       {/* Roles & Permissions */}
       <Card>
-        <CardHeader>
-          <CardTitle>Rôles et permissions</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Rôles et permissions</CardTitle>
+          <CardDescription className="text-sm">
             Vue d'ensemble des permissions par rôle
           </CardDescription>
         </CardHeader>
@@ -562,6 +563,7 @@ export default function Team() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

@@ -81,8 +81,9 @@ export default function Talents() {
   });
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
             <Link to="/dashboard">
@@ -90,10 +91,10 @@ export default function Talents() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Talents</h1>
-            <p className="text-muted-foreground">
-              Gérez votre base de données de talents (musiciens, artistes, etc.)
-            </p>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Music className="h-8 w-8 text-primary" />
+              Talents
+            </h2>
           </div>
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -103,7 +104,7 @@ export default function Talents() {
       </div>
 
       {/* Filtres par catégorie */}
-      <div className="mb-6">
+      <div>
         <Tabs value={selectedType} onValueChange={(val) => setSelectedType(val as TalentType | "all")}>
           <TabsList>
             <TabsTrigger value="all">
@@ -121,27 +122,27 @@ export default function Talents() {
 
       {/* Statistiques */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-4 mb-8">
+        <div className="grid gap-4 md:grid-cols-4">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
               <CardDescription>Total</CardDescription>
               <CardTitle className="text-3xl">{stats.total}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
               <CardDescription>Avec email</CardDescription>
               <CardTitle className="text-3xl">{stats.withEmail}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
               <CardDescription>Avec téléphone</CardDescription>
               <CardTitle className="text-3xl">{stats.withPhone}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
               <CardDescription>Avec site web</CardDescription>
               <CardTitle className="text-3xl">{stats.withWebsite || 0}</CardTitle>
             </CardHeader>
@@ -150,8 +151,12 @@ export default function Talents() {
       )}
 
       {/* Recherche */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Recherche</CardTitle>
+          <CardDescription className="text-sm">Filtrer les talents par nom, email ou téléphone</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
           <div className="flex gap-4">
             <div className="flex-1">
               <Label>Rechercher</Label>
@@ -167,8 +172,9 @@ export default function Talents() {
 
       {/* Liste des talents */}
       <Card>
-        <CardHeader>
-          <CardTitle>Liste des talents</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Liste des talents</CardTitle>
+          <CardDescription className="text-sm">Gérez votre base de données de talents</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -276,9 +282,9 @@ export default function Talents() {
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center text-muted-foreground"
+                    className="text-center py-6"
                   >
-                    Aucun talent trouvé
+                    <p className="text-sm text-muted-foreground">Aucun talent trouvé</p>
                   </TableCell>
                 </TableRow>
               )}
@@ -310,6 +316,7 @@ export default function Talents() {
           }}
         />
       )}
+      </div>
     </div>
   );
 }

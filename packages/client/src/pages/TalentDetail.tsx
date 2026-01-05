@@ -127,46 +127,45 @@ export default function TalentDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-10" />
             <Skeleton className="h-8 w-64" />
           </div>
-        </header>
-        <main className="container py-8">
           <div className="space-y-6">
             <Skeleton className="h-64 w-full" />
             <Skeleton className="h-96 w-full" />
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   if (!talent) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/talents">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h1 className="text-xl font-semibold">Talent introuvable</h1>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Music className="h-8 w-8 text-primary" />
+              Talent introuvable
+            </h2>
           </div>
-        </header>
-        <main className="container py-8">
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-muted-foreground">Ce talent n'existe pas ou a été supprimé.</p>
-              <Button className="mt-4" asChild>
+            <CardContent className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Ce talent n'existe pas ou a été supprimé.</p>
+              <Button size="sm" asChild>
                 <Link to="/talents">Retour aux talents</Link>
               </Button>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
@@ -175,26 +174,25 @@ export default function TalentDetail() {
   const genres = parseJsonArray(talent.genres);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/talents">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-xl font-semibold">
-                {talent.stageName || talent.name}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {talent.stageName && talent.name && `${talent.name} • `}Talent #{talent.id}
-              </p>
-            </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/talents">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Music className="h-8 w-8 text-primary" />
+              {talent.stageName || talent.name}
+            </h2>
           </div>
-          <div className="flex gap-2">
+        </div>
+        <div className="flex gap-2">
             {!isEditing ? (
               <>
                 <Button variant="outline" onClick={() => setIsEditing(true)}>
@@ -218,20 +216,18 @@ export default function TalentDetail() {
                 </Button>
               </>
             )}
-          </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="container py-8">
-        <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
           {/* Left Column - Main Info */}
           <div className="md:col-span-2 space-y-6">
             {/* Profile Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Profil</CardTitle>
-                <CardDescription>Informations personnelles et artistiques</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Profil</CardTitle>
+                <CardDescription className="text-sm">Informations personnelles et artistiques</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -353,9 +349,9 @@ export default function TalentDetail() {
 
             {/* Skills Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Compétences</CardTitle>
-                <CardDescription>Instruments et genres musicaux</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Compétences</CardTitle>
+                <CardDescription className="text-sm">Instruments et genres musicaux</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -419,9 +415,9 @@ export default function TalentDetail() {
 
             {/* Links Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Liens</CardTitle>
-                <CardDescription>Site web et réseaux sociaux</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Liens</CardTitle>
+                <CardDescription className="text-sm">Site web et réseaux sociaux</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -497,8 +493,8 @@ export default function TalentDetail() {
             {/* Notes Card */}
             {(talent.notes || isEditing) && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Notes</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Notes</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {isEditing ? (
@@ -522,8 +518,8 @@ export default function TalentDetail() {
           <div className="space-y-6">
             {/* Meta Info */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -549,8 +545,8 @@ export default function TalentDetail() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" className="w-full" asChild>
@@ -560,27 +556,28 @@ export default function TalentDetail() {
             </Card>
           </div>
         </div>
-      </main>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Supprimer le talent</DialogTitle>
-            <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce talent ? Cette action est irréversible.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Annuler
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
-              Supprimer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </div>
     </div>
+
+    {/* Delete Confirmation Dialog */}
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Supprimer le talent</DialogTitle>
+          <DialogDescription>
+            Êtes-vous sûr de vouloir supprimer ce talent ? Cette action est irréversible.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+            Supprimer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

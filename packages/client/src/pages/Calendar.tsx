@@ -146,37 +146,39 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/dashboard">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Calendrier</h1>
-            </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <CalendarIcon className="h-8 w-8 text-primary" />
+              Calendrier
+            </h2>
           </div>
+        </div>
           <Button asChild>
             <Link to="/sessions/new">
               <Plus className="mr-2 h-4 w-4" />
               Nouvelle session
             </Link>
           </Button>
-        </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
+      <div>
           {/* Legend */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle className="text-base">Légende</CardTitle>
+              <CardDescription className="text-sm">Statuts des sessions</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-4">
@@ -253,11 +255,12 @@ export default function Calendar() {
               )}
             </CardContent>
           </Card>
-        </div>
-      </main>
+      </div>
+      </div>
+    </div>
 
-      {/* Create Session Dialog */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+    {/* Create Session Dialog */}
+    <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Créer une session</DialogTitle>
@@ -357,6 +360,6 @@ export default function Calendar() {
           background: hsl(var(--primary) / 0.9);
         }
       `}</style>
-    </div>
+    </>
   );
 }
