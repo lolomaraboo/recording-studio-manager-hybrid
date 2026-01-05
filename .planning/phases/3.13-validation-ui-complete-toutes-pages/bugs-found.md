@@ -25,6 +25,10 @@
 - Performance: 0
 - Test Infrastructure: 2
 
+**Bugs by Status:**
+- ✅ Fixed: 3 (BUG-001, BUG-002, BUG-003)
+- 📋 Documented: 1 (BUG-004)
+
 ---
 
 ## Bugs List
@@ -71,13 +75,14 @@ This bug was blocking ALL E2E tests from running. After fix, tests can proceed n
 
 ---
 
-## BUG-002: E2E ui-validation test has ambiguous password selector
+## BUG-002: E2E ui-validation test has ambiguous password selector ✅ FIXED
 
 **Page:** /register (test infrastructure)
 **Severity:** P2
 **Category:** Test Infrastructure
 **Browser:** Chromium (Playwright)
 **Date found:** 2026-01-04
+**Date fixed:** 2026-01-04
 
 ### Description
 The E2E UI validation test for the register page fails with "strict mode violation" because the selector `input[type="password"]` matches 2 elements (password AND confirmPassword fields).
@@ -105,18 +110,33 @@ Error: strict mode violation: locator('input[type="password"]') resolved to 2 el
   2) <input id="confirmPassword" type="password" ...>
 ```
 
-### Fix Needed
-Update `e2e/ui-validation.spec.ts:70` to use more specific selector.
+### Fix Applied
+Changed selector in `e2e/ui-validation.spec.ts:70` from:
+```typescript
+const passwordInput = page.locator('input[type="password"]');
+```
+To:
+```typescript
+const passwordInput = page.locator('#password, input[name="password"]');
+```
+
+### Verification
+Test now passes successfully:
+```
+✓ Register page loads and displays form (4.3s)
+  ✓ Registration form elements visible
+```
 
 ---
 
-## BUG-003: 404 resource not found console error on login page
+## BUG-003: 404 resource not found console error on login page ✅ FIXED
 
 **Page:** /login (homepage)
 **Severity:** P3
 **Category:** Functional
 **Browser:** Chromium
 **Date found:** 2026-01-04
+**Date fixed:** 2026-01-04
 
 ### Description
 Console shows a 404 error for a resource that failed to load on the login page.
@@ -139,6 +159,26 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
 
 ### Additional Context
 Need to investigate which specific resource is failing. Likely a missing asset (image, font, or JS file). This was detected during UI validation tests.
+
+### Investigation
+Created debug test (`e2e/debug-404-error.spec.ts`) to identify failing resource.
+Found: `/vite.svg` returning 404 (Not Found)
+
+### Fix Applied
+Removed broken reference in `packages/client/index.html:5`:
+```html
+<!-- REMOVED: -->
+<!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
+```
+
+### Verification
+Build completed successfully after fix:
+```
+✓ built in 4.16s
+dist/index.html  0.42 kB │ gzip: 0.28 kB
+```
+
+**Note:** Fix requires production deployment to take effect (build artifact needs to be deployed).
 
 ---
 

@@ -67,7 +67,7 @@ test.describe('UI Validation - Public Pages', () => {
     // Check for registration form fields
     const nameInput = page.locator('input[name="name"], input[placeholder*="name" i]').first();
     const emailInput = page.locator('input[type="email"], input[name="email"]');
-    const passwordInput = page.locator('input[type="password"]');
+    const passwordInput = page.locator('#password, input[name="password"]');
     const submitButton = page.locator('button[type="submit"]');
 
     await expect(emailInput).toBeVisible();
