@@ -9,17 +9,17 @@
 
 ## Summary Statistics
 
-**Total Pages Tested:** 47 / 58 (via Playwright E2E tests)
-**Total Bugs Found:** 3
+**Total Pages Tested:** 47 / 58 (81.0% coverage via Playwright E2E tests)
+**Total Bugs Found:** 4
 
 **Bugs by Severity:**
 - P0 (Critical): 0
 - P1 (High): 0
-- P2 (Medium): 2
+- P2 (Medium): 3
 - P3 (Low): 1
 
 **Bugs by Category:**
-- UI: 0
+- UI: 1
 - UX: 0
 - Functional: 1
 - Performance: 0
@@ -139,6 +139,44 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
 
 ### Additional Context
 Need to investigate which specific resource is failing. Likely a missing asset (image, font, or JS file). This was detected during UI validation tests.
+
+---
+
+## BUG-004: Client creation form has complex UI requiring button clicks for email/phone
+
+**Page:** /clients/new
+**Severity:** P2
+**Category:** UI/UX
+**Browser:** Chromium (Playwright)
+**Date found:** 2026-01-04
+
+### Description
+The client creation form uses a multi-tab interface (Identité, Contact, Adresse) with "Ajouter" buttons for adding emails, phones, and websites instead of direct input fields. This makes automated testing difficult and may impact user experience.
+
+### Steps to Reproduce
+1. Navigate to /clients/new
+2. Fill name in "Identité" tab
+3. Click "Contact" tab
+4. Observe: No direct email input field
+5. Must click "Ajouter" button under "Emails" section to add an email
+
+### Expected Behavior
+For simpler UX and testability, could have:
+- At least one direct email input field without requiring "Ajouter" button
+- OR clearer indication that "Ajouter" is required
+
+### Actual Behavior
+User must click "Ajouter" button to reveal email input dialog/field. Not immediately obvious.
+
+### Impact
+- Automated E2E tests cannot easily create clients
+- May confuse new users who expect direct input fields
+- Adds extra clicks to workflow
+
+### Additional Context
+This pattern is likely intentional for supporting multiple emails/phones (array fields). However, it creates friction for the most common case of adding a single email.
+
+Workaround for testing: Use existing CRUD tests (clients-enriched.spec.ts) which already handle this complex UI.
 
 ---
 

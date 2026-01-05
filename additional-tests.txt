@@ -1,0 +1,58 @@
+
+🔧 Global Setup: Ensuring E2E test user exists...
+
+  ✅ E2E test user already exists
+
+
+Running 18 tests using 4 workers
+
+  ✓   2 [chromium] › e2e/navigation/client-portal-complete.spec.ts:46:3 › Client Portal - Remaining Pages › Client portal booking detail page structure (5.8s)
+  ✓   1 [chromium] › e2e/navigation/client-portal-complete.spec.ts:17:3 › Client Portal - Remaining Pages › Client portal projects page loads (5.8s)
+  ✓   3 [chromium] › e2e/navigation/client-portal-complete.spec.ts:37:3 › Client Portal - Remaining Pages › Client portal payments page loads (6.9s)
+  ✓   4 [chromium] › e2e/navigation/client-portal-complete.spec.ts:28:3 › Client Portal - Remaining Pages › Client portal invoices page loads (7.0s)
+  -   7 [chromium] › e2e/navigation/detail-pages.spec.ts:77:3 › Detail Pages - Staff Portal › Invoice detail page loads
+  -   5 [chromium] › e2e/navigation/detail-pages.spec.ts:52:3 › Detail Pages - Staff Portal › Session detail page loads
+  -   8 [chromium] › e2e/navigation/detail-pages.spec.ts:97:3 › Detail Pages - Staff Portal › Room detail page loads
+  -   9 [chromium] › e2e/navigation/detail-pages.spec.ts:117:3 › Detail Pages - Staff Portal › Equipment detail page loads
+  -  10 [chromium] › e2e/navigation/detail-pages.spec.ts:137:3 › Detail Pages - Staff Portal › Project detail page loads
+  -  11 [chromium] › e2e/navigation/detail-pages.spec.ts:157:3 › Detail Pages - Staff Portal › Track detail page loads
+  -  13 [chromium] › e2e/navigation/detail-pages.spec.ts:197:3 › Detail Pages - Staff Portal › Quote detail page loads
+  -  12 [chromium] › e2e/navigation/detail-pages.spec.ts:177:3 › Detail Pages - Staff Portal › Talent detail page loads
+  -  14 [chromium] › e2e/navigation/detail-pages.spec.ts:217:3 › Detail Pages - Staff Portal › Contract detail page loads
+  ✘   6 [chromium] › e2e/navigation/detail-pages.spec.ts:23:3 › Detail Pages - Staff Portal › Client detail page loads (23.8s)
+  ✓  17 [chromium] › e2e/navigation/super-admin-pages.spec.ts:32:3 › Super Admin Pages › Super admin database page loads or redirects (5.6s)
+  ✓  16 [chromium] › e2e/navigation/super-admin-pages.spec.ts:19:3 › Super Admin Pages › Super admin services page loads or redirects (5.8s)
+  -  15 [chromium] › e2e/navigation/detail-pages.spec.ts:237:3 › Detail Pages - Staff Portal › Expense detail page loads
+  ✓  18 [chromium] › e2e/navigation/super-admin-pages.spec.ts:41:3 › Super Admin Pages › Super admin logs page loads or redirects (5.4s)
+
+
+  1) [chromium] › e2e/navigation/detail-pages.spec.ts:23:3 › Detail Pages - Staff Portal › Client detail page loads 
+
+    TimeoutError: page.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"], #email')[22m
+
+
+      26 |     // Fill minimal required fields
+      27 |     await page.fill('input[name="name"], #name', 'Test Client Detail');
+    > 28 |     await page.fill('input[name="email"], #email', `test-detail-${Date.now()}@example.com`);
+         |                ^
+      29 |
+      30 |     // Submit form
+      31 |     const submitButton = page.locator('button[type="submit"]').first();
+        at /Users/marabook_m1/Documents/APP_HOME/CascadeProjects/windsurf-project/recording-studio-manager-hybrid/e2e/navigation/detail-pages.spec.ts:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/navigation-detail-pages-De-57418-al-Client-detail-page-loads-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/navigation-detail-pages-De-57418-al-Client-detail-page-loads-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/navigation-detail-pages-De-57418-al-Client-detail-page-loads-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/navigation/detail-pages.spec.ts:23:3 › Detail Pages - Staff Portal › Client detail page loads 
+  10 skipped
+  7 passed (48.1s)
