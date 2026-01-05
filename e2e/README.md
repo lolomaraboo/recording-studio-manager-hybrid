@@ -117,7 +117,7 @@ Test configuration in `playwright.config.ts`:
 
 ```bash
 # Test against different environment
-BASE_URL=http://localhost:5173 npx playwright test
+BASE_URL=http://localhost:5174 npx playwright test
 
 # CI mode (with retries)
 CI=true npx playwright test

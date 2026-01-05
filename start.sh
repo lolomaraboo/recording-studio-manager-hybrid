@@ -35,14 +35,14 @@ echo -e "${GREEN}✅ PostgreSQL ready${NC}"
 echo -e "${GREEN}✅ Database rsm_master found${NC}"
 echo ""
 
-# Clean up any existing processes on ports 3001 and 5173
+# Clean up any existing processes on ports 3001 and 5174
 echo -e "${BLUE}🧹 Cleaning up existing processes...${NC}"
-lsof -ti :3001 -ti :5173 2>/dev/null | xargs kill -9 2>/dev/null || true
+lsof -ti :3001 -ti :5174 2>/dev/null | xargs kill -9 2>/dev/null || true
 sleep 1
 
 echo -e "${BLUE}🚀 Starting development servers...${NC}"
 echo ""
-echo -e "${BLUE}Frontend:${NC} http://localhost:5173"
+echo -e "${BLUE}Frontend:${NC} http://localhost:5174"
 echo -e "${BLUE}Backend:${NC}  http://localhost:3001"
 echo -e "${BLUE}tRPC:${NC}     http://localhost:3001/api/trpc"
 echo ""

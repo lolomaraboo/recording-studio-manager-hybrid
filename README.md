@@ -100,7 +100,7 @@ pnpm --filter client dev
 
 ### URLs Dev
 
-- **Frontend:** http://localhost:5173
+- **Frontend:** http://localhost:5174
 - **Backend API:** http://localhost:3001
 - **tRPC Endpoint:** http://localhost:3001/api/trpc
 - **Health Check:** http://localhost:3001/health

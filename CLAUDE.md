@@ -77,7 +77,7 @@ pnpm --filter client dev
 ```
 
 **URLs:**
-- Frontend: http://localhost:5173
+- Frontend: http://localhost:5174
 - Backend: http://localhost:3001
 - tRPC endpoint: http://localhost:3001/api/trpc
 - Health check: http://localhost:3001/health

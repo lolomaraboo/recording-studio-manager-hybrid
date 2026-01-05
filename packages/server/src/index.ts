@@ -124,11 +124,15 @@ async function main() {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        // ⚠️ TEMPORARY DEV CONFIG - See ISSUE-011 in .planning/ISSUES.md
+        // TODO: Before production deployment, change to:
+        //   secure: process.env.NODE_ENV === 'production',
+        //   domain: process.env.NODE_ENV === 'production' ? '.recording-studio-manager.com' : undefined,
+        secure: false, // Allow cookies over HTTP for localhost development
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-        domain: process.env.NODE_ENV === 'production' ? '.recording-studio-manager.com' : undefined,
-        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
+        domain: undefined, // No domain restriction for localhost
+        sameSite: 'lax', // Allow cross-origin cookies for localhost dev (5174 → 3002)
       },
     })
   );

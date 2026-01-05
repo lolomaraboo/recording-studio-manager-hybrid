@@ -56,7 +56,7 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      ALLOWED_ORIGINS: http://localhost,http://localhost:80,http://client
+      ALLOWED_ORIGINS: http://localhost,http://localhost:80,http://localhost:5174,http://client,http://host.docker.internal:8080
     ports:
       - "3002:3002"
     depends_on:

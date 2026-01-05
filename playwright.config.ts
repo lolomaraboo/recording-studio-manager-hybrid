@@ -87,7 +87,7 @@ export default defineConfig({
   // Web server configuration (for local development)
   // webServer: {
   //   command: 'pnpm dev',
-  //   url: 'http://localhost:5173',
+  //   url: 'http://localhost:5174',
   //   reuseExistingServer: !process.env.CI,
   // },
 });

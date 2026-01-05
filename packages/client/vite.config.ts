@@ -29,8 +29,12 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:3001',
+        target: 'http://localhost:3002',
         changeOrigin: true,
+        secure: false,
+        // Forward cookies between browser and backend
+        cookieDomainRewrite: 'localhost',
+        cookiePathRewrite: '/',
       },
     },
   },

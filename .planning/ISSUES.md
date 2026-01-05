@@ -1,10 +1,54 @@
 # Project Issues & Deferred Work
 
-**Last updated:** 2025-12-27
+**Last updated:** 2026-01-04
 
 ---
 
 ## 🔴 Active Issues
+
+### ISSUE-011 (P0): ⚠️ CONFIGURATION TEMPORAIRE DEV - Session Cookies `secure: false`
+**Status:** 🟡 TEMPORARY DEV CONFIG
+**Created:** 2026-01-04
+**Phase:** 3.14 - Améliorations UI
+**File:** `packages/server/src/index.ts` lignes 126-132
+
+**Configuration actuelle (DEV SEULEMENT):**
+```javascript
+cookie: {
+  secure: false, // ⚠️ TEMPORARY - Allow cookies over HTTP for localhost
+  httpOnly: true,
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+  domain: undefined, // ⚠️ TEMPORARY - No domain restriction
+  sameSite: 'lax',
+}
+```
+
+**AVANT DÉPLOIEMENT PRODUCTION, REMETTRE:**
+```javascript
+cookie: {
+  secure: process.env.NODE_ENV === 'production',
+  httpOnly: true,
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+  domain: process.env.NODE_ENV === 'production' ? '.recording-studio-manager.com' : undefined,
+  sameSite: 'lax',
+}
+```
+
+**Raison:**
+- Vite dev (`localhost:5174`) communique avec Backend Docker (`localhost:3002`)
+- Navigateur bloque cookies avec `secure: true` sur HTTP (localhost)
+- En production HTTPS, `secure: true` est OBLIGATOIRE pour sécurité
+
+**Impact:**
+- ✅ Permet développement local avec Vite hot-reload
+- ⚠️ SÉCURITÉ RÉDUITE si déployé en production tel quel
+- ⚠️ Docker container a `NODE_ENV=production` donc ignore les conditionals
+
+**Résolution:**
+- Avant `docker-compose build` pour production: remettre configuration conditionnelle
+- OU ajouter variable d'environnement `COOKIE_SECURE=true` en production
+
+---
 
 ### ISSUE-010 (P1): E2E Tests Auth Failures - Backend Registration Fixed
 **Status:** ✅ PARTIALLY RESOLVED (2025-12-26)
