@@ -162,20 +162,20 @@ export function Clients() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Clients</h1>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Users className="h-8 w-8 text-primary" />
+              Clients
+            </h2>
           </div>
           <div className="flex gap-2">
             {/* Export Dropdown */}
@@ -248,16 +248,12 @@ export function Clients() {
             </Button>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
-          {/* Search */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recherche</CardTitle>
-            </CardHeader>
+        {/* Search */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Recherche</CardTitle>
+          </CardHeader>
             <CardContent>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -271,14 +267,14 @@ export function Clients() {
             </CardContent>
           </Card>
 
-          {/* Clients List */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>{filteredClients.length} client(s)</CardTitle>
-                  <CardDescription>Gérez votre base de données clients</CardDescription>
-                </div>
+        {/* Clients List */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base">{filteredClients.length} client(s)</CardTitle>
+                <CardDescription className="text-sm">Gérez votre base de données clients</CardDescription>
+              </div>
                 <div className="flex gap-1">
                   <Button
                     variant={viewMode === 'table' ? 'default' : 'outline'}
@@ -403,11 +399,11 @@ export function Clients() {
                   {viewMode === 'grid' && (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {filteredClients.map((client) => (
-                        <Card key={client.id} className="hover:shadow-md transition-shadow">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <CardTitle className="text-base flex items-center gap-2">
+                      <Card key={client.id} className="hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <CardTitle className="text-base flex items-center gap-2">
                                   {client.name}
                                   {client.revenue > 1000000 && (
                                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
@@ -636,36 +632,35 @@ export function Clients() {
                         </div>
                       </div>
                     </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun client</h3>
-                  <p className="text-muted-foreground mb-4">Commencez par ajouter votre premier client</p>
-                  <Button asChild>
-                    <Link to="/clients/new">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Nouveau client
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-6">
+                <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <h3 className="text-sm font-medium mb-1">Aucun client</h3>
+                <p className="text-sm text-muted-foreground mb-3">Commencez par ajouter votre premier client</p>
+                <Button asChild size="sm">
+                  <Link to="/clients/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nouveau client
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Import Dialog */}
-      <ImportClientsDialog
-        open={showImportDialog}
-        onClose={() => setShowImportDialog(false)}
-        format={importFormat}
-        onImportComplete={() => {
-          setShowImportDialog(false);
-          refetch();
-        }}
-      />
+        {/* Import Dialog */}
+        <ImportClientsDialog
+          open={showImportDialog}
+          onClose={() => setShowImportDialog(false)}
+          format={importFormat}
+          onImportComplete={() => {
+            setShowImportDialog(false);
+            refetch();
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -99,30 +99,26 @@ export default function Projects() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <Music className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Projets Musicaux</h1>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Music className="h-8 w-8 text-primary" />
+              Projets Musicaux
+            </h2>
           </div>
           <Button onClick={() => setShowCreateDialog(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Nouveau Projet
           </Button>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container py-8">
         {/* Filtres */}
         <Card className="mb-6">
           <CardContent className="pt-6">
@@ -240,23 +236,23 @@ export default function Projects() {
         ) : (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Music className="h-16 w-16 text-muted-foreground opacity-50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Aucun projet trouvé</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <Music className="h-8 w-8 text-muted-foreground opacity-50 mx-auto mb-2" />
+              <h3 className="text-sm font-medium mb-1">Aucun projet trouvé</h3>
+              <p className="text-sm text-muted-foreground mb-3">
                 {searchQuery || statusFilter !== "all"
                   ? "Aucun projet ne correspond à vos critères de recherche"
                   : "Créez votre premier projet musical pour commencer"}
               </p>
               {!searchQuery && statusFilter === "all" && (
-                <Button onClick={() => setShowCreateDialog(true)}>
+                <Button onClick={() => setShowCreateDialog(true)} size="sm">
                   <Plus className="mr-2 h-4 w-4" />
                   Créer un projet
                 </Button>
               )}
-            </CardContent>
-          </Card>
+          </CardContent>
+        </Card>
         )}
-      </main>
+      </div>
 
       {/* Dialog Création de Projet */}
       <CreateProjectDialog

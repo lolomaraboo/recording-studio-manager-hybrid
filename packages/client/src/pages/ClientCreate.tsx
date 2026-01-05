@@ -171,31 +171,32 @@ export default function ClientCreate() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/clients">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/clients">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
             </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Nouveau Client</h1>
-            <p className="text-muted-foreground">Ajouter un nouveau client avec toutes ses informations</p>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <User className="h-8 w-8 text-primary" />
+              Nouveau Client
+            </h2>
           </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations du client</CardTitle>
-            <CardDescription>
-              Remplissez les informations du client. Seul le nom est obligatoire.
-            </CardDescription>
-          </CardHeader>
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations du client</CardTitle>
+              <CardDescription className="text-sm">
+                Remplissez les informations du client. Seul le nom est obligatoire.
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4">
@@ -715,10 +716,11 @@ export default function ClientCreate() {
               >
                 Annuler
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
+              </div>
+            </CardContent>
+          </Card>
+        </form>
+      </div>
     </div>
   );
 }

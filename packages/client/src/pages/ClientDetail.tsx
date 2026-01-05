@@ -248,46 +248,37 @@ export default function ClientDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
-            <Skeleton className="h-10 w-10" />
-            <Skeleton className="h-8 w-64" />
-          </div>
-        </header>
-        <main className="container py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-48 w-full" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </main>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/clients">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h1 className="text-xl font-semibold">Client introuvable</h1>
+            <h2 className="text-3xl font-bold">Client introuvable</h2>
           </div>
-        </header>
-        <main className="container py-8">
           <Card>
             <CardContent className="pt-6">
               <p className="text-muted-foreground">Ce client n'existe pas ou a été supprimé.</p>
-              <Button className="mt-4" asChild>
+              <Button className="mt-4" asChild size="sm">
                 <Link to="/clients">Retour aux clients</Link>
               </Button>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
@@ -295,28 +286,25 @@ export default function ClientDetail() {
   const isVIP = stats.totalRevenue > 10000; // VIP if >10k€ revenue
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/clients">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold">{client.name}</h1>
-              {isVIP && <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />}
-            </div>
-            <p className="text-sm text-muted-foreground">Client #{client.id}</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/clients">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Users className="h-8 w-8 text-primary" />
+              {client.name}
+              {isVIP && <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />}
+            </h2>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
+        <div className="space-y-2">
           {/* Stats Row */}
           <div className="grid gap-6 md:grid-cols-4">
             <Card>
@@ -618,16 +606,16 @@ export default function ClientDetail() {
                             </TableBody>
                           </Table>
                         </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">Aucune session enregistrée</p>
-                        </div>
-                      )}
-                    </TabsContent>
+                    ) : (
+                      <div className="text-center py-6">
+                        <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm font-medium mb-1">Aucune session enregistrée</p>
+                      </div>
+                    )}
+                  </TabsContent>
 
-                    <TabsContent value="invoices" className="mt-4">
-                      {clientInvoices.length > 0 ? (
+                  <TabsContent value="invoices" className="mt-4">
+                    {clientInvoices.length > 0 ? (
                         <div className="rounded-md border">
                           <Table>
                             <TableHeader>
@@ -678,14 +666,14 @@ export default function ClientDetail() {
                             </TableBody>
                           </Table>
                         </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">Aucune facture émise</p>
-                        </div>
-                      )}
-                    </TabsContent>
-                  </Tabs>
+                    ) : (
+                      <div className="text-center py-6">
+                        <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm font-medium mb-1">Aucune facture émise</p>
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
                 </CardContent>
               </Card>
             </div>
@@ -758,11 +746,10 @@ export default function ClientDetail() {
                     </Button>
                   )}
                 </CardContent>
-              </Card>
-            </div>
+            </Card>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
