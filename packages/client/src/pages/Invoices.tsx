@@ -96,19 +96,21 @@ export function Invoices() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <FileText className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Factures</h1>
+            <div>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <FileText className="h-8 w-8 text-primary" />
+                Factures
+              </h2>
             </div>
           </div>
           <Button asChild>
@@ -118,11 +120,6 @@ export function Invoices() {
             </Link>
           </Button>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
           {/* Stats */}
           {invoicesLoading ? (
             <div className="grid gap-6 md:grid-cols-3">
@@ -133,7 +130,7 @@ export function Invoices() {
           ) : (
             <div className="grid gap-6 md:grid-cols-3">
               <Card>
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-3">
                   <CardDescription>Total facturé</CardDescription>
                   <CardTitle className="text-3xl">
                     {stats.total.toLocaleString("fr-FR", {
@@ -148,7 +145,7 @@ export function Invoices() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-3">
                   <CardDescription>Payé</CardDescription>
                   <CardTitle className="text-3xl text-green-600">
                     {stats.paid.toLocaleString("fr-FR", {
@@ -165,7 +162,7 @@ export function Invoices() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-3">
                   <CardDescription>En attente</CardDescription>
                   <CardTitle className="text-3xl text-orange-600">
                     {stats.pending.toLocaleString("fr-FR", {
@@ -186,10 +183,10 @@ export function Invoices() {
 
           {/* Filters */}
           <Card>
-            <CardHeader>
-              <CardTitle>Filtres</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Filtres</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -223,9 +220,9 @@ export function Invoices() {
 
           {/* Invoices List */}
           <Card>
-            <CardHeader>
-              <CardTitle>{filteredInvoices.length} facture(s)</CardTitle>
-              <CardDescription>Gérez vos factures et paiements</CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">{filteredInvoices.length} facture(s)</CardTitle>
+              <CardDescription className="text-sm">Gérez vos factures et paiements</CardDescription>
             </CardHeader>
             <CardContent>
               {invoicesLoading ? (
@@ -295,13 +292,13 @@ export function Invoices() {
                   </Table>
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucune facture</h3>
-                  <p className="text-muted-foreground mb-4">
+                <div className="text-center py-6">
+                  <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <h3 className="text-sm font-medium mb-1">Aucune facture</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
                     Commencez par créer votre première facture
                   </p>
-                  <Button asChild>
+                  <Button size="sm" asChild>
                     <Link to="/invoices/new">
                       <Plus className="mr-2 h-4 w-4" />
                       Nouvelle facture
@@ -311,8 +308,7 @@ export function Invoices() {
               )}
             </CardContent>
           </Card>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Link } from "react-router-dom";
-import { Plus, Pencil, Trash2, DoorOpen, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, DoorOpen, CheckCircle2, XCircle, ArrowLeft, Building } from "lucide-react";
 
 type RoomFormData = {
   name: string;
@@ -156,44 +156,45 @@ export default function Rooms() {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/dashboard">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Salles</h1>
-            <p className="text-muted-foreground">
-              Gérez vos salles d'enregistrement et leurs caractéristiques
-            </p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <div>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <Building className="h-8 w-8 text-primary" />
+                Salles
+              </h2>
+            </div>
           </div>
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouvelle salle
+          </Button>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nouvelle salle
-        </Button>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Liste des salles</CardTitle>
-          <CardDescription>
-            {rooms?.length || 0} salle(s) enregistrée(s)
-          </CardDescription>
-        </CardHeader>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Liste des salles</CardTitle>
+            <CardDescription className="text-sm">
+              {rooms?.length || 0} salle(s) enregistrée(s)
+            </CardDescription>
+          </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
               Chargement...
             </div>
           ) : !rooms || rooms.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <DoorOpen className="mx-auto h-12 w-12 mb-4 opacity-50" />
-              <p>Aucune salle enregistrée</p>
-              <p className="text-sm">Créez votre première salle pour commencer</p>
+            <div className="text-center py-6">
+              <DoorOpen className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <h3 className="text-sm font-medium mb-1">Aucune salle enregistrée</h3>
+              <p className="text-sm text-muted-foreground mb-3">Créez votre première salle pour commencer</p>
             </div>
           ) : (
             <Table>
@@ -487,6 +488,7 @@ export default function Rooms() {
           </form>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

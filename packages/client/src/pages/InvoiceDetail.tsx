@@ -29,6 +29,7 @@ import {
   CheckCircle,
   Calendar,
   User,
+  FileText,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -161,46 +162,43 @@ export default function InvoiceDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-10" />
             <Skeleton className="h-8 w-64" />
           </div>
-        </header>
-        <main className="container py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </main>
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!invoice) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/invoices">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h1 className="text-xl font-semibold">Facture introuvable</h1>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <FileText className="h-8 w-8 text-primary" />
+              Facture introuvable
+            </h2>
           </div>
-        </header>
-        <main className="container py-8">
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-muted-foreground">Cette facture n'existe pas ou a été supprimée.</p>
-              <Button className="mt-4" asChild>
+            <CardContent className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Cette facture n'existe pas ou a été supprimée.</p>
+              <Button size="sm" asChild>
                 <Link to="/invoices">Retour aux factures</Link>
               </Button>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
@@ -209,10 +207,11 @@ export default function InvoiceDetail() {
     invoice.status === "sent" && new Date(invoice.dueDate) < new Date() && !invoice.paidAt;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/invoices">
@@ -220,7 +219,10 @@ export default function InvoiceDetail() {
               </Link>
             </Button>
             <div>
-              <h1 className="text-xl font-semibold">Facture {invoice.invoiceNumber}</h1>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <FileText className="h-8 w-8 text-primary" />
+                Facture {invoice.invoiceNumber}
+              </h2>
               <p className="text-sm text-muted-foreground">{client?.name || "Client inconnu"}</p>
             </div>
           </div>
@@ -266,21 +268,19 @@ export default function InvoiceDetail() {
             )}
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
+        {/* Main Content */}
         <div className="grid gap-6 md:grid-cols-3">
           {/* Left Column - Invoice Details */}
           <div className="md:col-span-2 space-y-6">
             {/* Invoice Info Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Informations de la facture</CardTitle>
+                  <CardTitle className="text-base">Informations de la facture</CardTitle>
                   {getStatusBadge(invoice.status)}
                 </div>
-                <CardDescription>Détails et paramètres de la facture</CardDescription>
+                <CardDescription className="text-sm">Détails et paramètres de la facture</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -416,9 +416,9 @@ export default function InvoiceDetail() {
 
             {/* Invoice Items Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Détails de facturation</CardTitle>
-                <CardDescription>Lignes et montants de la facture</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Détails de facturation</CardTitle>
+                <CardDescription className="text-sm">Lignes et montants de la facture</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* TODO: Display invoice items when backend supports them */}
@@ -468,9 +468,9 @@ export default function InvoiceDetail() {
 
             {/* Notes Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Notes</CardTitle>
-                <CardDescription>Notes et commentaires sur la facture</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Notes</CardTitle>
+                <CardDescription className="text-sm">Notes et commentaires sur la facture</CardDescription>
               </CardHeader>
               <CardContent>
                 {isEditing ? (
@@ -491,8 +491,8 @@ export default function InvoiceDetail() {
           <div className="space-y-6">
             {/* Summary Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Résumé</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Résumé</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -552,8 +552,8 @@ export default function InvoiceDetail() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" className="w-full" onClick={handleDownloadPDF}>
@@ -581,8 +581,8 @@ export default function InvoiceDetail() {
             {/* Client Info Card */}
             {client && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Client</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Client</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div>
@@ -602,10 +602,11 @@ export default function InvoiceDetail() {
             )}
           </div>
         </div>
-      </main>
+      </div>
+    </div>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+    {/* Delete Confirmation Dialog */}
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Supprimer la facture</DialogTitle>
@@ -623,6 +624,6 @@ export default function InvoiceDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

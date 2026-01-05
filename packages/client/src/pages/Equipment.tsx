@@ -35,7 +35,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
-import { Plus, Pencil, Trash2, Package, ArrowLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, ArrowLeft, Wrench } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Equipment() {
@@ -168,49 +168,50 @@ export default function Equipment() {
   }
 
   return (
-    <div className="container py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/dashboard">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Équipement</h1>
-            <p className="text-muted-foreground mt-2">
-              Gérez votre inventaire d'équipement de studio
-            </p>
-          </div>
-        </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Ajouter un équipement
-        </Button>
-      </div>
-
-      {equipment && equipment.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Package className="h-12 w-12 text-muted-foreground mb-4" />
-            <CardTitle className="mb-2">Aucun équipement</CardTitle>
-            <CardDescription className="mb-4">
-              Commencez par ajouter votre premier équipement
-            </CardDescription>
-            <Button onClick={() => setIsAddDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Ajouter un équipement
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
             </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Liste de l'équipement</CardTitle>
-            <CardDescription>
-              {equipment?.length} équipement(s) au total
-            </CardDescription>
-          </CardHeader>
+            <div>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <Wrench className="h-8 w-8 text-primary" />
+                Équipement
+              </h2>
+            </div>
+          </div>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Ajouter un équipement
+          </Button>
+        </div>
+
+        {equipment && equipment.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-6">
+              <Package className="h-8 w-8 text-muted-foreground mb-2" />
+              <h3 className="text-sm font-medium mb-1">Aucun équipement</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Commencez par ajouter votre premier équipement
+              </p>
+              <Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Ajouter un équipement
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Liste de l'équipement</CardTitle>
+              <CardDescription className="text-sm">
+                {equipment?.length} équipement(s) au total
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -494,6 +495,7 @@ export default function Equipment() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

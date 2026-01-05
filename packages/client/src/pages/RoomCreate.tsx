@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Building } from "lucide-react";
 import { toast } from "sonner";
 
 export default function RoomCreate() {
@@ -75,29 +75,32 @@ export default function RoomCreate() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/rooms">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Nouvelle Salle</h1>
-            <p className="text-muted-foreground">Ajouter une nouvelle salle au studio</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link to="/rooms">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                <Building className="h-8 w-8 text-primary" />
+                Nouvelle Salle
+              </h1>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations de la salle</CardTitle>
-            <CardDescription>Configurez les détails de la salle</CardDescription>
-          </CardHeader>
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations de la salle</CardTitle>
+              <CardDescription className="text-sm">Configurez les détails de la salle</CardDescription>
+            </CardHeader>
           <CardContent className="space-y-6">
             {/* Row 1: Name & Type */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -290,6 +293,7 @@ export default function RoomCreate() {
           </CardContent>
         </Card>
       </form>
+      </div>
     </div>
   );
 }

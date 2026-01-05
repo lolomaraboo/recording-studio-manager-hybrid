@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, DoorOpen, Edit, Trash2, Save, X, CheckCircle2, XCircle, Users, Maximize } from "lucide-react";
+import { ArrowLeft, DoorOpen, Edit, Trash2, Save, X, CheckCircle2, XCircle, Users, Maximize, Building } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -122,55 +122,53 @@ export default function RoomDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-10" />
             <Skeleton className="h-8 w-64" />
           </div>
-        </header>
-        <main className="container py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </main>
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!room) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/rooms">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h1 className="text-xl font-semibold">Salle introuvable</h1>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Building className="h-8 w-8 text-primary" />
+              Salle introuvable
+            </h2>
           </div>
-        </header>
-        <main className="container py-8">
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-muted-foreground">Cette salle n'existe pas ou a été supprimée.</p>
-              <Button className="mt-4" asChild>
+            <CardContent className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Cette salle n'existe pas ou a été supprimée.</p>
+              <Button size="sm" asChild>
                 <Link to="/rooms">Retour aux salles</Link>
               </Button>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/rooms">
@@ -178,7 +176,10 @@ export default function RoomDetail() {
               </Link>
             </Button>
             <div>
-              <h1 className="text-xl font-semibold">{room.name}</h1>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <Building className="h-8 w-8 text-primary" />
+                {room.name}
+              </h2>
               <p className="text-sm text-muted-foreground">Salle #{room.id}</p>
             </div>
           </div>
@@ -208,18 +209,16 @@ export default function RoomDetail() {
             )}
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
+        {/* Main Content */}
         <div className="grid gap-6 md:grid-cols-3">
           {/* Left Column - Main Info */}
           <div className="md:col-span-2 space-y-6">
             {/* Room Info Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations de la salle</CardTitle>
-                <CardDescription>Détails et caractéristiques de la salle</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations de la salle</CardTitle>
+                <CardDescription className="text-sm">Détails et caractéristiques de la salle</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -399,9 +398,9 @@ export default function RoomDetail() {
 
             {/* Equipment Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Équipements</CardTitle>
-                <CardDescription>Caractéristiques et équipements de la salle</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Équipements</CardTitle>
+                <CardDescription className="text-sm">Caractéristiques et équipements de la salle</CardDescription>
               </CardHeader>
               <CardContent>
                 {isEditing ? (
@@ -476,9 +475,9 @@ export default function RoomDetail() {
 
             {/* Status Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Statut</CardTitle>
-                <CardDescription>État et disponibilité de la salle</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Statut</CardTitle>
+                <CardDescription className="text-sm">État et disponibilité de la salle</CardDescription>
               </CardHeader>
               <CardContent>
                 {isEditing ? (
@@ -552,8 +551,8 @@ export default function RoomDetail() {
           <div className="space-y-6">
             {/* Quick Stats */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -579,8 +578,8 @@ export default function RoomDetail() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" className="w-full" asChild>
@@ -596,10 +595,11 @@ export default function RoomDetail() {
             </Card>
           </div>
         </div>
-      </main>
+      </div>
+    </div>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+    {/* Delete Confirmation Dialog */}
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Supprimer la salle</DialogTitle>
@@ -617,6 +617,6 @@ export default function RoomDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

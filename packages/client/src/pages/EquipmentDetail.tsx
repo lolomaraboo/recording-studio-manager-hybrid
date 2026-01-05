@@ -168,67 +168,69 @@ export default function EquipmentDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-10" />
             <Skeleton className="h-8 w-64" />
           </div>
-        </header>
-        <main className="container py-8">
           <div className="space-y-6">
             <Skeleton className="h-64 w-full" />
             <Skeleton className="h-96 w-full" />
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   if (!equipment) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/equipment">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <h1 className="text-xl font-semibold">Équipement introuvable</h1>
-          </div>
-        </header>
-        <main className="container py-8">
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-muted-foreground">Cet équipement n'existe pas ou a été supprimé.</p>
-              <Button className="mt-4" asChild>
-                <Link to="/equipment">Retour aux équipements</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/equipment">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div>
-              <h1 className="text-xl font-semibold">{equipment.name}</h1>
-              <p className="text-sm text-muted-foreground">Équipement #{equipment.id}</p>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Wrench className="h-8 w-8 text-primary" />
+              Équipement introuvable
+            </h2>
           </div>
-          <div className="flex gap-2">
+          <Card>
+            <CardContent className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Cet équipement n'existe pas ou a été supprimé.</p>
+              <Button size="sm" asChild>
+                <Link to="/equipment">Retour aux équipements</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/equipment">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Wrench className="h-8 w-8 text-primary" />
+              {equipment.name}
+            </h2>
+          </div>
+        </div>
+        <div className="flex gap-2">
             {!isEditing ? (
               <>
                 <Button variant="outline" onClick={() => setIsEditing(true)}>
@@ -252,20 +254,18 @@ export default function EquipmentDetail() {
                 </Button>
               </>
             )}
-          </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="container py-8">
-        <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
           {/* Left Column - Main Info */}
           <div className="md:col-span-2 space-y-6">
             {/* Equipment Info Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations générales</CardTitle>
-                <CardDescription>Détails et spécifications de l'équipement</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations générales</CardTitle>
+                <CardDescription className="text-sm">Détails et spécifications de l'équipement</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -409,12 +409,12 @@ export default function EquipmentDetail() {
 
             {/* Purchase & Warranty Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
-                  <CardTitle>Achat & Garantie</CardTitle>
+                  <CardTitle className="text-base">Achat & Garantie</CardTitle>
                 </div>
-                <CardDescription>Informations d'achat et de garantie</CardDescription>
+                <CardDescription className="text-sm">Informations d'achat et de garantie</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -490,12 +490,12 @@ export default function EquipmentDetail() {
 
             {/* Maintenance Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <Wrench className="h-5 w-5" />
-                  <CardTitle>Maintenance</CardTitle>
+                  <CardTitle className="text-base">Maintenance</CardTitle>
                 </div>
-                <CardDescription>Historique et planification de la maintenance</CardDescription>
+                <CardDescription className="text-sm">Historique et planification de la maintenance</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -585,8 +585,8 @@ export default function EquipmentDetail() {
             {/* Notes Card */}
             {(equipment.notes || isEditing) && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Notes additionnelles</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Notes additionnelles</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {isEditing ? (
@@ -610,8 +610,8 @@ export default function EquipmentDetail() {
           <div className="space-y-6">
             {/* Status Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Statut</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Statut</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -681,8 +681,8 @@ export default function EquipmentDetail() {
 
             {/* Meta Info */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -708,8 +708,8 @@ export default function EquipmentDetail() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" className="w-full" asChild>
@@ -724,27 +724,28 @@ export default function EquipmentDetail() {
             </Card>
           </div>
         </div>
-      </main>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Supprimer l'équipement</DialogTitle>
-            <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer cet équipement ? Cette action est irréversible.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Annuler
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
-              Supprimer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </div>
     </div>
+
+    {/* Delete Confirmation Dialog */}
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Supprimer l'équipement</DialogTitle>
+          <DialogDescription>
+            Êtes-vous sûr de vouloir supprimer cet équipement ? Cette action est irréversible.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+            Supprimer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

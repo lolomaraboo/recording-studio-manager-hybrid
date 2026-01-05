@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 export default function InvoiceCreate() {
@@ -74,29 +74,33 @@ export default function InvoiceCreate() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/invoices">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Nouvelle Facture</h1>
-            <p className="text-muted-foreground">Créer une nouvelle facture client</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link to="/invoices">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                <FileText className="h-8 w-8 text-primary" />
+                Nouvelle Facture
+              </h1>
+              <p className="text-muted-foreground">Créer une nouvelle facture client</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations de la facture</CardTitle>
-            <CardDescription>Remplissez les détails de la facture</CardDescription>
-          </CardHeader>
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations de la facture</CardTitle>
+              <CardDescription className="text-sm">Remplissez les détails de la facture</CardDescription>
+            </CardHeader>
           <CardContent className="space-y-6">
             {/* Row 1: Client & Invoice Number */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -239,6 +243,7 @@ export default function InvoiceCreate() {
           </CardContent>
         </Card>
       </form>
+      </div>
     </div>
   );
 }
