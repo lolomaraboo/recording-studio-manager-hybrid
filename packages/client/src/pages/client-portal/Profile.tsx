@@ -128,11 +128,11 @@ export default function Profile() {
 
   if (!client) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">Unable to load profile</p>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="text-center py-6">
+            <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Unable to load profile</p>
           </div>
         </div>
       </div>
@@ -140,25 +140,26 @@ export default function Profile() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-4xl">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold">My Profile</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your account information and settings
-        </p>
-      </div>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold flex items-center gap-2">
+            <User className="h-8 w-8 text-primary" />
+            My Profile
+          </h2>
+        </div>
 
-      {/* Account Status Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <User className="mr-2 h-5 w-5" />
-            Account Status
-          </CardTitle>
-          <CardDescription>Your current account information</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        {/* Account Status Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center">
+              <User className="mr-2 h-5 w-5" />
+              Account Status
+            </CardTitle>
+            <CardDescription className="text-sm">Your current account information</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm font-medium">Account Type</p>
@@ -173,28 +174,28 @@ export default function Profile() {
             <p className="text-sm font-medium">Client ID</p>
             <p className="text-sm text-muted-foreground font-mono">#{client.id.toString().padStart(6, '0')}</p>
           </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Profile Information Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center">
-                <User className="mr-2 h-5 w-5" />
-                Profile Information
-              </CardTitle>
-              <CardDescription>Your contact details and personal information</CardDescription>
+        {/* Profile Information Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base flex items-center">
+                  <User className="mr-2 h-5 w-5" />
+                  Profile Information
+                </CardTitle>
+                <CardDescription className="text-sm">Your contact details and personal information</CardDescription>
+              </div>
+              {!isEditing && (
+                <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+                  Edit Profile
+                </Button>
+              )}
             </div>
-            {!isEditing && (
-              <Button onClick={() => setIsEditing(true)} variant="outline">
-                Edit Profile
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="flex items-center">
               <User className="mr-2 h-4 w-4" />
@@ -239,40 +240,40 @@ export default function Profile() {
             />
           </div>
 
-          {isEditing && (
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleProfileUpdate} disabled={isSaving}>
-                <Save className="mr-2 h-4 w-4" />
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </Button>
-              <Button onClick={handleCancelEdit} variant="outline" disabled={isSaving}>
-                Cancel
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Password Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center">
-                <Key className="mr-2 h-5 w-5" />
-                Password & Security
-              </CardTitle>
-              <CardDescription>Manage your password and security settings</CardDescription>
-            </div>
-            {!showPasswordForm && (
-              <Button onClick={() => setShowPasswordForm(true)} variant="outline">
-                Change Password
-              </Button>
+            {isEditing && (
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handleProfileUpdate} disabled={isSaving} size="sm">
+                  <Save className="mr-2 h-4 w-4" />
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
+                <Button onClick={handleCancelEdit} variant="outline" disabled={isSaving} size="sm">
+                  Cancel
+                </Button>
+              </div>
             )}
-          </div>
-        </CardHeader>
-        {showPasswordForm && (
-          <CardContent className="space-y-4">
+          </CardContent>
+        </Card>
+
+        {/* Password Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base flex items-center">
+                  <Key className="mr-2 h-5 w-5" />
+                  Password & Security
+                </CardTitle>
+                <CardDescription className="text-sm">Manage your password and security settings</CardDescription>
+              </div>
+              {!showPasswordForm && (
+                <Button onClick={() => setShowPasswordForm(true)} variant="outline" size="sm">
+                  Change Password
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          {showPasswordForm && (
+            <CardContent className="pt-0 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="currentPassword">Current Password</Label>
               <Input
@@ -312,29 +313,31 @@ export default function Profile() {
               />
             </div>
 
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handlePasswordChange} disabled={isSaving}>
-                <Key className="mr-2 h-4 w-4" />
-                {isSaving ? 'Updating...' : 'Update Password'}
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowPasswordForm(false);
-                  setPasswordData({
-                    currentPassword: '',
-                    newPassword: '',
-                    confirmPassword: '',
-                  });
-                }}
-                variant="outline"
-                disabled={isSaving}
-              >
-                Cancel
-              </Button>
-            </div>
-          </CardContent>
-        )}
-      </Card>
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handlePasswordChange} disabled={isSaving} size="sm">
+                  <Key className="mr-2 h-4 w-4" />
+                  {isSaving ? 'Updating...' : 'Update Password'}
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowPasswordForm(false);
+                    setPasswordData({
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: '',
+                    });
+                  }}
+                  variant="outline"
+                  disabled={isSaving}
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }

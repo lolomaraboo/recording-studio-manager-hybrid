@@ -46,54 +46,58 @@ export default function SuperAdmin() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header with breadcrumb */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/dashboard")}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Shield className="h-8 w-8" />
-            Super Admin Dashboard
-          </h1>
-          <p className="text-muted-foreground">Production system monitoring and management</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header with breadcrumb */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/dashboard")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <Shield className="h-8 w-8 text-primary" />
+                Super Admin Dashboard
+              </h2>
+              <p className="text-sm text-muted-foreground">Production system monitoring and management</p>
+            </div>
+          </div>
         </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="services" className="space-y-2">
+          <TabsList>
+            <TabsTrigger value="services">
+              <Server className="h-4 w-4 mr-2" />
+              Services
+            </TabsTrigger>
+            <TabsTrigger value="database">
+              <Database className="h-4 w-4 mr-2" />
+              Database
+            </TabsTrigger>
+            <TabsTrigger value="logs">
+              <FileText className="h-4 w-4 mr-2" />
+              Logs
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="services">
+            <ServicesTab />
+          </TabsContent>
+
+          <TabsContent value="database">
+            <DatabaseTab />
+          </TabsContent>
+
+          <TabsContent value="logs">
+            <LogsTab />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="services" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="services">
-            <Server className="h-4 w-4 mr-2" />
-            Services
-          </TabsTrigger>
-          <TabsTrigger value="database">
-            <Database className="h-4 w-4 mr-2" />
-            Database
-          </TabsTrigger>
-          <TabsTrigger value="logs">
-            <FileText className="h-4 w-4 mr-2" />
-            Logs
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="services">
-          <ServicesTab />
-        </TabsContent>
-
-        <TabsContent value="database">
-          <DatabaseTab />
-        </TabsContent>
-
-        <TabsContent value="logs">
-          <LogsTab />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }
@@ -123,9 +127,9 @@ function ServicesTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Service Monitoring</h2>
+        <h3 className="text-base font-medium">Service Monitoring</h3>
         <Button onClick={handleRefresh} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
@@ -133,7 +137,7 @@ function ServicesTab() {
       </div>
 
       {/* Container Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-2 md:grid-cols-3">
         {metricsLoading ? (
           <>
             <Card><Skeleton className="h-24" /></Card>
@@ -143,26 +147,26 @@ function ServicesTab() {
         ) : metrics ? (
           <>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Containers</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Total Containers</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">{metrics.containers.total}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Running</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Running</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold text-green-600">{metrics.containers.running}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Stopped</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Stopped</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold text-red-600">{metrics.containers.stopped}</div>
               </CardContent>
             </Card>
@@ -172,11 +176,11 @@ function ServicesTab() {
 
       {/* Docker Containers */}
       <Card>
-        <CardHeader>
-          <CardTitle>Docker Containers</CardTitle>
-          <CardDescription>Running services and their status</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Docker Containers</CardTitle>
+          <CardDescription className="text-sm">Running services and their status</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           {containersLoading ? (
             <Skeleton className="h-64" />
           ) : containers && containers.containers.length > 0 ? (
@@ -216,11 +220,11 @@ function ServicesTab() {
 
       {/* Health Status */}
       <Card>
-        <CardHeader>
-          <CardTitle>Health Checks</CardTitle>
-          <CardDescription>System-wide health status</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Health Checks</CardTitle>
+          <CardDescription className="text-sm">System-wide health status</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           {healthLoading ? (
             <Skeleton className="h-32" />
           ) : health ? (
@@ -272,11 +276,11 @@ function DatabaseTab() {
   );
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Database Management</h2>
+    <div className="space-y-2">
+      <h3 className="text-base font-medium">Database Management</h3>
 
       {/* Tenant Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-2 md:grid-cols-3">
         {statsLoading ? (
           <>
             <Card><Skeleton className="h-24" /></Card>
@@ -286,28 +290,28 @@ function DatabaseTab() {
         ) : tenantStats && tenantStats.tenantStats.length > 0 ? (
           <>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Tenants</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Total Tenants</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">{tenantStats.tenantStats.length}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total DB Size</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Total DB Size</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">
                   {tenantStats.tenantStats.reduce((sum, t) => sum + t.sizeMB, 0)} MB
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Avg Size/Tenant</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Avg Size/Tenant</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">
                   {Math.round(tenantStats.tenantStats.reduce((sum, t) => sum + t.sizeMB, 0) / tenantStats.tenantStats.length)} MB
                 </div>
@@ -319,11 +323,11 @@ function DatabaseTab() {
 
       {/* Organizations Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Organizations</CardTitle>
-          <CardDescription>All registered organizations</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Organizations</CardTitle>
+          <CardDescription className="text-sm">All registered organizations</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <div className="space-y-4">
             <Input
               placeholder="Search organizations..."
@@ -368,11 +372,11 @@ function DatabaseTab() {
 
       {/* Users Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Users</CardTitle>
-          <CardDescription>All registered users</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Users</CardTitle>
+          <CardDescription className="text-sm">All registered users</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <div className="space-y-4">
             <Input
               placeholder="Search users by email..."
@@ -435,9 +439,9 @@ function LogsTab() {
     );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Container Logs</h2>
+        <h3 className="text-base font-medium">Container Logs</h3>
         <Button
           onClick={() => refetchLogs()}
           variant="outline"
@@ -450,11 +454,11 @@ function LogsTab() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Select Container</CardTitle>
-          <CardDescription>View last 100 lines of container logs</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Select Container</CardTitle>
+          <CardDescription className="text-sm">View last 100 lines of container logs</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-0 space-y-4">
           <Select value={selectedContainer} onValueChange={setSelectedContainer}>
             <SelectTrigger>
               <SelectValue placeholder="Choose a container..." />

@@ -49,16 +49,16 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Register</CardTitle>
-          <CardDescription>
+    <div className="container pt-6 pb-4 px-2">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Register</CardTitle>
+          <CardDescription className="text-sm">
             Create your studio account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input

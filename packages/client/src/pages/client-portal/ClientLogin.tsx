@@ -79,21 +79,21 @@ export default function ClientLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+    <div className="container pt-6 pb-4 px-2">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="pb-3 space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Music className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Client Portal</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-base">Client Portal</CardTitle>
+          <CardDescription className="text-sm">
             Sign in to access your bookings, invoices, and projects
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="pt-0">
           <Tabs defaultValue="password" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="password">Password</TabsTrigger>

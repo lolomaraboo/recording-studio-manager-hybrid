@@ -131,13 +131,13 @@ function BillingTabContent() {
     <>
       {/* Current Plan */}
       <Card>
-        <CardHeader>
-          <CardTitle>Plan actuel</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Plan actuel</CardTitle>
+          <CardDescription className="text-sm">
             Gérez votre abonnement et vos informations de facturation
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-0 space-y-4">
           <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -182,13 +182,13 @@ function BillingTabContent() {
       {/* Usage Meters */}
       {usageStats && (
         <Card>
-          <CardHeader>
-            <CardTitle>Utilisation</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Utilisation</CardTitle>
+            <CardDescription className="text-sm">
               Votre consommation pour la période en cours
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-4">
             {renderUsageMeter(
               "Sessions",
               usageStats.sessionsUsed,
@@ -211,13 +211,13 @@ function BillingTabContent() {
       {/* Payment Method */}
       {subscriptionInfo?.paymentMethod && (
         <Card>
-          <CardHeader>
-            <CardTitle>Moyen de paiement</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Moyen de paiement</CardTitle>
+            <CardDescription className="text-sm">
               Carte bancaire utilisée pour les paiements
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-4">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white font-bold text-xs">
@@ -240,13 +240,13 @@ function BillingTabContent() {
 
       {/* Stripe Customer Portal Link */}
       <Card>
-        <CardHeader>
-          <CardTitle>Gestion de la facturation</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Gestion de la facturation</CardTitle>
+          <CardDescription className="text-sm">
             Accédez à votre portail client Stripe pour gérer vos factures
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <Button variant="outline" className="w-full" onClick={handleManageBilling} disabled={isLoadingPortal}>
             <CreditCard className="mr-2 h-4 w-4" />
             {isLoadingPortal ? "Chargement..." : "Ouvrir le portail de facturation"}
@@ -333,16 +333,17 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Paramètres</h2>
-        <p className="text-muted-foreground">
-          Gérez les préférences de votre compte et de votre studio
-        </p>
-      </div>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold flex items-center gap-2">
+            <SettingsIcon className="h-8 w-8 text-primary" />
+            Paramètres
+          </h2>
+        </div>
 
-      <Tabs defaultValue="general" className="space-y-4">
+        <Tabs defaultValue="general" className="space-y-2">
         <TabsList>
           <TabsTrigger value="general">
             <SettingsIcon className="mr-2 h-4 w-4" />
@@ -367,15 +368,15 @@ export default function Settings() {
         </TabsList>
 
         {/* General Tab */}
-        <TabsContent value="general" className="space-y-4">
+        <TabsContent value="general" className="space-y-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Profil utilisateur</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Profil utilisateur</CardTitle>
+              <CardDescription className="text-sm">
                 Informations personnelles et préférences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="flex items-center gap-4">
                 <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
                   <User className="h-10 w-10 text-primary" />
@@ -503,13 +504,13 @@ export default function Settings() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Préférences d'affichage</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Préférences d'affichage</CardTitle>
+              <CardDescription className="text-sm">
                 Personnalisez l'apparence de l'application
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="theme">Thème</Label>
                 <Select defaultValue="system">
@@ -554,15 +555,15 @@ export default function Settings() {
         </TabsContent>
 
         {/* Organization Tab */}
-        <TabsContent value="organization" className="space-y-4">
+        <TabsContent value="organization" className="space-y-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Informations de l'organisation</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations de l'organisation</CardTitle>
+              <CardDescription className="text-sm">
                 Détails de votre studio d'enregistrement
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               {/* Logo Upload */}
               <div className="space-y-2">
                 <Label>Logo du studio</Label>
@@ -649,11 +650,11 @@ export default function Settings() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Informations légales</CardTitle>
-              <CardDescription>SIRET, TVA et mentions légales</CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations légales</CardTitle>
+              <CardDescription className="text-sm">SIRET, TVA et mentions légales</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="siret">SIRET</Label>
@@ -683,15 +684,15 @@ export default function Settings() {
         </TabsContent>
 
         {/* Notifications Tab */}
-        <TabsContent value="notifications" className="space-y-4">
+        <TabsContent value="notifications" className="space-y-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Préférences de notification</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Préférences de notification</CardTitle>
+              <CardDescription className="text-sm">
                 Choisissez les notifications que vous souhaitez recevoir
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="notifications-all">Activer les notifications</Label>
@@ -777,15 +778,15 @@ export default function Settings() {
         </TabsContent>
 
         {/* Security Tab */}
-        <TabsContent value="security" className="space-y-4">
+        <TabsContent value="security" className="space-y-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Mot de passe</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Mot de passe</CardTitle>
+              <CardDescription className="text-sm">
                 Modifier votre mot de passe de connexion
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Mot de passe actuel</Label>
                 <Input id="currentPassword" type="password" />
@@ -810,13 +811,13 @@ export default function Settings() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Authentification à deux facteurs (2FA)</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Authentification à deux facteurs (2FA)</CardTitle>
+              <CardDescription className="text-sm">
                 Sécurisez votre compte avec une couche de protection supplémentaire
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
@@ -865,13 +866,13 @@ export default function Settings() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Sessions actives</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Sessions actives</CardTitle>
+              <CardDescription className="text-sm">
                 Gérer les appareils connectés à votre compte
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-0 space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
@@ -911,10 +912,11 @@ export default function Settings() {
         </TabsContent>
 
         {/* Billing Tab */}
-        <TabsContent value="billing" className="space-y-4">
+        <TabsContent value="billing" className="space-y-2">
           <BillingTabContent />
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

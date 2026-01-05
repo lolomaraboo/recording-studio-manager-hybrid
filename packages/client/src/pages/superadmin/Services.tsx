@@ -31,20 +31,24 @@ export default function Services() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold">Service Monitoring</h2>
-          <p className="text-muted-foreground">Docker containers, system metrics, and health checks</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Server className="h-8 w-8 text-primary" />
+              Service Monitoring
+            </h2>
+            <p className="text-sm text-muted-foreground">Docker containers, system metrics, and health checks</p>
+          </div>
+          <Button onClick={handleRefresh} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
-        <Button onClick={handleRefresh} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
-      </div>
 
-      {/* Container Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
+        {/* Container Metrics */}
+        <div className="grid gap-2 md:grid-cols-3">
         {metricsLoading ? (
           <>
             <Card><Skeleton className="h-24" /></Card>
@@ -54,40 +58,40 @@ export default function Services() {
         ) : metrics ? (
           <>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Containers</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Total Containers</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">{metrics.containers.total}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Running</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Running</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold text-green-600">{metrics.containers.running}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Stopped</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Stopped</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold text-red-600">{metrics.containers.stopped}</div>
               </CardContent>
             </Card>
           </>
         ) : null}
-      </div>
+        </div>
 
-      {/* Docker Containers */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Docker Containers</CardTitle>
-          <CardDescription>Running services and their status</CardDescription>
-        </CardHeader>
-        <CardContent>
+        {/* Docker Containers */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Docker Containers</CardTitle>
+            <CardDescription className="text-sm">Running services and their status</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
           {containersLoading ? (
             <Skeleton className="h-64" />
           ) : containers && containers.containers.length > 0 ? (
@@ -123,15 +127,15 @@ export default function Services() {
             <p className="text-muted-foreground">No containers found</p>
           )}
         </CardContent>
-      </Card>
+        </Card>
 
-      {/* Health Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Health Checks</CardTitle>
-          <CardDescription>System-wide health status</CardDescription>
-        </CardHeader>
-        <CardContent>
+        {/* Health Status */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Health Checks</CardTitle>
+            <CardDescription className="text-sm">System-wide health status</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
           {healthLoading ? (
             <Skeleton className="h-32" />
           ) : health ? (
@@ -153,7 +157,8 @@ export default function Services() {
             <p className="text-muted-foreground">No health data available</p>
           )}
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

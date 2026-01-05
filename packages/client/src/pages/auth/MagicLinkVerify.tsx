@@ -74,30 +74,30 @@ export default function MagicLinkVerify() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+    <div className="container pt-6 pb-4 px-2">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="pb-3 space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Music className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-base">
             {state === 'verifying' && 'Verifying Magic Link...'}
             {state === 'success' && 'Verification Successful!'}
             {state === 'error' && 'Verification Failed'}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm">
             {state === 'verifying' && 'Please wait while we verify your magic link'}
             {state === 'success' && 'Redirecting you to the portal...'}
             {state === 'error' && 'There was a problem with your magic link'}
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="pt-0 space-y-4">
           {state === 'verifying' && (
-            <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <div className="flex flex-col items-center space-y-2 py-6">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <p className="text-sm text-muted-foreground text-center">
                 Validating your authentication token...
               </p>

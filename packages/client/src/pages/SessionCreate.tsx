@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { UpgradeModal } from "@/components/UpgradeModal";
 
@@ -89,30 +89,31 @@ export default function SessionCreate() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/sessions">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/sessions">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
             </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Nouvelle Session</h1>
-            <p className="text-muted-foreground">Créer une nouvelle session d'enregistrement</p>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Plus className="h-8 w-8 text-primary" />
+              Nouvelle Session
+            </h2>
           </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations de la session</CardTitle>
-            <CardDescription>Remplissez les champs requis pour créer une nouvelle session</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations de la session</CardTitle>
+              <CardDescription className="text-sm">Remplissez les champs requis pour créer une nouvelle session</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-6">
             {/* Row 1: Title */}
             <div className="space-y-2">
               <Label htmlFor="title">
@@ -285,6 +286,7 @@ export default function SessionCreate() {
           onClose={() => setShowUpgradeModal(false)}
         />
       )}
+      </div>
     </div>
   );
 }

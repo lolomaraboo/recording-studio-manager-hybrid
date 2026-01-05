@@ -13,7 +13,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useNavigate } from "react-router-dom";
 import {
-  Calendar, Users, FileText, TrendingUp,
+  Calendar, Users, FileText, TrendingUp, Home,
   TrendingDown, DollarSign, Clock, Settings, AlertTriangle,
   Wrench, CheckCircle2, AlertCircle, RotateCcw, MessageSquare
 } from "lucide-react";
@@ -82,20 +82,18 @@ function DraggableWidget({
     <div
       ref={setNodeRef}
       style={style}
-      className="w-full md:w-[calc(50%-0.5rem)] min-h-[400px]"
+      className="group"
     >
-      <Card className="h-full flex flex-col">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex-1">{/* Titre sera dans children */}</div>
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded"
-          >
-            <GripVertical className="h-4 w-4 text-muted-foreground" />
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 overflow-auto">
+      <Card className="h-full flex flex-col relative">
+        {/* Poignée de drag - visible seulement au hover */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute top-2 right-2 cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <CardContent className="flex-1 overflow-auto p-4">
           {children}
         </CardContent>
       </Card>
@@ -264,12 +262,13 @@ export function Dashboard() {
     .filter((w): w is WidgetConfig => w !== undefined && w.visible);
 
   return (
-    <div className="space-y-6">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
       {/* Welcome Section avec boutons de configuration */}
       <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-bold mb-2 flex items-center gap-2">
-                  <TrendingUp className="h-8 w-8" />
+                  <Home className="h-8 w-8 text-primary" />
                   Dashboard
                 </h2>
                 <p className="text-muted-foreground">Voici un aperçu de votre activité</p>
@@ -317,7 +316,7 @@ export function Dashboard() {
                 items={visibleWidgets.map(w => w.id)}
                 strategy={rectSortingStrategy}
               >
-                <div className="flex flex-wrap gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                   {visibleWidgets.map((widget) => (
                     <DraggableWidget key={widget.id} id={widget.id}>
                       {renderWidget(widget.id, {
@@ -336,6 +335,7 @@ export function Dashboard() {
                 </div>
               </SortableContext>
       </DndContext>
+      </div>
     </div>
   );
 }
@@ -428,9 +428,9 @@ function renderWidget(
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Aucune session aujourd'hui</p>
+            <div className="text-center py-4 text-muted-foreground">
+              <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Aucune session aujourd'hui</p>
             </div>
           )}
         </div>
@@ -466,9 +466,9 @@ function renderWidget(
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Aucune session à venir</p>
+            <div className="text-center py-4 text-muted-foreground">
+              <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Aucune session à venir</p>
             </div>
           )}
         </div>
@@ -481,14 +481,15 @@ function renderWidget(
             <FileText className="h-5 w-5" />
             Factures en attente
           </CardTitle>
-          <div className="text-center py-8">
-            <div className="text-4xl font-bold">{stats?.pendingInvoicesCount || 0}</div>
-            <div className="text-sm text-muted-foreground mt-2">
+          <div className="text-center py-3">
+            <div className="text-3xl font-bold">{stats?.pendingInvoicesCount || 0}</div>
+            <div className="text-sm text-muted-foreground mt-1">
               {((stats?.pendingInvoicesTotal || 0) / 100).toFixed(2)}€ en attente
             </div>
             <Button
               variant="outline"
-              className="mt-4"
+              size="sm"
+              className="mt-3"
               onClick={() => navigate("/invoices")}
             >
               Voir les factures
@@ -538,13 +539,13 @@ function renderWidget(
             <DollarSign className="h-5 w-5" />
             Revenus hebdomadaires
           </CardTitle>
-          <div className="text-center py-8">
-            <div className="text-4xl font-bold">
+          <div className="text-center py-3">
+            <div className="text-3xl font-bold">
               {((stats?.revenueThisMonth || 0) / 100).toFixed(2)}€
             </div>
-            <div className="text-sm text-muted-foreground mt-2">Ce mois</div>
+            <div className="text-sm text-muted-foreground mt-1">Ce mois</div>
             {revenueTrend !== 0 && (
-              <div className={`flex items-center justify-center gap-1 text-sm mt-2 ${revenueTrend > 0 ? "text-green-500" : "text-red-500"}`}>
+              <div className={`flex items-center justify-center gap-1 text-sm mt-1 ${revenueTrend > 0 ? "text-green-500" : "text-red-500"}`}>
                 {revenueTrend > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                 <span>{Math.abs(revenueTrend).toFixed(1)}% vs mois dernier</span>
               </div>
@@ -560,9 +561,9 @@ function renderWidget(
             <Users className="h-5 w-5" />
             Top Clients
           </CardTitle>
-          <div className="text-center py-8 text-muted-foreground">
-            <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Données disponibles prochainement</p>
+          <div className="text-center py-4 text-muted-foreground">
+            <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Données disponibles prochainement</p>
           </div>
         </div>
       );
@@ -585,9 +586,9 @@ function renderWidget(
                 <div className="text-sm text-muted-foreground">{equipment.category}</div>
               </div>
             )) || (
-              <div className="text-center py-8 text-muted-foreground">
-                <CheckCircle2 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Aucun équipement en maintenance</p>
+              <div className="text-center py-4 text-muted-foreground">
+                <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Aucun équipement en maintenance</p>
               </div>
             )}
           </div>
@@ -601,9 +602,9 @@ function renderWidget(
             <MessageSquare className="h-5 w-5" />
             Messages non lus
           </CardTitle>
-          <div className="text-center py-8 text-muted-foreground">
-            <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Aucun message non lu</p>
+          <div className="text-center py-4 text-muted-foreground">
+            <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Aucun message non lu</p>
           </div>
         </div>
       );

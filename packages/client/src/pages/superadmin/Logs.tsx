@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, FileText } from "lucide-react";
 
 export default function Logs() {
   const [selectedContainer, setSelectedContainer] = useState<string>("");
@@ -18,29 +18,33 @@ export default function Logs() {
     );
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold">Container Logs</h2>
-          <p className="text-muted-foreground">View real-time logs from Docker containers</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <FileText className="h-8 w-8 text-primary" />
+              Container Logs
+            </h2>
+            <p className="text-sm text-muted-foreground">View real-time logs from Docker containers</p>
+          </div>
+          <Button
+            onClick={() => refetchLogs()}
+            variant="outline"
+            size="sm"
+            disabled={!selectedContainer}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
-        <Button
-          onClick={() => refetchLogs()}
-          variant="outline"
-          size="sm"
-          disabled={!selectedContainer}
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Select Container</CardTitle>
-          <CardDescription>View last 100 lines of container logs</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Select Container</CardTitle>
+            <CardDescription className="text-sm">View last 100 lines of container logs</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
           <Select value={selectedContainer} onValueChange={setSelectedContainer}>
             <SelectTrigger>
               <SelectValue placeholder="Choose a container..." />
@@ -68,7 +72,8 @@ export default function Logs() {
             </div>
           )}
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

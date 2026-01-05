@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Database } from "lucide-react";
 
 export default function Database() {
   const [searchOrg, setSearchOrg] = useState("");
@@ -32,14 +33,18 @@ export default function Database() {
   );
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h2 className="text-3xl font-bold">Database Management</h2>
-        <p className="text-muted-foreground">Organizations, users, and tenant statistics</p>
-      </div>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        <div>
+          <h2 className="text-3xl font-bold flex items-center gap-2">
+            <Database className="h-8 w-8 text-primary" />
+            Database Management
+          </h2>
+          <p className="text-sm text-muted-foreground">Organizations, users, and tenant statistics</p>
+        </div>
 
-      {/* Tenant Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+        {/* Tenant Stats */}
+        <div className="grid gap-2 md:grid-cols-3">
         {statsLoading ? (
           <>
             <Card><Skeleton className="h-24" /></Card>
@@ -49,28 +54,28 @@ export default function Database() {
         ) : tenantStats && tenantStats.tenantStats.length > 0 ? (
           <>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Tenants</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Total Tenants</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">{tenantStats.tenantStats.length}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total DB Size</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Total DB Size</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">
                   {tenantStats.tenantStats.reduce((sum, t) => sum + t.sizeMB, 0)} MB
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Avg Size/Tenant</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Avg Size/Tenant</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-2xl font-bold">
                   {Math.round(tenantStats.tenantStats.reduce((sum, t) => sum + t.sizeMB, 0) / tenantStats.tenantStats.length)} MB
                 </div>
@@ -78,15 +83,15 @@ export default function Database() {
             </Card>
           </>
         ) : null}
-      </div>
+        </div>
 
-      {/* Organizations Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Organizations</CardTitle>
-          <CardDescription>All registered organizations</CardDescription>
-        </CardHeader>
-        <CardContent>
+        {/* Organizations Table */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Organizations</CardTitle>
+            <CardDescription className="text-sm">All registered organizations</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
           <div className="space-y-4">
             <Input
               placeholder="Search organizations..."
@@ -125,15 +130,15 @@ export default function Database() {
             )}
           </div>
         </CardContent>
-      </Card>
+        </Card>
 
-      {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Users</CardTitle>
-          <CardDescription>All registered users</CardDescription>
-        </CardHeader>
-        <CardContent>
+        {/* Users Table */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Users</CardTitle>
+            <CardDescription className="text-sm">All registered users</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
           <div className="space-y-4">
             <Input
               placeholder="Search users by email..."
@@ -178,7 +183,8 @@ export default function Database() {
             )}
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

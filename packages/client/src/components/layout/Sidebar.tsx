@@ -22,6 +22,7 @@ import {
   Wrench,
   MessageCircle,
   DoorOpen,
+  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -67,7 +68,7 @@ const navSections: NavSection[] = [
       {
         title: "Sessions",
         href: "/sessions",
-        icon: <Music className="h-5 w-5" />,
+        icon: <Mic className="h-5 w-5" />,
       },
       {
         title: "Calendrier",

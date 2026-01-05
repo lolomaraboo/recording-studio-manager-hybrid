@@ -120,28 +120,27 @@ export default function Chat() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)]">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/dashboard">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">Messages</h2>
-            <p className="text-muted-foreground">
-              Communiquez avec vos clients et collaborateurs
-            </p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <MessageSquare className="h-8 w-8 text-primary" />
+              Messages
+            </h2>
           </div>
         </div>
-      </div>
 
-      <Card className="h-[calc(100%-5rem)]">
+        <Card className="h-[calc(100vh-10rem)]">
         <div className="grid md:grid-cols-[350px_1fr] h-full">
           {/* Conversations List */}
           <div className="border-r">
-            <CardHeader className="border-b">
+            <CardHeader className="pb-3 border-b">
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -294,16 +293,17 @@ export default function Chat() {
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Sélectionnez une conversation</p>
-                  <p className="text-sm">pour commencer à discuter</p>
+                <div className="text-center py-6">
+                  <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <h3 className="text-sm font-medium mb-1">Sélectionnez une conversation</h3>
+                  <p className="text-sm text-muted-foreground">pour commencer à discuter</p>
                 </div>
               </div>
             )}
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

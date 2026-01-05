@@ -90,12 +90,12 @@ export default function BookingDetail() {
 
   if (!sessionToken || !bookingId) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">Invalid booking ID</p>
-            <Button onClick={() => navigate('/client-portal/bookings')} className="mt-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="text-center py-6">
+            <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground mb-3">Invalid booking ID</p>
+            <Button size="sm" onClick={() => navigate('/client-portal/bookings')}>
               Back to Bookings
             </Button>
           </div>
@@ -106,9 +106,11 @@ export default function BookingDetail() {
 
   if (bookingQuery.isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <p className="text-muted-foreground">Loading booking details...</p>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="text-center py-6">
+            <p className="text-sm text-muted-foreground">Loading booking details...</p>
+          </div>
         </div>
       </div>
     );
@@ -116,12 +118,12 @@ export default function BookingDetail() {
 
   if (bookingQuery.error) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-            <p className="mt-4 text-red-600">{bookingQuery.error.message}</p>
-            <Button onClick={() => navigate('/client-portal/bookings')} className="mt-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="text-center py-6">
+            <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+            <p className="text-sm text-red-600 mb-3">{bookingQuery.error.message}</p>
+            <Button size="sm" onClick={() => navigate('/client-portal/bookings')}>
               Back to Bookings
             </Button>
           </div>
@@ -186,47 +188,50 @@ export default function BookingDetail() {
   const canCancelBooking = booking.status !== 'cancelled' && booking.status !== 'completed' && new Date(booking.startTime) > new Date();
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-5xl">
-      {/* Back Button + Cancel Booking */}
-      <div className="flex items-center justify-between mb-4">
-        <Button
-          onClick={() => navigate('/client-portal/bookings')}
-          variant="ghost"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Bookings
-        </Button>
-
-        {canCancelBooking && (
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center justify-between">
           <Button
-            onClick={() => setShowCancelDialog(true)}
-            variant="destructive"
+            onClick={() => navigate('/client-portal/bookings')}
+            variant="ghost"
+            size="sm"
           >
-            <XCircle className="mr-2 h-4 w-4" />
-            Cancel Booking
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Bookings
           </Button>
-        )}
-      </div>
 
-      {/* Booking Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl">{booking.title}</CardTitle>
-              <CardDescription>Booking #{booking.id}</CardDescription>
+          {canCancelBooking && (
+            <Button
+              onClick={() => setShowCancelDialog(true)}
+              variant="destructive"
+              size="sm"
+            >
+              <XCircle className="mr-2 h-4 w-4" />
+              Cancel Booking
+            </Button>
+          )}
+        </div>
+
+        {/* Booking Header */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-base">{booking.title}</CardTitle>
+                <CardDescription className="text-sm">Booking #{booking.id}</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Badge variant="outline" className={getStatusColor(booking.status)}>
+                  {formatStatus(booking.status)}
+                </Badge>
+                <Badge variant="outline" className={getPaymentStatusColor(booking.paymentStatus || 'unpaid')}>
+                  {formatStatus(booking.paymentStatus || 'unpaid')}
+                </Badge>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Badge variant="outline" className={getStatusColor(booking.status)}>
-                {formatStatus(booking.status)}
-              </Badge>
-              <Badge variant="outline" className={getPaymentStatusColor(booking.paymentStatus || 'unpaid')}>
-                {formatStatus(booking.paymentStatus || 'unpaid')}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
           {booking.description && (
             <div>
               <p className="text-sm font-medium text-muted-foreground">Description</p>
@@ -250,19 +255,19 @@ export default function BookingDetail() {
                 <p className="text-sm text-muted-foreground">{formatDateTime(booking.endTime)}</p>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Room Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Music className="mr-2 h-5 w-5" />
-            Studio Room
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
+        {/* Room Information */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center">
+              <Music className="mr-2 h-5 w-5" />
+              Studio Room
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{booking.room?.name}</p>
@@ -293,15 +298,15 @@ export default function BookingDetail() {
         </CardContent>
       </Card>
 
-      {/* Payment Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <DollarSign className="mr-2 h-5 w-5" />
-            Payment Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        {/* Payment Summary */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center">
+              <DollarSign className="mr-2 h-5 w-5" />
+              Payment Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground">Total Amount</p>
@@ -355,28 +360,28 @@ export default function BookingDetail() {
                     : `Pay Balance ($${balance.toFixed(2)})`}
                 </Button>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Payment History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <FileText className="mr-2 h-5 w-5" />
-            Payment History
-          </CardTitle>
-          <CardDescription>All transactions for this booking</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!booking.paymentHistory || booking.paymentHistory.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <CreditCard className="mx-auto h-12 w-12 mb-2 opacity-50" />
-              <p>No payment transactions yet</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
+        {/* Payment History */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center">
+              <FileText className="mr-2 h-5 w-5" />
+              Payment History
+            </CardTitle>
+            <CardDescription className="text-sm">All transactions for this booking</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {!booking.paymentHistory || booking.paymentHistory.length === 0 ? (
+              <div className="text-center py-6">
+                <CreditCard className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No payment transactions yet</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
               {booking.paymentHistory.map((transaction: any) => (
                 <div
                   key={transaction.id}
@@ -414,14 +419,14 @@ export default function BookingDetail() {
                     <p className="text-xs text-muted-foreground">{transaction.currency.toUpperCase()}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Cancel Booking Dialog */}
-      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        {/* Cancel Booking Dialog */}
+        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Cancel Booking</DialogTitle>
@@ -473,9 +478,10 @@ export default function BookingDetail() {
             >
               {cancelBookingMutation.isPending ? 'Cancelling...' : 'Cancel Booking'}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

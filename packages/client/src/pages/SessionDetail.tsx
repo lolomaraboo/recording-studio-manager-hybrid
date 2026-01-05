@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Calendar, Clock, MapPin, User, Edit, Trash2, Save, X } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, User, Edit, Trash2, Save, X, Mic } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -128,85 +128,83 @@ export default function SessionDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
-            <Skeleton className="h-10 w-10" />
-            <Skeleton className="h-8 w-64" />
-          </div>
-        </header>
-        <main className="container py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </main>
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/sessions">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h1 className="text-xl font-semibold">Session introuvable</h1>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Mic className="h-8 w-8 text-primary" />
+              Session introuvable
+            </h2>
           </div>
-        </header>
-        <main className="container py-8">
           <Card>
             <CardContent className="pt-6">
-              <p className="text-muted-foreground">Cette session n'existe pas ou a été supprimée.</p>
-              <Button className="mt-4" asChild>
-                <Link to="/sessions">Retour aux sessions</Link>
-              </Button>
+              <div className="text-center py-6">
+                <Mic className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <h3 className="text-sm font-medium mb-1">Session introuvable</h3>
+                <p className="text-sm text-muted-foreground mb-3">Cette session n'existe pas ou a été supprimée.</p>
+                <Button size="sm" asChild>
+                  <Link to="/sessions">Retour aux sessions</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/sessions">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div>
-              <h1 className="text-xl font-semibold">{session.title}</h1>
-              <p className="text-sm text-muted-foreground">Session #{session.id}</p>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Mic className="h-8 w-8 text-primary" />
+              {session.title}
+            </h2>
           </div>
           <div className="flex gap-2">
             {!isEditing ? (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(true)}>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Modifier
                 </Button>
-                <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+                <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Supprimer
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
                   <X className="mr-2 h-4 w-4" />
                   Annuler
                 </Button>
-                <Button onClick={handleSave} disabled={updateMutation.isPending}>
+                <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
                   <Save className="mr-2 h-4 w-4" />
                   Enregistrer
                 </Button>
@@ -214,20 +212,18 @@ export default function SessionDetail() {
             )}
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="grid gap-6 md:grid-cols-3">
+        {/* Main Content */}
+        <div className="grid gap-2 md:grid-cols-3">
           {/* Left Column - Main Info */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-2">
             {/* Session Info Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations de la session</CardTitle>
-                <CardDescription>Détails et paramètres de la session</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations de la session</CardTitle>
+                <CardDescription className="text-sm">Détails et paramètres de la session</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-0 space-y-4">
                 {isEditing ? (
                   <>
                     <div className="space-y-2">
@@ -407,11 +403,11 @@ export default function SessionDetail() {
 
             {/* Notes Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Notes</CardTitle>
-                <CardDescription>Notes et commentaires sur la session</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Notes</CardTitle>
+                <CardDescription className="text-sm">Notes et commentaires sur la session</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 {isEditing ? (
                   <Textarea
                     value={formData.notes}
@@ -429,13 +425,13 @@ export default function SessionDetail() {
           </div>
 
           {/* Right Column - Meta Info */}
-          <div className="space-y-6">
+          <div className="space-y-2">
             {/* Quick Stats */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-0 space-y-4">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Statut</p>
                   <p className="text-sm font-medium capitalize">{session.status || "Programmée"}</p>
@@ -470,10 +466,10 @@ export default function SessionDetail() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions rapides</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="pt-0 space-y-2">
                 <Button variant="outline" className="w-full" asChild>
                   <Link to={`/clients/${session.clientId}`}>Voir le client</Link>
                 </Button>
@@ -487,7 +483,7 @@ export default function SessionDetail() {
             </Card>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

@@ -39,16 +39,16 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
+    <div className="container pt-6 pb-4 px-2">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Login</CardTitle>
+          <CardDescription className="text-sm">
             Enter your credentials to access your studio
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

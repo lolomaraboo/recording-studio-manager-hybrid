@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { Calendar, Plus, Search, ArrowLeft, Clock, MapPin, Download } from "lucide-react";
+import { Calendar, Plus, Search, ArrowLeft, Clock, MapPin, Download, Mic } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -101,20 +101,20 @@ export function Sessions() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Sessions</h1>
-            </div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              <Mic className="h-8 w-8 text-primary" />
+              Sessions
+            </h2>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
@@ -131,17 +131,13 @@ export function Sessions() {
             </Button>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
-        <div className="space-y-6">
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Filtres</CardTitle>
+        {/* Filters */}
+        <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Filtres</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -183,11 +179,11 @@ export function Sessions() {
 
           {/* Sessions List */}
           <Card>
-            <CardHeader>
-              <CardTitle>{filteredSessions.length} session(s)</CardTitle>
-              <CardDescription>Gérez toutes vos sessions d'enregistrement</CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">{filteredSessions.length} session(s)</CardTitle>
+              <CardDescription className="text-sm">Gérez toutes vos sessions d'enregistrement</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {isLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
@@ -218,9 +214,9 @@ export function Sessions() {
                             <TableCell>
                               <div>
                                 <div className="font-medium">{session.title}</div>
-                                <div className="text-sm text-muted-foreground capitalize">
-                                  {session.status}
-                                </div>
+                                <Badge variant={getStatusColor(session.status)} className="mt-1">
+                                  {getStatusLabel(session.status)}
+                                </Badge>
                               </div>
                             </TableCell>
                             <TableCell>
@@ -265,13 +261,13 @@ export function Sessions() {
                   </Table>
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucune session</h3>
-                  <p className="text-muted-foreground mb-4">
+                <div className="text-center py-6">
+                  <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <h3 className="text-sm font-medium mb-1">Aucune session</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
                     Commencez par créer votre première session
                   </p>
-                  <Button asChild>
+                  <Button asChild size="sm">
                     <Link to="/sessions/new">
                       <Plus className="mr-2 h-4 w-4" />
                       Nouvelle session
@@ -281,8 +277,7 @@ export function Sessions() {
               )}
             </CardContent>
           </Card>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
