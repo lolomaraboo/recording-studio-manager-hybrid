@@ -647,10 +647,64 @@ Phase 3.11-04 complete: Full project audit (80+ items analyzed), 21 fichiers obs
 
 ---
 
+### Phase 3.12: Modes d'affichage multiples clients (INSERTED)
+**Goal**: Add 3 viewing modes to /clients page: Table, Grid, Kanban with avatar/badges display
+
+**Depends on**: Phase 3.11 (cleanup complete)
+
+**Research**: Unlikely (standard UI patterns, localStorage persistence)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 3.12-01: Multiple Display Modes implementation (Table/Grid/Kanban, localStorage, avatars, badges)
+
+**Status**: Not started
+
+**Details**:
+Add 3 viewing modes to enhance client list UX:
+- **Table mode** (current): Dense view, good for scanning many clients
+- **Grid mode**: Card layout with avatars (initials), name, artist name, VIP badge, contact, stats
+- **Kanban mode**: Expanded cards with maximum details (notes, projects, last activity)
+
+User can toggle between modes with button group, selection persisted in localStorage. Maintains existing search/filter functionality across all modes.
+
+**Rationale**: Improve UX for client management - different users prefer different views. Grid/Kanban modes make client cards more visual and information-rich, especially useful with vCard enrichment (Phase 3.9.4).
+
+---
+
+### Phase 3.13: Validation UI Complète de Toutes les Pages (INSERTED)
+**Goal**: Systematic UI validation of all pages before marketing launch (Admin, Client Portal, Super Admin)
+
+**Depends on**: Phase 3.12 (display modes complete)
+
+**Research**: Unlikely (manual testing methodology, existing Playwright patterns)
+
+**Plans**: 3 plans
+
+Plans:
+- [ ] 3.13-01: Test Matrix & Protocol Creation (autonomous, no checkpoints)
+- [ ] 3.13-02: Execute UI Validation Tests (checkpoint: human-verify)
+- [ ] 3.13-03: Analyze & Prioritize Fixes (checkpoint: decision)
+
+**Status**: Planned (3 plans created - 2026-01-04)
+
+**Details**:
+Comprehensive UI validation before Phase 4 (Marketing Foundation):
+- **Admin Dashboard**: 37 pages (Dashboard, Sessions, Calendar, Clients, Talents, Rooms, Equipment, Team, Invoices, Quotes, Contracts, Expenses, Financial Reports, Analytics, Reports, Projects, Tracks, Audio Files, Shares, Chat, Notifications)
+- **Client Portal**: 5 pages (Dashboard, Profile, Bookings, Payments, Activity)
+- **Super Admin**: 3 pages (Services, Database, Logs)
+
+Validate: UI consistency, navigation, forms, data display, error states, mobile responsive, dark mode, accessibility.
+
+**Rationale**: Before driving traffic via marketing (Phase 4), ensure all pages work flawlessly. Catch UI bugs, inconsistencies, broken features. Quality gate before public launch.
+
+---
+
 ### Phase 4: Marketing Foundation
 **Goal**: Public landing page explaining product, visible pricing, functional demo studio
 
-**Depends on**: Phase 3 (pricing to display, billing to enable signups)
+**Depends on**: Phase 3.13 (UI validation complete)
 
 **Research**: Unlikely (static pages, established React patterns)
 
@@ -747,7 +801,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 3.9 (INSERTED) → 3.9.1 (INSERTED) → 3.9.4 (INSERTED) → 3.10 (INSERTED) → 3.11 (INSERTED) → 4 → 5 → 6 → 7 → 8
+Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 3.9 (INSERTED) → 3.9.1 (INSERTED) → 3.9.4 (INSERTED) → 3.10 (INSERTED) → 3.11 (INSERTED) → 3.12 (INSERTED) → 3.13 (INSERTED) → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -770,14 +824,16 @@ Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) �
 | 3.9.1. Notes avec historique daté (INSERTED) | 1/2 | ⏳ In progress | 2025-12-29 |
 | 3.9.4. Clients enrichis compatible vCard (INSERTED) | 2/2 | ✅ Complete | 2025-12-31 |
 | 3.10. Test Clients Enrichis vCard (INSERTED) | 3/3 | ✅ Complete | 2026-01-02 |
-| 3.11. Rangement et nettoyage du dossier (INSERTED) | 1/? | 🔄 In progress | 2026-01-04 |
+| 3.11. Rangement et nettoyage du dossier (INSERTED) | 4/4 | ✅ Complete | 2026-01-04 |
+| 3.12. Modes d'affichage multiples clients (INSERTED) | 0/1 | Not started | - |
+| 3.13. Validation UI Complète (INSERTED) | 0/? | Not started | - |
 | 4. Marketing Foundation | 0/3 | Not started | - |
 | 5. Onboarding & UX | 0/4 | Not started | - |
 | 6. Support & Documentation | 0/3 | Not started | - |
 | 7. Production Hardening | 0/3 | Not started | - |
 | 8. Launch Ready | 0/3 | Not started | - |
 
-**Total**: 44/44 plans complete (100%) - Phase 3.11 TERMINÉ (cleanup, git housekeeping, docs organization, full audit)
+**Total**: 44/46+ plans complete (95.7%) - Phase 3.11 COMPLETE, Phase 3.12-3.13 inserted before Phase 4
 
 ---
 
