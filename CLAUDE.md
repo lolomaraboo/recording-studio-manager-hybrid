@@ -356,6 +356,65 @@ This project uses a structured phase planning system in `.planning/phases/`:
 3. Document deviations, issues, and decisions
 4. Update or create SUMMARY.md with completion status
 
+## Development Test Data
+
+### Test Studio UI (Organization 16)
+
+Complete test data for UI validation and development on localhost:5174.
+
+**Location:** `packages/database/scripts/test-data/`
+
+**Setup:**
+```bash
+# Create tenant data (5 clients, 8 sessions, 4 projects, etc.)
+docker exec -i rsm-postgres psql -U postgres -d tenant_16 < packages/database/scripts/test-data/setup-test-studio-ui.sql
+
+# Create admin user
+docker exec -i rsm-postgres psql -U postgres -d rsm_master < packages/database/scripts/test-data/create-test-studio-user.sql
+```
+
+**Login Credentials:**
+- Email: `admin@test-studio-ui.com`
+- Password: `password`
+- Organization: Test Studio UI (ID: 16)
+
+**Available Data:**
+- 5 clients (Emma Dubois, Lucas Martin, Sound Production SARL, Sarah Petit, Alexandre Grand)
+- 4 rooms (Studio Principal, Studio Mix, Studio Master, Salle Répétition)
+- 8 equipment items (Neumann U87 Ai, Shure SM7B, Apollo x16, API 512c, etc.)
+- 8 sessions (mix of completed/scheduled)
+- 4 projects (Horizons Lointains, Night Sessions Vol.1, Blue Notes, Delta Road)
+- 10 tracks with metadata
+- 3 musicians/talents
+- 3 invoices with line items
+
+**Purpose:**
+Created during Phase 3.14-04 for UI harmonization validation. Provides realistic data to test all 58 pages of the application.
+
+### UI Validation Script
+
+Automated validation of UI harmonization patterns:
+
+```bash
+cd packages/client/src/pages
+bash ../../../../packages/database/scripts/test-data/validate-ui-complete.sh
+```
+
+**Validates:**
+- Pages with `text-primary` icons (48 pages)
+- Pages with `pb-3` cards (50 pages)
+- Container spacing by section (Admin/Client Portal/SuperAdmin/Public)
+
+## Session History
+
+### 2026-01-05: Phase 3.14-04 Complete
+- ✅ UI harmonization validation (58/58 pages)
+- ✅ Test data creation for Organization 16
+- ✅ Visual testing on localhost:5174
+- ✅ Scripts committed: setup-test-studio-ui.sql, create-test-studio-user.sql, validate-ui-complete.sh
+- 📝 Decision: Keep Vite native (not in Docker) for dev speed
+- 📝 ISSUE-011 documented: Reminder to set `secure: true` for production cookies
+
 ## Stack Reference
 
 **Frontend:**
