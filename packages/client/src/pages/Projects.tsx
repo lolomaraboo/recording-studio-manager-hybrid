@@ -120,8 +120,11 @@ export default function Projects() {
           </Button>
         </div>
         {/* Filtres */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Filtres</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -155,19 +158,19 @@ export default function Projects() {
 
         {/* Liste des projets */}
         {isLoading ? (
-          <div className="flex justify-center py-12">
+          <div className="flex justify-center py-6">
             <Clock className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : filteredProjects && filteredProjects.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredProjects.map((project: any) => (
               <Card key={project.id} className="hover:border-primary/50 transition-colors cursor-pointer">
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{project.name}</CardTitle>
+                      <CardTitle className="text-base truncate">{project.name}</CardTitle>
                       {project.artistName && (
-                        <CardDescription className="truncate">{project.artistName}</CardDescription>
+                        <CardDescription className="text-sm truncate">{project.artistName}</CardDescription>
                       )}
                     </div>
                     {getStatusBadge(project.status)}
@@ -235,8 +238,8 @@ export default function Projects() {
           </div>
         ) : (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Music className="h-8 w-8 text-muted-foreground opacity-50 mx-auto mb-2" />
+            <CardContent className="flex flex-col items-center justify-center py-6">
+              <Music className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
               <h3 className="text-sm font-medium mb-1">Aucun projet trouvé</h3>
               <p className="text-sm text-muted-foreground mb-3">
                 {searchQuery || statusFilter !== "all"
@@ -502,8 +505,8 @@ function ProjectDetailsDialog({
           {/* Vue d'ensemble */}
           <TabsContent value="overview" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Informations du projet</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations du projet</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -555,15 +558,15 @@ function ProjectDetailsDialog({
           {/* Tracks (NOUVEAU) */}
           <TabsContent value="tracks" className="space-y-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Tracks du projet</CardTitle>
+                  <CardTitle className="text-base">Tracks du projet</CardTitle>
                   <Button size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     Ajouter Track
                   </Button>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   TODO: Implémenter liste tracks avec drag&drop
                 </CardDescription>
               </CardHeader>
@@ -578,9 +581,9 @@ function ProjectDetailsDialog({
           {/* Crédits */}
           <TabsContent value="credits" className="space-y-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Musiciens & Crédits</CardTitle>
+                  <CardTitle className="text-base">Musiciens & Crédits</CardTitle>
                   <Button size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     Ajouter
@@ -614,9 +617,9 @@ function ProjectDetailsDialog({
           {/* Étapes */}
           <TabsContent value="milestones" className="space-y-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Étapes de Production</CardTitle>
+                  <CardTitle className="text-base">Étapes de Production</CardTitle>
                   <Button size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     Ajouter
@@ -657,9 +660,9 @@ function ProjectDetailsDialog({
           {/* Fichiers */}
           <TabsContent value="files" className="space-y-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Fichiers Audio & Documents</CardTitle>
+                  <CardTitle className="text-base">Fichiers Audio & Documents</CardTitle>
                   <Button size="sm">
                     <Upload className="mr-2 h-4 w-4" />
                     Upload

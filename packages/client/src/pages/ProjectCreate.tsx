@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Music } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProjectCreate() {
@@ -70,29 +70,33 @@ export default function ProjectCreate() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/projects">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Nouveau Projet</h1>
-            <p className="text-muted-foreground">Créer un nouveau projet musical</p>
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link to="/projects">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                <Music className="h-8 w-8 text-primary" />
+                Nouveau Projet
+              </h1>
+              <p className="text-muted-foreground">Créer un nouveau projet musical</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations du projet</CardTitle>
-            <CardDescription>Détails du projet musical</CardDescription>
-          </CardHeader>
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Informations du projet</CardTitle>
+              <CardDescription className="text-sm">Détails du projet musical</CardDescription>
+            </CardHeader>
           <CardContent className="space-y-6">
             {/* Row 1: Client & Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,7 +271,8 @@ export default function ProjectCreate() {
             </div>
           </CardContent>
         </Card>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

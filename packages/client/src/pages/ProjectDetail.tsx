@@ -254,28 +254,24 @@ export default function ProjectDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-10" />
             <Skeleton className="h-8 w-64" />
           </div>
-        </header>
-        <main className="container py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </main>
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container flex h-16 items-center gap-4">
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/projects">
                 <ArrowLeft className="h-5 w-5" />
@@ -283,26 +279,24 @@ export default function ProjectDetail() {
             </Button>
             <h1 className="text-xl font-semibold">Projet introuvable</h1>
           </div>
-        </header>
-        <main className="container py-8">
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-muted-foreground">Ce projet n'existe pas ou a été supprimé.</p>
-              <Button className="mt-4" asChild>
+            <CardContent className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Ce projet n'existe pas ou a été supprimé.</p>
+              <Button size="sm" asChild>
                 <Link to="/projects">Retour aux projets</Link>
               </Button>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="container pt-2 pb-4 px-2">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/projects">
@@ -310,7 +304,10 @@ export default function ProjectDetail() {
               </Link>
             </Button>
             <div>
-              <h1 className="text-xl font-semibold">{project.name}</h1>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <Music className="h-8 w-8 text-primary" />
+                {project.name}
+              </h2>
               <p className="text-sm text-muted-foreground">
                 {project.artistName ? `${project.artistName} • ` : ""}Projet #{project.id}
               </p>
@@ -342,18 +339,16 @@ export default function ProjectDetail() {
             )}
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container py-8">
+        {/* Main Content */}
         <div className="grid gap-6 md:grid-cols-3">
           {/* Left Column - Main Info */}
           <div className="md:col-span-2 space-y-6">
             {/* Project Info Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations du projet</CardTitle>
-                <CardDescription>Détails et paramètres du projet</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations du projet</CardTitle>
+                <CardDescription className="text-sm">Détails et paramètres du projet</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -572,11 +567,11 @@ export default function ProjectDetail() {
 
             {/* Tracks Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Pistes</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-base">Pistes</CardTitle>
+                    <CardDescription className="text-sm">
                       {project.tracks?.length || 0} piste(s) dans ce projet
                     </CardDescription>
                   </div>
@@ -625,10 +620,10 @@ export default function ProjectDetail() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Music className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                    <p>Aucune piste dans ce projet</p>
-                    <p className="text-sm">Ajoutez votre première piste pour commencer</p>
+                  <div className="text-center py-6">
+                    <Music className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                    <h3 className="text-sm font-medium mb-1">Aucune piste dans ce projet</h3>
+                    <p className="text-sm text-muted-foreground">Ajoutez votre première piste pour commencer</p>
                   </div>
                 )}
               </CardContent>
@@ -637,8 +632,8 @@ export default function ProjectDetail() {
             {/* Notes Card */}
             {(project.notes || isEditing) && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Notes</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Notes</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {isEditing ? (
@@ -662,8 +657,8 @@ export default function ProjectDetail() {
           <div className="space-y-6">
             {/* Status Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Statut</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Statut</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -698,8 +693,8 @@ export default function ProjectDetail() {
             {/* Client Info */}
             {client && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Client</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Client</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-2">
@@ -714,8 +709,8 @@ export default function ProjectDetail() {
 
             {/* Meta Info */}
             <Card>
-              <CardHeader>
-                <CardTitle>Informations</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -741,8 +736,8 @@ export default function ProjectDetail() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" className="w-full" asChild>
@@ -757,10 +752,9 @@ export default function ProjectDetail() {
             </Card>
           </div>
         </div>
-      </main>
 
-      {/* Create Track Dialog */}
-      <Dialog open={showCreateTrackDialog} onOpenChange={setShowCreateTrackDialog}>
+        {/* Create Track Dialog */}
+        <Dialog open={showCreateTrackDialog} onOpenChange={setShowCreateTrackDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Ajouter une piste</DialogTitle>
@@ -1103,28 +1097,29 @@ export default function ProjectDetail() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+        </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Supprimer le projet</DialogTitle>
-            <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible et
-              supprimera également toutes les pistes associées.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Annuler
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
-              Supprimer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Supprimer le projet</DialogTitle>
+              <DialogDescription>
+                Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible et
+                supprimera également toutes les pistes associées.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+                Annuler
+              </Button>
+              <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+                Supprimer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
