@@ -6,7 +6,7 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { Link, useNavigate } from "react-router-dom";
