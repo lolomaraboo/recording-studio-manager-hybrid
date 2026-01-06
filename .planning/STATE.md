@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 11.5 of 17 (Catalogue de Services) - v4.0 Workflow Commercial Complet
-Plan: 11.5-03 (Quote Builder Integration) - COMPLETE
-Status: Phase 11.5 COMPLETE - 3/3 plans done
-Last activity: 2026-01-06 - Plan 11.5-03 complete (Autocomplete + catalog modal in quote creation)
+Phase: 12 of 17 (Tasks Chronométrées - Timer & Database) - v4.0 Workflow Commercial Complet
+Plan: 12-01 (Database Schema) - COMPLETE
+Status: Phase 12 in progress - 1/? plans done
+Last activity: 2026-01-06 - Plan 12-01 complete (task_types + time_entries schema with migration)
 
-Progress: ██████░░░░ 59% (v4.0: 7/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete)
+Progress: ██████░░░░ 60% (v4.0: 8/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete, Phase 12-01 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 58
-- Average duration: 45.8 min
-- Total execution time: 45.87 hours
+- Total plans completed: 59
+- Average duration: 44.9 min
+- Total execution time: 45.93 hours
 
 **By Phase:**
 
@@ -65,10 +65,11 @@ Progress: ██████░░░░ 59% (v4.0: 7/? plans - Phase 10 complet
 | 10 | 3/6 | 47 min | 15.7 min |
 | 11 | 1/3 | 795 min | 795 min |
 | 11.5 | 3/3 | 43 min | 14.3 min |
+| 12 | 1/? | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: [12 min, 795 min, 21 min, 3 min, 19 min]
-- Trend: Backend operations consistently fast (3-21 min), frontend UI with checkpoint pause (795 min includes 12h pause), Phase 11.5 complete average 14.3 min
+- Last 5 plans: [795 min, 21 min, 3 min, 19 min, 4 min]
+- Trend: Backend database schemas ultra-fast (3-4 min), UI implementations vary (19-795 min depending on complexity), catalog features average 14.3 min
 
 ## Accumulated Context
 
@@ -311,18 +312,15 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-06T04:59:33Z
-Stopped at: Phase 11.5 COMPLETE (all 3 plans done)
+Last session: 2026-01-06T05:52:36Z
+Stopped at: Phase 12-01 COMPLETE (Database Schema)
 Resume context:
-  - Phase 11.5-03 complete (Quote Builder Integration)
-  - QuoteCreate.tsx enhanced with dual service catalog access:
-    1. Autocomplete in description field (fuzzy search, keyboard nav, auto-fill)
-    2. "Du catalogue" button with category-filtered modal (table view, click-to-add)
-  - Per-line tax rate override implemented (LineItem.taxRate optional field)
-  - Tax calculation supports mixed rates per line (10% + 20% in same quote)
-  - Visual Badge indicator shows "TVA X%" when line differs from quote default
-  - Empty state in catalog modal links to /services page
-  - Fixed pre-existing bug: added alert-dialog component (Services.tsx now works)
-  - Phase 11.5 COMPLETE: Service catalog fully functional (database → UI → quote integration)
-  - Next: Return to Phase 11 remaining plans OR proceed to Phase 12 (Tasks Chronométrées)
+  - Phase 12-01 complete (Database Schema for Time Tracking)
+  - Created task_types table (9 fields: name, hourlyRate, category, color, sortOrder, isActive)
+  - Created time_entries table (13 fields: timestamps, duration, rate snapshot, manual adjustments)
+  - Generated migration 0006_add_task_types_time_entries.sql with CHECK constraint
+  - TypeScript types exported (TaskType, InsertTaskType, TimeEntry, InsertTimeEntry)
+  - Key decisions: hourlyRate snapshot preserves historical rates, flexible session/project linking
+  - Phase 12 in progress: 1/? plans complete
+  - Next: Phase 12-02 (Timer Backend Logic & tRPC Endpoints)
 Resume file: None

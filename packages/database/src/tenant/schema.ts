@@ -1013,3 +1013,73 @@ export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
     references: [quotes.id],
   }),
 }));
+
+/**
+ * Task Types table (Tenant DB)
+ * Pre-defined task types for time tracking (Setup, Recording, Mixing, etc.)
+ */
+export const taskTypes = pgTable("task_types", {
+  id: serial("id").primaryKey(),
+
+  // Task details
+  name: varchar("name", { length: 100 }).notNull(), // "Setup", "Recording", "Mixing", "Mastering", "Break"
+  description: text("description"), // Detailed explanation
+
+  // Pricing
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }).notNull(), // Default rate in organization currency
+
+  // Category
+  category: varchar("category", { length: 50 }).notNull().default("billable"), // "billable" | "non-billable" (for breaks)
+
+  // UI
+  color: varchar("color", { length: 7 }), // Hex color for UI display (e.g., "#FF5733")
+  sortOrder: integer("sort_order").notNull().default(0), // For UI ordering
+
+  // Status
+  isActive: boolean("is_active").notNull().default(true), // Soft delete - hide inactive types
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type TaskType = typeof taskTypes.$inferSelect;
+export type InsertTaskType = typeof taskTypes.$inferInsert;
+
+/**
+ * Time Entries table (Tenant DB)
+ * Time tracking entries for tasks during sessions or projects
+ */
+export const timeEntries = pgTable("time_entries", {
+  id: serial("id").primaryKey(),
+
+  // Task type reference
+  taskTypeId: integer("task_type_id").notNull().references(() => taskTypes.id),
+
+  // Flexible linking: time tracked on session OR project
+  sessionId: integer("session_id").references(() => sessions.id, { onDelete: "set null" }), // Links to session if time tracked during session
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }), // Alternative: time tracked directly on project
+
+  // Time tracking
+  startTime: timestamp("start_time").notNull(), // When timer started
+  endTime: timestamp("end_time"), // When timer stopped (null = currently running)
+  durationMinutes: integer("duration_minutes"), // Calculated duration in minutes (stored for performance)
+
+  // Pricing snapshot
+  hourlyRateSnapshot: decimal("hourly_rate_snapshot", { precision: 10, scale: 2 }).notNull(), // Snapshot of task_type hourly rate at entry time
+
+  // Manual adjustments
+  manuallyAdjusted: boolean("manually_adjusted").notNull().default(false), // True if user edited start/end times after auto-tracking
+
+  // Notes
+  notes: text("notes"), // Optional notes about this time entry
+
+  // Audit
+  createdBy: integer("created_by"), // FK to master.users for future multi-user tracking
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+// NOTE: CHECK constraint (session_id IS NOT NULL OR project_id IS NOT NULL) will be added manually to migration SQL
+
+export type TimeEntry = typeof timeEntries.$inferSelect;
+export type InsertTimeEntry = typeof timeEntries.$inferInsert;

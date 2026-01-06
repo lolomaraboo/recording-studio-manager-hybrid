@@ -1003,10 +1003,10 @@ Catalog stores: name, description, unit price, category (Studio/Post-prod/Locati
 - Time tracking data model (sessions, tasks, timestamps)
 - Hourly rate calculation logic per task type
 
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 12-01: TBD (run /gsd:plan-phase 12 to break down)
+- [x] 12-01: Database Schema (task_types, time_entries tables with migration) (Completed 2026-01-06 - 4 min)
 
 ### Phase 13: Tasks Chronométrées - UI & History
 
