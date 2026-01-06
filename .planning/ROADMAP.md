@@ -977,10 +977,12 @@ Plans:
 
 **Research**: Unlikely (standard CRUD patterns, autocomplete, modals)
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 11.5-01: TBD (run /gsd:plan-phase 11.5 to break down)
+- [x] 11.5-01: Backend Infrastructure (service_catalog schema, migration, tRPC router) (Completed 2026-01-06 - 21 min)
+- [ ] 11.5-02: Service Catalog Management Page (CRUD UI)
+- [ ] 11.5-03: Quick Access Integration (autocomplete + modal in quote builder)
 
 **Details**:
 Catalog stores: name, description, unit price, category (Studio/Post-prod/Location/Other), default quantity, specific VAT rate. Two access methods in quote creation: (1) Autocomplete in description field with fuzzy search, (2) "From catalog" button opening modal with category filters. Maintains flexibility to add free-form items. Templates/bundles/quote duplication deferred to future phases.
