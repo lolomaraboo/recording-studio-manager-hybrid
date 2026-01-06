@@ -981,7 +981,7 @@ Plans:
 
 Plans:
 - [x] 11.5-01: Backend Infrastructure (service_catalog schema, migration, tRPC router) (Completed 2026-01-06 - 21 min)
-- [ ] 11.5-02: Service Catalog Management Page (CRUD UI)
+- [x] 11.5-02: Service Catalog Management Page (CRUD UI) (Completed 2026-01-06 - 3 min)
 - [ ] 11.5-03: Quick Access Integration (autocomplete + modal in quote builder)
 
 **Details**:

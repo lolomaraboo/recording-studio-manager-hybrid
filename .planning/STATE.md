@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 11.5 of 17 (Catalogue de Services) - v4.0 Workflow Commercial Complet
-Plan: 11.5-01 (Backend Infrastructure) - COMPLETE
-Status: Phase 11.5 in progress - 1/3 plans complete (11.5-02 and 11.5-03 remain)
-Last activity: 2026-01-06 - Plan 11.5-01 complete (service_catalog schema, tRPC router, migration)
+Plan: 11.5-02 (Services Management Page) - COMPLETE
+Status: Phase 11.5 in progress - 2/3 plans complete (11.5-03 remains)
+Last activity: 2026-01-06 - Plan 11.5-02 complete (Services CRUD page with search/filter)
 
-Progress: ████░░░░░░ 57% (v4.0: 5/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5-01 complete)
+Progress: █████░░░░░ 58% (v4.0: 6/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5-01/02 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 56
-- Average duration: 48.5 min
-- Total execution time: 45.5 hours
+- Total plans completed: 57
+- Average duration: 46.3 min
+- Total execution time: 45.55 hours
 
 **By Phase:**
 
@@ -64,11 +64,11 @@ Progress: ████░░░░░░ 57% (v4.0: 5/? plans - Phase 10 complet
 | 3.14 | 4/4 | 170 min | 42.5 min |
 | 10 | 3/6 | 47 min | 15.7 min |
 | 11 | 1/3 | 795 min | 795 min |
-| 11.5 | 1/3 | 21 min | 21 min |
+| 11.5 | 2/3 | 24 min | 12 min |
 
 **Recent Trend:**
-- Last 5 plans: [30 min, 5 min, 12 min, 795 min, 21 min]
-- Trend: Backend operations consistently fast (5-21 min), frontend UI with checkpoint pause (795 min includes 12h pause)
+- Last 5 plans: [5 min, 12 min, 795 min, 21 min, 3 min]
+- Trend: Backend operations consistently fast (3-21 min), frontend UI with checkpoint pause (795 min includes 12h pause)
 
 ## Accumulated Context
 
@@ -311,15 +311,18 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-06T04:35:00Z
-Stopped at: Phase 11.5-01 complete
+Last session: 2026-01-06T04:36:44Z
+Stopped at: Phase 11.5-02 complete
 Resume context:
-  - Phase 11.5-01 complete (Service Catalog Backend Infrastructure)
-  - service_catalog table schema added to tenant database (11 columns)
-  - PostgreSQL migration generated (0009_aspiring_paper_doll.sql)
-  - serviceCatalog tRPC router created with full CRUD + search/filter (5 operations)
-  - Router registered in main app router
-  - All TypeScript compilation successful (0 errors)
-  - Phase 11.5 now 1/3 plans complete (11.5-02 and 11.5-03 remain)
-  - Next: Plan Phase 11.5-02 (Service Catalog Management Page - CRUD UI)
+  - Phase 11.5-02 complete (Service Catalog Management Page)
+  - Services.tsx page created (519 lines) with full CRUD interface
+  - Table view with 6 columns: Nom, Catégorie, Prix unitaire, TVA, Qté défaut, Actions
+  - Real-time search (300ms debounce) on name/description
+  - Category filter dropdown (4 categories)
+  - Create/edit modal with 6-field form and validation
+  - Delete confirmation AlertDialog with safety warning
+  - /services route registered in App.tsx
+  - Services link added to Sidebar (CONTACTS section, between Clients and Talents)
+  - Phase 11.5 now 2/3 plans complete (11.5-03 remains)
+  - Next: Plan Phase 11.5-03 (Quote Builder Integration - autocomplete + catalog modal)
 Resume file: None

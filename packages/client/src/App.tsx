@@ -26,6 +26,7 @@ import TalentDetail from './pages/TalentDetail';
 import TalentCreate from './pages/TalentCreate';
 import { Quotes } from './pages/Quotes';
 import QuoteCreate from './pages/QuoteCreate';
+import Services from './pages/Services';
 import { Contracts } from './pages/Contracts';
 import ContractCreate from './pages/ContractCreate';
 import { Expenses } from './pages/Expenses';
@@ -153,6 +154,7 @@ function App() {
             <Route path="quotes" element={<Quotes />} />
             <Route path="quotes/new" element={<QuoteCreate />} />
             <Route path="quotes/:id" element={<QuoteDetail />} />
+            <Route path="services" element={<Services />} />
             <Route path="contracts" element={<Contracts />} />
             <Route path="contracts/new" element={<ContractCreate />} />
             <Route path="contracts/:id" element={<ContractDetail />} />

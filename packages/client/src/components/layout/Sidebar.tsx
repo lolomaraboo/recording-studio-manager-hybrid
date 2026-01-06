@@ -87,6 +87,11 @@ const navSections: NavSection[] = [
         icon: <Users className="h-5 w-5" />,
       },
       {
+        title: "Services",
+        href: "/services",
+        icon: <Package className="h-5 w-5" />,
+      },
+      {
         title: "Talents",
         href: "/talents",
         icon: <Users className="h-5 w-5" />,
