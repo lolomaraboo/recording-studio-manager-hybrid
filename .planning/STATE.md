@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 12 of 17 (Tasks Chronométrées - Timer & Database) - v4.0 Workflow Commercial Complet
-Plan: 12-01 (Database Schema) - COMPLETE
-Status: Phase 12 in progress - 1/? plans done
-Last activity: 2026-01-06 - Plan 12-01 complete (task_types + time_entries schema with migration)
+Plan: 12-02 (Timer Backend Logic) - COMPLETE
+Status: Phase 12 in progress - 2/? plans done
+Last activity: 2026-01-06 - Plan 12-02 complete (timer service + tRPC API with 8 procedures)
 
-Progress: ██████░░░░ 60% (v4.0: 8/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete, Phase 12-01 complete)
+Progress: ██████░░░░ 60% (v4.0: 9/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete, Phase 12 Plans 1-2 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 59
-- Average duration: 44.9 min
-- Total execution time: 45.93 hours
+- Total plans completed: 60
+- Average duration: 44.1 min
+- Total execution time: 44.10 hours
 
 **By Phase:**
 
@@ -65,11 +65,11 @@ Progress: ██████░░░░ 60% (v4.0: 8/? plans - Phase 10 complet
 | 10 | 3/6 | 47 min | 15.7 min |
 | 11 | 1/3 | 795 min | 795 min |
 | 11.5 | 3/3 | 43 min | 14.3 min |
-| 12 | 1/? | 4 min | 4 min |
+| 12 | 2/? | 13 min | 6.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [795 min, 21 min, 3 min, 19 min, 4 min]
-- Trend: Backend database schemas ultra-fast (3-4 min), UI implementations vary (19-795 min depending on complexity), catalog features average 14.3 min
+- Last 5 plans: [21 min, 3 min, 19 min, 4 min, 9 min]
+- Trend: Backend implementations averaging 6.5 min (database + API layer), UI implementations vary (19-795 min depending on complexity)
 
 ## Accumulated Context
 
@@ -312,15 +312,15 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-06T05:52:36Z
-Stopped at: Phase 12-01 COMPLETE (Database Schema)
+Last session: 2026-01-06T05:46:10Z
+Stopped at: Phase 12-02 COMPLETE (Timer Backend Logic)
 Resume context:
-  - Phase 12-01 complete (Database Schema for Time Tracking)
-  - Created task_types table (9 fields: name, hourlyRate, category, color, sortOrder, isActive)
-  - Created time_entries table (13 fields: timestamps, duration, rate snapshot, manual adjustments)
-  - Generated migration 0006_add_task_types_time_entries.sql with CHECK constraint
-  - TypeScript types exported (TaskType, InsertTaskType, TimeEntry, InsertTimeEntry)
-  - Key decisions: hourlyRate snapshot preserves historical rates, flexible session/project linking
-  - Phase 12 in progress: 1/? plans complete
-  - Next: Phase 12-02 (Timer Backend Logic & tRPC Endpoints)
+  - Phase 12-02 complete (Timer Backend Logic & tRPC API)
+  - Created timer-service.ts with 6 business logic functions (start/stop/getActive/adjust/calculateCost/getTimeHistory)
+  - Created time-tracking tRPC router with 8 procedures (3 taskTypes, 3 timer, 2 timeEntries)
+  - Added Drizzle ORM relations for timeEntries and taskTypes
+  - Seeded 5 default task types (Setup/Recording/Mixing/Mastering/Break)
+  - Key decisions: XOR validation (sessionId OR projectId), TenantDb type inference, cost calculation formula
+  - Phase 12 in progress: 2/? plans complete
+  - Next: Phase 12-03 (Real-time Socket.IO Integration)
 Resume file: None
