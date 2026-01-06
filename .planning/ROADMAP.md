@@ -969,11 +969,27 @@ Plans:
 Plans:
 - [x] 11-01: Quote Management UI - Line Items Builder, PDF Download, State Transitions (Completed 2026-01-06 - 795 min)
 
+### Phase 11.5: Catalogue de Services
+
+**Goal**: Service/product catalog for quick quote creation - dedicated management page + quick access (autocomplete + modal) in quote builder
+
+**Depends on**: Phase 11
+
+**Research**: Unlikely (standard CRUD patterns, autocomplete, modals)
+
+**Plans**: TBD
+
+Plans:
+- [ ] 11.5-01: TBD (run /gsd:plan-phase 11.5 to break down)
+
+**Details**:
+Catalog stores: name, description, unit price, category (Studio/Post-prod/Location/Other), default quantity, specific VAT rate. Two access methods in quote creation: (1) Autocomplete in description field with fuzzy search, (2) "From catalog" button opening modal with category filters. Maintains flexibility to add free-form items. Templates/bundles/quote duplication deferred to future phases.
+
 ### Phase 12: Tasks Chronométrées - Timer & Database
 
 **Goal**: Database schema for task types (Setup/Recording/Mixing/Mastering/Break), timer functionality (start/stop), manual adjustments, and hourly rates
 
-**Depends on**: Phase 11
+**Depends on**: Phase 11.5
 
 **Research**: Likely (Real-time timer sync, WebSocket for multi-user timer visibility)
 
