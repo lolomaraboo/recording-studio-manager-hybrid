@@ -479,39 +479,40 @@ export type InsertTrackCredit = typeof trackCredits.$inferInsert;
 
 /**
  * Quotes table (Tenant DB)
- * Price quotes/estimates for clients before creating invoices
+ * Price quotes/estimates for clients with 7-state workflow
+ * States: draft → sent → accepted/rejected/expired → converted_to_project
  */
 export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
   quoteNumber: varchar("quote_number", { length: 100 }).notNull().unique(),
   clientId: integer("client_id").notNull().references(() => clients.id),
-  projectId: integer("project_id").references(() => projects.id),
 
-  // Dates
-  issueDate: timestamp("issue_date").notNull().defaultNow(),
-  validUntil: timestamp("valid_until").notNull(), // Quote expiration date
+  // Status & Workflow (7-state FSM)
+  status: varchar("status", { length: 50 }).notNull().default("draft"),
+  // "draft" | "sent" | "accepted" | "rejected" | "expired" | "cancelled" | "converted_to_project"
 
-  // Status
-  status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted"
+  // Timestamps (for state tracking)
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  sentAt: timestamp("sent_at"),          // When quote was sent to client
+  respondedAt: timestamp("responded_at"), // When client accepted/rejected
+  expiresAt: timestamp("expires_at"),    // Calculated expiration deadline (locked when sent)
 
-  // Pricing
+  // Financial (mirror invoice pattern)
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
 
-  // Conversion
-  convertedToInvoiceId: integer("converted_to_invoice_id").references(() => invoices.id),
+  // Quote-specific fields
+  validityDays: integer("validity_days").notNull().default(30), // Quote valid for N days
+  terms: text("terms"), // Terms and conditions
+  notes: text("notes"), // Client-visible notes
+  internalNotes: text("internal_notes"), // Not visible to client
+
+  // Conversion tracking (quote → project, NOT invoice)
+  convertedToProjectId: integer("converted_to_project_id").references(() => projects.id),
   convertedAt: timestamp("converted_at"),
-
-  // Details
-  title: varchar("title", { length: 255 }),
-  description: text("description"),
-  terms: text("terms"), // Payment terms and conditions
-  notes: text("notes"),
-
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export type Quote = typeof quotes.$inferSelect;
@@ -525,15 +526,17 @@ export const quoteItems = pgTable("quote_items", {
   id: serial("id").primaryKey(),
   quoteId: integer("quote_id").notNull().references(() => quotes.id),
 
-  // Item Info
+  // Service details
   description: varchar("description", { length: 500 }).notNull(),
   quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
 
-  // Optional links
-  sessionId: integer("session_id").references(() => sessions.id),
-  equipmentId: integer("equipment_id").references(() => equipment.id),
+  // Optional: Link to service templates (future feature)
+  serviceTemplateId: integer("service_template_id"), // Nullable - for future templates
+
+  // Ordering
+  displayOrder: integer("display_order").notNull().default(0),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

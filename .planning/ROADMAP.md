@@ -881,7 +881,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 3.13. Validation UI Complète | v3.0 | 2/2 | ✅ Complete | 2026-01-04 |
 | 3.14. Améliorations UI | v3.0 | 4/4 | ✅ Complete | 2026-01-05 |
 | **v4.0 - Workflow Commercial Complet (IN PROGRESS)** | | | | |
-| 10. Système Devis - Backend | v4.0 | 0/? | Not started | - |
+| 10. Système Devis - Backend | v4.0 | 1/6 | In Progress | 2026-01-05 |
 | 11. Système Devis - Frontend | v4.0 | 0/? | Not started | - |
 | 12. Tasks Chronométrées - Timer | v4.0 | 0/? | Not started | - |
 | 13. Tasks Chronométrées - UI | v4.0 | 0/? | Not started | - |
@@ -897,7 +897,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
-**v4.0 Total**: 0/? plans (starting Phase 10)
+**v4.0 Total**: 1/? plans (Phase 10 started - 30 min)
 **v1.0 Total**: 0/17 plans (deferred after v4.0)
 
 ---
@@ -944,10 +944,17 @@ Success criteria (from PROJECT.md):
 - Template engine for service items with variables
 - Conversion logic from quote to project (data mapping)
 
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 10-01: TBD (run /gsd:plan-phase 10 to break down)
+- [x] 10-01: Database Schema & Migrations (Completed 2026-01-05 - 30 min)
+- [ ] 10-02: tRPC Router & State Machine
+- [ ] 10-03: PDF Generation Service
+- [ ] 10-04: Quote Number Generation
+- [ ] 10-05: Service Templates (Optional)
+- [ ] 10-06: Testing & Validation
+
+**Status**: 🔄 In Progress (1/6 plans complete - 30 min total)
 
 ### Phase 11: Système de Devis - Frontend UI
 
