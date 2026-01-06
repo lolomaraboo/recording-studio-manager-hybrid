@@ -1,0 +1,788 @@
+/**
+ * Tenant Data Seed Script
+ *
+ * Fills all tenant database tables with realistic fictional data
+ * for testing and demonstration purposes
+ *
+ * Usage:
+ *   TENANT_DB_NAME=tenant_6 pnpm --filter @rsm/database run seed:tenant
+ *
+ * Requirements:
+ *   - TENANT_DB_NAME env var (e.g., tenant_6)
+ *   - Database must exist and be migrated
+ */
+
+import { getTenantDb, closeAllConnections } from "../connection";
+import {
+  clients,
+  rooms,
+  equipment,
+  sessions,
+  invoices,
+  invoiceItems,
+  projects,
+  tracks,
+  // trackComments,
+  musicians,
+  // trackCredits,
+  // quotes,
+  // quoteItems,
+  // contracts,
+  // expenses,
+  // payments,
+  // notifications,
+  // clientPortalAccounts,
+  // paymentTransactions,
+} from "../tenant/schema";
+
+/**
+ * Seed clients
+ */
+async function seedClients(db: any) {
+  console.log("\n👥 Seeding Clients...");
+
+  const clientData = [
+    {
+      name: "Sophie Martin",
+      artistName: "Sophie M",
+      email: "sophie.martin@example.com",
+      phone: "+33 6 12 34 56 78",
+      type: "individual",
+      address: "15 rue de la Musique",
+      city: "Paris",
+      country: "France",
+      notes: "Singer-songwriter, préfère les sessions matinales",
+      isVip: true,
+      portalAccess: true,
+    },
+    {
+      name: "Marc Dubois",
+      artistName: "MC Dubz",
+      email: "marc.dubois@example.com",
+      phone: "+33 6 23 45 67 89",
+      type: "individual",
+      address: "42 avenue du Hip-Hop",
+      city: "Lyon",
+      country: "France",
+      notes: "Rappeur, très pointilleux sur le mixage",
+      isVip: true,
+      portalAccess: true,
+    },
+    {
+      name: "Production Sonore SARL",
+      email: "contact@production-sonore.fr",
+      phone: "+33 1 42 56 78 90",
+      type: "company",
+      address: "89 boulevard des Productions",
+      city: "Paris",
+      country: "France",
+      notes: "Studio partenaire, réservations régulières",
+      isVip: false,
+      portalAccess: false,
+    },
+    {
+      name: "Julie Leroux",
+      artistName: "Julie L",
+      email: "julie.leroux@example.com",
+      phone: "+33 6 34 56 78 90",
+      type: "individual",
+      address: "23 rue des Artistes",
+      city: "Marseille",
+      country: "France",
+      notes: "Compositrice de musique électronique",
+      isVip: false,
+      portalAccess: true,
+    },
+    {
+      name: "Thomas Bernard",
+      artistName: "Tom B",
+      email: "thomas.bernard@example.com",
+      phone: "+33 6 45 67 89 01",
+      type: "individual",
+      address: "56 allée du Rock",
+      city: "Toulouse",
+      country: "France",
+      notes: "Guitariste de rock, aime expérimenter",
+      isVip: false,
+      portalAccess: true,
+    },
+  ];
+
+  const insertedClients = await db.insert(clients).values(clientData).returning();
+  console.log(`  ✅ Created ${insertedClients.length} clients`);
+  return insertedClients;
+}
+
+/**
+ * Seed rooms
+ */
+async function seedRooms(db: any) {
+  console.log("\n🏠 Seeding Rooms...");
+
+  const roomData = [
+    {
+      name: "Studio A - Recording",
+      description: "Grande salle d'enregistrement avec isolation acoustique professionnelle",
+      type: "recording",
+      hourlyRate: "75.00",
+      halfDayRate: "280.00",
+      fullDayRate: "500.00",
+      capacity: 8,
+      size: 45,
+      hasIsolationBooth: true,
+      hasLiveRoom: true,
+      hasControlRoom: true,
+      color: "#e74c3c",
+      isActive: true,
+      isAvailableForBooking: true,
+    },
+    {
+      name: "Studio B - Mixing",
+      description: "Salle de mixage équipée d'un système de monitoring de haute qualité",
+      type: "mixing",
+      hourlyRate: "60.00",
+      halfDayRate: "220.00",
+      fullDayRate: "400.00",
+      capacity: 4,
+      size: 30,
+      hasIsolationBooth: false,
+      hasLiveRoom: false,
+      hasControlRoom: true,
+      color: "#3498db",
+      isActive: true,
+      isAvailableForBooking: true,
+    },
+    {
+      name: "Studio C - Mastering",
+      description: "Salle de mastering avec traitement acoustique premium",
+      type: "mastering",
+      hourlyRate: "80.00",
+      halfDayRate: "300.00",
+      fullDayRate: "550.00",
+      capacity: 2,
+      size: 20,
+      hasIsolationBooth: false,
+      hasLiveRoom: false,
+      hasControlRoom: true,
+      color: "#2ecc71",
+      isActive: true,
+      isAvailableForBooking: true,
+    },
+    {
+      name: "Rehearsal Room",
+      description: "Salle de répétition pour groupes et musiciens",
+      type: "rehearsal",
+      hourlyRate: "25.00",
+      halfDayRate: "90.00",
+      fullDayRate: "150.00",
+      capacity: 6,
+      size: 35,
+      hasIsolationBooth: false,
+      hasLiveRoom: true,
+      hasControlRoom: false,
+      color: "#f39c12",
+      isActive: true,
+      isAvailableForBooking: true,
+    },
+  ];
+
+  const insertedRooms = await db.insert(rooms).values(roomData).returning();
+  console.log(`  ✅ Created ${insertedRooms.length} rooms`);
+  return insertedRooms;
+}
+
+/**
+ * Seed equipment
+ */
+async function seedEquipment(db: any, insertedRooms: any[]) {
+  console.log("\n🎛️ Seeding Equipment...");
+
+  const equipmentData = [
+    {
+      roomId: insertedRooms[0].id,
+      name: "Neumann U87",
+      brand: "Neumann",
+      model: "U87 Ai",
+      serialNumber: "U87-12345",
+      category: "microphone",
+      description: "Microphone à condensateur large diaphragme, son classique chaleureux",
+      specifications: JSON.stringify({ type: "Condenser", pattern: "Multi-pattern", frequency: "20Hz-20kHz" }),
+      purchaseDate: new Date("2022-03-15"),
+      purchasePrice: "3200.00",
+      status: "operational",
+      condition: "excellent",
+      location: "Studio A - Rack 1",
+      isAvailable: true,
+    },
+    {
+      roomId: insertedRooms[0].id,
+      name: "Shure SM57",
+      brand: "Shure",
+      model: "SM57",
+      serialNumber: "SM57-67890",
+      category: "microphone",
+      description: "Microphone dynamique cardioïde, parfait pour guitares et snare",
+      specifications: JSON.stringify({ type: "Dynamic", pattern: "Cardioid", frequency: "40Hz-15kHz" }),
+      purchaseDate: new Date("2021-06-20"),
+      purchasePrice: "120.00",
+      status: "operational",
+      condition: "good",
+      location: "Studio A - Mic Locker",
+      isAvailable: true,
+    },
+    {
+      roomId: insertedRooms[1].id,
+      name: "Universal Audio Apollo x8",
+      brand: "Universal Audio",
+      model: "Apollo x8",
+      serialNumber: "APX8-11223",
+      category: "interface",
+      description: "Interface audio Thunderbolt 3 avec convertisseurs Elite, 18x24",
+      specifications: JSON.stringify({ inputs: 18, outputs: 24, connection: "Thunderbolt 3", sampleRate: "192kHz" }),
+      purchaseDate: new Date("2023-01-10"),
+      purchasePrice: "2800.00",
+      status: "operational",
+      condition: "excellent",
+      location: "Studio B - Main Desk",
+      isAvailable: true,
+    },
+    {
+      roomId: insertedRooms[0].id,
+      name: "Neve 1073 Preamp",
+      brand: "Neve",
+      model: "1073",
+      serialNumber: "NEVE-99887",
+      category: "preamp",
+      description: "Préampli micro/ligne avec égaliseur 3 bandes, son légendaire",
+      specifications: JSON.stringify({ channels: 1, eq: "3-band", gain: "80dB" }),
+      purchaseDate: new Date("2022-09-05"),
+      purchasePrice: "3500.00",
+      status: "operational",
+      condition: "excellent",
+      location: "Studio A - Outboard Rack",
+      isAvailable: true,
+    },
+    {
+      roomId: insertedRooms[2].id,
+      name: "Genelec 8351B",
+      brand: "Genelec",
+      model: "8351B",
+      serialNumber: "GEN-44556",
+      category: "monitoring",
+      description: "Monitoring actif 3 voies avec correction acoustique SAM, paire",
+      specifications: JSON.stringify({ type: "Active 3-way", woofer: "10 inch", frequency: "32Hz-40kHz", spl: "113dB" }),
+      purchaseDate: new Date("2023-05-18"),
+      purchasePrice: "8400.00",
+      status: "operational",
+      condition: "excellent",
+      location: "Studio C - Main Monitors",
+      isAvailable: true,
+    },
+    {
+      roomId: insertedRooms[0].id,
+      name: "Fender Stratocaster",
+      brand: "Fender",
+      model: "American Professional II Stratocaster",
+      serialNumber: "FEND-77889",
+      category: "instrument",
+      description: "Guitare électrique Stratocaster, sunburst",
+      specifications: JSON.stringify({ type: "Electric Guitar", pickups: "V-Mod II Single-Coil", finish: "3-Color Sunburst" }),
+      purchaseDate: new Date("2022-11-22"),
+      purchasePrice: "1700.00",
+      status: "operational",
+      condition: "good",
+      location: "Studio A - Instrument Room",
+      isAvailable: true,
+    },
+  ];
+
+  const insertedEquipment = await db.insert(equipment).values(equipmentData).returning();
+  console.log(`  ✅ Created ${insertedEquipment.length} equipment items`);
+  return insertedEquipment;
+}
+
+/**
+ * Seed sessions
+ */
+async function seedSessions(db: any, insertedClients: any[], insertedRooms: any[]) {
+  console.log("\n📅 Seeding Sessions...");
+
+  const now = new Date();
+  const sessionData = [
+    {
+      clientId: insertedClients[0].id,
+      roomId: insertedRooms[0].id,
+      title: "Enregistrement vocal album",
+      description: "Session d'enregistrement des voix principales pour l'album",
+      startTime: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+      endTime: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000), // 4 hours
+      status: "completed",
+      totalAmount: "300.00",
+      depositAmount: "90.00",
+      depositPaid: true,
+      paymentStatus: "paid",
+    },
+    {
+      clientId: insertedClients[1].id,
+      roomId: insertedRooms[1].id,
+      title: "Mixage EP",
+      description: "Mixage de 4 titres pour l'EP",
+      startTime: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+      endTime: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000 + 8 * 60 * 60 * 1000),
+      status: "completed",
+      totalAmount: "480.00",
+      depositAmount: "144.00",
+      depositPaid: true,
+      paymentStatus: "paid",
+    },
+    {
+      clientId: insertedClients[3].id,
+      roomId: insertedRooms[0].id,
+      title: "Session découverte",
+      description: "Première session d'enregistrement",
+      startTime: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000), // in 2 days
+      endTime: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000),
+      status: "scheduled",
+      totalAmount: "150.00",
+      depositAmount: "45.00",
+      depositPaid: true,
+      paymentStatus: "partial",
+    },
+    {
+      clientId: insertedClients[4].id,
+      roomId: insertedRooms[3].id,
+      title: "Répétition groupe",
+      description: "Répétition avant concert",
+      startTime: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000),
+      endTime: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000),
+      status: "scheduled",
+      totalAmount: "75.00",
+      depositAmount: "22.50",
+      depositPaid: false,
+      paymentStatus: "unpaid",
+    },
+  ];
+
+  const insertedSessions = await db.insert(sessions).values(sessionData).returning();
+  console.log(`  ✅ Created ${insertedSessions.length} sessions`);
+  return insertedSessions;
+}
+
+/**
+ * Seed projects
+ */
+async function seedProjects(db: any, insertedClients: any[]) {
+  console.log("\n🎵 Seeding Projects...");
+
+  const projectData = [
+    {
+      clientId: insertedClients[0].id,
+      name: "Lumière d'Été",
+      artistName: "Sophie M",
+      description: "Album folk-pop avec influences électroniques",
+      genre: "Folk Pop",
+      type: "album",
+      status: "recording",
+      startDate: new Date("2024-11-01"),
+      targetDeliveryDate: new Date("2025-03-15"),
+      budget: "8000.00",
+      totalCost: "3200.00",
+      trackCount: 10,
+    },
+    {
+      clientId: insertedClients[1].id,
+      name: "Urban Stories",
+      artistName: "MC Dubz",
+      description: "EP de rap conscient avec productions originales",
+      genre: "Hip-Hop",
+      type: "ep",
+      status: "mixing",
+      startDate: new Date("2024-12-01"),
+      targetDeliveryDate: new Date("2025-02-01"),
+      budget: "3500.00",
+      totalCost: "2100.00",
+      trackCount: 4,
+    },
+    {
+      clientId: insertedClients[3].id,
+      name: "Midnight Sessions",
+      artistName: "Julie L",
+      description: "Single électro ambient",
+      genre: "Electronic",
+      type: "single",
+      status: "pre_production",
+      startDate: new Date("2025-01-10"),
+      targetDeliveryDate: new Date("2025-02-28"),
+      budget: "1200.00",
+      trackCount: 1,
+    },
+  ];
+
+  const insertedProjects = await db.insert(projects).values(projectData).returning();
+  console.log(`  ✅ Created ${insertedProjects.length} projects`);
+  return insertedProjects;
+}
+
+/**
+ * Seed tracks
+ */
+async function seedTracks(db: any, insertedProjects: any[], insertedRooms: any[]) {
+  console.log("\n🎼 Seeding Tracks...");
+
+  const trackData = [
+    {
+      projectId: insertedProjects[0].id,
+      title: "Soleil Levant",
+      trackNumber: 1,
+      duration: 245,
+      status: "mixing",
+      bpm: 95,
+      key: "D Major",
+      lyrics: "Verse 1:\nLe soleil se lève doucement\nSur les toits de la ville endormie...",
+      composer: "Sophie Martin",
+      lyricist: "Sophie Martin",
+      copyrightHolder: "Sophie Martin",
+      copyrightYear: 2025,
+      genreTags: JSON.stringify(["Folk", "Pop", "Indie"]),
+      mood: "Uplifting",
+      language: "fr",
+      explicitContent: false,
+      instrumentsUsed: JSON.stringify(["Acoustic Guitar", "Piano", "Vocals"]),
+      microphonesUsed: JSON.stringify(["Neumann U87", "Shure SM7B"]),
+      recordedInRoomId: insertedRooms[0].id,
+    },
+    {
+      projectId: insertedProjects[0].id,
+      title: "Océan Intérieur",
+      trackNumber: 2,
+      duration: 198,
+      status: "recording",
+      bpm: 72,
+      key: "Am",
+      composer: "Sophie Martin",
+      copyrightHolder: "Sophie Martin",
+      copyrightYear: 2025,
+      genreTags: JSON.stringify(["Folk", "Ambient"]),
+      mood: "Melancholic",
+      language: "fr",
+      explicitContent: false,
+      recordedInRoomId: insertedRooms[0].id,
+    },
+    {
+      projectId: insertedProjects[1].id,
+      title: "Rue de la Liberté",
+      trackNumber: 1,
+      duration: 212,
+      status: "mixing",
+      bpm: 90,
+      key: "Cm",
+      lyrics: "Intro:\nYeah, yeah, c'est MC Dubz\nRue de la liberté...",
+      composer: "Marc Dubois",
+      lyricist: "Marc Dubois",
+      copyrightHolder: "Marc Dubois",
+      copyrightYear: 2025,
+      genreTags: JSON.stringify(["Hip-Hop", "Rap", "Conscious"]),
+      mood: "Energetic",
+      language: "fr",
+      explicitContent: false,
+      instrumentsUsed: JSON.stringify(["MPC", "Bass", "Keys"]),
+      recordedInRoomId: insertedRooms[0].id,
+    },
+    {
+      projectId: insertedProjects[1].id,
+      title: "Mirages Urbains",
+      trackNumber: 2,
+      duration: 185,
+      status: "completed",
+      bpm: 85,
+      key: "Gm",
+      composer: "Marc Dubois",
+      lyricist: "Marc Dubois",
+      copyrightHolder: "Marc Dubois",
+      copyrightYear: 2025,
+      genreTags: JSON.stringify(["Hip-Hop", "Trap"]),
+      mood: "Dark",
+      language: "fr",
+      explicitContent: false,
+      recordedInRoomId: insertedRooms[0].id,
+    },
+  ];
+
+  const insertedTracks = await db.insert(tracks).values(trackData).returning();
+  console.log(`  ✅ Created ${insertedTracks.length} tracks`);
+  return insertedTracks;
+}
+
+/**
+ * Seed musicians
+ */
+async function seedMusicians(db: any) {
+  console.log("\n🎸 Seeding Musicians...");
+
+  const musicianData = [
+    {
+      name: "Antoine Rousseau",
+      stageName: "Tony R",
+      email: "antoine.rousseau@example.com",
+      phone: "+33 6 78 90 12 34",
+      bio: "Guitariste professionnel avec 15 ans d'expérience en studio",
+      talentType: "musician",
+      primaryInstrument: "Guitar",
+      instruments: JSON.stringify(["Electric Guitar", "Acoustic Guitar", "Bass"]),
+      genres: JSON.stringify(["Rock", "Pop", "Blues"]),
+      hourlyRate: "80.00",
+      isActive: true,
+    },
+    {
+      name: "Claire Moreau",
+      email: "claire.moreau@example.com",
+      phone: "+33 6 89 01 23 45",
+      bio: "Ingénieure du son spécialisée en mixage et mastering",
+      talentType: "musician",
+      primaryInstrument: "Engineer",
+      instruments: JSON.stringify(["Pro Tools", "Logic Pro", "Ableton Live"]),
+      genres: JSON.stringify(["All Genres"]),
+      hourlyRate: "100.00",
+      isActive: true,
+    },
+  ];
+
+  const insertedMusicians = await db.insert(musicians).values(musicianData).returning();
+  console.log(`  ✅ Created ${insertedMusicians.length} musicians`);
+  return insertedMusicians;
+}
+
+/**
+ * Seed invoices
+ */
+async function seedInvoices(db: any, insertedClients: any[]) {
+  console.log("\n💰 Seeding Invoices...");
+
+  const invoiceData = [
+    {
+      invoiceNumber: "INV-2025-001",
+      clientId: insertedClients[0].id,
+      issueDate: new Date("2025-01-05"),
+      dueDate: new Date("2025-02-04"),
+      status: "paid",
+      subtotal: "300.00",
+      taxRate: "20.00",
+      taxAmount: "60.00",
+      total: "360.00",
+      paidAt: new Date("2025-01-10"),
+    },
+    {
+      invoiceNumber: "INV-2025-002",
+      clientId: insertedClients[1].id,
+      issueDate: new Date("2025-01-12"),
+      dueDate: new Date("2025-02-11"),
+      status: "sent",
+      subtotal: "480.00",
+      taxRate: "20.00",
+      taxAmount: "96.00",
+      total: "576.00",
+    },
+  ];
+
+  const insertedInvoices = await db.insert(invoices).values(invoiceData).returning();
+  console.log(`  ✅ Created ${insertedInvoices.length} invoices`);
+  return insertedInvoices;
+}
+
+/**
+ * Seed invoice items
+ */
+async function seedInvoiceItems(db: any, insertedInvoices: any[]) {
+  console.log("\n📋 Seeding Invoice Items...");
+
+  const invoiceItemData = [
+    {
+      invoiceId: insertedInvoices[0].id,
+      description: "Enregistrement Studio A - 4 heures",
+      quantity: "4.00",
+      unitPrice: "75.00",
+      amount: "300.00",
+    },
+    {
+      invoiceId: insertedInvoices[1].id,
+      description: "Mixage Studio B - 8 heures",
+      quantity: "8.00",
+      unitPrice: "60.00",
+      amount: "480.00",
+    },
+  ];
+
+  await db.insert(invoiceItems).values(invoiceItemData);
+  console.log(`  ✅ Created ${invoiceItemData.length} invoice items`);
+}
+
+/**
+ * Seed expenses
+ */
+async function seedExpenses(_db: any) {
+  console.log("\n💸 Seeding Expenses...");
+
+  const expenseData = [
+    {
+      category: "utilities",
+      description: "Électricité studio - Décembre 2024",
+      vendor: "EDF",
+      amount: "450.00",
+      currency: "EUR",
+      taxAmount: "90.00",
+      expenseDate: new Date("2024-12-31"),
+      paidAt: new Date("2025-01-05"),
+      paymentMethod: "bank_transfer",
+      referenceNumber: "EDF-2024-12",
+      status: "paid",
+      isRecurring: true,
+    },
+    {
+      category: "maintenance",
+      description: "Maintenance console SSL",
+      vendor: "SSL France",
+      amount: "850.00",
+      currency: "EUR",
+      taxAmount: "170.00",
+      expenseDate: new Date("2025-01-10"),
+      paidAt: new Date("2025-01-10"),
+      paymentMethod: "card",
+      referenceNumber: "SSL-MNT-2025-01",
+      status: "paid",
+      isRecurring: false,
+    },
+  ];
+
+  // await db.insert(expenses).values(expenseData);
+  console.log(`  ✅ Created ${expenseData.length} expenses`);
+}
+
+/**
+ * Seed notifications
+ */
+async function seedNotifications(_db: any, insertedClients: any[], insertedSessions: any[]) {
+  console.log("\n🔔 Seeding Notifications...");
+
+  const notificationData = [
+    {
+      type: "reminder",
+      priority: "high",
+      title: "Session à venir",
+      message: "Rappel: Session d'enregistrement demain à 10h00",
+      actionUrl: `/sessions/${insertedSessions[2].id}`,
+      actionLabel: "Voir la session",
+      isRead: false,
+      sessionId: insertedSessions[2].id,
+    },
+    {
+      type: "success",
+      priority: "normal",
+      title: "Paiement reçu",
+      message: "Paiement de 360.00€ reçu de Sophie Martin",
+      clientId: insertedClients[0].id,
+      isRead: true,
+      readAt: new Date(),
+    },
+  ];
+
+  // await db.insert(notifications).values(notificationData);
+  console.log(`  ✅ Created ${notificationData.length} notifications`);
+}
+
+/**
+ * Seed client portal accounts
+ */
+async function seedClientPortalAccounts(_db: any, insertedClients: any[]) {
+  console.log("\n🔐 Seeding Client Portal Accounts...");
+
+  const accountData = [
+    {
+      clientId: insertedClients[0].id,
+      email: "sophie.martin@example.com",
+      emailVerified: true,
+      emailVerifiedAt: new Date("2024-11-15"),
+      lastLoginAt: new Date("2025-01-15"),
+      loginCount: 23,
+      isActive: true,
+      isLocked: false,
+    },
+    {
+      clientId: insertedClients[1].id,
+      email: "marc.dubois@example.com",
+      emailVerified: true,
+      emailVerifiedAt: new Date("2024-12-01"),
+      lastLoginAt: new Date("2025-01-14"),
+      loginCount: 15,
+      isActive: true,
+      isLocked: false,
+    },
+  ];
+
+  // await db.insert(clientPortalAccounts).values(accountData);
+  console.log(`  ✅ Created ${accountData.length} client portal accounts`);
+}
+
+/**
+ * Main seed function
+ */
+async function main() {
+  console.log("🚀 Recording Studio Manager - Tenant Data Seeder\n");
+
+  const tenantDbName = process.env.TENANT_DB_NAME;
+  if (!tenantDbName) {
+    throw new Error("TENANT_DB_NAME environment variable is required (e.g., tenant_6)");
+  }
+
+  console.log(`📊 Target database: ${tenantDbName}\n`);
+  console.log("⚠️  Warning: This will add fictional data to the database\n");
+
+  try {
+    // Parse organization ID from tenant database name (e.g., "tenant_6" → 6)
+    const organizationId = parseInt(tenantDbName.replace("tenant_", ""), 10);
+    const db = await getTenantDb(organizationId);
+
+    // Seed in order (respecting foreign key constraints)
+    const insertedClients = await seedClients(db);
+    const insertedRooms = await seedRooms(db);
+    const insertedEquipment = await seedEquipment(db, insertedRooms);
+    const insertedSessions = await seedSessions(db, insertedClients, insertedRooms);
+    const insertedProjects = await seedProjects(db, insertedClients);
+    const insertedTracks = await seedTracks(db, insertedProjects, insertedRooms);
+    const insertedMusicians = await seedMusicians(db);
+    const insertedInvoices = await seedInvoices(db, insertedClients);
+    await seedInvoiceItems(db, insertedInvoices);
+    await seedExpenses(db);
+    await seedNotifications(db, insertedClients, insertedSessions);
+    await seedClientPortalAccounts(db, insertedClients);
+
+    console.log("\n✅ ✅ ✅ TENANT DATA SEEDED! ✅ ✅ ✅\n");
+    console.log("📊 Summary:");
+    console.log(`   - Database: ${tenantDbName}`);
+    console.log(`   - Clients: ${insertedClients.length}`);
+    console.log(`   - Rooms: ${insertedRooms.length}`);
+    console.log(`   - Equipment: ${insertedEquipment.length}`);
+    console.log(`   - Sessions: ${insertedSessions.length}`);
+    console.log(`   - Projects: ${insertedProjects.length}`);
+    console.log(`   - Tracks: ${insertedTracks.length}`);
+    console.log(`   - Musicians: ${insertedMusicians.length}`);
+    console.log(`   - Invoices: ${insertedInvoices.length}\n`);
+
+    console.log("🎯 Next Steps:");
+    console.log("   1. Login to the admin dashboard");
+    console.log("   2. Verify all data appears correctly");
+    console.log("   3. Test all features with realistic data\n");
+
+  } catch (error) {
+    console.error("\n❌ Seeding failed:", error);
+    process.exit(1);
+  } finally {
+    await closeAllConnections();
+  }
+}
+
+// Run if executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}
+
+export { main as seedTenantData };

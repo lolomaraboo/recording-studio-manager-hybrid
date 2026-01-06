@@ -1,0 +1,334 @@
+=== AUTO-BUILD PROGRESS ===
+
+Project: Recording Studio Manager - File Organization Audit
+Workspace: 001-verify-file-organization-and-correct-placement
+Started: 2026-01-02 08:59:17
+
+Workflow Type: investigation
+Rationale: Read-only exploratory task focused on analyzing and documenting the current state
+of codebase organization across all 4 packages (database, server, shared, client) and root
+directory. No code changes - only assessment and reporting.
+
+Session 1 (Planner):
+- Created implementation_plan.json
+- Phases: 4 (Inventory, Analyze, Detect Issues, Report)
+- Total subtasks: 14
+- Created init.sh
+- Created build-progress.txt
+
+Phase Summary:
+
+Phase 1 - Complete Directory Inventory (investigation):
+  - 3 subtasks, depends on []
+  - Generate directory tree, inventory root files, survey packages
+
+Phase 2 - File Location Analysis (investigation):
+  - 5 subtasks, depends on [phase-1-inventory]
+  - Identify misplaced tests, docs, images, scripts
+  - Check package structure compliance
+
+Phase 3 - Issue Detection (investigation):
+  - 4 subtasks, depends on [phase-2-analyze]
+  - Detect orphaned files, duplicates
+  - Check .gitignore and config locations
+
+Phase 4 - Generate Audit Report (implementation):
+  - 4 subtasks (1 to create report, 3 to populate)
+  - depends on [phase-3-detect-issues]
+  - Create comprehensive markdown report with findings
+
+Services Involved:
+- All services (project-wide audit)
+  - database: Drizzle ORM package
+  - server: Express API backend
+  - shared: Utility library
+  - client: React + Vite frontend
+
+Key Investigation Areas:
+- Root directory: ~100+ files (many test files, scripts, images at root)
+- Test files: 20+ .spec.ts, .mjs, .sh files scattered at root
+- Documentation: 13+ .md files (some should be in docs/)
+- Screenshots: Multiple .png files (should be in screenshots/)
+- Scripts: Various .mjs and .sh files (should be in scripts/)
+
+Parallelism Analysis:
+- Max parallel phases: 1
+- Recommended workers: 1
+- Sequential execution required
+- Reasoning: Investigation workflow requires sequential analysis:
+  inventory → analyze → detect issues → report generation
+
+Verification Strategy:
+- Risk level: trivial (read-only, zero code changes)
+- Skip validation: false (minimal mode enabled)
+- Manual checks only - verify report completeness
+- No tests, security scans, or deployments required
+
+=== STARTUP COMMAND ===
+
+To continue building this spec, run:
+
+  source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 001 --parallel 1
+
+Example with explicit spec number:
+
+  source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 001 --parallel 1
+
+=== EXPECTED OUTPUT ===
+
+Deliverable: file-organization-audit-report.md
+
+Report Sections:
+- Executive Summary: High-level assessment of organization health
+- Directory Structure Overview: Tree visualization
+- Findings: Well-organized areas + issues detected
+- Statistics: Total files, misplaced count, orphaned count
+- Recommendations: Prioritized action items
+
+=== CRITICAL CONSTRAINTS ===
+
+⚠️  READ-ONLY TASK - NO FILE MODIFICATIONS ALLOWED
+- Do not move, rename, or delete any files
+- Do not modify any configuration files
+- Only create the audit report file
+- Verify git working tree stays clean (except report)
+
+=== END SESSION 1 ===
+
+=== SESSION 2 - Coder Agent (Implementation) ===
+
+Started: 2026-01-02
+
+--- Subtask 1-1: Generate complete directory tree structure ---
+Status: COMPLETED
+
+Findings:
+- Total files: 696 (excluding node_modules and .git)
+- Total directories: 92
+
+Directory structure mapped:
+- packages/database: Drizzle ORM, migrations, scripts
+- packages/server: Express/tRPC backend, routers, middleware, services
+- packages/shared: Common types and utilities
+- packages/client: React/Vite frontend, components, pages, hooks
+
+Other notable directories:
+- .planning/: Extensive project planning documentation (45+ phases)
+- .claude/: Claude Code tooling and workflows
+- e2e/: End-to-end test suites
+- scripts/: Deployment and utility scripts
+- nginx/: Production configuration
+- docs/: Deployment documentation
+- screenshots/: Test screenshots
+
+Root-level observations (to analyze in next subtasks):
+- Many test files at root (.spec.ts, .mjs, .sh)
+- Several PNG screenshots at root
+- Multiple markdown docs at root
+- Configuration files (docker-compose variants, package.json)
+
+Verification: PASSED (696 > 0)
+
+--- Subtask 2-1: Identify misplaced test files ---
+Status: COMPLETED
+
+TOTAL MISPLACED TEST FILES: 39
+
+1. ROOT-LEVEL TEST FILES (28 files - should be in e2e/):
+   .spec.ts files (11):
+   - test-auth-final.spec.ts
+   - test-auth-login.spec.ts
+   - test-auth-verification.spec.ts
+   - test-cors-https.spec.ts
+   - test-debug-register.spec.ts
+   - test-global-search.spec.ts
+   - test-homepage-check.spec.ts
+   - test-multitenant-subdomain.spec.ts
+   - test-production-dashboard.spec.ts
+   - test-projects-e2e.spec.ts
+   - test-signup-validation.spec.ts
+
+   test-*.mjs files (14):
+   - test-booking-flow.mjs
+   - test-chatbot-playwright.mjs
+   - test-chatbot-simple.mjs
+   - test-chatbot.mjs
+   - test-client-login-flow.mjs
+   - test-client-portal.mjs
+   - test-production-validation.mjs
+   - test-profile-page.mjs
+   - test-register.mjs
+   - test-responsive-sidebar.mjs
+   - test-signup-debug.mjs
+   - test-signup-flow.mjs
+   - test-stripe-checkout.mjs
+   - test-stripe-payment.mjs
+
+   test-*.sh files (3):
+   - test-billing.sh
+   - test-login-api.sh
+   - test-no-500-errors.sh
+
+2. SERVER PACKAGE ROOT TEST FILES (9 files - should be in src/__tests__/):
+   - test-ai-actions-complete.ts
+   - test-ai-actions-simple.ts
+   - test-ai-direct.ts
+   - test-ai-quick.ts
+   - test-chatbot-complete.ts
+   - test-hallucination-detector.ts
+   - test-llm-direct.ts
+   - test-remaining-actions.ts
+   - test-tenant-query.ts
+
+3. CLIENT PACKAGE ROOT TEST FILES (1 file - should be in e2e/):
+   - test-register-page.mjs
+
+4. DATABASE PACKAGE ROOT TEST FILES (1 file - should be in src/__tests__/):
+   - test-filter.ts
+
+PROPER TEST LOCATIONS (already exist):
+- ./e2e/ - Organized e2e test suites (auth/, crud/, features/, etc.)
+- ./packages/server/src/__tests__/ - Server unit/integration tests
+- ./packages/client/e2e/ - Client-specific e2e tests
+- ./packages/database/src/__tests__/ - Database tests
+
+Recommendations:
+- Move root .spec.ts files → e2e/ (create appropriate subdirs)
+- Move root test-*.mjs files → e2e/helpers/ or e2e/scripts/
+- Move root test-*.sh files → scripts/ or e2e/scripts/
+- Move packages/server/test-*.ts → packages/server/src/__tests__/
+- Move packages/client/test-*.mjs → packages/client/e2e/
+- Move packages/database/test-*.ts → packages/database/src/__tests__/
+
+Verification: PASSED (28 root-level test files found)
+
+--- Subtask 2-5: Check package structure compliance ---
+Status: COMPLETED
+
+Package Structure Compliance Check (src/, package.json, tsconfig.json):
+
+All 4 packages PASS core structure requirements:
+
+✅ client/ - CORE COMPLIANT
+   - src/ ✓ (contains components/, contexts/, hooks/, lib/, pages/)
+   - package.json ✓
+   - tsconfig.json ✓
+   - Additional valid: e2e/, Dockerfiles, vite.config.ts, tailwind.config.ts
+   - ⚠️ Misplaced: test-register-page.mjs (should be in e2e/)
+
+✅ database/ - CORE COMPLIANT
+   - src/ ✓ (contains connection.ts, master/, tenant/, scripts/, __tests__/)
+   - package.json ✓
+   - tsconfig.json ✓
+   - Additional valid: drizzle/, scripts/, drizzle.config.*.ts, vitest.config.ts
+   - ⚠️ Misplaced at root (7 files - should be in scripts/):
+     * check-talents.ts
+     * create-tenant4.ts
+     * get-tenant-db-name.ts
+     * list-databases.ts
+     * migrate-tenant.ts
+     * migrate-vcard.ts
+     * test-filter.ts
+
+✅ server/ - CORE COMPLIANT
+   - src/ ✓ (contains _core/, lib/, middleware/, routers/, routes/, scripts/, services/, utils/, webhooks/, __tests__/)
+   - package.json ✓
+   - tsconfig.json ✓
+   - Additional valid: Dockerfiles, vitest.config.ts, .env.example
+   - ⚠️ Misplaced at root (9 files - should be in src/__tests__/):
+     * test-ai-actions-complete.ts
+     * test-ai-actions-simple.ts
+     * test-ai-direct.ts
+     * test-ai-quick.ts
+     * test-chatbot-complete.ts
+     * test-hallucination-detector.ts
+     * test-llm-direct.ts
+     * test-remaining-actions.ts
+     * test-tenant-query.ts
+
+✅ shared/ - FULLY COMPLIANT (cleanest structure)
+   - src/ ✓ (contains types/, constants.ts, types.ts, utils.ts, index.ts)
+   - package.json ✓
+   - tsconfig.json ✓
+   - No misplaced files - exemplary organization
+
+SUMMARY:
+- Core structure: 4/4 packages PASS (100%)
+- Files needing relocation within packages: 17
+  * client: 1 file
+  * database: 7 files
+  * server: 9 files
+  * shared: 0 files (clean)
+
+Verification: PASSED (all packages have required src/, package.json, tsconfig.json)
+
+--- Subtask 3-1: Detect orphaned files ---
+Status: COMPLETED
+
+ORPHANED FILES DETECTED: 21 files total
+
+1. BACKUP FILES (1 file - DEFINITE ORPHAN, should be deleted):
+   - packages/database/src/scripts/seed-tenant-data.ts.bak
+
+2. ONE-OFF DATABASE SCRIPTS with hardcoded connections (7 files):
+   Location: packages/database/ root
+   Reason: All have hardcoded tenant IDs or connection strings for specific debug sessions
+
+   - check-talents.ts → Hardcoded tenant_4, one-off debug query
+   - create-tenant4.ts → Hardcoded tenant_4, one-time setup script
+   - get-tenant-db-name.ts → Hardcoded org 4, one-off lookup
+   - list-databases.ts → Hardcoded localhost connection, one-off utility
+   - migrate-tenant.ts → Manual migration, superseded by drizzle migrations
+   - migrate-vcard.ts → Hardcoded VPS IP (167.99.254.57!), specific migration
+   - test-filter.ts → Hardcoded tenant_4, debug test script
+
+3. ONE-OFF FIX SCRIPTS (1 file):
+   - packages/server/src/scripts/fix-tenant-7.ts → Hardcoded org 7, one-time fix
+
+   Note: packages/server/src/scripts/fix-tenants.ts is a GENERIC fix script (may still be useful)
+
+4. DEBUG SCREENSHOTS (6 files - artifacts from debugging sessions):
+   Location: screenshots/
+   Reason: Timestamped debug artifacts, not regular test output
+
+   - debug-workflow1-error-1766750948802.png
+   - debug-workflow1-error-1766757649654.png
+   - debug-workflow2-error-1766757648899.png
+   - debug-workflow3-error-1766757645476.png
+   - debug-workflow4-error-1766757649540.png
+   - debug-workflow5-error-1766757666808.png
+
+5. DEBUG TEST FILES at root (2 files):
+   Reason: Files with "debug" prefix are for one-off debugging, not regular testing
+
+   - test-debug-register.spec.ts → Debug-specific test (should be in e2e/ if kept)
+   - test-signup-debug.mjs → Debug test script (should be in e2e/ if kept)
+
+6. PLANNING ERROR SCREENSHOTS (1 file):
+   - .planning/phases/3.4-comprehensive-site-testing/errors/error-004-clients-400.png
+   Reason: Archived error from completed testing phase
+
+POTENTIALLY ORPHANED (2 files - need review):
+   - STATUS_CURRENT.md (root) → Status tracking dated 2025-12-23, may be outdated
+   - packages/server/src/scripts/fix-tenants.ts → Generic fix script, may still be useful
+
+IDENTIFICATION CRITERIA USED:
+1. Backup file extensions (.bak, .backup, .old, .orig)
+2. Hardcoded tenant IDs in scripts (tenant_4, org 7)
+3. Hardcoded IP addresses (167.99.254.57)
+4. "debug" prefix/suffix in filenames
+5. Timestamped filenames indicating one-off usage
+6. Scripts superseded by formal migration tools (drizzle)
+7. Files unreferenced anywhere else in codebase
+
+RECOMMENDATIONS:
+- DELETE: Backup files (seed-tenant-data.ts.bak)
+- DELETE: All 7 one-off database scripts with hardcoded values
+- DELETE: fix-tenant-7.ts (one-time fix completed)
+- DELETE: 6 debug screenshots if debug session is complete
+- MOVE/DELETE: 2 debug test files (to e2e/ if still needed, delete if not)
+- REVIEW: STATUS_CURRENT.md (move to .planning/ or update/delete)
+- KEEP: fix-tenants.ts (generic utility, may be useful)
+
+Verification: PASSED (21 orphaned files identified with clear reasoning)
+

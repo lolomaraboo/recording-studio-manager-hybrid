@@ -1083,3 +1083,25 @@ export const timeEntries = pgTable("time_entries", {
 
 export type TimeEntry = typeof timeEntries.$inferSelect;
 export type InsertTimeEntry = typeof timeEntries.$inferInsert;
+
+/**
+ * Time Tracking Relations
+ */
+export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
+  taskType: one(taskTypes, {
+    fields: [timeEntries.taskTypeId],
+    references: [taskTypes.id],
+  }),
+  session: one(sessions, {
+    fields: [timeEntries.sessionId],
+    references: [sessions.id],
+  }),
+  project: one(projects, {
+    fields: [timeEntries.projectId],
+    references: [projects.id],
+  }),
+}));
+
+export const taskTypesRelations = relations(taskTypes, ({ many }) => ({
+  timeEntries: many(timeEntries),
+}));

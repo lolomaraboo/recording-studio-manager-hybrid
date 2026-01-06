@@ -1,0 +1,384 @@
+"ID","Type","Prénom","Nom","Nom complet","Nom artiste","Email","Téléphone","Rue","Ville","Code postal","Région","Pays","Anniversaire","Genre","Notes"
+"1","Particulier","John","Doe","Test vCard Client",,"test@example.com",,,,,,,,,
+"2","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"3","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L",,,,,,,,,,
+"4","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"5","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"6","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"7","Particulier",,,,,,,,,,,,,,
+"8","Particulier",,,,,,,,,,,,,,
+"9","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"10","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"14","Particulier",,,"Sans nom",,,,,,,,,,,
+"16","Particulier",,,"Sans nom",,,,,,,,,,,
+"12","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"11","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"15","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"13","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"17","Particulier",,,"Sans nom",,,,,,,,,,,
+"18","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"19","Particulier",,,,,,,,,,,,,,
+"20","Particulier",,,,,,,,,,,,,,
+"21","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"22","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"24","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"25","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"26","Particulier",,,"Sans nom",,,,,,,,,,,
+"27","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"28","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"29","Particulier",,,"Sans nom",,,,,,,,,,,
+"31","Particulier",,,"Sans nom",,,,,,,,,,,
+"32","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"30","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"47","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"57","Particulier",,,"Sans nom",,,,,,,,,,,
+"67","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"77","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"87","Particulier",,,"Sans nom",,,,,,,,,,,
+"33","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"54","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"64","Particulier",,,"Sans nom",,,,,,,,,,,
+"70","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"79","Particulier",,,"Sans nom",,,,,,,,,,,
+"34","Particulier",,,"Sans nom",,,,,,,,,,,
+"52","Particulier",,,"Sans nom",,,,,,,,,,,
+"63","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"68","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"86","Particulier",,,"Sans nom",,,,,,,,,,,
+"89","Particulier",,,"Sans nom",,,,,,,,,,,
+"35","Particulier",,,"Sans nom",,,,,,,,,,,
+"36","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"44","Particulier",,,,,,,,,,,,,,
+"45","Particulier",,,"Sans nom",,,,,,,,,,,
+"51","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"65","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"72","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"81","Particulier",,,"Sans nom",,,,,,,,,,,
+"37","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"50","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"62","Particulier",,,"Sans nom",,,,,,,,,,,
+"71","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"82","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"38","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"48","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"60","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"73","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"80","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"39","Particulier",,,"Sans nom",,,,,,,,,,,
+"42","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"46","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"56","Particulier",,,"Sans nom",,,,,,,,,,,
+"66","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"76","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"85","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"40","Particulier",,,"Sans nom",,,,,,,,,,,
+"43","Particulier",,,,,,,,,,,,,,
+"53","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"61","Particulier",,,"Sans nom",,,,,,,,,,,
+"69","Particulier",,,"Sans nom",,,,,,,,,,,
+"83","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"55","Particulier",,,"Sans nom",,,,,,,,,,,
+"58","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"75","Particulier",,,"Sans nom",,,,,,,,,,,
+"84","Particulier",,,"Sans nom",,,,,,,,,,,
+"90","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"103","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"113","Particulier",,,"Sans nom",,,,,,,,,,,
+"124","Particulier",,,"Sans nom",,,,,,,,,,,
+"131","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"140","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"155","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"164","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"178","Particulier",,,"Sans nom",,,,,,,,,,,
+"91","Particulier",,,,,,,,,,,,,,
+"94","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"104","Particulier",,,"Sans nom",,,,,,,,,,,
+"110","Particulier",,,"Sans nom",,,,,,,,,,,
+"118","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"129","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"142","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"151","Particulier",,,"Sans nom",,,,,,,,,,,
+"165","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"177","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"92","Particulier",,,,,,,,,,,,,,
+"93","Particulier",,,"Sans nom",,,,,,,,,,,
+"100","Particulier",,,"Sans nom",,,,,,,,,,,
+"111","Particulier",,,"Sans nom",,,,,,,,,,,
+"125","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"130","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"143","Particulier",,,"Sans nom",,,,,,,,,,,
+"157","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"166","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"176","Particulier",,,"Sans nom",,,,,,,,,,,
+"95","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"107","Particulier",,,"Sans nom",,,,,,,,,,,
+"117","Particulier",,,"Sans nom",,,,,,,,,,,
+"128","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"141","Particulier",,,"Sans nom",,,,,,,,,,,
+"149","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"159","Particulier",,,"Sans nom",,,,,,,,,,,
+"169","Particulier",,,"Sans nom",,,,,,,,,,,
+"181","Particulier",,,"Sans nom",,,,,,,,,,,
+"96","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"105","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"120","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"134","Particulier",,,"Sans nom",,,,,,,,,,,
+"145","Particulier",,,"Sans nom",,,,,,,,,,,
+"153","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"162","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"171","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"179","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"185","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"97","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"106","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"116","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"126","Particulier",,,"Sans nom",,,,,,,,,,,
+"132","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"138","Particulier",,,"Sans nom",,,,,,,,,,,
+"147","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"156","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"168","Particulier",,,"Sans nom",,,,,,,,,,,
+"174","Particulier",,,"Sans nom",,,,,,,,,,,
+"184","Particulier",,,"Sans nom",,,,,,,,,,,
+"98","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"109","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"121","Particulier",,,"Sans nom",,,,,,,,,,,
+"136","Particulier",,,"Sans nom",,,,,,,,,,,
+"144","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"154","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"161","Particulier",,,"Sans nom",,,,,,,,,,,
+"172","Particulier",,,"Sans nom",,,,,,,,,,,
+"182","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"99","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"108","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"115","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"119","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"127","Particulier",,,"Sans nom",,,,,,,,,,,
+"137","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"148","Particulier",,,"Sans nom",,,,,,,,,,,
+"158","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"163","Particulier",,,"Sans nom",,,,,,,,,,,
+"173","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"183","Particulier",,,"Sans nom",,,,,,,,,,,
+"101","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"112","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"122","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"135","Particulier",,,"Sans nom",,,,,,,,,,,
+"146","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"152","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"160","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"170","Particulier",,,"Sans nom",,,,,,,,,,,
+"180","Particulier",,,"Sans nom",,,,,,,,,,,
+"102","Particulier",,,"Sans nom",,,,,,,,,,,
+"114","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"123","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"133","Particulier",,,"Sans nom",,,,,,,,,,,
+"139","Particulier",,,"Sans nom",,,,,,,,,,,
+"150","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"167","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"175","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"186","Particulier",,,"Sans nom",,,,,,,,,,,
+"188","Particulier",,,,,,,,,,,,,,
+"200","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"214","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"222","Particulier",,,"Sans nom",,,,,,,,,,,
+"233","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"242","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"252","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"263","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"270","Particulier",,,"Sans nom",,,,,,,,,,,
+"283","Particulier",,,"Sans nom",,,,,,,,,,,
+"297","Particulier",,,"Sans nom",,,,,,,,,,,
+"304","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"311","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"321","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"326","Particulier",,,"Sans nom",,,,,,,,,,,
+"341","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"351","Particulier",,,"Sans nom",,,,,,,,,,,
+"359","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"369","Particulier",,,"Sans nom",,,,,,,,,,,
+"379","Particulier",,,"Sans nom",,,,,,,,,,,
+"187","Particulier",,,,,,,,,,,,,,
+"195","Particulier",,,"Sans nom",,,,,,,,,,,
+"206","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"217","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"226","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"240","Particulier",,,"Sans nom",,,,,,,,,,,
+"248","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"257","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"266","Particulier",,,"Sans nom",,,,,,,,,,,
+"275","Particulier",,,"Sans nom",,,,,,,,,,,
+"280","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"292","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"300","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"310","Particulier",,,"Sans nom",,,,,,,,,,,
+"313","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"324","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"333","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"338","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"349","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"360","Particulier",,,"Sans nom",,,,,,,,,,,
+"378","Particulier",,,"Sans nom",,,,,,,,,,,
+"189","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"196","Particulier",,,"Sans nom",,,,,,,,,,,
+"215","Particulier",,,"Sans nom",,,,,,,,,,,
+"221","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"231","Particulier",,,"Sans nom",,,,,,,,,,,
+"241","Particulier",,,"Sans nom",,,,,,,,,,,
+"247","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"254","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"264","Particulier",,,"Sans nom",,,,,,,,,,,
+"269","Particulier",,,"Sans nom",,,,,,,,,,,
+"285","Particulier",,,"Sans nom",,,,,,,,,,,
+"291","Particulier",,,"Sans nom",,,,,,,,,,,
+"306","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"312","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"329","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"339","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"353","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"365","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"377","Particulier",,,"Sans nom",,,,,,,,,,,
+"190","Particulier",,,"Sans nom",,,,,,,,,,,
+"199","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"208","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"219","Particulier",,,"Sans nom",,,,,,,,,,,
+"229","Particulier",,,"Sans nom",,,,,,,,,,,
+"239","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"245","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"255","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"265","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"276","Particulier",,,"Sans nom",,,,,,,,,,,
+"278","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"288","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"298","Particulier",,,"Sans nom",,,,,,,,,,,
+"303","Particulier",,,"Sans nom",,,,,,,,,,,
+"318","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"327","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"336","Particulier",,,"Sans nom",,,,,,,,,,,
+"344","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"354","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"366","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"374","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"191","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"202","Particulier",,,"Sans nom",,,,,,,,,,,
+"207","Particulier",,,"Sans nom",,,,,,,,,,,
+"216","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"225","Particulier",,,"Sans nom",,,,,,,,,,,
+"236","Particulier",,,"Sans nom",,,,,,,,,,,
+"251","Particulier",,,"Sans nom",,,,,,,,,,,
+"259","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"274","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"277","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"287","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"294","Particulier",,,"Sans nom",,,,,,,,,,,
+"301","Particulier",,,"Sans nom",,,,,,,,,,,
+"315","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"323","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"335","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"345","Particulier",,,"Sans nom",,,,,,,,,,,
+"357","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"363","Particulier",,,"Sans nom",,,,,,,,,,,
+"376","Particulier",,,"Sans nom",,,,,,,,,,,
+"192","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"201","Particulier",,,"Sans nom",,,,,,,,,,,
+"212","Particulier",,,"Sans nom",,,,,,,,,,,
+"223","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"234","Particulier",,,"Sans nom",,,,,,,,,,,
+"243","Particulier",,,"Sans nom",,,,,,,,,,,
+"261","Particulier",,,"Sans nom",,,,,,,,,,,
+"271","Particulier",,,"Sans nom",,,,,,,,,,,
+"286","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"295","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"302","Particulier",,,"Sans nom",,,,,,,,,,,
+"319","Particulier",,,"Sans nom",,,,,,,,,,,
+"330","Particulier",,,"Sans nom",,,,,,,,,,,
+"343","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"352","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"367","Particulier",,,"Sans nom",,,,,,,,,,,
+"375","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"193","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"203","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"211","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"220","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"230","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"238","Particulier",,,"Sans nom",,,,,,,,,,,
+"249","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"260","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"273","Particulier",,,"Sans nom",,,,,,,,,,,
+"281","Particulier",,,"Sans nom",,,,,,,,,,,
+"289","Particulier",,,"Sans nom",,,,,,,,,,,
+"309","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"320","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"325","Particulier",,,"Sans nom",,,,,,,,,,,
+"334","Particulier",,,"Sans nom",,,,,,,,,,,
+"346","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"356","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"364","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"372","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"194","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"204","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"210","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"224","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"237","Particulier",,,"Sans nom",,,,,,,,,,,
+"246","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"256","Particulier",,,"Sans nom",,,,,,,,,,,
+"268","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"282","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"296","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"299","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"307","Particulier",,,"Sans nom",,,,,,,,,,,
+"317","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"331","Particulier",,,"Sans nom",,,,,,,,,,,
+"342","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"350","Particulier",,,"Sans nom",,,,,,,,,,,
+"361","Particulier",,,"Sans nom",,,,,,,,,,,
+"370","Particulier",,,"Sans nom",,,,,,,,,,,
+"197","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"209","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"218","Particulier",,,"Sans nom",,,,,,,,,,,
+"228","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"232","Particulier",,,"Sans nom",,,,,,,,,,,
+"244","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"253","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"262","Particulier",,,"Sans nom",,,,,,,,,,,
+"272","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"284","Particulier",,,"Sans nom",,,,,,,,,,,
+"293","Particulier",,,"Sans nom",,,,,,,,,,,
+"305","Particulier",,,"Sans nom",,,,,,,,,,,
+"316","Particulier",,,"Sans nom",,,,,,,,,,,
+"328","Particulier",,,"Sans nom",,,,,,,,,,,
+"340","Particulier",,,"Sans nom",,,,,,,,,,,
+"348","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"358","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"368","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"373","Particulier",,,"Sans nom",,,,,,,,,,,
+"198","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"205","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"213","Particulier",,,"Sans nom",,,,,,,,,,,
+"227","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"235","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"250","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"258","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"267","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"279","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"290","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"308","Particulier",,,"Sans nom",,,,,,,,,,,
+"314","Particulier","John","Doe","Test vCard Client",,"john@work.com","+33612345678",,,,,,,,
+"322","Particulier",,,"Sophie Dubois",,,,,,,,,,,
+"332","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"337","Particulier",,,"Sans nom",,,,,,,,,,,
+"347","Particulier",,,"Sans nom",,,,,,,,,,,
+"355","Particulier",,,"Sans nom",,,,,,,,,,,
+"362","Particulier",,,"Sans nom",,,,,,,,,,,
+"371","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"380","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"381","Particulier",,,"Sans nom",,,,,,,,,,,
+"382","Particulier",,,"Sans nom",,,,,,,,,,,
+"383","Particulier",,,"Sans nom",,,,,,,,,,,
+"23","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"41","Particulier",,,"Sans nom",,,,,,,,,,,
+"49","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"
+"59","Particulier","Marc","Lefebvre","Marc Lefebvre","Marc L","marc.lefebvre@example.com","+33 7 89 01 23 45",,,,,,,,
+"74","Particulier",,,"Sans nom",,,,,,,,,,,
+"78","Particulier",,,"Sans nom",,,,,,,,,,,
+"88","Particulier","Charlie","Rousseau","Charlie Rousseau",,"charlie@work.com","+33612345678","10 Rue de la Paix","Paris","75002","Île-de-France","France","1990-03-15","M","Client import test vCard"

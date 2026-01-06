@@ -1,0 +1,537 @@
+import { useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { trpc } from "@/lib/trpc";
+import {
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Download,
+  Send,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  User,
+  FileText,
+} from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { toast } from "sonner";
+
+export default function QuoteDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // Fetch quote data
+  const { data: quote, isLoading, refetch } = trpc.quotes.get.useQuery(
+    { id: Number(id) },
+    { enabled: !!id }
+  );
+
+  // Fetch related data
+  const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
+
+  // Mutations
+  const updateMutation = trpc.quotes.update.useMutation({
+    onSuccess: () => {
+      toast.success("Devis mis à jour");
+      setIsEditing(false);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const deleteMutation = trpc.quotes.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Devis supprimé");
+      navigate("/quotes");
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  // Form state
+  const [formData, setFormData] = useState({
+    quoteNumber: quote?.quoteNumber || "",
+    clientId: quote?.clientId || 0,
+    title: quote?.title || "",
+    description: quote?.description || "",
+    issueDate: quote?.issueDate ? new Date(quote.issueDate).toISOString().slice(0, 10) : "",
+    validUntil: quote?.validUntil ? new Date(quote.validUntil).toISOString().slice(0, 10) : "",
+    status: quote?.status || "draft",
+    subtotal: quote?.subtotal || "",
+    taxRate: quote?.taxRate || "20.00",
+    taxAmount: quote?.taxAmount || "",
+    total: quote?.total || "",
+    terms: quote?.terms || "",
+    notes: quote?.notes || "",
+  });
+
+  // Update form when quote loads
+  useState(() => {
+    if (quote) {
+      setFormData({
+        quoteNumber: quote.quoteNumber,
+        clientId: quote.clientId,
+        title: quote.title || "",
+        description: quote.description || "",
+        issueDate: new Date(quote.issueDate).toISOString().slice(0, 10),
+        validUntil: new Date(quote.validUntil).toISOString().slice(0, 10),
+        status: quote.status,
+        subtotal: quote.subtotal,
+        taxRate: quote.taxRate,
+        taxAmount: quote.taxAmount,
+        total: quote.total,
+        terms: quote.terms || "",
+        notes: quote.notes || "",
+      });
+    }
+  });
+
+  const handleSave = () => {
+    updateMutation.mutate({
+      id: Number(id),
+      title: formData.title,
+      description: formData.description,
+      validUntil: new Date(formData.validUntil),
+      status: formData.status as "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted",
+      subtotal: formData.subtotal,
+      taxRate: formData.taxRate,
+      taxAmount: formData.taxAmount,
+      total: formData.total,
+      terms: formData.terms,
+      notes: formData.notes,
+    });
+  };
+
+  const handleDelete = () => {
+    deleteMutation.mutate({ id: Number(id) });
+  };
+
+  const handleDownloadPDF = () => {
+    toast.info(`Génération PDF devis ${quote?.quoteNumber} - À implémenter`);
+  };
+
+  const handleSendEmail = () => {
+    toast.info("Envoi email - À implémenter");
+  };
+
+  const handleConvertToInvoice = () => {
+    toast.info("Conversion en facture - À implémenter");
+  };
+
+  const handleAccept = () => {
+    updateMutation.mutate({
+      id: Number(id),
+      status: "accepted",
+    });
+  };
+
+  const handleReject = () => {
+    updateMutation.mutate({
+      id: Number(id),
+      status: "rejected",
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    const badges = {
+      draft: <Badge variant="secondary">Brouillon</Badge>,
+      sent: <Badge className="bg-blue-500">Envoyé</Badge>,
+      accepted: <Badge className="bg-green-500">Accepté</Badge>,
+      rejected: <Badge variant="destructive">Refusé</Badge>,
+      expired: <Badge variant="outline" className="text-gray-500">Expiré</Badge>,
+      converted: <Badge className="bg-purple-500">Converti</Badge>,
+    };
+    return badges[status as keyof typeof badges] || badges.draft;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  if (!quote) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 gap-4">
+        <FileText className="h-12 w-12 text-muted-foreground" />
+        <p className="text-muted-foreground">Devis introuvable</p>
+        <Link to="/quotes">
+          <Button variant="outline">Retour aux devis</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const client = clients?.find((c: any) => c.id === quote.clientId);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link to="/quotes">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">Devis {quote.quoteNumber}</h1>
+            <p className="text-muted-foreground">
+              {client ? `${client.name}` : "Client non trouvé"}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {!isEditing ? (
+            <>
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+                <Download className="mr-2 h-4 w-4" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleSendEmail}>
+                <Send className="mr-2 h-4 w-4" />
+                Envoyer
+              </Button>
+              {quote.status === "draft" && (
+                <Button variant="outline" size="sm" onClick={() => handleSave()}>
+                  <Send className="mr-2 h-4 w-4" />
+                  Marquer envoyé
+                </Button>
+              )}
+              {quote.status === "sent" && (
+                <>
+                  <Button variant="outline" size="sm" className="bg-green-50" onClick={handleAccept}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Accepter
+                  </Button>
+                  <Button variant="outline" size="sm" className="bg-red-50" onClick={handleReject}>
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Refuser
+                  </Button>
+                </>
+              )}
+              {quote.status === "accepted" && (
+                <Button size="sm" onClick={handleConvertToInvoice}>
+                  Convertir en facture
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Modifier
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Supprimer
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                <X className="mr-2 h-4 w-4" />
+                Annuler
+              </Button>
+              <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
+                <Save className="mr-2 h-4 w-4" />
+                Enregistrer
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Quote Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Informations du devis</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!isEditing ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">N° Devis</p>
+                      <p className="font-medium">{quote.quoteNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Statut</p>
+                      <div className="mt-1">{getStatusBadge(quote.status)}</div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Date d'émission</p>
+                      <p className="font-medium">
+                        {format(new Date(quote.issueDate), "PPP", { locale: fr })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Valide jusqu'au</p>
+                      <p className="font-medium">
+                        {format(new Date(quote.validUntil), "PPP", { locale: fr })}
+                      </p>
+                    </div>
+                  </div>
+                  {quote.title && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Titre</p>
+                      <p className="font-medium">{quote.title}</p>
+                    </div>
+                  )}
+                  {quote.description && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Description</p>
+                      <p className="whitespace-pre-wrap">{quote.description}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="quoteNumber">N° Devis</Label>
+                      <Input
+                        id="quoteNumber"
+                        value={formData.quoteNumber}
+                        onChange={(e) => setFormData({ ...formData, quoteNumber: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Statut</Label>
+                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Brouillon</SelectItem>
+                          <SelectItem value="sent">Envoyé</SelectItem>
+                          <SelectItem value="accepted">Accepté</SelectItem>
+                          <SelectItem value="rejected">Refusé</SelectItem>
+                          <SelectItem value="expired">Expiré</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="issueDate">Date d'émission</Label>
+                      <Input
+                        id="issueDate"
+                        type="date"
+                        value={formData.issueDate}
+                        onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="validUntil">Valide jusqu'au</Label>
+                      <Input
+                        id="validUntil"
+                        type="date"
+                        value={formData.validUntil}
+                        onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Titre</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Titre du devis"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={4}
+                      placeholder="Description détaillée"
+                    />
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pricing */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Montants</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Sous-total</span>
+                  <span className="font-medium">{quote.subtotal} €</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    TVA ({quote.taxRate}%)
+                  </span>
+                  <span className="font-medium">{quote.taxAmount} €</span>
+                </div>
+                <div className="border-t pt-2 flex justify-between">
+                  <span className="font-semibold">Total</span>
+                  <span className="text-2xl font-bold">{quote.total} €</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Terms & Notes */}
+          {(quote.terms || quote.notes) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Conditions et notes</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {quote.terms && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Conditions</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {quote.terms}
+                    </p>
+                  </div>
+                )}
+                {quote.notes && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Notes</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {quote.notes}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Client Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Client
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {client ? (
+                <div className="space-y-2">
+                  <p className="font-medium">{client.name}</p>
+                  {client.email && (
+                    <p className="text-sm text-muted-foreground">{client.email}</p>
+                  )}
+                  {client.phone && (
+                    <p className="text-sm text-muted-foreground">{client.phone}</p>
+                  )}
+                  <Link to={`/clients/${client.id}`}>
+                    <Button variant="outline" size="sm" className="w-full mt-2">
+                      Voir le profil
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Client non trouvé</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Metadata */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Métadonnées
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Créé le</p>
+                <p className="text-sm font-medium">
+                  {format(new Date(quote.createdAt), "PPP", { locale: fr })}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Modifié le</p>
+                <p className="text-sm font-medium">
+                  {format(new Date(quote.updatedAt), "PPP", { locale: fr })}
+                </p>
+              </div>
+              {quote.convertedAt && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Converti le</p>
+                  <p className="text-sm font-medium">
+                    {format(new Date(quote.convertedAt), "PPP", { locale: fr })}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Delete Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Supprimer le devis</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

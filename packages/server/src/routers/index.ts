@@ -25,6 +25,7 @@ import { subscriptionsRouter } from './subscriptions.js';
 import { superadminRouter } from './superadmin.js';
 import { clientNotesRouter } from './clientNotes.js';
 import { serviceCatalogRouter } from './serviceCatalog.js';
+import { timeTrackingRouter } from './time-tracking.js';
 
 /**
  * Main App Router
@@ -84,6 +85,7 @@ export const appRouter = router({
   clientPortalDashboard: clientPortalDashboardRouter,
   clientPortalBooking: clientPortalBookingRouter,
   clientPortalStripe: clientPortalStripeRouter,
+  timeTracking: timeTrackingRouter,
 });
 
 /**
