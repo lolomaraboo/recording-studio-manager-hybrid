@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 11.5 of 17 (Catalogue de Services) - v4.0 Workflow Commercial Complet
-Plan: 11.5-02 (Services Management Page) - COMPLETE
-Status: Phase 11.5 in progress - 2/3 plans complete (11.5-03 remains)
-Last activity: 2026-01-06 - Plan 11.5-02 complete (Services CRUD page with search/filter)
+Plan: 11.5-03 (Quote Builder Integration) - COMPLETE
+Status: Phase 11.5 COMPLETE - 3/3 plans done
+Last activity: 2026-01-06 - Plan 11.5-03 complete (Autocomplete + catalog modal in quote creation)
 
-Progress: █████░░░░░ 58% (v4.0: 6/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5-01/02 complete)
+Progress: ██████░░░░ 59% (v4.0: 7/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 57
-- Average duration: 46.3 min
-- Total execution time: 45.55 hours
+- Total plans completed: 58
+- Average duration: 45.8 min
+- Total execution time: 45.87 hours
 
 **By Phase:**
 
@@ -64,11 +64,11 @@ Progress: █████░░░░░ 58% (v4.0: 6/? plans - Phase 10 complet
 | 3.14 | 4/4 | 170 min | 42.5 min |
 | 10 | 3/6 | 47 min | 15.7 min |
 | 11 | 1/3 | 795 min | 795 min |
-| 11.5 | 2/3 | 24 min | 12 min |
+| 11.5 | 3/3 | 43 min | 14.3 min |
 
 **Recent Trend:**
-- Last 5 plans: [5 min, 12 min, 795 min, 21 min, 3 min]
-- Trend: Backend operations consistently fast (3-21 min), frontend UI with checkpoint pause (795 min includes 12h pause)
+- Last 5 plans: [12 min, 795 min, 21 min, 3 min, 19 min]
+- Trend: Backend operations consistently fast (3-21 min), frontend UI with checkpoint pause (795 min includes 12h pause), Phase 11.5 complete average 14.3 min
 
 ## Accumulated Context
 
@@ -311,18 +311,18 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-06T04:36:44Z
-Stopped at: Phase 11.5-02 complete
+Last session: 2026-01-06T04:59:33Z
+Stopped at: Phase 11.5 COMPLETE (all 3 plans done)
 Resume context:
-  - Phase 11.5-02 complete (Service Catalog Management Page)
-  - Services.tsx page created (519 lines) with full CRUD interface
-  - Table view with 6 columns: Nom, Catégorie, Prix unitaire, TVA, Qté défaut, Actions
-  - Real-time search (300ms debounce) on name/description
-  - Category filter dropdown (4 categories)
-  - Create/edit modal with 6-field form and validation
-  - Delete confirmation AlertDialog with safety warning
-  - /services route registered in App.tsx
-  - Services link added to Sidebar (CONTACTS section, between Clients and Talents)
-  - Phase 11.5 now 2/3 plans complete (11.5-03 remains)
-  - Next: Plan Phase 11.5-03 (Quote Builder Integration - autocomplete + catalog modal)
+  - Phase 11.5-03 complete (Quote Builder Integration)
+  - QuoteCreate.tsx enhanced with dual service catalog access:
+    1. Autocomplete in description field (fuzzy search, keyboard nav, auto-fill)
+    2. "Du catalogue" button with category-filtered modal (table view, click-to-add)
+  - Per-line tax rate override implemented (LineItem.taxRate optional field)
+  - Tax calculation supports mixed rates per line (10% + 20% in same quote)
+  - Visual Badge indicator shows "TVA X%" when line differs from quote default
+  - Empty state in catalog modal links to /services page
+  - Fixed pre-existing bug: added alert-dialog component (Services.tsx now works)
+  - Phase 11.5 COMPLETE: Service catalog fully functional (database → UI → quote integration)
+  - Next: Return to Phase 11 remaining plans OR proceed to Phase 12 (Tasks Chronométrées)
 Resume file: None
