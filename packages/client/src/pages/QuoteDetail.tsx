@@ -72,6 +72,83 @@ export default function QuoteDetail() {
     },
   });
 
+  const generatePDFMutation = trpc.quotes.generatePDF.useMutation({
+    onSuccess: (result) => {
+      // Decode base64 to binary
+      const binaryString = atob(result.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // Create blob and download
+      const blob = new Blob([bytes], { type: result.mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(`PDF téléchargé: ${result.filename}`);
+    },
+    onError: (error) => {
+      toast.error(`Erreur PDF: ${error.message}`);
+    },
+  });
+
+  const sendMutation = trpc.quotes.send.useMutation({
+    onSuccess: () => {
+      toast.success("Devis envoyé au client");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const acceptMutation = trpc.quotes.accept.useMutation({
+    onSuccess: () => {
+      toast.success("Devis accepté");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const rejectMutation = trpc.quotes.reject.useMutation({
+    onSuccess: () => {
+      toast.success("Devis refusé");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const cancelMutation = trpc.quotes.cancel.useMutation({
+    onSuccess: () => {
+      toast.success("Devis annulé");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const convertMutation = trpc.quotes.convertToProject.useMutation({
+    onSuccess: (projectId) => {
+      toast.success("Projet créé à partir du devis");
+      navigate(`/projects/${projectId}`);
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
   // Form state
   const [formData, setFormData] = useState({
     quoteNumber: quote?.quoteNumber || "",
@@ -131,29 +208,33 @@ export default function QuoteDetail() {
   };
 
   const handleDownloadPDF = () => {
-    toast.info(`Génération PDF devis ${quote?.quoteNumber} - À implémenter`);
+    if (!quote) return;
+    generatePDFMutation.mutate({ quoteId: quote.id });
   };
 
-  const handleSendEmail = () => {
-    toast.info("Envoi email - À implémenter");
-  };
-
-  const handleConvertToInvoice = () => {
-    toast.info("Conversion en facture - À implémenter");
+  const handleSend = () => {
+    if (!quote) return;
+    sendMutation.mutate({ id: quote.id });
   };
 
   const handleAccept = () => {
-    updateMutation.mutate({
-      id: Number(id),
-      status: "accepted",
-    });
+    if (!quote) return;
+    acceptMutation.mutate({ id: quote.id });
   };
 
   const handleReject = () => {
-    updateMutation.mutate({
-      id: Number(id),
-      status: "rejected",
-    });
+    if (!quote) return;
+    rejectMutation.mutate({ id: quote.id });
+  };
+
+  const handleCancel = () => {
+    if (!quote) return;
+    cancelMutation.mutate({ id: quote.id });
+  };
+
+  const handleConvertToProject = () => {
+    if (!quote) return;
+    convertMutation.mutate({ id: quote.id });
   };
 
   const getStatusBadge = (status: string) => {
@@ -212,37 +293,15 @@ export default function QuoteDetail() {
         <div className="flex items-center gap-2">
           {!isEditing ? (
             <>
-              <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadPDF}
+                disabled={generatePDFMutation.isPending}
+              >
                 <Download className="mr-2 h-4 w-4" />
-                PDF
+                {generatePDFMutation.isPending ? "Génération..." : "Télécharger PDF"}
               </Button>
-              <Button variant="outline" size="sm" onClick={handleSendEmail}>
-                <Send className="mr-2 h-4 w-4" />
-                Envoyer
-              </Button>
-              {quote.status === "draft" && (
-                <Button variant="outline" size="sm" onClick={() => handleSave()}>
-                  <Send className="mr-2 h-4 w-4" />
-                  Marquer envoyé
-                </Button>
-              )}
-              {quote.status === "sent" && (
-                <>
-                  <Button variant="outline" size="sm" className="bg-green-50" onClick={handleAccept}>
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Accepter
-                  </Button>
-                  <Button variant="outline" size="sm" className="bg-red-50" onClick={handleReject}>
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Refuser
-                  </Button>
-                </>
-              )}
-              {quote.status === "accepted" && (
-                <Button size="sm" onClick={handleConvertToInvoice}>
-                  Convertir en facture
-                </Button>
-              )}
               <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Modifier
@@ -439,6 +498,71 @@ export default function QuoteDetail() {
                     </p>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Actions Section - State Transitions */}
+          {!isEditing && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex flex-wrap gap-2">
+                  {/* DRAFT: Can send or cancel */}
+                  {quote.status === "draft" && (
+                    <>
+                      <Button onClick={handleSend} disabled={sendMutation.isPending}>
+                        <Send className="h-4 w-4 mr-2" />
+                        {sendMutation.isPending ? "Envoi..." : "Envoyer au client"}
+                      </Button>
+                      <Button variant="destructive" onClick={handleCancel} disabled={cancelMutation.isPending}>
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Annuler
+                      </Button>
+                    </>
+                  )}
+
+                  {/* SENT: Can accept, reject, or cancel */}
+                  {quote.status === "sent" && !quote.isExpired && (
+                    <>
+                      <Button onClick={handleAccept} disabled={acceptMutation.isPending}>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Accepter
+                      </Button>
+                      <Button variant="outline" onClick={handleReject} disabled={rejectMutation.isPending}>
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Refuser
+                      </Button>
+                      <Button variant="destructive" onClick={handleCancel} disabled={cancelMutation.isPending}>
+                        Annuler
+                      </Button>
+                    </>
+                  )}
+
+                  {/* ACCEPTED: Can convert to project */}
+                  {quote.status === "accepted" && (
+                    <Button onClick={handleConvertToProject} disabled={convertMutation.isPending}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      {convertMutation.isPending ? "Conversion..." : "Convertir en projet"}
+                    </Button>
+                  )}
+
+                  {/* EXPIRED: Show message */}
+                  {quote.isExpired && (
+                    <div className="text-sm text-muted-foreground">
+                      Ce devis a expiré. Créez un nouveau devis si nécessaire.
+                    </div>
+                  )}
+
+                  {/* REJECTED/CANCELLED/CONVERTED: No actions */}
+                  {(quote.status === "rejected" || quote.status === "cancelled" || quote.status === "converted_to_project") && (
+                    <div className="text-sm text-muted-foreground">
+                      Aucune action disponible pour ce devis.
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           )}
