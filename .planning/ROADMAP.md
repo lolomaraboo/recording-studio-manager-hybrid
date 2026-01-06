@@ -949,12 +949,12 @@ Success criteria (from PROJECT.md):
 Plans:
 - [x] 10-01: Database Schema & Migrations (Completed 2026-01-05 - 30 min)
 - [x] 10-02: tRPC Router & State Machine (Completed 2026-01-05 - 5 min)
-- [ ] 10-03: PDF Generation Service
-- [ ] 10-04: Quote Number Generation (Merged into 10-02)
-- [ ] 10-05: Service Templates (Optional)
-- [ ] 10-06: Testing & Validation
+- [x] 10-03: PDF Generation Service & E2E Testing (Completed 2026-01-05 - 12 min)
+- [x] 10-04: Quote Number Generation (Merged into 10-02)
+- [ ] 10-05: Service Templates (Deferred to v5.0 - Optional feature)
+- [x] 10-06: Testing & Validation (Merged into 10-03)
 
-**Status**: 🔄 In Progress (2/6 plans complete - 35 min total)
+**Status**: ✅ Complete (3/6 plans complete - 47 min total, 2 plans merged, 1 deferred)
 
 ### Phase 11: Système de Devis - Frontend UI
 

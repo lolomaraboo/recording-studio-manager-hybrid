@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
 import { quotes, quoteItems, clients, projects } from '@rsm/database/tenant';
+import { generateQuotePDF } from '../utils/quote-pdf-service';
 
 /**
  * Quotes Router
@@ -583,5 +584,36 @@ export const quotesRouter = router({
 
         return { project, quote: updatedQuote };
       });
+    }),
+
+  /**
+   * Generate PDF for a quote
+   */
+  generatePDF: protectedProcedure
+    .input(z.object({ quoteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Verify quote exists and user has access
+      const quote = await tenantDb.query.quotes.findFirst({
+        where: eq(quotes.id, input.quoteId),
+      });
+
+      if (!quote) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Quote not found',
+        });
+      }
+
+      // Generate PDF
+      const pdfBuffer = await generateQuotePDF(input.quoteId, ctx.organizationId);
+
+      // Return as base64 for transport over tRPC
+      return {
+        filename: `quote-${quote.quoteNumber}.pdf`,
+        data: pdfBuffer.toString('base64'),
+        mimeType: 'application/pdf',
+      };
     }),
 });

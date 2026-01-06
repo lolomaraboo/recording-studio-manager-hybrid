@@ -958,3 +958,28 @@ export const paymentTransactions = pgTable("payment_transactions", {
 
 export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
 export type InsertPaymentTransaction = typeof paymentTransactions.$inferInsert;
+
+/**
+ * Relations
+ * Define relationships between tables for Drizzle query API
+ */
+import { relations } from 'drizzle-orm';
+
+export const quotesRelations = relations(quotes, ({ one, many }) => ({
+  client: one(clients, {
+    fields: [quotes.clientId],
+    references: [clients.id],
+  }),
+  items: many(quoteItems),
+  project: one(projects, {
+    fields: [quotes.convertedToProjectId],
+    references: [projects.id],
+  }),
+}));
+
+export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
+  quote: one(quotes, {
+    fields: [quoteItems.quoteId],
+    references: [quotes.id],
+  }),
+}));
