@@ -24,6 +24,7 @@ import { adminRouter } from './admin.js';
 import { subscriptionsRouter } from './subscriptions.js';
 import { superadminRouter } from './superadmin.js';
 import { clientNotesRouter } from './clientNotes.js';
+import { serviceCatalogRouter } from './serviceCatalog.js';
 
 /**
  * Main App Router
@@ -45,6 +46,7 @@ import { clientNotesRouter } from './clientNotes.js';
  * - quotes: Quotes & quote items CRUD
  * - contracts: Legal contracts CRUD
  * - expenses: Business expenses CRUD
+ * - serviceCatalog: Service catalog for quick quote insertion CRUD
  * - ai: AI Chatbot (Phase 2 - P0 Priority)
  * - search: Global search across all entities
  * - clientPortalAuth: Client Portal Authentication (Phase 4.1)
@@ -72,6 +74,7 @@ export const appRouter = router({
   quotes: quotesRouter,
   contracts: contractsRouter,
   expenses: expensesRouter,
+  serviceCatalog: serviceCatalogRouter,
   notifications: notificationsRouter,
   files: filesRouter,
   shares: sharesRouter,

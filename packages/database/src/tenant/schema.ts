@@ -545,6 +545,36 @@ export type QuoteItem = typeof quoteItems.$inferSelect;
 export type InsertQuoteItem = typeof quoteItems.$inferInsert;
 
 /**
+ * Service Catalog table (Tenant DB)
+ * Pre-defined service items for quick quote insertion
+ */
+export const serviceCatalog = pgTable("service_catalog", {
+  id: serial("id").primaryKey(),
+
+  // Service details
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }).notNull(), // "Studio" | "Post-production" | "Location matériel" | "Autre"
+
+  // Pricing
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
+
+  // Defaults for quote insertion
+  defaultQuantity: decimal("default_quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
+
+  // Metadata
+  isActive: boolean("is_active").notNull().default(true),
+  displayOrder: integer("display_order").notNull().default(0),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type ServiceCatalog = typeof serviceCatalog.$inferSelect;
+export type InsertServiceCatalog = typeof serviceCatalog.$inferInsert;
+
+/**
  * Contracts table (Tenant DB)
  * Legal contracts with clients
  */
