@@ -881,8 +881,8 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 3.13. Validation UI Complète | v3.0 | 2/2 | ✅ Complete | 2026-01-04 |
 | 3.14. Améliorations UI | v3.0 | 4/4 | ✅ Complete | 2026-01-05 |
 | **v4.0 - Workflow Commercial Complet (IN PROGRESS)** | | | | |
-| 10. Système Devis - Backend | v4.0 | 1/6 | In Progress | 2026-01-05 |
-| 11. Système Devis - Frontend | v4.0 | 0/? | Not started | - |
+| 10. Système Devis - Backend | v4.0 | 3/6 | ✅ Complete | 2026-01-05 |
+| 11. Système Devis - Frontend | v4.0 | 0/1 | ⏳ Planned | - |
 | 12. Tasks Chronométrées - Timer | v4.0 | 0/? | Not started | - |
 | 13. Tasks Chronométrées - UI | v4.0 | 0/? | Not started | - |
 | 14. Architecture Flexible - Backend | v4.0 | 0/? | Not started | - |
@@ -897,7 +897,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
-**v4.0 Total**: 1/? plans (Phase 10 started - 30 min)
+**v4.0 Total**: 3/? plans (Phase 10 complete - 47 min, Phase 11 planned)
 **v1.0 Total**: 0/17 plans (deferred after v4.0)
 
 ---
@@ -964,10 +964,10 @@ Plans:
 
 **Research**: Unlikely (established UI patterns, forms, modals)
 
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 11-01: TBD (run /gsd:plan-phase 11 to break down)
+- [x] 11-01: Quote Management UI - Line Items Builder, PDF Download, State Transitions (Completed 2026-01-06 - 795 min)
 
 ### Phase 12: Tasks Chronométrées - Timer & Database
 
