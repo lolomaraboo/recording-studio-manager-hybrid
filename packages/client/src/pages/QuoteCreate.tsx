@@ -37,9 +37,16 @@ export default function QuoteCreate() {
   });
 
   // Form state
-  const [formData, setFormData] = useState({
-    clientId: 0,
-    projectId: 0,
+  const [formData, setFormData] = useState<{
+    clientId: number | undefined;
+    projectId: number | undefined;
+    title: string;
+    terms: string;
+    notes: string;
+    internalNotes: string;
+  }>({
+    clientId: undefined,
+    projectId: undefined,
     title: "",
     terms: "",
     notes: "",
@@ -150,7 +157,7 @@ export default function QuoteCreate() {
                     Client <span className="text-destructive">*</span>
                   </Label>
                   <Select
-                    value={formData.clientId.toString()}
+                    value={formData.clientId?.toString() ?? ""}
                     onValueChange={(value) => setFormData({ ...formData, clientId: parseInt(value) })}
                   >
                     <SelectTrigger id="clientId">
@@ -169,7 +176,7 @@ export default function QuoteCreate() {
                 <div className="space-y-2">
                   <Label htmlFor="projectId">Projet (optionnel)</Label>
                   <Select
-                    value={formData.projectId.toString()}
+                    value={formData.projectId?.toString() ?? "0"}
                     onValueChange={(value) => setFormData({ ...formData, projectId: parseInt(value) })}
                   >
                     <SelectTrigger id="projectId">
