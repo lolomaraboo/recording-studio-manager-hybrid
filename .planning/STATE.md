@@ -25,12 +25,12 @@
 
 ## Current Position
 
-Phase: 3.14 of 8 (Améliorations UI de Toutes les Pages) [INSERTED] - Complete ✅
-Plan: 4 of 4 in current phase (All plans complete)
-Status: Phase complete - Ready for next phase
-Last activity: 2026-01-05 - Phase 3.14 COMPLETE (58/58 pages harmonized)
+Phase: 10 of 17 (Système de Devis - Backend & Database) - v4.0 Workflow Commercial Complet
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-05 - Milestone v4.0 created (8 phases: 10-17)
 
-Progress: ████████████████████ 100% (49/49 plans complete) - Phase 3.13: 2/2 complete, Phase 3.14: 4/4 complete ✅
+Progress: ░░░░░░░░░░ 0% (v4.0 starting - v3.0 shipped 100%)
 
 ## Performance Metrics
 
@@ -146,6 +146,11 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 ### Roadmap Evolution
 
+- **2026-01-05:** Milestone v4.0 created: Workflow Commercial Complet, 8 phases (Phase 10-17)
+  - Features: Système de Devis complet, Tasks Chronométrées, Architecture Session/Project Flexible, Facturation Automatique Temps Réel
+  - Business rationale: Complete commercial workflow (quote → invoice) before marketing push
+  - Phases 4-8 (Marketing & Launch) deferred to v1.0 after v4.0 features complete
+  - v3.0 (Foundation & Polish) marked as SHIPPED - 49/49 plans complete (Phases 1-3.14)
 - **2025-12-26:** Phase 3.1 inserted after Phase 3 - "Fix Production Authentication 401 Errors" (URGENT)
   - Reason: Critical production blocker discovered - all API endpoints returning 401 Unauthorized
   - Impact: All tRPC queries/mutations failing, WebSocket authentication broken
@@ -303,17 +308,13 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-05T00:20:00Z
-Stopped at: ✅ Completed Phase 3.14-02-PLAN.md (Harmonize 20 pages Admin Part 1)
+Last session: 2026-01-05T01:30:00Z
+Stopped at: Milestone v4.0 initialization
 Resume context:
-  - Executed Phase 3.14-02: Harmonize Admin Dashboard Part 1 (~90 min across 3 sessions)
-    - Task 1: Clients (3) + Projects (3) = 6 fichiers ✅
-    - Task 2: Invoices (3) + Rooms (3) + Equipment (3) = 9 fichiers ✅
-    - Task 3: Talents (3) + Team (1) + Calendar (1) = 5 fichiers ✅
-    - Applied 5 UI patterns mechanically (reference: Sessions.tsx)
-    - Build production: ✅ SUCCESS (5.67s, 0 errors client)
-    - Commits: 3 (25e865b, 66d31e5, 4cde456)
-  - Documentation: Created 3.14-02-SUMMARY.md
-  - **Phase 3.14 Progress:** 1/4 plans complete (~90 min total)
-  - Next: 3.14-03 (Harmonize 17 pages Admin Part 2) - Tracks, AudioFiles, Quotes, Contracts, Reports, Analytics
+  - Created milestone v4.0 "Workflow Commercial Complet" (8 phases: 10-17)
+  - Restructured roadmap: v3.0 SHIPPED ✅, v4.0 IN PROGRESS, v1.0 DEFERRED
+  - Phase directories created: 10-systeme-devis-backend through 17-facturation-auto-stripe
+  - STATE.md updated: Current position = Phase 10 (ready to plan)
+  - ROADMAP.md updated: Milestone sections, progress table with milestone column
+  - Next: Plan Phase 10 (Système de Devis - Backend & Database)
 Resume file: None

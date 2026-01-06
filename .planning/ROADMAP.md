@@ -850,39 +850,55 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute sequentially: 1 → 2 → 3 → 3.1 (URGENT) → 3.2 (INSERTED) → 3.3 (URGENT) → 3.4 (INSERTED) → 3.5 (INSERTED) → 3.6 (INSERTED) → 3.7 (INSERTED) → 3.8 (INSERTED) → 3.8.1 (URGENT) → 3.8.2 (URGENT) → 3.8.3 (URGENT) → 3.8.4 (INSERTED) → 3.9 (INSERTED) → 3.9.1 (INSERTED) → 3.9.4 (INSERTED) → 3.10 (INSERTED) → 3.11 (INSERTED) → 3.12 (INSERTED) → 3.13 (INSERTED) → 4 → 5 → 6 → 7 → 8
+v3.0: 1 → 2 → 3 → 3.1-3.14 (all complete ✅)
+v4.0: 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17
+v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Production Stability | 3/3 | ✅ Complete | 2025-12-26 |
-| 2. Complete Phase 5 | 2/2 | ✅ Complete | 2025-12-26 |
-| 3. Billing Infrastructure | 3/3 | ✅ Complete | 2025-12-26 |
-| 3.1. Fix Production Auth (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
-| 3.2. End-to-End Testing (INSERTED) | 2/2 | ✅ Complete | 2025-12-26 |
-| 3.3. Fix Registration Session (INSERTED) | 1/1 | ✅ Complete | 2025-12-26 |
-| 3.4. Comprehensive Site Testing (INSERTED) | 6/6 | ✅ Complete | 2025-12-27 |
-| 3.5. Password Confirmation Field (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
-| 3.6. Breadcrumb Navigation (INSERTED) | 1/1 | ✅ Complete | 2025-12-28 |
-| 3.7. AI Chatbot Cache Invalidation (INSERTED) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8. Vérifier Chatbot Mémoire (INSERTED) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8.1. Fix Chatbot SessionId Bug (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8.2. Persist SessionId localStorage (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8.3. Fix Chatbot Date Awareness (URGENT) | 1/1 | ✅ Complete | 2025-12-29 |
-| 3.8.4. Implement RAG with Qdrant (INSERTED) | 2/3 | 🔄 In progress | 2025-12-29 |
-| 3.9. Super Admin Dashboard (INSERTED) | 2/2 | ✅ Complete | 2025-12-29 |
-| 3.9.1. Notes avec historique daté (INSERTED) | 1/2 | ⏳ In progress | 2025-12-29 |
-| 3.9.4. Clients enrichis compatible vCard (INSERTED) | 2/2 | ✅ Complete | 2025-12-31 |
-| 3.10. Test Clients Enrichis vCard (INSERTED) | 3/3 | ✅ Complete | 2026-01-02 |
-| 3.11. Rangement et nettoyage du dossier (INSERTED) | 4/4 | ✅ Complete | 2026-01-04 |
-| 3.12. Modes d'affichage multiples clients (INSERTED) | 0/1 | Not started | - |
-| 3.13. Validation UI Complète (INSERTED) | 0/? | Not started | - |
-| 4. Marketing Foundation | 0/3 | Not started | - |
-| 5. Onboarding & UX | 0/4 | Not started | - |
-| 6. Support & Documentation | 0/3 | Not started | - |
-| 7. Production Hardening | 0/3 | Not started | - |
-| 8. Launch Ready | 0/3 | Not started | - |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| **v3.0 - Foundation & Polish (SHIPPED)** | | | | |
+| 1. Production Stability | v3.0 | 3/3 | ✅ Complete | 2025-12-26 |
+| 2. Complete Phase 5 | v3.0 | 2/2 | ✅ Complete | 2025-12-26 |
+| 3. Billing Infrastructure | v3.0 | 3/3 | ✅ Complete | 2025-12-26 |
+| 3.1. Fix Production Auth | v3.0 | 1/1 | ✅ Complete | 2025-12-26 |
+| 3.2. End-to-End Testing | v3.0 | 2/2 | ✅ Complete | 2025-12-26 |
+| 3.3. Fix Registration Session | v3.0 | 1/1 | ✅ Complete | 2025-12-26 |
+| 3.4. Comprehensive Site Testing | v3.0 | 6/6 | ✅ Complete | 2025-12-27 |
+| 3.5. Password Confirmation Field | v3.0 | 1/1 | ✅ Complete | 2025-12-28 |
+| 3.6. Breadcrumb Navigation | v3.0 | 1/1 | ✅ Complete | 2025-12-28 |
+| 3.7. AI Chatbot Cache Invalidation | v3.0 | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8. Vérifier Chatbot Mémoire | v3.0 | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.1. Fix Chatbot SessionId Bug | v3.0 | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.2. Persist SessionId localStorage | v3.0 | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.3. Fix Chatbot Date Awareness | v3.0 | 1/1 | ✅ Complete | 2025-12-29 |
+| 3.8.4. Implement RAG with Qdrant | v3.0 | 3/3 | ✅ Complete | 2025-12-29 |
+| 3.9. Super Admin Dashboard | v3.0 | 2/2 | ✅ Complete | 2025-12-29 |
+| 3.9.1. Notes avec historique daté | v3.0 | 2/2 | ✅ Complete | 2025-12-29 |
+| 3.9.4. Clients enrichis compatible vCard | v3.0 | 2/2 | ✅ Complete | 2025-12-31 |
+| 3.10. Test Clients Enrichis vCard | v3.0 | 3/3 | ✅ Complete | 2026-01-02 |
+| 3.11. Rangement et nettoyage | v3.0 | 4/4 | ✅ Complete | 2026-01-04 |
+| 3.12. Modes d'affichage multiples | v3.0 | 1/1 | ✅ Complete | 2026-01-04 |
+| 3.13. Validation UI Complète | v3.0 | 2/2 | ✅ Complete | 2026-01-04 |
+| 3.14. Améliorations UI | v3.0 | 4/4 | ✅ Complete | 2026-01-05 |
+| **v4.0 - Workflow Commercial Complet (IN PROGRESS)** | | | | |
+| 10. Système Devis - Backend | v4.0 | 0/? | Not started | - |
+| 11. Système Devis - Frontend | v4.0 | 0/? | Not started | - |
+| 12. Tasks Chronométrées - Timer | v4.0 | 0/? | Not started | - |
+| 13. Tasks Chronométrées - UI | v4.0 | 0/? | Not started | - |
+| 14. Architecture Flexible - Backend | v4.0 | 0/? | Not started | - |
+| 15. Architecture Flexible - UI | v4.0 | 0/? | Not started | - |
+| 16. Facturation Auto - Backend | v4.0 | 0/? | Not started | - |
+| 17. Facturation Auto - Stripe | v4.0 | 0/? | Not started | - |
+| **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
+| 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
+| 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
+| 6. Support & Documentation | v1.0 | 0/3 | Deferred | - |
+| 7. Production Hardening | v1.0 | 0/3 | Deferred | - |
+| 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
-**Total**: 44/46+ plans complete (95.7%) - Phase 3.11 COMPLETE, Phase 3.12-3.13 inserted before Phase 4
+**v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
+**v4.0 Total**: 0/? plans (starting Phase 10)
+**v1.0 Total**: 0/17 plans (deferred after v4.0)
 
 ---
 
@@ -901,6 +917,162 @@ Success criteria (from PROJECT.md):
 - [x] Tests E2E validated (Phase 8)
 - [x] Security production (Phase 8)
 - [x] Legal ready (Phase 6)
+
+## Milestones
+
+- ✅ **v3.0 - Foundation & Polish** - Phases 1-3.14 (shipped 2026-01-05)
+- 🚧 **v4.0 - Workflow Commercial Complet** - Phases 10-17 (in progress)
+- 📋 **v1.0 - Marketing & Launch** - Phases 4-8 (deferred after v4.0)
+
+---
+
+## 🚧 v4.0 - Workflow Commercial Complet (In Progress)
+
+**Milestone Goal:** Transform RSM into a complete commercial studio management platform with quote-to-invoice workflow, time tracking, flexible project architecture, and real-time billing automation.
+
+### Phase 10: Système de Devis - Backend & Database
+
+**Goal**: Database schema and backend logic for quote templates, workflow validation (draft → sent → accepted/rejected), and quote-to-project conversion
+
+**Depends on**: Phase 3.14 (UI harmonization complete)
+
+**Research**: Likely (Quote workflow state machine, PDF generation for quotes)
+
+**Research topics**:
+- Quote state machine patterns (draft/sent/accepted/rejected/expired)
+- PDF generation libraries (react-pdf vs PDFKit vs Puppeteer)
+- Template engine for service items with variables
+- Conversion logic from quote to project (data mapping)
+
+**Plans**: TBD
+
+Plans:
+- [ ] 10-01: TBD (run /gsd:plan-phase 10 to break down)
+
+### Phase 11: Système de Devis - Frontend UI
+
+**Goal**: Quote creation UI with template selection, custom line items, workflow actions (send/accept/reject), and quote-to-project button
+
+**Depends on**: Phase 10
+
+**Research**: Unlikely (established UI patterns, forms, modals)
+
+**Plans**: TBD
+
+Plans:
+- [ ] 11-01: TBD (run /gsd:plan-phase 11 to break down)
+
+### Phase 12: Tasks Chronométrées - Timer & Database
+
+**Goal**: Database schema for task types (Setup/Recording/Mixing/Mastering/Break), timer functionality (start/stop), manual adjustments, and hourly rates
+
+**Depends on**: Phase 11
+
+**Research**: Likely (Real-time timer sync, WebSocket for multi-user timer visibility)
+
+**Research topics**:
+- Timer state management (local vs server-side)
+- WebSocket patterns for real-time timer updates
+- Time tracking data model (sessions, tasks, timestamps)
+- Hourly rate calculation logic per task type
+
+**Plans**: TBD
+
+Plans:
+- [ ] 12-01: TBD (run /gsd:plan-phase 12 to break down)
+
+### Phase 13: Tasks Chronométrées - UI & History
+
+**Goal**: Timer UI component (start/stop/pause buttons), task history view, manual time entry, and task-to-invoice preview
+
+**Depends on**: Phase 12
+
+**Research**: Unlikely (standard UI patterns, tables, forms)
+
+**Plans**: TBD
+
+Plans:
+- [ ] 13-01: TBD (run /gsd:plan-phase 13 to break down)
+
+### Phase 14: Architecture Session/Project Flexible - Backend
+
+**Goal**: Database schema supporting standalone sessions (no project) AND sessions linked to projects, with backward compatibility for existing data
+
+**Depends on**: Phase 13
+
+**Research**: Likely (Migration strategy for existing sessions, data model refactoring)
+
+**Research topics**:
+- Optional foreign key patterns (session.projectId nullable)
+- Migration scripts for existing session data
+- Query optimization for mixed session types
+- Backward compatibility strategies
+
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: TBD (run /gsd:plan-phase 14 to break down)
+
+### Phase 15: Architecture Session/Project Flexible - UI Adaptation
+
+**Goal**: UI updates to support standalone sessions, project-linked sessions, and studio type preferences (all types supported)
+
+**Depends on**: Phase 14
+
+**Research**: Unlikely (UI pattern adaptation, conditional rendering)
+
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: TBD (run /gsd:plan-phase 15 to break down)
+
+### Phase 16: Facturation Automatique - Backend Integration
+
+**Goal**: Auto-generate invoices from timed tasks, support per-session OR global project invoicing, calculate line items ("Recording - 2h30 @ 50€/h = 125€"), handle deposits/advances
+
+**Depends on**: Phase 15
+
+**Research**: Likely (Invoice generation logic, Stripe integration for deposits, tax calculation)
+
+**Research topics**:
+- Invoice generation from time tracking data
+- Stripe Payment Intents for deposits/advances
+- Tax calculation patterns (VAT, sales tax)
+- Partial payment workflows
+
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: TBD (run /gsd:plan-phase 16 to break down)
+
+### Phase 17: Facturation Automatique - Stripe & UI
+
+**Goal**: Stripe Checkout integration for invoice payment, payment status tracking, invoice UI with payment button, and email notifications
+
+**Depends on**: Phase 16
+
+**Research**: Likely (Stripe Checkout Sessions, webhook handling for payments)
+
+**Research topics**:
+- Stripe Checkout Sessions for invoice payments
+- Webhook handling (payment_intent.succeeded, payment_intent.failed)
+- Email notification templates (invoice sent, payment received)
+- Invoice PDF generation for email attachments
+
+**Plans**: TBD
+
+Plans:
+- [ ] 17-01: TBD (run /gsd:plan-phase 17 to break down)
+
+---
+
+## 📋 v1.0 - Marketing & Launch (Deferred After v4.0)
+
+**Milestone Goal:** Marketing-ready platform with public landing page, onboarding, documentation, and production hardening (Phases 4-8 deferred until after v4.0 workflow features)
+
+**Rationale:** Business priority shifted - complete commercial workflow features (v4.0) before marketing push (v1.0). Studios need functional quote-to-invoice system more urgently than landing page polish.
+
+---
 
 ## v2.0 Enterprise Roadmap (Post-Launch)
 
