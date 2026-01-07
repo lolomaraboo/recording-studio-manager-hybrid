@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 12 of 17 (Tasks Chronométrées - Timer & Database) - v4.0 Workflow Commercial Complet
-Plan: 12-03 (Socket.IO Integration) - COMPLETE
-Status: Phase 12 COMPLETE - 3/3 plans done
-Last activity: 2026-01-07 - Phase 12 complete (Socket.IO real-time broadcasting)
+Phase: 13 of 17 (Tasks Chronométrées - UI & History) - v4.0 Workflow Commercial Complet
+Plan: 13-01 of 1 - COMPLETE
+Status: Phase 13 complete - Timer UI components with real-time Socket.IO and trackId support
+Last activity: 2026-01-07 - Phase 13-01 complete (TaskTypes, ActiveTimer, TimeHistory + trackId architecture)
 
-Progress: ██████░░░░ 62% (v4.0: 10/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete, Phase 12 complete)
+Progress: ██████░░░░ 63% (v4.0: 11/? plans - Phases 10, 11-01, 11.5, 12, 13 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 61
-- Average duration: 43.5 min
-- Total execution time: 44.22 hours
+- Total plans completed: 62
+- Average duration: 44.2 min
+- Total execution time: 45.72 hours
 
 **By Phase:**
 
@@ -66,10 +66,11 @@ Progress: ██████░░░░ 62% (v4.0: 10/? plans - Phase 10 comple
 | 11 | 1/3 | 795 min | 795 min |
 | 11.5 | 3/3 | 43 min | 14.3 min |
 | 12 | 3/3 | 20 min | 6.7 min |
+| 13 | 1/1 | 90 min | 90 min |
 
 **Recent Trend:**
-- Last 5 plans: [3 min, 19 min, 4 min, 9 min, 7 min]
-- Trend: Backend implementations averaging 6.7 min (database + API + Socket.IO), UI implementations vary (19-795 min depending on complexity)
+- Last 5 plans: [19 min, 4 min, 9 min, 7 min, 90 min]
+- Trend: Backend implementations fast (6.7 min avg), UI implementations vary by complexity (90 min for 3 components + architecture enhancement)
 
 ## Accumulated Context
 
@@ -134,6 +135,7 @@ Progress: ██████░░░░ 62% (v4.0: 10/? plans - Phase 10 comple
 | 3.9 | Password filtering | Excluded password hashes from user list endpoint for security |
 | 3.9 | Pagination default 50 | Scalable approach for large datasets in listOrganizations and listUsers |
 | 3.9 | Dedicated SuperAdmin sidebar layout | User explicitly requested "les trois onglets devrait etre dans la sidebar et on devrait avoir que ca dedans" - completely separate layout from normal dashboard with only 3 superadmin menu items (Services, Database, Logs). Improved UX clarity and admin workflow isolation. |
+| 13 | Multi-context time tracking (trackId support) | Extended time tracking from session/project to also support track-level timing. User requested "on doit tout pouvoir timer" - studios bill at different granularities (session=room rental, project=album, track=individual song work). Added trackId column, XOR validation, migration created. Maximum billing flexibility. |
 
 ### Deferred Issues
 
@@ -312,16 +314,14 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-07T17:54:21Z
-Stopped at: Phase 12 COMPLETE (Tasks Chronométrées - Timer & Database)
+Last session: 2026-01-07T19:45:00Z
+Stopped at: Phase 13-01 COMPLETE (Tasks Chronométrées - UI & History)
 Resume context:
-  - Phase 12-03 complete (Socket.IO Real-time Integration)
-  - Installed socket.io@^4.8.1 and integrated with Express using httpServer pattern
-  - Created socket-auth middleware reusing express-session (no duplicate auth)
-  - Implemented organization-scoped broadcasting with `org:${organizationId}` rooms
-  - Added real-time events: timer:started, timer:stopped, timer:adjusted
-  - Created type-safe socket event interfaces in shared package
-  - Key decisions: Reuse session auth, org-scoped rooms for multi-tenancy, broadcast after DB operations
-  - Phase 12 COMPLETE: 3/3 plans done (database schema, tRPC API, Socket.IO)
-  - Next: Phase 13 (Tasks Chronométrées - UI & History)
+  - Phase 13 complete: Timer UI components created with 0 TypeScript errors
+  - Components: TaskTypes.tsx (387 lines), ActiveTimer.tsx (192 lines), TimeHistory.tsx (260 lines)
+  - Socket.IO client setup: packages/client/src/socket.ts (real-time timer updates)
+  - Architectural enhancement: trackId support added (session/project/track flexibility)
+  - Migration created: 0007_add_track_id_to_time_entries.sql (pending application)
+  - SUMMARY created: .planning/phases/13-tasks-chronometrees-ui/13-01-SUMMARY.md
+  - Next: Phase 14 (Architecture Session/Project Flexible - Backend)
 Resume file: None

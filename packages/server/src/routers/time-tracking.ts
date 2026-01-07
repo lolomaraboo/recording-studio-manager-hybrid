@@ -140,20 +140,19 @@ export const timeTrackingRouter = router({
           taskTypeId: z.number(),
           sessionId: z.number().optional(),
           projectId: z.number().optional(),
+          trackId: z.number().optional(),
           notes: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
         const tenantDb = await ctx.getTenantDb();
 
-        // XOR validation: exactly one of sessionId OR projectId required
-        if (
-          (!input.sessionId && !input.projectId) ||
-          (input.sessionId && input.projectId)
-        ) {
+        // XOR validation: exactly one of sessionId, projectId, or trackId required
+        const count = [input.sessionId, input.projectId, input.trackId].filter(Boolean).length;
+        if (count !== 1) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Exactly one of sessionId or projectId must be provided',
+            message: 'Exactly one of sessionId, projectId, or trackId must be provided',
           });
         }
 
@@ -161,6 +160,7 @@ export const timeTrackingRouter = router({
           taskTypeId: input.taskTypeId,
           sessionId: input.sessionId,
           projectId: input.projectId,
+          trackId: input.trackId,
           notes: input.notes,
         });
 
@@ -172,6 +172,7 @@ export const timeTrackingRouter = router({
             taskType: result.taskType,
             sessionId: result.sessionId,
             projectId: result.projectId,
+            trackId: result.trackId,
             startTime: result.startTime,
             userId: ctx.user?.id,
           });
@@ -189,6 +190,11 @@ export const timeTrackingRouter = router({
         const tenantDb = await ctx.getTenantDb();
         const result = await stopTimer(tenantDb, input.timeEntryId);
 
+        // Calculate cost for broadcast
+        const cost = result.durationMinutes && result.hourlyRateSnapshot
+          ? (result.durationMinutes * parseFloat(result.hourlyRateSnapshot)) / 60
+          : 0;
+
         // Broadcast timer:stopped event to organization
         const io = ctx.req.app.get('io');
         if (io && ctx.organizationId) {
@@ -196,7 +202,7 @@ export const timeTrackingRouter = router({
             timeEntryId: result.id,
             endTime: result.endTime,
             durationMinutes: result.durationMinutes,
-            cost: result.cost,
+            cost: cost.toFixed(2),
             userId: ctx.user?.id,
           });
         }
@@ -212,23 +218,22 @@ export const timeTrackingRouter = router({
         z.object({
           sessionId: z.number().optional(),
           projectId: z.number().optional(),
+          trackId: z.number().optional(),
         })
       )
       .query(async ({ ctx, input }) => {
         const tenantDb = await ctx.getTenantDb();
 
-        // XOR validation
-        if (
-          (!input.sessionId && !input.projectId) ||
-          (input.sessionId && input.projectId)
-        ) {
+        // XOR validation: exactly one of sessionId, projectId, or trackId required
+        const count = [input.sessionId, input.projectId, input.trackId].filter(Boolean).length;
+        if (count !== 1) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Exactly one of sessionId or projectId must be provided',
+            message: 'Exactly one of sessionId, projectId, or trackId must be provided',
           });
         }
 
-        const result = await getActiveTimer(tenantDb, input.sessionId, input.projectId);
+        const result = await getActiveTimer(tenantDb, input.sessionId, input.projectId, input.trackId);
         return result;
       }),
   }),
@@ -246,6 +251,7 @@ export const timeTrackingRouter = router({
         z.object({
           sessionId: z.number().optional(),
           projectId: z.number().optional(),
+          trackId: z.number().optional(),
           dateRange: z
             .object({
               start: z.string(), // ISO date string
@@ -259,14 +265,12 @@ export const timeTrackingRouter = router({
       .query(async ({ ctx, input }) => {
         const tenantDb = await ctx.getTenantDb();
 
-        // XOR validation
-        if (
-          (!input.sessionId && !input.projectId) ||
-          (input.sessionId && input.projectId)
-        ) {
+        // XOR validation: exactly one of sessionId, projectId, or trackId required
+        const count = [input.sessionId, input.projectId, input.trackId].filter(Boolean).length;
+        if (count !== 1) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Exactly one of sessionId or projectId must be provided',
+            message: 'Exactly one of sessionId, projectId, or trackId must be provided',
           });
         }
 
@@ -286,6 +290,7 @@ export const timeTrackingRouter = router({
           tenantDb,
           input.sessionId,
           input.projectId,
+          input.trackId,
           filters
         );
 

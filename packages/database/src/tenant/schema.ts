@@ -1055,9 +1055,10 @@ export const timeEntries = pgTable("time_entries", {
   // Task type reference
   taskTypeId: integer("task_type_id").notNull().references(() => taskTypes.id),
 
-  // Flexible linking: time tracked on session OR project
+  // Flexible linking: time tracked on session, project, OR track
   sessionId: integer("session_id").references(() => sessions.id, { onDelete: "set null" }), // Links to session if time tracked during session
-  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }), // Alternative: time tracked directly on project
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }), // Links to project if time tracked on project
+  trackId: integer("track_id").references(() => tracks.id, { onDelete: "set null" }), // Links to track if time tracked on specific track
 
   // Time tracking
   startTime: timestamp("start_time").notNull(), // When timer started
@@ -1079,7 +1080,7 @@ export const timeEntries = pgTable("time_entries", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
-// NOTE: CHECK constraint (session_id IS NOT NULL OR project_id IS NOT NULL) will be added manually to migration SQL
+// NOTE: CHECK constraint (session_id IS NOT NULL OR project_id IS NOT NULL OR track_id IS NOT NULL) will be added manually to migration SQL
 
 export type TimeEntry = typeof timeEntries.$inferSelect;
 export type InsertTimeEntry = typeof timeEntries.$inferInsert;
@@ -1099,6 +1100,10 @@ export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
   project: one(projects, {
     fields: [timeEntries.projectId],
     references: [projects.id],
+  }),
+  track: one(tracks, {
+    fields: [timeEntries.trackId],
+    references: [tracks.id],
   }),
 }));
 

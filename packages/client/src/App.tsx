@@ -47,6 +47,7 @@ import Notifications from './pages/Notifications';
 import Shares from './pages/Shares';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import TaskTypes from './pages/TaskTypes';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Toaster } from '@/components/ui/sonner';
 import { ClientPortalLayout } from './components/client-portal/ClientPortalLayout';
@@ -171,6 +172,7 @@ function App() {
             <Route path="shares" element={<Shares />} />
             <Route path="settings" element={<Settings />} />
             <Route path="team" element={<Team />} />
+            <Route path="task-types" element={<TaskTypes />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

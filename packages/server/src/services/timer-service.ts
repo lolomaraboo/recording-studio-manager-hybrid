@@ -15,6 +15,7 @@ interface StartTimerInput {
   taskTypeId: number;
   sessionId?: number;
   projectId?: number;
+  trackId?: number;
   notes?: string;
 }
 
@@ -61,13 +62,14 @@ export async function startTimer(
   db: TenantDb,
   data: StartTimerInput
 ): Promise<TimeEntry & { taskType: any }> {
-  const { taskTypeId, sessionId, projectId, notes } = data;
+  const { taskTypeId, sessionId, projectId, trackId, notes } = data;
 
-  // Validation: Exactly one of sessionId OR projectId required
-  if ((!sessionId && !projectId) || (sessionId && projectId)) {
+  // Validation: Exactly one of sessionId, projectId, or trackId required
+  const count = [sessionId, projectId, trackId].filter(Boolean).length;
+  if (count !== 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Exactly one of sessionId or projectId must be provided',
+      message: 'Exactly one of sessionId, projectId, or trackId must be provided',
     });
   }
 
@@ -90,10 +92,15 @@ export async function startTimer(
     });
   }
 
-  // Check for active timer on this session/project
-  const whereCondition = sessionId
-    ? and(eq(timeEntries.sessionId, sessionId), isNull(timeEntries.endTime))
-    : and(eq(timeEntries.projectId, projectId!), isNull(timeEntries.endTime));
+  // Check for active timer on this session/project/track
+  let whereCondition: SQL | undefined;
+  if (sessionId) {
+    whereCondition = and(eq(timeEntries.sessionId, sessionId), isNull(timeEntries.endTime));
+  } else if (projectId) {
+    whereCondition = and(eq(timeEntries.projectId, projectId), isNull(timeEntries.endTime));
+  } else {
+    whereCondition = and(eq(timeEntries.trackId, trackId!), isNull(timeEntries.endTime));
+  }
 
   const activeTimer = await db.query.timeEntries.findFirst({
     where: whereCondition,
@@ -102,7 +109,7 @@ export async function startTimer(
   if (activeTimer) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Cannot start timer: active timer already running for this session/project',
+      message: 'Cannot start timer: active timer already running for this session/project/track',
     });
   }
 
@@ -113,6 +120,7 @@ export async function startTimer(
       taskTypeId,
       sessionId: sessionId ?? null,
       projectId: projectId ?? null,
+      trackId: trackId ?? null,
       startTime: new Date(),
       endTime: null,
       durationMinutes: null,
@@ -192,25 +200,32 @@ export async function stopTimer(
 }
 
 /**
- * Get currently running timer for session or project
+ * Get currently running timer for session, project, or track
  *
  * Returns active time entry (endTime IS NULL) with task_type joined.
  */
 export async function getActiveTimer(
   db: TenantDb,
   sessionId?: number,
-  projectId?: number
+  projectId?: number,
+  trackId?: number
 ): Promise<(TimeEntry & { taskType: any }) | null> {
-  if ((!sessionId && !projectId) || (sessionId && projectId)) {
+  const count = [sessionId, projectId, trackId].filter(Boolean).length;
+  if (count !== 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Exactly one of sessionId or projectId must be provided',
+      message: 'Exactly one of sessionId, projectId, or trackId must be provided',
     });
   }
 
-  const whereCondition = sessionId
-    ? and(eq(timeEntries.sessionId, sessionId), isNull(timeEntries.endTime))
-    : and(eq(timeEntries.projectId, projectId!), isNull(timeEntries.endTime));
+  let whereCondition: SQL | undefined;
+  if (sessionId) {
+    whereCondition = and(eq(timeEntries.sessionId, sessionId), isNull(timeEntries.endTime));
+  } else if (projectId) {
+    whereCondition = and(eq(timeEntries.projectId, projectId), isNull(timeEntries.endTime));
+  } else {
+    whereCondition = and(eq(timeEntries.trackId, trackId!), isNull(timeEntries.endTime));
+  }
 
   const activeTimer = await db.query.timeEntries.findFirst({
     where: whereCondition,
@@ -330,12 +345,14 @@ export async function getTimeHistory(
   db: TenantDb,
   sessionId?: number,
   projectId?: number,
+  trackId?: number,
   filters?: TimeHistoryFilters
 ): Promise<TimeHistoryResult> {
-  if ((!sessionId && !projectId) || (sessionId && projectId)) {
+  const count = [sessionId, projectId, trackId].filter(Boolean).length;
+  if (count !== 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Exactly one of sessionId or projectId must be provided',
+      message: 'Exactly one of sessionId, projectId, or trackId must be provided',
     });
   }
 
@@ -344,8 +361,10 @@ export async function getTimeHistory(
 
   if (sessionId) {
     conditions.push(eq(timeEntries.sessionId, sessionId));
+  } else if (projectId) {
+    conditions.push(eq(timeEntries.projectId, projectId));
   } else {
-    conditions.push(eq(timeEntries.projectId, projectId!));
+    conditions.push(eq(timeEntries.trackId, trackId!));
   }
 
   // Date range filter
