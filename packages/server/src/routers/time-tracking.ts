@@ -164,6 +164,19 @@ export const timeTrackingRouter = router({
           notes: input.notes,
         });
 
+        // Broadcast timer:started event to organization
+        const io = ctx.req.app.get('io');
+        if (io && ctx.organizationId) {
+          io.to(`org:${ctx.organizationId}`).emit('timer:started', {
+            timeEntryId: result.id,
+            taskType: result.taskType,
+            sessionId: result.sessionId,
+            projectId: result.projectId,
+            startTime: result.startTime,
+            userId: ctx.user?.id,
+          });
+        }
+
         return result;
       }),
 
@@ -175,6 +188,19 @@ export const timeTrackingRouter = router({
       .mutation(async ({ ctx, input }) => {
         const tenantDb = await ctx.getTenantDb();
         const result = await stopTimer(tenantDb, input.timeEntryId);
+
+        // Broadcast timer:stopped event to organization
+        const io = ctx.req.app.get('io');
+        if (io && ctx.organizationId) {
+          io.to(`org:${ctx.organizationId}`).emit('timer:stopped', {
+            timeEntryId: result.id,
+            endTime: result.endTime,
+            durationMinutes: result.durationMinutes,
+            cost: result.cost,
+            userId: ctx.user?.id,
+          });
+        }
+
         return result;
       }),
 
@@ -286,6 +312,18 @@ export const timeTrackingRouter = router({
           endTime: input.endTime ? new Date(input.endTime) : undefined,
           notes: input.notes,
         });
+
+        // Broadcast timer:adjusted event to organization
+        const io = ctx.req.app.get('io');
+        if (io && ctx.organizationId) {
+          io.to(`org:${ctx.organizationId}`).emit('timer:adjusted', {
+            timeEntryId: result.id,
+            startTime: result.startTime,
+            endTime: result.endTime,
+            durationMinutes: result.durationMinutes,
+            userId: ctx.user?.id,
+          });
+        }
 
         return result;
       }),

@@ -6,12 +6,15 @@ import { RedisStore } from 'connect-redis';
 import { createClient } from 'redis';
 import * as Sentry from '@sentry/node';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import { Server as SocketIOServer } from 'socket.io';
+import { createServer } from 'http';
 import { appRouter } from './routers/index.js';
 import { createContext } from './_core/context.js';
 import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
 import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
 import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
+import { socketAuthMiddleware } from './middleware/socket-auth.js';
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -39,6 +42,9 @@ if (process.env.SENTRY_DSN_BACKEND) {
 
 async function main() {
   const app = express();
+
+  // Create HTTP server for Socket.IO integration
+  const httpServer = createServer(app);
 
   // Initialize Redis client for session storage
   const redis = createClient({
@@ -114,28 +120,57 @@ async function main() {
     console.log('✅ Express trust proxy enabled for production');
   }
 
-  app.use(
-    session({
-      store: new RedisStore({
-        client: redis,
-        prefix: 'rsm:session:',
-      }),
-      secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        // ⚠️ TEMPORARY DEV CONFIG - See ISSUE-011 in .planning/ISSUES.md
-        // TODO: Before production deployment, change to:
-        //   secure: process.env.NODE_ENV === 'production',
-        //   domain: process.env.NODE_ENV === 'production' ? '.recording-studio-manager.com' : undefined,
-        secure: false, // Allow cookies over HTTP for localhost development
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-        domain: undefined, // No domain restriction for localhost
-        sameSite: 'lax', // Allow cross-origin cookies for localhost dev (5174 → 3002)
-      },
-    })
-  );
+  // Store session middleware for Socket.IO authentication
+  const sessionMiddleware = session({
+    store: new RedisStore({
+      client: redis,
+      prefix: 'rsm:session:',
+    }),
+    secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      // ⚠️ TEMPORARY DEV CONFIG - See ISSUE-011 in .planning/ISSUES.md
+      // TODO: Before production deployment, change to:
+      //   secure: process.env.NODE_ENV === 'production',
+      //   domain: process.env.NODE_ENV === 'production' ? '.recording-studio-manager.com' : undefined,
+      secure: false, // Allow cookies over HTTP for localhost development
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      domain: undefined, // No domain restriction for localhost
+      sameSite: 'lax', // Allow cross-origin cookies for localhost dev (5174 → 3002)
+    },
+  });
+
+  app.use(sessionMiddleware);
+
+  // Initialize Socket.IO server for real-time timer updates
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: process.env.NODE_ENV === 'production'
+        ? /^https:\/\/([a-z0-9-]+\.)?recording-studio-manager\.com$/
+        : 'http://localhost:5174',
+      credentials: true,
+    },
+  });
+
+  // Store io instance for use in routes/services
+  app.set('io', io);
+
+  // Socket.IO authentication middleware
+  io.use((socket, next) => socketAuthMiddleware(socket, next, sessionMiddleware));
+
+  // Socket.IO connection handler
+  io.on('connection', (socket) => {
+    console.log(`[Socket.IO] User connected: ${socket.data.userId} (org: ${socket.data.organizationId})`);
+
+    // Join organization-specific room for scoped broadcasting
+    socket.join(`org:${socket.data.organizationId}`);
+
+    socket.on('disconnect', () => {
+      console.log(`[Socket.IO] User disconnected: ${socket.data.userId}`);
+    });
+  });
 
   // Health check routes (public, no auth required)
   app.use('/api', healthRouter);
@@ -240,10 +275,11 @@ async function main() {
     app.use(Sentry.Handlers.errorHandler());
   }
 
-  // Start server
-  app.listen(PORT, () => {
+  // Start server (use httpServer for Socket.IO support)
+  httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📡 tRPC endpoint: http://localhost:${PORT}/api/trpc`);
+    console.log(`🔌 Socket.IO ready for real-time updates`);
     console.log(`❤️  Health check: http://localhost:${PORT}/health`);
   });
 }

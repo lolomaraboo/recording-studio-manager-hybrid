@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 12 of 17 (Tasks Chronométrées - Timer & Database) - v4.0 Workflow Commercial Complet
-Plan: 12-02 (Timer Backend Logic) - COMPLETE
-Status: Phase 12 in progress - 2/? plans done
-Last activity: 2026-01-06 - Plan 12-02 complete (timer service + tRPC API with 8 procedures)
+Plan: 12-03 (Socket.IO Integration) - COMPLETE
+Status: Phase 12 COMPLETE - 3/3 plans done
+Last activity: 2026-01-07 - Phase 12 complete (Socket.IO real-time broadcasting)
 
-Progress: ██████░░░░ 60% (v4.0: 9/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete, Phase 12 Plans 1-2 complete)
+Progress: ██████░░░░ 62% (v4.0: 10/? plans - Phase 10 complete, Phase 11-01 complete, Phase 11.5 complete, Phase 12 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 60
-- Average duration: 44.1 min
-- Total execution time: 44.10 hours
+- Total plans completed: 61
+- Average duration: 43.5 min
+- Total execution time: 44.22 hours
 
 **By Phase:**
 
@@ -65,11 +65,11 @@ Progress: ██████░░░░ 60% (v4.0: 9/? plans - Phase 10 complet
 | 10 | 3/6 | 47 min | 15.7 min |
 | 11 | 1/3 | 795 min | 795 min |
 | 11.5 | 3/3 | 43 min | 14.3 min |
-| 12 | 2/? | 13 min | 6.5 min |
+| 12 | 3/3 | 20 min | 6.7 min |
 
 **Recent Trend:**
-- Last 5 plans: [21 min, 3 min, 19 min, 4 min, 9 min]
-- Trend: Backend implementations averaging 6.5 min (database + API layer), UI implementations vary (19-795 min depending on complexity)
+- Last 5 plans: [3 min, 19 min, 4 min, 9 min, 7 min]
+- Trend: Backend implementations averaging 6.7 min (database + API + Socket.IO), UI implementations vary (19-795 min depending on complexity)
 
 ## Accumulated Context
 
@@ -312,15 +312,16 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-06T05:46:10Z
-Stopped at: Phase 12-02 COMPLETE (Timer Backend Logic)
+Last session: 2026-01-07T17:54:21Z
+Stopped at: Phase 12 COMPLETE (Tasks Chronométrées - Timer & Database)
 Resume context:
-  - Phase 12-02 complete (Timer Backend Logic & tRPC API)
-  - Created timer-service.ts with 6 business logic functions (start/stop/getActive/adjust/calculateCost/getTimeHistory)
-  - Created time-tracking tRPC router with 8 procedures (3 taskTypes, 3 timer, 2 timeEntries)
-  - Added Drizzle ORM relations for timeEntries and taskTypes
-  - Seeded 5 default task types (Setup/Recording/Mixing/Mastering/Break)
-  - Key decisions: XOR validation (sessionId OR projectId), TenantDb type inference, cost calculation formula
-  - Phase 12 in progress: 2/? plans complete
-  - Next: Phase 12-03 (Real-time Socket.IO Integration)
+  - Phase 12-03 complete (Socket.IO Real-time Integration)
+  - Installed socket.io@^4.8.1 and integrated with Express using httpServer pattern
+  - Created socket-auth middleware reusing express-session (no duplicate auth)
+  - Implemented organization-scoped broadcasting with `org:${organizationId}` rooms
+  - Added real-time events: timer:started, timer:stopped, timer:adjusted
+  - Created type-safe socket event interfaces in shared package
+  - Key decisions: Reuse session auth, org-scoped rooms for multi-tenancy, broadcast after DB operations
+  - Phase 12 COMPLETE: 3/3 plans done (database schema, tRPC API, Socket.IO)
+  - Next: Phase 13 (Tasks Chronométrées - UI & History)
 Resume file: None
