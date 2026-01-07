@@ -1025,24 +1025,20 @@ Plans:
 Plans:
 - [ ] 13-01: TBD (run /gsd:plan-phase 13 to break down)
 
-### Phase 14: Architecture Session/Project Flexible - Backend
+### Phase 14: Architecture Session/Project Flexible - Backend ✅ COMPLETE
+
+**Status**: Complete (2026-01-07)
 
 **Goal**: Database schema supporting standalone sessions (no project) AND sessions linked to projects, with backward compatibility for existing data
 
 **Depends on**: Phase 13
 
-**Research**: Likely (Migration strategy for existing sessions, data model refactoring)
+**Research**: Completed (nullable FK, SET NULL on delete, index for performance)
 
-**Research topics**:
-- Optional foreign key patterns (session.projectId nullable)
-- Migration scripts for existing session data
-- Query optimization for mixed session types
-- Backward compatibility strategies
-
-**Plans**: TBD
+**Plans**: 1/1 complete (3 min total)
 
 Plans:
-- [ ] 14-01: TBD (run /gsd:plan-phase 14 to break down)
+- [x] 14-01: Add projectId to sessions schema + migration + router updates (3 min)
 
 ### Phase 15: Architecture Session/Project Flexible - UI Adaptation
 

@@ -141,6 +141,7 @@ export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   clientId: integer("client_id").notNull().references(() => clients.id),
   roomId: integer("room_id").notNull().references(() => rooms.id),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   startTime: timestamp("start_time").notNull(),
@@ -1109,4 +1110,23 @@ export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
 
 export const taskTypesRelations = relations(taskTypes, ({ many }) => ({
   timeEntries: many(timeEntries),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  client: one(clients, {
+    fields: [sessions.clientId],
+    references: [clients.id],
+  }),
+  room: one(rooms, {
+    fields: [sessions.roomId],
+    references: [rooms.id],
+  }),
+  project: one(projects, {
+    fields: [sessions.projectId],
+    references: [projects.id],
+  }),
+}));
+
+export const projectsRelations = relations(projects, ({ many }) => ({
+  sessions: many(sessions),
 }));

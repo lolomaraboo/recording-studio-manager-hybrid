@@ -73,6 +73,7 @@ export const sessionsRouter = router({
       z.object({
         clientId: z.number(),
         roomId: z.number(),
+        projectId: z.number().optional(),
         title: z.string(),
         description: z.string().optional(),
         startTime: z.string(), // ISO date string
@@ -95,6 +96,7 @@ export const sessionsRouter = router({
         .values({
           clientId: input.clientId,
           roomId: input.roomId,
+          projectId: input.projectId,
           title: input.title,
           description: input.description,
           startTime: new Date(input.startTime),
@@ -118,6 +120,7 @@ export const sessionsRouter = router({
         data: z.object({
           clientId: z.number().optional(),
           roomId: z.number().optional(),
+          projectId: z.number().optional(),
           title: z.string().optional(),
           description: z.string().optional(),
           startTime: z.string().optional(),

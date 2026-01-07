@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 13 of 17 (Tasks Chronométrées - UI & History) - v4.0 Workflow Commercial Complet
-Plan: 13-01 of 1 - COMPLETE
-Status: Phase 13 complete - Timer UI components with real-time Socket.IO and trackId support
-Last activity: 2026-01-07 - Phase 13-01 complete (TaskTypes, ActiveTimer, TimeHistory + trackId architecture)
+Phase: 14 of 17 (Architecture Session/Project Flexible - Backend) - v4.0 Workflow Commercial Complet
+Plan: 14-01 of 1 - COMPLETE
+Status: Phase 14 complete - Sessions support optional project linkage (nullable FK)
+Last activity: 2026-01-07 - Phase 14-01 complete (projectId column + migration + router updates)
 
-Progress: ██████░░░░ 63% (v4.0: 11/? plans - Phases 10, 11-01, 11.5, 12, 13 complete)
+Progress: ███████░░░ 65% (v4.0: 12/? plans - Phases 10, 11-01, 11.5, 12, 13, 14 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 62
-- Average duration: 44.2 min
-- Total execution time: 45.72 hours
+- Total plans completed: 63
+- Average duration: 43.5 min
+- Total execution time: 45.77 hours
 
 **By Phase:**
 
@@ -67,10 +67,11 @@ Progress: ██████░░░░ 63% (v4.0: 11/? plans - Phases 10, 11-0
 | 11.5 | 3/3 | 43 min | 14.3 min |
 | 12 | 3/3 | 20 min | 6.7 min |
 | 13 | 1/1 | 90 min | 90 min |
+| 14 | 1/1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: [19 min, 4 min, 9 min, 7 min, 90 min]
-- Trend: Backend implementations fast (6.7 min avg), UI implementations vary by complexity (90 min for 3 components + architecture enhancement)
+- Last 5 plans: [4 min, 9 min, 7 min, 90 min, 3 min]
+- Trend: Backend schema changes very fast (3-7 min), UI implementations vary by complexity (90 min for 3 components + architecture)
 
 ## Accumulated Context
 
@@ -136,6 +137,7 @@ Progress: ██████░░░░ 63% (v4.0: 11/? plans - Phases 10, 11-0
 | 3.9 | Pagination default 50 | Scalable approach for large datasets in listOrganizations and listUsers |
 | 3.9 | Dedicated SuperAdmin sidebar layout | User explicitly requested "les trois onglets devrait etre dans la sidebar et on devrait avoir que ca dedans" - completely separate layout from normal dashboard with only 3 superadmin menu items (Services, Database, Logs). Improved UX clarity and admin workflow isolation. |
 | 13 | Multi-context time tracking (trackId support) | Extended time tracking from session/project to also support track-level timing. User requested "on doit tout pouvoir timer" - studios bill at different granularities (session=room rental, project=album, track=individual song work). Added trackId column, XOR validation, migration created. Maximum billing flexibility. |
+| 14 | Optional session-project linkage (nullable FK) | Sessions can optionally belong to a project via projectId column. Nullable FK with SET NULL on delete ensures sessions survive project deletion (historical session records preserved). Supports dual workflows: standalone sessions (hourly bookings) OR project-linked sessions (album recording). Backend ready for Phase 15 UI adaptation. |
 
 ### Deferred Issues
 
@@ -314,14 +316,15 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-07T19:45:00Z
-Stopped at: Phase 13-01 COMPLETE (Tasks Chronométrées - UI & History)
+Last session: 2026-01-07T01:53:58Z
+Stopped at: Phase 14-01 COMPLETE (Architecture Session/Project Flexible - Backend)
 Resume context:
-  - Phase 13 complete: Timer UI components created with 0 TypeScript errors
-  - Components: TaskTypes.tsx (387 lines), ActiveTimer.tsx (192 lines), TimeHistory.tsx (260 lines)
-  - Socket.IO client setup: packages/client/src/socket.ts (real-time timer updates)
-  - Architectural enhancement: trackId support added (session/project/track flexibility)
-  - Migration created: 0007_add_track_id_to_time_entries.sql (pending application)
-  - SUMMARY created: .planning/phases/13-tasks-chronometrees-ui/13-01-SUMMARY.md
-  - Next: Phase 14 (Architecture Session/Project Flexible - Backend)
+  - Phase 14 complete: Sessions support optional project linkage (nullable FK)
+  - Schema changes: projectId column added to sessions table + relations
+  - Migration created: 0008_add_project_id_to_sessions.sql (pending application)
+  - Router updated: sessions.ts accepts optional projectId in create/update
+  - Bug fix: apply-track-id-migration.ts getMasterDb() missing await
+  - Backward compatibility confirmed: existing sessions remain valid (projectId = NULL)
+  - SUMMARY created: .planning/phases/14-architecture-session-project-flexible-backend/14-01-SUMMARY.md
+  - Next: Phase 15 (Architecture Session/Project Flexible - UI Adaptation)
 Resume file: None
