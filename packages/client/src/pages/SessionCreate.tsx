@@ -18,6 +18,7 @@ export default function SessionCreate() {
   // Fetch related data for selects
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: rooms } = trpc.rooms.list.useQuery();
+  const { data: projects } = trpc.projects.list.useQuery();
   const { data: subscription } = trpc.subscriptions.getCurrentSubscription.useQuery();
 
   // Create mutation with limit error handling
@@ -42,6 +43,7 @@ export default function SessionCreate() {
     description: "",
     clientId: 0,
     roomId: 0,
+    projectId: 0,
     startTime: "",
     endTime: "",
     status: "scheduled" as const,
@@ -80,6 +82,7 @@ export default function SessionCreate() {
       description: formData.description || undefined,
       clientId: formData.clientId,
       roomId: formData.roomId,
+      projectId: formData.projectId || undefined,
       startTime: new Date(formData.startTime).toISOString(),
       endTime: new Date(formData.endTime).toISOString(),
       status: formData.status,
@@ -171,6 +174,27 @@ export default function SessionCreate() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Row 2.5: Project (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="projectId">Projet associé (optionnel)</Label>
+              <Select
+                value={formData.projectId.toString()}
+                onValueChange={(value) => setFormData({ ...formData, projectId: parseInt(value) })}
+              >
+                <SelectTrigger id="projectId">
+                  <SelectValue placeholder="Aucun projet (session standalone)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Aucun projet</SelectItem>
+                  {projects?.map((project) => (
+                    <SelectItem key={project.id} value={project.id.toString()}>
+                      {project.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Row 3: Start & End Time */}

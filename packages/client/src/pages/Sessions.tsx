@@ -198,6 +198,7 @@ export function Sessions() {
                         <TableHead>Session</TableHead>
                         <TableHead>Client</TableHead>
                         <TableHead>Salle</TableHead>
+                        <TableHead>Projet</TableHead>
                         <TableHead>Date & Heure</TableHead>
                         <TableHead>Statut</TableHead>
                         <TableHead>Montant</TableHead>
@@ -229,6 +230,18 @@ export function Sessions() {
                                 <MapPin className="h-3 w-3" />
                                 {roomMap[session.roomId] || "N/A"}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              {session.projectId ? (
+                                <Link
+                                  to={`/projects/${session.projectId}`}
+                                  className="text-primary hover:underline text-sm"
+                                >
+                                  Projet #{session.projectId}
+                                </Link>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">—</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="text-sm">

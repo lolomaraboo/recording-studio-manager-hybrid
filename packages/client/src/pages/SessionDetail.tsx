@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Calendar, Clock, MapPin, User, Edit, Trash2, Save, X, Mic } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, User, Edit, Trash2, Save, X, Mic, FolderKanban } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -400,6 +400,26 @@ export default function SessionDetail() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Project Associated Card */}
+            {session.projectId && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Projet associé</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex items-center gap-2">
+                    <FolderKanban className="h-4 w-4 text-muted-foreground" />
+                    <Link
+                      to={`/projects/${session.projectId}`}
+                      className="text-primary hover:underline"
+                    >
+                      Voir le projet
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Notes Card */}
             <Card>

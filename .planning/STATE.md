@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 14 of 17 (Architecture Session/Project Flexible - Backend) - v4.0 Workflow Commercial Complet
-Plan: 14-01 of 1 - COMPLETE
-Status: Phase 14 complete - Sessions support optional project linkage (nullable FK)
-Last activity: 2026-01-07 - Phase 14-01 complete (projectId column + migration + router updates)
+Phase: 15 of 17 (Architecture Session/Project Flexible - UI Adaptation) - v4.0 Workflow Commercial Complet
+Plan: 15-01 of 1 - COMPLETE
+Status: Phase 15 complete - UI supports standalone/project-linked sessions with optional selector
+Last activity: 2026-01-07 - Phase 15-01 complete (SessionCreate selector + SessionDetail card + Sessions column)
 
-Progress: ███████░░░ 65% (v4.0: 12/? plans - Phases 10, 11-01, 11.5, 12, 13, 14 complete)
+Progress: ███████░░░ 67% (v4.0: 13/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 63
-- Average duration: 43.5 min
-- Total execution time: 45.77 hours
+- Total plans completed: 64
+- Average duration: 43.1 min
+- Total execution time: 46.03 hours
 
 **By Phase:**
 
@@ -68,10 +68,11 @@ Progress: ███████░░░ 65% (v4.0: 12/? plans - Phases 10, 11-0
 | 12 | 3/3 | 20 min | 6.7 min |
 | 13 | 1/1 | 90 min | 90 min |
 | 14 | 1/1 | 3 min | 3 min |
+| 15 | 1/1 | 16 min | 16 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 9 min, 7 min, 90 min, 3 min]
-- Trend: Backend schema changes very fast (3-7 min), UI implementations vary by complexity (90 min for 3 components + architecture)
+- Last 5 plans: [9 min, 7 min, 90 min, 3 min, 16 min]
+- Trend: Backend schema changes very fast (3-7 min), UI implementations vary by complexity (16-90 min depending on components count)
 
 ## Accumulated Context
 
@@ -138,6 +139,7 @@ Progress: ███████░░░ 65% (v4.0: 12/? plans - Phases 10, 11-0
 | 3.9 | Dedicated SuperAdmin sidebar layout | User explicitly requested "les trois onglets devrait etre dans la sidebar et on devrait avoir que ca dedans" - completely separate layout from normal dashboard with only 3 superadmin menu items (Services, Database, Logs). Improved UX clarity and admin workflow isolation. |
 | 13 | Multi-context time tracking (trackId support) | Extended time tracking from session/project to also support track-level timing. User requested "on doit tout pouvoir timer" - studios bill at different granularities (session=room rental, project=album, track=individual song work). Added trackId column, XOR validation, migration created. Maximum billing flexibility. |
 | 14 | Optional session-project linkage (nullable FK) | Sessions can optionally belong to a project via projectId column. Nullable FK with SET NULL on delete ensures sessions survive project deletion (historical session records preserved). Supports dual workflows: standalone sessions (hourly bookings) OR project-linked sessions (album recording). Backend ready for Phase 15 UI adaptation. |
+| 15 | Display project ID instead of title in Sessions list | Sessions.tsx shows "Projet #{id}" instead of project title because sessions.list backend doesn't JOIN projects table. Trade-off: Simplicity Phase 15 (UI only, 16 min) vs perfectionism (backend modification + LEFT JOIN = out of scope, +2-3h). Functional but sub-optimal UX. Future improvement: Modify sessions router to include project.title in response. |
 
 ### Deferred Issues
 
@@ -316,15 +318,16 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-07T01:53:58Z
-Stopped at: Phase 14-01 COMPLETE (Architecture Session/Project Flexible - Backend)
+Last session: 2026-01-07T21:44:22Z
+Stopped at: Phase 15-01 COMPLETE (Architecture Session/Project Flexible - UI Adaptation)
 Resume context:
-  - Phase 14 complete: Sessions support optional project linkage (nullable FK)
-  - Schema changes: projectId column added to sessions table + relations
-  - Migration created: 0008_add_project_id_to_sessions.sql (pending application)
-  - Router updated: sessions.ts accepts optional projectId in create/update
-  - Bug fix: apply-track-id-migration.ts getMasterDb() missing await
-  - Backward compatibility confirmed: existing sessions remain valid (projectId = NULL)
-  - SUMMARY created: .planning/phases/14-architecture-session-project-flexible-backend/14-01-SUMMARY.md
-  - Next: Phase 15 (Architecture Session/Project Flexible - UI Adaptation)
+  - Phase 15 complete: UI supports standalone/project-linked sessions
+  - SessionCreate.tsx: Optional "Projet associé" selector with projects.list query
+  - SessionDetail.tsx: Conditional "Projet associé" card with FolderKanban icon + link
+  - Sessions.tsx: "Projet" column displaying "Projet #{id}" link or "—" for standalone
+  - Decision: Display ID temporarily (sessions.list doesn't JOIN projects - future enhancement)
+  - Backward compatible: Existing sessions (projectId=NULL) work without modification
+  - Type checking passed: pnpm check clean
+  - SUMMARY created: .planning/phases/15-architecture-session-project-flexible-ui/15-01-SUMMARY.md
+  - Next: Phase 16 (Facturation Automatique Temps Réel - Backend Integration)
 Resume file: None
