@@ -189,6 +189,11 @@ export const invoices = pgTable("invoices", {
 
   paidAt: timestamp("paid_at"),
   notes: text("notes"),
+
+  // PDF Storage
+  pdfS3Key: text("pdf_s3_key"), // S3 key (path) for invoice PDF file
+  sentAt: timestamp("sent_at"), // When invoice email was sent
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

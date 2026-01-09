@@ -6,6 +6,10 @@ import { router, protectedProcedure } from '../_core/trpc';
 import { invoices, timeEntries, clients } from '@rsm/database/tenant';
 import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
 import { getStripeClient, formatStripeAmount } from '../utils/stripe-client';
+import { getInvoicePDFUrl } from '../services/storage/s3-service';
+import { sendInvoiceEmail } from '../services/email/resend-service';
+import { generateInvoicePDF } from '../services/pdf/invoice-pdf-generator';
+import { uploadInvoicePDF } from '../services/storage/s3-service';
 
 /**
  * Invoices Router
@@ -419,5 +423,104 @@ export const invoicesRouter = router({
         sessionId: session.id,
         checkoutUrl: session.url,
       };
+    }),
+
+  /**
+   * Download invoice PDF
+   * Generates a temporary signed URL for accessing the invoice PDF from S3
+   */
+  downloadPDF: protectedProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get invoice and verify it has a PDF
+      const invoice = await tenantDb.query.invoices.findFirst({
+        where: eq(invoices.id, input.invoiceId),
+      });
+
+      if (!invoice) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Invoice not found',
+        });
+      }
+
+      if (!invoice.pdfS3Key) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invoice PDF not yet generated',
+        });
+      }
+
+      // Generate signed URL (valid for 1 hour)
+      const downloadUrl = await getInvoicePDFUrl(invoice.pdfS3Key);
+
+      return { downloadUrl };
+    }),
+
+  /**
+   * Send invoice email manually
+   * Generates PDF, uploads to S3, and sends email with attachment
+   */
+  sendInvoice: protectedProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Load invoice with client and line items
+      const invoice = await tenantDb.query.invoices.findFirst({
+        where: eq(invoices.id, input.invoiceId),
+        with: {
+          client: true,
+          items: true,
+        },
+      });
+
+      if (!invoice) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Invoice not found',
+        });
+      }
+
+      if (!invoice.client.email) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Client does not have an email address',
+        });
+      }
+
+      // Generate PDF
+      const pdfBuffer = await generateInvoicePDF(invoice);
+
+      // Upload to S3
+      const pdfS3Key = await uploadInvoicePDF({
+        invoiceId: invoice.id,
+        organizationId: ctx.organizationId,
+        pdfBuffer,
+        filename: `invoice-${invoice.invoiceNumber}.pdf`,
+      });
+
+      // Update invoice status and S3 key
+      await tenantDb
+        .update(invoices)
+        .set({
+          status: 'sent' as any,
+          pdfS3Key,
+          sentAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(invoices.id, input.invoiceId));
+
+      // Send email with PDF
+      await sendInvoiceEmail({
+        to: invoice.client.email,
+        subject: `Invoice #${invoice.invoiceNumber} from ${process.env.STUDIO_NAME || 'Your Studio'}`,
+        invoiceData: invoice,
+        pdfBuffer,
+      });
+
+      return { success: true };
     }),
 });

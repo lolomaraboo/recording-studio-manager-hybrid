@@ -22,6 +22,9 @@ import {
   sendPaymentReceiptEmail,
   sendBookingConfirmationEmail,
 } from "../utils/email-service";
+import { sendInvoiceEmail } from "../services/email/resend-service";
+import { generateInvoicePDF } from "../services/pdf/invoice-pdf-generator";
+import { uploadInvoicePDF } from "../services/storage/s3-service";
 
 /**
  * Stripe Webhook Handler
@@ -379,6 +382,8 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
  * Actions:
  * - Update invoice status (PAID or PARTIALLY_PAID)
  * - Record payment amount and timestamp
+ * - Generate PDF and upload to S3
+ * - Send email with PDF attachment
  */
 async function handleInvoiceCheckoutPayment(
   tenantDb: any,
@@ -388,9 +393,13 @@ async function handleInvoiceCheckoutPayment(
 ) {
   console.log(`[Stripe Webhook] Processing invoice checkout payment for invoice ${invoiceId}`);
 
-  // Get invoice
+  // Get invoice with client and line items
   const invoice = await tenantDb.query.invoices.findFirst({
     where: eq(invoices.id, invoiceId),
+    with: {
+      client: true,
+      items: true,
+    },
   });
 
   if (!invoice) {
@@ -405,6 +414,7 @@ async function handleInvoiceCheckoutPayment(
   );
 
   const amountPaid = parseStripeAmount(paymentIntent.amount);
+  const organizationId = parseInt(session.metadata?.organizationId || "0");
 
   // Update invoice in database transaction for atomicity
   await tenantDb.transaction(async (tx: any) => {
@@ -440,6 +450,47 @@ async function handleInvoiceCheckoutPayment(
       console.log(`[Stripe Webhook] Invoice ${invoiceId} marked as PAID (€${amountPaid})`);
     }
   });
+
+  // Generate PDF and send email (async, don't block webhook response)
+  try {
+    console.log(`[Stripe Webhook] Generating PDF for invoice ${invoiceId}`);
+    const pdfBuffer = await generateInvoicePDF(invoice);
+
+    console.log(`[Stripe Webhook] Uploading PDF to S3 for invoice ${invoiceId}`);
+    const pdfS3Key = await uploadInvoicePDF({
+      invoiceId: invoice.id,
+      organizationId,
+      pdfBuffer,
+      filename: `invoice-${invoice.invoiceNumber}.pdf`,
+    });
+
+    // Update invoice with S3 key
+    await tenantDb
+      .update(invoices)
+      .set({ pdfS3Key })
+      .where(eq(invoices.id, invoiceId));
+
+    console.log(`[Stripe Webhook] PDF uploaded to S3: ${pdfS3Key}`);
+
+    // Send email with PDF attachment
+    if (invoice.client.email) {
+      const subject = isDeposit
+        ? `Deposit Payment Received - Invoice #${invoice.invoiceNumber}`
+        : `Payment Received - Invoice #${invoice.invoiceNumber}`;
+
+      await sendInvoiceEmail({
+        to: invoice.client.email,
+        subject,
+        invoiceData: invoice,
+        pdfBuffer,
+      });
+
+      console.log(`[Stripe Webhook] Email sent to ${invoice.client.email}`);
+    }
+  } catch (emailError: any) {
+    // Log error but don't throw - email failure shouldn't fail the webhook
+    console.error(`[Stripe Webhook] Failed to generate PDF or send email:`, emailError);
+  }
 
   console.log(`[Stripe Webhook] ✅ Invoice ${invoiceId} payment processed successfully`);
 }
@@ -699,6 +750,21 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
 
   // Handle invoice payment failure
   if (invoiceId) {
+    // Get invoice with client details
+    const invoice = await tenantDb.query.invoices.findFirst({
+      where: eq(invoices.id, invoiceId),
+      with: {
+        client: true,
+        items: true,
+      },
+    });
+
+    if (!invoice) {
+      console.error(`[Stripe Webhook] Invoice ${invoiceId} not found`);
+      return;
+    }
+
+    // Update invoice status
     await tenantDb
       .update(invoices)
       .set({
@@ -708,6 +774,24 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
       .where(eq(invoices.id, invoiceId));
 
     console.log(`[Stripe Webhook] Invoice ${invoiceId} marked as PAYMENT_FAILED`);
+
+    // Send payment failed email (without PDF)
+    if (invoice.client.email) {
+      try {
+        await sendInvoiceEmail({
+          to: invoice.client.email,
+          subject: `Payment Failed - Invoice #${invoice.invoiceNumber}`,
+          invoiceData: invoice,
+          // No PDF attachment for failed payments
+        });
+
+        console.log(`[Stripe Webhook] Payment failed email sent to ${invoice.client.email}`);
+      } catch (emailError: any) {
+        console.error(`[Stripe Webhook] Failed to send payment failed email:`, emailError);
+        // Don't throw - email failure shouldn't fail the webhook
+      }
+    }
+
     return;
   }
 
