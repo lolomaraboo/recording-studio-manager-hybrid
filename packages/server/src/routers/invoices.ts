@@ -2,8 +2,9 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
-import { invoices, timeEntries } from '@rsm/database/tenant';
+import { invoices, timeEntries, clients } from '@rsm/database/tenant';
 import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
+import { getStripeClient, formatStripeAmount } from '../utils/stripe-client';
 
 /**
  * Invoices Router
@@ -284,5 +285,69 @@ export const invoicesRouter = router({
       });
 
       return entries;
+    }),
+
+  /**
+   * Create Stripe Payment Intent for invoice deposit
+   */
+  createDepositPaymentIntent: protectedProcedure
+    .input(
+      z.object({
+        invoiceId: z.number(),
+        depositAmount: z.number().positive(), // Amount in euros
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get invoice with client details
+      const invoice = await tenantDb.query.invoices.findFirst({
+        where: eq(invoices.id, input.invoiceId),
+        with: { client: true },
+      });
+
+      if (!invoice) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Invoice not found' });
+      }
+
+      // Validate deposit amount
+      if (input.depositAmount > parseFloat(invoice.total)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Deposit amount cannot exceed invoice total',
+        });
+      }
+
+      // Create Stripe Payment Intent
+      const stripe = getStripeClient();
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: formatStripeAmount(input.depositAmount), // Convert euros to cents
+        currency: 'eur',
+        metadata: {
+          type: 'invoice_deposit',
+          invoiceId: invoice.id.toString(),
+          organizationId: ctx.organizationId.toString(),
+          clientId: invoice.clientId.toString(),
+        },
+        description: `Acompte facture ${invoice.invoiceNumber} - ${invoice.client.name}`,
+      });
+
+      // Update invoice with deposit information
+      const remainingBalance = parseFloat(invoice.total) - input.depositAmount;
+
+      await tenantDb
+        .update(invoices)
+        .set({
+          depositAmount: input.depositAmount.toFixed(2),
+          stripeDepositPaymentIntentId: paymentIntent.id,
+          remainingBalance: remainingBalance.toFixed(2),
+          updatedAt: new Date(),
+        })
+        .where(eq(invoices.id, input.invoiceId));
+
+      return {
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+      };
     }),
 });

@@ -180,6 +180,13 @@ export const invoices = pgTable("invoices", {
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+
+  // Deposit & Advance Payments
+  depositAmount: decimal("deposit_amount", { precision: 10, scale: 2 }), // Amount requested as deposit (nullable = no deposit)
+  depositPaidAt: timestamp("deposit_paid_at"), // When deposit was paid
+  stripeDepositPaymentIntentId: varchar("stripe_deposit_payment_intent_id", { length: 255 }), // Stripe PI for deposit
+  remainingBalance: decimal("remaining_balance", { precision: 10, scale: 2 }), // Calculated: total - depositAmount (or total if no deposit)
+
   paidAt: timestamp("paid_at"),
   notes: text("notes"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 16 of 17 (Facturation Automatique Backend) - v4.0 Workflow Commercial Complet
-Plan: 16-01 of 1 - COMPLETE
-Status: Phase 16 complete - Invoice generation from time entries operational
-Last activity: 2026-01-09 - Phase 16-01 complete (Auto-invoice backend service + tRPC endpoints)
+Plan: 16-02 of 3 - In progress
+Status: Phase 16 ongoing - Stripe deposits integration complete
+Last activity: 2026-01-09 - Phase 16-02 complete (Stripe Payment Intents for invoice deposits)
 
-Progress: ████████░░ 75% (v4.0: 15/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16 complete)
+Progress: ████████░░ 76% (v4.0: 16/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16-01, 16-02 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 66
-- Average duration: 43.4 min
-- Total execution time: 47.68 hours
+- Total plans completed: 67
+- Average duration: 43.0 min
+- Total execution time: 47.95 hours
 
 **By Phase:**
 
@@ -70,11 +70,11 @@ Progress: ████████░░ 75% (v4.0: 15/? plans - Phases 10, 11-0
 | 14 | 1/1 | 3 min | 3 min |
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
-| 16 | 1/1 | 10 min | 10 min |
+| 16 | 2/3 | 26 min | 13 min |
 
 **Recent Trend:**
-- Last 5 plans: [90 min, 3 min, 16 min, 89 min, 10 min]
-- Trend: Backend services rapides (10 min pour service + tests + endpoints), TypeScript cleanup comprehensive (89 min), schema migrations rapides (3-16 min)
+- Last 5 plans: [3 min, 16 min, 89 min, 10 min, 16 min]
+- Trend: Stripe integrations rapides (16 min pour schema + endpoints + webhooks), backend services (10 min), TypeScript cleanup (89 min)
 
 ## Accumulated Context
 
@@ -323,17 +323,17 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-09T22:41:55Z
-Stopped at: Phase 16-01 COMPLETE (Auto-Invoice Generation Backend)
+Last session: 2026-01-09T22:57:54Z
+Stopped at: Phase 16-02 COMPLETE (Stripe Deposits & Advances)
 Resume context:
-  - Phase 16 complete: Service de génération d'invoices depuis time entries opérationnel
-  - Backend: generateInvoiceFromTimeEntries service + 2 tRPC endpoints (generateFromTimeEntries, getUninvoicedTimeEntries)
-  - Tests: 4 unit tests passing (grouping, calculations, validations, error handling)
-  - Schema: invoiceId FK ajouté à time_entries, relations bidirectionnelles configurées
-  - Migration 0009: Créée et validée (non appliquée car Docker offline - à appliquer au prochain démarrage)
-  - TypeScript: Clean pour fonctionnalités implémentées (4 errors pré-existantes hors scope)
-  - Line items: Format "{TaskType} - {hours}h{minutes} @ {rate}€/h" pour clarté client
-  - Modes: session (facturation unique session) ET project (consolidation projet) supportés
-  - SUMMARY created: .planning/phases/16-facturation-automatique-backend/16-01-SUMMARY.md
-  - Next: Phase 16-02 (Stripe Deposits & Advances UI)
+  - Phase 16-02 complete: Stripe Payment Intent integration pour acomptes/avances sur factures
+  - Schema: 4 nouveaux champs ajoutés à invoices (depositAmount, depositPaidAt, stripeDepositPaymentIntentId, remainingBalance)
+  - Migration 0010: Créée manuellement (non appliquée - Docker offline, à appliquer au redémarrage)
+  - tRPC endpoint: createDepositPaymentIntent avec validation (depositAmount <= total)
+  - Webhook: handleInvoiceDepositPayment() route via metadata.type='invoice_deposit'
+  - Stripe pattern: Réutilise getStripeClient() + formatStripeAmount() de Phase 3
+  - Balance auto: remainingBalance = total - depositAmount calculé côté serveur
+  - TypeScript: 0 erreurs (build database requis pour régénérer dist/)
+  - SUMMARY created: .planning/phases/16-facturation-automatique-backend/16-02-SUMMARY.md
+  - Next: Phase 16-03 (Tax Calculation & Validation)
 Resume file: None

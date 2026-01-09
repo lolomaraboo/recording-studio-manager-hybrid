@@ -7,6 +7,7 @@ import {
   clientPortalActivityLogs,
   clients,
   rooms,
+  invoices,
 } from "@rsm/database/tenant/schema";
 import { organizations } from "@rsm/database/master/schema";
 import { eq, and } from "drizzle-orm";
@@ -333,6 +334,15 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
 
   console.log(`[Stripe Webhook] Processing payment_intent.succeeded: ${paymentIntent.id}`);
 
+  const metadata = paymentIntent.metadata;
+
+  // Route based on payment type in metadata
+  if (metadata.type === 'invoice_deposit') {
+    await handleInvoiceDepositPayment(paymentIntent);
+    return;
+  }
+
+  // Existing booking payment logic
   // Extract metadata
   const organizationId = parseInt(paymentIntent.metadata?.organization_id || "0");
   const bookingId = parseInt(paymentIntent.metadata?.booking_id || "0");
@@ -413,6 +423,44 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
   }
 
   console.log(`[Stripe Webhook] Successfully processed payment_intent.succeeded for booking ${bookingId}`);
+}
+
+/**
+ * Handle invoice deposit payment success
+ *
+ * Triggered when:
+ * - Payment Intent for invoice deposit succeeds
+ *
+ * Actions:
+ * - Update invoice.depositPaidAt timestamp
+ * - Mark deposit as paid
+ */
+async function handleInvoiceDepositPayment(paymentIntent: Stripe.PaymentIntent) {
+  const metadata = paymentIntent.metadata;
+  const organizationId = parseInt(metadata.organizationId || "0");
+  const invoiceId = parseInt(metadata.invoiceId || "0");
+
+  if (!organizationId || !invoiceId) {
+    console.error("[Stripe Webhook] Missing required metadata in invoice deposit payment:", {
+      organizationId,
+      invoiceId,
+      paymentIntentId: paymentIntent.id,
+    });
+    return;
+  }
+
+  const tenantDb = await getTenantDb(organizationId);
+
+  // Update invoice deposit status
+  await tenantDb
+    .update(invoices)
+    .set({
+      depositPaidAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(invoices.id, invoiceId));
+
+  console.log(`[Stripe Webhook] ✅ Deposit payment succeeded for invoice ${invoiceId}`);
 }
 
 /**
