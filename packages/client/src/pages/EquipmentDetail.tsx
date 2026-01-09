@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Package, Edit, Trash2, Save, X, Calendar, DollarSign, Wrench } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Save, X, Calendar, DollarSign, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -123,7 +123,7 @@ export default function EquipmentDetail() {
         brand: equipment.brand || "",
         model: equipment.model || "",
         serialNumber: equipment.serialNumber || "",
-        category: equipment.category,
+        category: equipment.category as "microphone" | "preamp" | "interface" | "outboard" | "instrument" | "monitoring" | "computer" | "cable" | "accessory" | "other",
         description: equipment.description || "",
         specifications: equipment.specifications || "",
         purchaseDate: equipment.purchaseDate
@@ -133,8 +133,8 @@ export default function EquipmentDetail() {
         warrantyUntil: equipment.warrantyUntil
           ? new Date(equipment.warrantyUntil).toISOString().split("T")[0]
           : "",
-        status: equipment.status,
-        condition: equipment.condition,
+        status: equipment.status as "operational" | "maintenance" | "out_of_service" | "rented",
+        condition: equipment.condition as "excellent" | "good" | "fair" | "poor",
         lastMaintenanceAt: equipment.lastMaintenanceAt
           ? new Date(equipment.lastMaintenanceAt).toISOString().split("T")[0]
           : "",
@@ -157,7 +157,6 @@ export default function EquipmentDetail() {
       warrantyUntil: formData.warrantyUntil ? new Date(formData.warrantyUntil) : null,
       lastMaintenanceAt: formData.lastMaintenanceAt ? new Date(formData.lastMaintenanceAt) : null,
       nextMaintenanceAt: formData.nextMaintenanceAt ? new Date(formData.nextMaintenanceAt) : null,
-      roomId: formData.roomId || null,
       purchasePrice: formData.purchasePrice || null,
     });
   };

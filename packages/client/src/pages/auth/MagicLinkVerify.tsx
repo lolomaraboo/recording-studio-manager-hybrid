@@ -60,8 +60,8 @@ export default function MagicLinkVerify() {
       }
 
       // For login magic links, authenticate and redirect
-      if (result.purpose === 'login' && result.sessionToken && result.client) {
-        login(result.sessionToken, result.client);
+      if (result.purpose === 'login' && (result as any).sessionToken && (result as any).client) {
+        login((result as any).sessionToken, (result as any).client);
         setState('success');
         setTimeout(() => navigate('/client-portal'), 1500);
       } else {

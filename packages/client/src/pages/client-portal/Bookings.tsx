@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useClientPortalAuth } from "@/contexts/ClientPortalAuthContext";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -19,7 +18,6 @@ import { Calendar } from "lucide-react";
  * - Redirect to Stripe Checkout for payment
  */
 export default function Bookings() {
-  const navigate = useNavigate();
   const { sessionToken } = useClientPortalAuth();
   usePageTitle('My Bookings');
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
@@ -163,7 +161,7 @@ export default function Bookings() {
                             <h3 className="text-sm font-semibold">{room.name}</h3>
                             <span
                               className="px-2 py-1 text-xs font-medium rounded"
-                              style={{ backgroundColor: room.color + "20", color: room.color }}
+                              style={{ backgroundColor: room.color ? room.color + "20" : undefined, color: room.color || undefined }}
                             >
                               {room.type}
                             </span>

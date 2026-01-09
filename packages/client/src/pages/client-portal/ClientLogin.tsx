@@ -46,7 +46,7 @@ export default function ClientLogin() {
       console.log('Login successful:', result);
 
       // Store session in context (localStorage)
-      authLogin(result.sessionToken, result.client);
+      authLogin(result.sessionToken, result.client as any);
 
       toast.success('Login successful!');
       // Navigate to client portal index (dashboard)

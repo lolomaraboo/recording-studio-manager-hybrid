@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save, Upload, X, Plus, User, Building2, Phone as PhoneIcon, Mail, Globe, MapPin, Info } from "lucide-react";
+import { ArrowLeft, Save, Upload, X, Plus, User, Building2, Phone as PhoneIcon, MapPin, Info } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ClientCreate() {

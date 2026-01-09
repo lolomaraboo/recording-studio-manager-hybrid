@@ -229,21 +229,7 @@ export class AIActionExecutor {
   }) {
     const { start_date, end_date, room_id } = params;
 
-    let query = this.db
-      .select({
-        id: sessions.id,
-        title: sessions.title,
-        clientId: sessions.clientId,
-        roomId: sessions.roomId,
-        startTime: sessions.startTime,
-        endTime: sessions.endTime,
-        status: sessions.status,
-        totalAmount: sessions.totalAmount,
-      })
-      .from(sessions)
-      .orderBy(sessions.startTime);
-
-    // Apply filters
+    // Build filters
     const filters = [];
     if (start_date) {
       filters.push(gte(sessions.startTime, new Date(start_date)));
@@ -255,11 +241,23 @@ export class AIActionExecutor {
       filters.push(eq(sessions.roomId, room_id));
     }
 
-    if (filters.length > 0) {
-      query = query.where(and(...filters));
-    }
+    // Build query with filters in single chain
+    const baseQuery = this.db
+      .select({
+        id: sessions.id,
+        title: sessions.title,
+        clientId: sessions.clientId,
+        roomId: sessions.roomId,
+        startTime: sessions.startTime,
+        endTime: sessions.endTime,
+        status: sessions.status,
+        totalAmount: sessions.totalAmount,
+      })
+      .from(sessions);
 
-    const result = await query.limit(50);
+    const result = await (filters.length > 0
+      ? baseQuery.where(and(...filters)).orderBy(sessions.startTime).limit(50)
+      : baseQuery.orderBy(sessions.startTime).limit(50));
 
     return {
       sessions: result,
@@ -376,7 +374,7 @@ export class AIActionExecutor {
   async get_all_clients(params: { is_vip?: boolean; limit?: number } = {}) {
     const { is_vip, limit = 50 } = params;
 
-    let query = this.db
+    const baseQuery = this.db
       .select({
         id: clients.id,
         name: clients.name,
@@ -386,14 +384,11 @@ export class AIActionExecutor {
         isVip: clients.isVip,
         isActive: clients.isActive,
       })
-      .from(clients)
-      .where(eq(clients.isActive, true));
+      .from(clients);
 
-    if (is_vip !== undefined) {
-      query = query.where(eq(clients.isVip, is_vip));
-    }
-
-    const result = await query.limit(limit);
+    const result = await (is_vip !== undefined
+      ? baseQuery.where(and(eq(clients.isActive, true), eq(clients.isVip, is_vip))).limit(limit)
+      : baseQuery.where(eq(clients.isActive, true)).limit(limit));
 
     return {
       clients: result,
@@ -662,13 +657,11 @@ export class AIActionExecutor {
   async get_all_invoices(params: { status?: string; limit?: number } = {}) {
     const { status, limit = 50 } = params;
 
-    let query = this.db.select().from(invoices).orderBy(desc(invoices.createdAt));
+    const baseQuery = this.db.select().from(invoices);
 
-    if (status) {
-      query = query.where(eq(invoices.status, status));
-    }
-
-    const result = await query.limit(limit);
+    const result = await (status
+      ? baseQuery.where(eq(invoices.status, status)).orderBy(desc(invoices.createdAt)).limit(limit)
+      : baseQuery.orderBy(desc(invoices.createdAt)).limit(limit));
 
     return {
       invoices: result,
@@ -810,13 +803,11 @@ export class AIActionExecutor {
   async get_all_quotes(params: { status?: string; limit?: number } = {}) {
     const { status, limit = 50 } = params;
 
-    let query = this.db.select().from(quotes).orderBy(desc(quotes.createdAt));
+    const baseQuery = this.db.select().from(quotes);
 
-    if (status) {
-      query = query.where(eq(quotes.status, status));
-    }
-
-    const result = await query.limit(limit);
+    const result = await (status
+      ? baseQuery.where(eq(quotes.status, status)).orderBy(desc(quotes.createdAt)).limit(limit)
+      : baseQuery.orderBy(desc(quotes.createdAt)).limit(limit));
 
     return {
       quotes: result,
@@ -854,15 +845,13 @@ export class AIActionExecutor {
       .values({
         clientId: client_id,
         quoteNumber: quote_number,
-        validUntil: new Date(valid_until),
+        expiresAt: new Date(valid_until),
         status: "draft",
         subtotal: subtotal.toString(),
         taxRate: tax_rate.toString(),
         taxAmount: taxAmount.toString(),
         total: total.toString(),
-        title,
-        description,
-        projectId: project_id,
+        notes: description,
       })
       .returning();
 
@@ -947,12 +936,12 @@ export class AIActionExecutor {
       })
       .returning();
 
-    // Update quote status
+    // Update quote status (note: quotes convert to projects in the schema, not invoices)
+    // This marks the quote as converted_to_project status
     await this.db
       .update(quotes)
       .set({
-        status: "converted",
-        convertedToInvoiceId: invoice.id,
+        status: "converted_to_project",
         convertedAt: new Date(),
       })
       .where(eq(quotes.id, quote_id));
@@ -1147,13 +1136,11 @@ export class AIActionExecutor {
   async get_all_projects(params: { status?: string; limit?: number } = {}) {
     const { status, limit = 50 } = params;
 
-    let query = this.db.select().from(projects).orderBy(desc(projects.createdAt));
+    const baseQuery = this.db.select().from(projects);
 
-    if (status) {
-      query = query.where(eq(projects.status, status));
-    }
-
-    const result = await query.limit(limit);
+    const result = await (status
+      ? baseQuery.where(eq(projects.status, status)).orderBy(desc(projects.createdAt)).limit(limit)
+      : baseQuery.orderBy(desc(projects.createdAt)).limit(limit));
 
     return {
       projects: result,

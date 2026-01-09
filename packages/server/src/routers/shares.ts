@@ -156,8 +156,8 @@ export const sharesRouter = router({
         throw new Error("Share not found");
       }
 
-      // Mark as revoked instead of deleting
-      mockShares[index].status = "revoked";
+      // Mark as expired instead of deleting (using "expired" as revoked status)
+      mockShares[index].status = "expired";
       return { success: true };
     }),
 
@@ -167,7 +167,7 @@ export const sharesRouter = router({
   getStats: protectedProcedure.query(async () => {
     const activeShares = mockShares.filter((s) => s.status === "active");
     const expiredShares = mockShares.filter(
-      (s) => s.status === "expired" || s.status === "revoked"
+      (s) => s.status === "expired"
     );
     const totalAccess = mockShares.reduce((acc, s) => acc + s.accessCount, 0);
 

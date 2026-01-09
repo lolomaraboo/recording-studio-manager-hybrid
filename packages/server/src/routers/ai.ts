@@ -66,7 +66,7 @@ export const aiRouter = router({
       const llm = getLLMProvider();
 
       // Create AI action executor with tenant DB
-      const actionExecutor = new AIActionExecutor(tenantDb);
+      const actionExecutor = new AIActionExecutor(tenantDb as any);
 
       // Load conversation context with conditional RAG strategy
       // - Recent context (15 messages) always loaded
@@ -375,13 +375,11 @@ export const aiRouter = router({
       const tenantDb = await ctx.getTenantDb();
       const { sessionId, limit, offset } = input;
 
-      let query = tenantDb.select().from(aiActionLogs).orderBy(desc(aiActionLogs.createdAt));
+      const baseQuery = tenantDb.select().from(aiActionLogs);
 
-      if (sessionId) {
-        query = query.where(eq(aiActionLogs.sessionId, sessionId));
-      }
-
-      const logs = await query.limit(limit).offset(offset);
+      const logs = await (sessionId
+        ? baseQuery.where(eq(aiActionLogs.sessionId, sessionId)).orderBy(desc(aiActionLogs.createdAt)).limit(limit).offset(offset)
+        : baseQuery.orderBy(desc(aiActionLogs.createdAt)).limit(limit).offset(offset));
 
       return logs.map((log) => ({
         id: log.id,

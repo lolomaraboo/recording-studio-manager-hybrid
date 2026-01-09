@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, DoorOpen, Edit, Trash2, Save, X, CheckCircle2, XCircle, Users, Maximize, Building } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Save, X, CheckCircle2, XCircle, Users, Maximize, Building } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -89,10 +89,10 @@ export default function RoomDetail() {
       setFormData({
         name: room.name,
         description: room.description || "",
-        type: room.type,
-        hourlyRate: room.hourlyRate,
-        halfDayRate: room.halfDayRate,
-        fullDayRate: room.fullDayRate,
+        type: room.type as "recording" | "mixing" | "mastering" | "rehearsal" | "live",
+        hourlyRate: parseFloat(room.hourlyRate),
+        halfDayRate: room.halfDayRate ? parseFloat(room.halfDayRate) : 0,
+        fullDayRate: room.fullDayRate ? parseFloat(room.fullDayRate) : 0,
         capacity: room.capacity,
         size: room.size || undefined,
         hasIsolationBooth: room.hasIsolationBooth,
@@ -379,15 +379,15 @@ export default function RoomDetail() {
                       <div className="grid gap-2 md:grid-cols-3">
                         <div className="p-3 bg-muted/50 rounded-lg">
                           <p className="text-xs text-muted-foreground mb-1">Horaire</p>
-                          <p className="text-lg font-semibold">{formatPrice(room.hourlyRate)}</p>
+                          <p className="text-lg font-semibold">{formatPrice(parseFloat(room.hourlyRate))}</p>
                         </div>
                         <div className="p-3 bg-muted/50 rounded-lg">
                           <p className="text-xs text-muted-foreground mb-1">Demi-journée</p>
-                          <p className="text-lg font-semibold">{formatPrice(room.halfDayRate)}</p>
+                          <p className="text-lg font-semibold">{formatPrice(parseFloat(room.halfDayRate || "0"))}</p>
                         </div>
                         <div className="p-3 bg-muted/50 rounded-lg">
                           <p className="text-xs text-muted-foreground mb-1">Journée</p>
-                          <p className="text-lg font-semibold">{formatPrice(room.fullDayRate)}</p>
+                          <p className="text-lg font-semibold">{formatPrice(parseFloat(room.fullDayRate || "0"))}</p>
                         </div>
                       </div>
                     </div>

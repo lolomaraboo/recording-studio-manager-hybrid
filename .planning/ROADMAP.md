@@ -1055,11 +1055,32 @@ Plans:
 
 **Status**: ✅ Complete (1/1 plans finished - 16 min total)
 
+---
+
+### Phase 15.5: TypeScript Cleanup (INSERTED)
+
+**Goal**: Corriger toutes erreurs TypeScript (316 total: 44 server + 272 client) avant Phase 16, restaurer type safety complet après migrations 0007-trackId et 0008-projectId
+
+**Depends on**: Phase 15
+
+**Research**: Unlikely (TypeScript error patterns, Drizzle type regeneration)
+
+**Plans**: 1 plan
+
+Plans:
+- [x] 15.5-01: TypeScript cleanup 316 errors → 0 (Completed 2026-01-09 - 89 min)
+
+**Status**: ✅ Complete (1/1 plans finished - 89 min total)
+
+**Rationale**: Migrations 0007 (trackId) et 0008 (projectId) appliquées mais types Drizzle non régénérés → cascade 316 erreurs. Type safety critique avant facturation automatique (Phase 16) pour éviter bugs production. Cleanup comprehensive: schema queries, session types, obsolete fields, type conversions.
+
+---
+
 ### Phase 16: Facturation Automatique - Backend Integration
 
 **Goal**: Auto-generate invoices from timed tasks, support per-session OR global project invoicing, calculate line items ("Recording - 2h30 @ 50€/h = 125€"), handle deposits/advances
 
-**Depends on**: Phase 15
+**Depends on**: Phase 15.5
 
 **Research**: Likely (Invoice generation logic, Stripe integration for deposits, tax calculation)
 

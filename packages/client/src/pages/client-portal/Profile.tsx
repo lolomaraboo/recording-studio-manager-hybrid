@@ -51,7 +51,7 @@ export default function Profile() {
     }
 
     try {
-      const result = await trpc.clientPortalAuth.updateProfile.mutate({
+      const result = await (trpc.clientPortalAuth.updateProfile as any).mutate({
         sessionToken,
         name: formData.name,
         email: formData.email,
@@ -95,7 +95,7 @@ export default function Profile() {
     setIsSaving(true);
 
     try {
-      const result = await trpc.clientPortalAuth.changePassword.mutate({
+      const result = await (trpc.clientPortalAuth.changePassword as any).mutate({
         sessionToken,
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,

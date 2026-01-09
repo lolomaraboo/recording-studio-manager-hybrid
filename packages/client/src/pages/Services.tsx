@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -161,15 +161,15 @@ export default function Services() {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
       category: formData.category,
-      unitPrice: parseFloat(formData.unitPrice),
-      taxRate: parseFloat(formData.taxRate),
-      defaultQuantity: parseFloat(formData.defaultQuantity),
+      unitPrice: formData.unitPrice,
+      taxRate: formData.taxRate,
+      defaultQuantity: formData.defaultQuantity,
     };
 
     if (editingService !== null) {
-      await updateMutation.mutateAsync({ id: editingService, ...data });
+      await updateMutation.mutateAsync({ id: editingService, ...data } as any);
     } else {
-      await createMutation.mutateAsync(data);
+      await createMutation.mutateAsync(data as any);
     }
   };
 
@@ -317,8 +317,8 @@ export default function Services() {
                         </div>
                       </TableCell>
                       <TableCell>{service.category}</TableCell>
-                      <TableCell className="text-right">{formatPrice(service.unitPrice)}</TableCell>
-                      <TableCell className="text-right">{formatTax(service.taxRate)}</TableCell>
+                      <TableCell className="text-right">{formatPrice(parseFloat(service.unitPrice))}</TableCell>
+                      <TableCell className="text-right">{formatTax(parseFloat(service.taxRate))}</TableCell>
                       <TableCell className="text-right">{service.defaultQuantity}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

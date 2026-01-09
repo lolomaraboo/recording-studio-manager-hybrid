@@ -202,11 +202,14 @@ export class LLMProvider {
     const toolCalls: ToolCall[] = [];
     if (message.tool_calls) {
       for (const tc of message.tool_calls) {
-        toolCalls.push({
-          id: tc.id,
-          name: tc.function.name,
-          input: JSON.parse(tc.function.arguments),
-        });
+        // Type guard to check if tool call has 'function' property
+        if ('function' in tc) {
+          toolCalls.push({
+            id: tc.id,
+            name: tc.function.name,
+            input: JSON.parse(tc.function.arguments),
+          });
+        }
       }
     }
 

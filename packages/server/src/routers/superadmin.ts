@@ -229,7 +229,7 @@ export const superadminRouter = router({
             const sizeResult = await masterDb.execute(
               sql`SELECT pg_database_size(${tenant.databaseName}) as size`
             );
-            const size = sizeResult.rows[0]?.size || 0;
+            const size = sizeResult[0]?.size || 0;
 
             // Format size (bytes to MB)
             const sizeMB = Math.round(Number(size) / 1024 / 1024);

@@ -144,23 +144,6 @@ export function Clients() {
     }
   };
 
-  const _getTypeLabel = (type: string) => {
-    switch (type) {
-      case "solo_artist":
-        return "Artiste Solo";
-      case "band":
-        return "Groupe";
-      case "label":
-        return "Label";
-      case "company":
-        return "Entreprise";
-      case "producer":
-        return "Producteur";
-      default:
-        return type;
-    }
-  };
-
   return (
     <div className="container pt-2 pb-4 px-2">
       <div className="space-y-2">
@@ -423,32 +406,16 @@ export function Clients() {
                           <CardContent className="space-y-3">
                             {/* Contact Info enrichi */}
                             <div className="space-y-2 text-sm">
-                              {/* Téléphones enrichis */}
-                              {client.phones && Array.isArray(client.phones) && client.phones.length > 0 ? (
-                                client.phones.map((phone: any, idx: number) => (
-                                  <div key={idx} className="flex items-center gap-2 text-muted-foreground">
-                                    <Phone className="h-3 w-3 flex-shrink-0" />
-                                    <span className="text-xs capitalize">{phone.type}:</span>
-                                    <span>{phone.number}</span>
-                                  </div>
-                                ))
-                              ) : client.phone ? (
+                              {/* Téléphone */}
+                              {client.phone ? (
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <Phone className="h-3 w-3 flex-shrink-0" />
                                   <span>{client.phone}</span>
                                 </div>
                               ) : null}
 
-                              {/* Emails enrichis */}
-                              {client.emails && Array.isArray(client.emails) && client.emails.length > 0 ? (
-                                client.emails.map((email: any, idx: number) => (
-                                  <div key={idx} className="flex items-center gap-2 text-muted-foreground">
-                                    <Mail className="h-3 w-3 flex-shrink-0" />
-                                    <span className="text-xs capitalize">{email.type}:</span>
-                                    <span className="truncate">{email.email}</span>
-                                  </div>
-                                ))
-                              ) : client.email ? (
+                              {/* Email */}
+                              {client.email ? (
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <Mail className="h-3 w-3 flex-shrink-0" />
                                   <span className="truncate">{client.email}</span>
@@ -510,16 +477,8 @@ export function Clients() {
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                   <div className="space-y-1 text-xs">
-                                    {/* Afficher téléphones enrichis ou simple */}
-                                    {client.phones && Array.isArray(client.phones) && client.phones.length > 0 ? (
-                                      client.phones.slice(0, 2).map((phone: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-1 text-muted-foreground">
-                                          <Phone className="h-3 w-3" />
-                                          <span className="capitalize">{phone.type}:</span>
-                                          <span>{phone.number}</span>
-                                        </div>
-                                      ))
-                                    ) : client.phone ? (
+                                    {/* Afficher téléphone */}
+                                    {client.phone ? (
                                       <div className="flex items-center gap-1 text-muted-foreground">
                                         <Phone className="h-3 w-3" />
                                         <span>{client.phone}</span>
@@ -527,12 +486,7 @@ export function Clients() {
                                     ) : null}
 
                                     {/* Afficher email principal */}
-                                    {client.emails && Array.isArray(client.emails) && client.emails.length > 0 ? (
-                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
-                                        <Mail className="h-3 w-3 flex-shrink-0" />
-                                        <span className="truncate">{client.emails[0].email}</span>
-                                      </div>
-                                    ) : client.email ? (
+                                    {client.email ? (
                                       <div className="flex items-center gap-1 text-muted-foreground truncate">
                                         <Mail className="h-3 w-3 flex-shrink-0" />
                                         <span className="truncate">{client.email}</span>
@@ -586,16 +540,8 @@ export function Clients() {
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                   <div className="space-y-1 text-xs">
-                                    {/* Afficher téléphones enrichis ou simple */}
-                                    {client.phones && Array.isArray(client.phones) && client.phones.length > 0 ? (
-                                      client.phones.slice(0, 2).map((phone: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-1 text-muted-foreground">
-                                          <Phone className="h-3 w-3" />
-                                          <span className="capitalize">{phone.type}:</span>
-                                          <span>{phone.number}</span>
-                                        </div>
-                                      ))
-                                    ) : client.phone ? (
+                                    {/* Afficher téléphone */}
+                                    {client.phone ? (
                                       <div className="flex items-center gap-1 text-muted-foreground">
                                         <Phone className="h-3 w-3" />
                                         <span>{client.phone}</span>
@@ -603,12 +549,7 @@ export function Clients() {
                                     ) : null}
 
                                     {/* Afficher email principal */}
-                                    {client.emails && Array.isArray(client.emails) && client.emails.length > 0 ? (
-                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
-                                        <Mail className="h-3 w-3 flex-shrink-0" />
-                                        <span className="truncate">{client.emails[0].email}</span>
-                                      </div>
-                                    ) : client.email ? (
+                                    {client.email ? (
                                       <div className="flex items-center gap-1 text-muted-foreground truncate">
                                         <Mail className="h-3 w-3 flex-shrink-0" />
                                         <span className="truncate">{client.email}</span>

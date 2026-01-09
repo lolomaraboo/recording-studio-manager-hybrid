@@ -16,7 +16,7 @@ export function Expenses() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  const { data: expenses, isLoading: expensesLoading } = trpc.expenses.list.useQuery({ limit: 100 });
+  const { data: expenses, isLoading: expensesLoading } = trpc.expenses.list.useQuery();
 
   // Filter and sort expenses
   const filteredExpenses = useMemo(() => {

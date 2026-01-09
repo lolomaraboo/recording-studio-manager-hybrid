@@ -5,6 +5,7 @@ import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import { createClient } from 'redis';
 import * as Sentry from '@sentry/node';
+import { setupExpressErrorHandler } from '@sentry/node';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
@@ -15,6 +16,14 @@ import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
 import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
 import { socketAuthMiddleware } from './middleware/socket-auth.js';
+
+// Augment express-session types to include custom session data
+declare module 'express-session' {
+  interface SessionData {
+    userId?: number;
+    organizationId?: number;
+  }
+}
 
 /**
  * Recording Studio Manager - tRPC Server
@@ -272,7 +281,7 @@ async function main() {
 
   // Sentry error handler (MUST be after all routes)
   if (process.env.SENTRY_DSN_BACKEND) {
-    app.use(Sentry.Handlers.errorHandler());
+    setupExpressErrorHandler(app);
   }
 
   // Start server (use httpServer for Socket.IO support)

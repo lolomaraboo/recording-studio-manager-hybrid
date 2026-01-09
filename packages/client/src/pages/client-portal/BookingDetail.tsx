@@ -134,6 +134,23 @@ export default function BookingDetail() {
 
   const booking = bookingQuery.data;
 
+  // Guard clause for undefined booking
+  if (!booking) {
+    return (
+      <div className="container pt-2 pb-4 px-2">
+        <div className="space-y-2">
+          <div className="text-center py-6">
+            <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground mb-3">Booking not found</p>
+            <Button size="sm" onClick={() => navigate('/client-portal/bookings')}>
+              Back to Bookings
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       confirmed: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
@@ -276,8 +293,8 @@ export default function BookingDetail() {
             <Badge
               variant="outline"
               style={{
-                backgroundColor: booking.room?.color + '20',
-                color: booking.room?.color,
+                backgroundColor: booking.room?.color ? booking.room.color + '20' : undefined,
+                color: booking.room?.color || undefined,
               }}
             >
               {booking.room?.type}

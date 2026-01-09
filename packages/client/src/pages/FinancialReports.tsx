@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
@@ -17,10 +16,7 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
-  FileText,
   Download,
-  Calendar,
-  Users,
   Target,
   PieChart,
   ArrowLeft,
@@ -34,7 +30,7 @@ export default function FinancialReports() {
 
   // Queries
   const { data: invoices, isLoading: loadingInvoices } =
-    trpc.invoices.list.useQuery({ status: "paid" });
+    trpc.invoices.list.useQuery();
   const { data: quotes, isLoading: loadingQuotes } = trpc.quotes.list.useQuery();
   const { data: expenses, isLoading: loadingExpenses } =
     trpc.expenses.list.useQuery();
@@ -48,9 +44,6 @@ export default function FinancialReports() {
   const netProfit = totalRevenue - totalExpenses;
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
-  const totalQuotesValue =
-    quotes?.reduce((sum, q) => sum + Number(q.total || 0), 0) || 0;
-  const pendingQuotes = quotes?.filter((q) => q.status === "draft").length || 0;
   const acceptedQuotes = quotes?.filter((q) => q.status === "accepted").length || 0;
 
   const conversionRate =

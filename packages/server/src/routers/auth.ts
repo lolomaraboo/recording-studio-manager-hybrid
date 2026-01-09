@@ -156,7 +156,14 @@ export const authRouter = router({
 
       // Find organization - try owner first, then membership
       let orgList = await masterDb
-        .select()
+        .select({
+          id: organizations.id,
+          name: organizations.name,
+          ownerId: organizations.ownerId,
+          subdomain: organizations.subdomain,
+          createdAt: organizations.createdAt,
+          updatedAt: organizations.updatedAt,
+        })
         .from(organizations)
         .where(eq(organizations.ownerId, user.id))
         .limit(1);
@@ -221,9 +228,8 @@ export const authRouter = router({
    * Get current user
    */
   me: publicProcedure.query(async ({ ctx }) => {
-    const session = ctx.req.session as any;
-
-    if (!session.userId || !session.organizationId) {
+    // Use context user/org (works with both session and dev headers)
+    if (!ctx.user || !ctx.organizationId) {
       return null;
     }
 
@@ -233,7 +239,7 @@ export const authRouter = router({
     const userList = await masterDb
       .select()
       .from(users)
-      .where(eq(users.id, session.userId))
+      .where(eq(users.id, ctx.user.id))
       .limit(1);
 
     if (userList.length === 0) {
@@ -246,7 +252,7 @@ export const authRouter = router({
     const orgList = await masterDb
       .select()
       .from(organizations)
-      .where(eq(organizations.id, session.organizationId))
+      .where(eq(organizations.id, ctx.organizationId))
       .limit(1);
 
     if (orgList.length === 0) {

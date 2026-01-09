@@ -259,7 +259,7 @@ export function Sessions() {
                             </TableCell>
                             <TableCell>
                               <div className="font-medium">
-                                {session.totalAmount ? (session.totalAmount / 100).toFixed(2) + "€" : "N/A"}
+                                {session.totalAmount ? (parseFloat(session.totalAmount) / 100).toFixed(2) + "€" : "N/A"}
                               </div>
                             </TableCell>
                             <TableCell className="text-right">

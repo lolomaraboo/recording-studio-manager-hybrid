@@ -51,7 +51,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Music, Plus, Search, Filter, ArrowLeft } from "lucide-react";
+import { Music, Plus, Search, Filter } from "lucide-react";
 
 type TrackStatus = "recording" | "editing" | "mixing" | "mastering" | "completed";
 

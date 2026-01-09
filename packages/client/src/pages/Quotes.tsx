@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { FileText, Plus, Search, ArrowLeft, Eye, Euro } from "lucide-react";
+import { FileText, Plus, Search, ArrowLeft, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -39,7 +39,7 @@ export function Quotes() {
       result = result.filter(
         (quote) =>
           quote.quoteNumber.toLowerCase().includes(query) ||
-          quote.title?.toLowerCase().includes(query) ||
+          quote.notes?.toLowerCase().includes(query) ||
           clientMap[quote.clientId]?.toLowerCase().includes(query)
       );
     }
@@ -240,7 +240,7 @@ export function Quotes() {
                       {filteredQuotes.map((quote) => (
                         <TableRow key={quote.id} className="cursor-pointer hover:bg-muted/50">
                           <TableCell className="font-medium">{quote.quoteNumber}</TableCell>
-                          <TableCell>{quote.title || "-"}</TableCell>
+                          <TableCell>{quote.notes?.substring(0, 50) || "-"}</TableCell>
                           <TableCell>{clientMap[quote.clientId] || "Client inconnu"}</TableCell>
                           <TableCell className="font-semibold">
                             <div className="flex items-center gap-1">
@@ -252,8 +252,8 @@ export function Quotes() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            {quote.validUntil
-                              ? format(new Date(quote.validUntil), "dd MMM yyyy", { locale: fr })
+                            {quote.expiresAt
+                              ? format(new Date(quote.expiresAt), "dd MMM yyyy", { locale: fr })
                               : "-"}
                           </TableCell>
                           <TableCell>{getStatusBadge(quote.status)}</TableCell>

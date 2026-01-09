@@ -133,10 +133,12 @@ export const filesRouter = router({
       const newFile = {
         id: mockFiles.length + 1,
         ...input,
+        description: input.description || "",
+        version: input.version || "",
         createdAt: new Date(),
       };
 
-      mockFiles.push(newFile);
+      mockFiles.push(newFile as any);
       return newFile;
     }),
 

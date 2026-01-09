@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -153,10 +152,6 @@ export default function QuoteDetail() {
   const [formData, setFormData] = useState({
     quoteNumber: quote?.quoteNumber || "",
     clientId: quote?.clientId || 0,
-    title: quote?.title || "",
-    description: quote?.description || "",
-    issueDate: quote?.issueDate ? new Date(quote.issueDate).toISOString().slice(0, 10) : "",
-    validUntil: quote?.validUntil ? new Date(quote.validUntil).toISOString().slice(0, 10) : "",
     status: quote?.status || "draft",
     subtotal: quote?.subtotal || "",
     taxRate: quote?.taxRate || "20.00",
@@ -166,40 +161,14 @@ export default function QuoteDetail() {
     notes: quote?.notes || "",
   });
 
-  // Update form when quote loads
-  useState(() => {
-    if (quote) {
-      setFormData({
-        quoteNumber: quote.quoteNumber,
-        clientId: quote.clientId,
-        title: quote.title || "",
-        description: quote.description || "",
-        issueDate: new Date(quote.issueDate).toISOString().slice(0, 10),
-        validUntil: new Date(quote.validUntil).toISOString().slice(0, 10),
-        status: quote.status,
-        subtotal: quote.subtotal,
-        taxRate: quote.taxRate,
-        taxAmount: quote.taxAmount,
-        total: quote.total,
-        terms: quote.terms || "",
-        notes: quote.notes || "",
-      });
-    }
-  });
-
   const handleSave = () => {
     updateMutation.mutate({
       id: Number(id),
-      title: formData.title,
-      description: formData.description,
-      validUntil: new Date(formData.validUntil),
-      status: formData.status as "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted",
-      subtotal: formData.subtotal,
-      taxRate: formData.taxRate,
-      taxAmount: formData.taxAmount,
-      total: formData.total,
-      terms: formData.terms,
-      notes: formData.notes,
+      data: {
+        notes: formData.notes,
+        terms: formData.terms,
+        taxRate: formData.taxRate,
+      },
     });
   };
 
@@ -214,27 +183,27 @@ export default function QuoteDetail() {
 
   const handleSend = () => {
     if (!quote) return;
-    sendMutation.mutate({ id: quote.id });
+    sendMutation.mutate({ quoteId: quote.id });
   };
 
   const handleAccept = () => {
     if (!quote) return;
-    acceptMutation.mutate({ id: quote.id });
+    acceptMutation.mutate({ quoteId: quote.id });
   };
 
   const handleReject = () => {
     if (!quote) return;
-    rejectMutation.mutate({ id: quote.id });
+    rejectMutation.mutate({ quoteId: quote.id });
   };
 
   const handleCancel = () => {
     if (!quote) return;
-    cancelMutation.mutate({ id: quote.id });
+    cancelMutation.mutate({ quoteId: quote.id });
   };
 
   const handleConvertToProject = () => {
     if (!quote) return;
-    convertMutation.mutate({ id: quote.id });
+    convertMutation.mutate({ quoteId: quote.id });
   };
 
   const getStatusBadge = (status: string) => {
@@ -351,98 +320,59 @@ export default function QuoteDetail() {
                       <div className="mt-1">{getStatusBadge(quote.status)}</div>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Date d'émission</p>
+                      <p className="text-sm text-muted-foreground">Date de création</p>
                       <p className="font-medium">
-                        {format(new Date(quote.issueDate), "PPP", { locale: fr })}
+                        {format(new Date(quote.createdAt), "PPP", { locale: fr })}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Valide jusqu'au</p>
-                      <p className="font-medium">
-                        {format(new Date(quote.validUntil), "PPP", { locale: fr })}
-                      </p>
-                    </div>
+                    {quote.expiresAt && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Expire le</p>
+                        <p className="font-medium">
+                          {format(new Date(quote.expiresAt), "PPP", { locale: fr })}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  {quote.title && (
+                  {quote.notes && (
                     <div>
-                      <p className="text-sm text-muted-foreground">Titre</p>
-                      <p className="font-medium">{quote.title}</p>
-                    </div>
-                  )}
-                  {quote.description && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Description</p>
-                      <p className="whitespace-pre-wrap">{quote.description}</p>
+                      <p className="text-sm text-muted-foreground">Notes</p>
+                      <p className="whitespace-pre-wrap">{quote.notes}</p>
                     </div>
                   )}
                 </>
               ) : (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="quoteNumber">N° Devis</Label>
-                      <Input
-                        id="quoteNumber"
-                        value={formData.quoteNumber}
-                        onChange={(e) => setFormData({ ...formData, quoteNumber: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="status">Statut</Label>
-                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="draft">Brouillon</SelectItem>
-                          <SelectItem value="sent">Envoyé</SelectItem>
-                          <SelectItem value="accepted">Accepté</SelectItem>
-                          <SelectItem value="rejected">Refusé</SelectItem>
-                          <SelectItem value="expired">Expiré</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="issueDate">Date d'émission</Label>
-                      <Input
-                        id="issueDate"
-                        type="date"
-                        value={formData.issueDate}
-                        onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="validUntil">Valide jusqu'au</Label>
-                      <Input
-                        id="validUntil"
-                        type="date"
-                        value={formData.validUntil}
-                        onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
-                    <Label htmlFor="title">Titre</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Titre du devis"
+                    <Label htmlFor="notes">Notes</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      rows={4}
+                      placeholder="Notes visibles par le client"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="terms">Conditions</Label>
                     <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      rows={4}
-                      placeholder="Description détaillée"
+                      id="terms"
+                      value={formData.terms || ""}
+                      onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                      rows={3}
+                      placeholder="Termes et conditions"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="taxRate">Taux de TVA (%)</Label>
+                    <Input
+                      id="taxRate"
+                      type="number"
+                      step="0.01"
+                      value={formData.taxRate}
+                      onChange={(e) => setFormData({ ...formData, taxRate: e.target.value })}
                     />
                   </div>
                 </div>

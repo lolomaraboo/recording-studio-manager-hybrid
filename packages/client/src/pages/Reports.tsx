@@ -32,7 +32,7 @@ export default function Reports() {
     trpc.invoices.list.useQuery();
   const { data: projects, isLoading: loadingProjects } =
     trpc.projects.list.useQuery();
-  const { data: rooms, isLoading: loadingRooms } = trpc.rooms.list.useQuery();
+  const { isLoading: loadingRooms } = trpc.rooms.list.useQuery();
 
   const isLoading =
     loadingSessions ||

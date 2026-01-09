@@ -114,7 +114,7 @@ export const searchRouter = router({
             invoiceNumber: invoices.invoiceNumber,
             clientId: clients.id,
             clientName: clients.name,
-            totalAmount: invoices.totalAmount,
+            totalAmount: invoices.total,
             status: invoices.status,
           })
           .from(invoices)

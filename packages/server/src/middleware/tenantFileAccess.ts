@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getSessionUser } from '../lib/session';
-import { db } from '@rsm/database';
+import { getMasterDb } from '@rsm/database/connection';
 import { tenantDatabases } from '@rsm/database/master/schema';
 import { eq } from 'drizzle-orm';
 
@@ -22,17 +21,20 @@ export async function validateTenantFileAccess(
 
     const requestedTenantName = `tenant_${match[1]}`;
 
-    // Get authenticated user's organization
-    const user = await getSessionUser(req);
-    if (!user) {
+    // Get authenticated user from session
+    const userId = req.session?.userId;
+    const organizationId = req.session?.organizationId;
+
+    if (!userId || !organizationId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     // Get user's tenant database
-    const [userTenant] = await db
+    const masterDb = await getMasterDb();
+    const [userTenant] = await masterDb
       .select()
       .from(tenantDatabases)
-      .where(eq(tenantDatabases.organizationId, user.organizationId))
+      .where(eq(tenantDatabases.organizationId, organizationId))
       .limit(1);
 
     if (!userTenant) {
@@ -42,7 +44,7 @@ export async function validateTenantFileAccess(
     // Verify user can only access their own tenant's files
     if (userTenant.databaseName !== requestedTenantName) {
       console.warn(
-        `[Security] User ${user.id} attempted to access ${requestedTenantName} files (belongs to ${userTenant.databaseName})`
+        `[Security] User ${userId} attempted to access ${requestedTenantName} files (belongs to ${userTenant.databaseName})`
       );
       return res.status(403).json({ error: 'Access denied' });
     }

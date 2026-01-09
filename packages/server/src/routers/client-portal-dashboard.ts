@@ -570,7 +570,7 @@ export const clientPortalDashboardRouter = router({
       await tenantDb.insert(clientPortalActivityLogs).values({
         clientId,
         action: "view_project",
-        description: `Viewed project "${project.title}"`,
+        description: `Viewed project "${project.name}"`,
         resourceType: "project",
         resourceId: input.projectId,
         status: "success",

@@ -246,7 +246,7 @@ export const clientsRouter = router({
         .set({
           ...input.data,
           updatedAt: new Date(),
-        })
+        } as any)
         .where(eq(clients.id, input.id))
         .returning();
 

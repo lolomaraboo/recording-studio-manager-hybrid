@@ -91,7 +91,7 @@ export const serviceCatalogRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
-      const [service] = await tenantDb.insert(serviceCatalog).values(input).returning();
+      const [service] = await tenantDb.insert(serviceCatalog).values(input as any).returning();
       return service;
     }),
 

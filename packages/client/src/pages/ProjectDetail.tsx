@@ -207,8 +207,8 @@ export default function ProjectDetail() {
         artistName: project.artistName || "",
         description: project.description || "",
         genre: project.genre || "",
-        type: project.type,
-        status: project.status,
+        type: project.type as "single" | "album" | "ep" | "demo" | "soundtrack" | "podcast",
+        status: project.status as "pre_production" | "recording" | "mixing" | "mastering" | "editing" | "delivered" | "archived" | "completed",
         targetDeliveryDate: project.targetDeliveryDate
           ? new Date(project.targetDeliveryDate).toISOString().split("T")[0]
           : "",
@@ -246,7 +246,6 @@ export default function ProjectDetail() {
       ...trackFormData,
       duration: trackFormData.duration || undefined,
       bpm: trackFormData.bpm || undefined,
-      copyrightYear: trackFormData.copyrightYear || undefined,
     });
   };
 

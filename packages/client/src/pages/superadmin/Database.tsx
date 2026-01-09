@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Database } from "lucide-react";
+import { Database as DatabaseIcon } from "lucide-react";
 
 export default function Database() {
   const [searchOrg, setSearchOrg] = useState("");
@@ -37,7 +37,7 @@ export default function Database() {
       <div className="space-y-2">
         <div>
           <h2 className="text-3xl font-bold flex items-center gap-2">
-            <Database className="h-8 w-8 text-primary" />
+            <DatabaseIcon className="h-8 w-8 text-primary" />
             Database Management
           </h2>
           <p className="text-sm text-muted-foreground">Organizations, users, and tenant statistics</p>

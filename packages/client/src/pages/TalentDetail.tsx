@@ -27,7 +27,6 @@ import {
   Mail,
   Phone,
   Globe,
-  User,
   ExternalLink,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -93,7 +92,7 @@ export default function TalentDetail() {
         email: talent.email || "",
         phone: talent.phone || "",
         bio: talent.bio || "",
-        talentType: talent.talentType,
+        talentType: talent.talentType as TalentType,
         website: talent.website || "",
         spotifyUrl: talent.spotifyUrl || "",
         instruments: talent.instruments || "",
@@ -305,7 +304,7 @@ export default function TalentDetail() {
                   <>
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Type</p>
-                      <Badge variant="outline">{TALENT_TYPE_LABELS[talent.talentType]}</Badge>
+                      <Badge variant="outline">{TALENT_TYPE_LABELS[talent.talentType as keyof typeof TALENT_TYPE_LABELS]}</Badge>
                     </div>
 
                     {(talent.email || talent.phone) && (

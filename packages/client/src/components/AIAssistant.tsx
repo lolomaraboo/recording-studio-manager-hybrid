@@ -259,14 +259,6 @@ export function AIAssistant() {
       handleSendMessage();
     }
   };
-
-  // Clear conversation and start fresh
-  const startNewConversation = () => {
-    setSessionId(null);
-    localStorage.removeItem('chatbot_sessionId');
-    setMessages([]);
-  };
-
   if (!assistantOpen || !isOpen) {
     return null;
   }

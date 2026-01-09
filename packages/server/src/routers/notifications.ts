@@ -143,7 +143,7 @@ export const notificationsRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const db = await ctx.getTenantDb();
-      const targetUserId = input.userId || ctx.session.userId;
+      const targetUserId = input.userId || ctx.req.session.userId;
 
       const [notification] = await db
         .insert(notifications)
@@ -161,7 +161,7 @@ export const notificationsRouter = router({
       // Broadcast notification to connected SSE clients
       notificationBroadcaster.sendToUser(
         targetUserId,
-        ctx.session.organizationId,
+        ctx.req.session.organizationId,
         notification
       );
 

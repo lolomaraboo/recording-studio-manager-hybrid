@@ -110,7 +110,7 @@ export default function AudioFiles() {
     }
   };
 
-  const handleDownload = async (fileId: number, _fileName: string) => {
+  const handleDownload = async (_fileId: number, _fileName: string) => {
     try {
       const result = await getDownloadUrl();
       if (result.data?.url) {

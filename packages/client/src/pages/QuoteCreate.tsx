@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -346,7 +346,7 @@ export default function QuoteCreate() {
                                         <div className="font-medium">{service.name}</div>
                                         <div className="text-xs text-muted-foreground">{service.category}</div>
                                       </div>
-                                      <div className="text-sm font-medium">{service.unitPrice.toFixed(2)} €</div>
+                                      <div className="text-sm font-medium">{parseFloat(service.unitPrice).toFixed(2)} €</div>
                                     </CommandItem>
                                   ))}
                                 </CommandGroup>
@@ -547,7 +547,7 @@ export default function QuoteCreate() {
                           </div>
                         </TableCell>
                         <TableCell>{service.category}</TableCell>
-                        <TableCell className="text-right">{service.unitPrice.toFixed(2)} €</TableCell>
+                        <TableCell className="text-right">{parseFloat(service.unitPrice).toFixed(2)} €</TableCell>
                         <TableCell className="text-right">{service.taxRate}%</TableCell>
                         <TableCell className="text-right">{service.defaultQuantity}</TableCell>
                       </TableRow>

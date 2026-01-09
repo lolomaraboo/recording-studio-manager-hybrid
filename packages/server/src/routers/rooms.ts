@@ -107,7 +107,13 @@ export const roomsRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const { id, ...updateData } = input;
+      const { id, hourlyRate, halfDayRate, fullDayRate, ...restData } = input;
+
+      // Convert numeric rates to strings for decimal columns
+      const updateData: any = { ...restData };
+      if (hourlyRate !== undefined) updateData.hourlyRate = hourlyRate.toString();
+      if (halfDayRate !== undefined) updateData.halfDayRate = halfDayRate.toString();
+      if (fullDayRate !== undefined) updateData.fullDayRate = fullDayRate.toString();
 
       const updatedRoom = await ctx.tenantDb
         .update(rooms)

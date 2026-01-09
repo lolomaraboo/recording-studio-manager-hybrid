@@ -284,8 +284,8 @@ export default function ClientDashboard() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {invoice.status === 'paid'
-                      ? `Paid on ${invoice.date.toLocaleDateString()}`
-                      : `Due ${invoice.dueDate?.toLocaleDateString()}`}
+                      ? `Paid on ${invoice.date ? new Date(invoice.date).toLocaleDateString() : '—'}`
+                      : `Due ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : '—'}`}
                   </p>
                 </div>
                 <div className="text-right">

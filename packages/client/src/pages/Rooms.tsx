@@ -216,9 +216,9 @@ export default function Rooms() {
                     <TableCell className="font-medium">{room.name}</TableCell>
                     <TableCell>{roomTypeLabels[room.type as keyof typeof roomTypeLabels]}</TableCell>
                     <TableCell>{room.capacity} pers.</TableCell>
-                    <TableCell>{formatPrice(room.hourlyRate)}</TableCell>
-                    <TableCell>{formatPrice(room.halfDayRate)}</TableCell>
-                    <TableCell>{formatPrice(room.fullDayRate)}</TableCell>
+                    <TableCell>{formatPrice(parseFloat(room.hourlyRate))}</TableCell>
+                    <TableCell>{formatPrice(parseFloat(room.halfDayRate || "0"))}</TableCell>
+                    <TableCell>{formatPrice(parseFloat(room.fullDayRate || "0"))}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {room.isActive ? (

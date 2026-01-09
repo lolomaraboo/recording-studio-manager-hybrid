@@ -24,13 +24,9 @@ import {
   Globe,
   Shield,
   CreditCard,
-  Palette,
-  Mail,
-  Key,
   Smartphone,
   Save,
   Upload,
-  Download,
 } from "lucide-react";
 
 /**

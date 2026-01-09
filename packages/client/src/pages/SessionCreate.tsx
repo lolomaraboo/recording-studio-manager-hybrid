@@ -190,7 +190,7 @@ export default function SessionCreate() {
                   <SelectItem value="0">Aucun projet</SelectItem>
                   {projects?.map((project) => (
                     <SelectItem key={project.id} value={project.id.toString()}>
-                      {project.title}
+                      {project.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

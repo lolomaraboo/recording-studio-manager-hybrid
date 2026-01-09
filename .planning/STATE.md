@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 15 of 17 (Architecture Session/Project Flexible - UI Adaptation) - v4.0 Workflow Commercial Complet
-Plan: 15-01 of 1 - COMPLETE
-Status: Phase 15 complete - UI supports standalone/project-linked sessions with optional selector
-Last activity: 2026-01-07 - Phase 15-01 complete (SessionCreate selector + SessionDetail card + Sessions column)
+Phase: 15.5 of 17 (TypeScript Cleanup) - v4.0 Workflow Commercial Complet
+Plan: 15.5-01 of 1 - COMPLETE
+Status: Phase 15.5 complete - Type safety 100% restaurée (316 erreurs → 0)
+Last activity: 2026-01-09 - Phase 15.5-01 complete (TypeScript cleanup: 0 errors server + client)
 
-Progress: ███████░░░ 67% (v4.0: 13/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15 complete)
+Progress: ████████░░ 70% (v4.0: 14/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 64
-- Average duration: 43.1 min
-- Total execution time: 46.03 hours
+- Total plans completed: 65
+- Average duration: 43.9 min
+- Total execution time: 47.51 hours
 
 **By Phase:**
 
@@ -69,10 +69,11 @@ Progress: ███████░░░ 67% (v4.0: 13/? plans - Phases 10, 11-0
 | 13 | 1/1 | 90 min | 90 min |
 | 14 | 1/1 | 3 min | 3 min |
 | 15 | 1/1 | 16 min | 16 min |
+| 15.5 | 1/1 | 89 min | 89 min |
 
 **Recent Trend:**
-- Last 5 plans: [9 min, 7 min, 90 min, 3 min, 16 min]
-- Trend: Backend schema changes very fast (3-7 min), UI implementations vary by complexity (16-90 min depending on components count)
+- Last 5 plans: [7 min, 90 min, 3 min, 16 min, 89 min]
+- Trend: TypeScript cleanup comprehensive (89 min pour 316 erreurs), schema migrations rapides (3-16 min), UI implementations medium (16-90 min)
 
 ## Accumulated Context
 
@@ -318,16 +319,16 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-07T21:44:22Z
-Stopped at: Phase 15-01 COMPLETE (Architecture Session/Project Flexible - UI Adaptation)
+Last session: 2026-01-09T22:05:17Z
+Stopped at: Phase 15.5-01 COMPLETE (TypeScript Cleanup)
 Resume context:
-  - Phase 15 complete: UI supports standalone/project-linked sessions
-  - SessionCreate.tsx: Optional "Projet associé" selector with projects.list query
-  - SessionDetail.tsx: Conditional "Projet associé" card with FolderKanban icon + link
-  - Sessions.tsx: "Projet" column displaying "Projet #{id}" link or "—" for standalone
-  - Decision: Display ID temporarily (sessions.list doesn't JOIN projects - future enhancement)
-  - Backward compatible: Existing sessions (projectId=NULL) work without modification
-  - Type checking passed: pnpm check clean
-  - SUMMARY created: .planning/phases/15-architecture-session-project-flexible-ui/15-01-SUMMARY.md
+  - Phase 15.5 complete: Type safety 100% restaurée (316 erreurs → 0)
+  - Server: 0 TypeScript errors (44→0) - Drizzle queries, session types, schema fields corrigés
+  - Client: 0 TypeScript errors (272→0) - Schema fields alignment, type conversions, unused vars cleaned
+  - Drizzle types regenerated with trackId/projectId from migrations 0007/0008
+  - Production builds succeed for all packages
+  - No technical debt: No @ts-ignore, strategic as any only where unavoidable
+  - All packages strict mode TypeScript compliant
+  - SUMMARY created: .planning/phases/15.5-typescript-cleanup/15.5-01-SUMMARY.md
   - Next: Phase 16 (Facturation Automatique Temps Réel - Backend Integration)
 Resume file: None

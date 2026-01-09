@@ -235,7 +235,7 @@ export default function Equipment() {
                     </TableCell>
                     <TableCell>
                       {item.purchasePrice
-                        ? `${item.purchasePrice.toLocaleString("fr-FR")} €`
+                        ? `${parseFloat(item.purchasePrice).toLocaleString("fr-FR")} €`
                         : "—"}
                     </TableCell>
                     <TableCell className="text-right">

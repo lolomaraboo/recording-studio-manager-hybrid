@@ -54,29 +54,46 @@ export async function createContext(
   let tenantDb: TenantDb | null = null;
 
   try {
-    // Get user from session
-    const session = opts.req.session as any;
+    // Development mode: check for test headers
+    const testUserId = opts.req.headers['x-test-user-id'] as string | undefined;
+    const testOrgId = opts.req.headers['x-test-org-id'] as string | undefined;
 
-    // Debug session
-    console.log('[Auth Debug] Session ID:', opts.req.sessionID);
-    console.log('[Auth Debug] Session data:', { userId: session.userId, organizationId: session.organizationId });
-    console.log('[Auth Debug] Cookie header:', opts.req.headers.cookie);
-
-    if (session.userId && session.organizationId) {
-      // User is authenticated via session
+    if (process.env.NODE_ENV === 'development' && testUserId && testOrgId) {
+      // Dev mode bypass with test headers
       user = {
-        id: session.userId,
-        email: session.email || 'user@example.com',
-        name: session.name || 'User',
-        role: session.role || 'user',
+        id: parseInt(testUserId),
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'admin',
       };
-      organizationId = session.organizationId;
-
-      // Load tenant DB
+      organizationId = parseInt(testOrgId);
       tenantDb = await getTenantDb(organizationId);
-      console.log('[Auth Debug] User authenticated:', { userId: user.id, organizationId });
+      console.log('[Auth Debug] Dev mode bypass:', { userId: user.id, organizationId });
     } else {
-      console.log('[Auth Debug] No valid session - user not authenticated');
+      // Normal flow: Get user from session
+      const session = opts.req.session as any;
+
+      // Debug session
+      console.log('[Auth Debug] Session ID:', opts.req.sessionID);
+      console.log('[Auth Debug] Session data:', { userId: session.userId, organizationId: session.organizationId });
+      console.log('[Auth Debug] Cookie header:', opts.req.headers.cookie);
+
+      if (session.userId && session.organizationId) {
+        // User is authenticated via session
+        user = {
+          id: session.userId,
+          email: session.email || 'user@example.com',
+          name: session.name || 'User',
+          role: session.role || 'user',
+        };
+        organizationId = session.organizationId;
+
+        // Load tenant DB
+        tenantDb = await getTenantDb(organizationId);
+        console.log('[Auth Debug] User authenticated:', { userId: user.id, organizationId });
+      } else {
+        console.log('[Auth Debug] No valid session - user not authenticated');
+      }
     }
   } catch (error) {
     // Auth is optional for publicProcedure

@@ -273,20 +273,22 @@ router.post('/avatar', uploadAvatar.single('file'), async (req: any, res) => {
     }
 
     // Get user's tenant database name
-    const { getSessionUser } = await import('../lib/session');
-    const { db } = await import('@rsm/database');
+    const { getMasterDb } = await import('@rsm/database/connection');
     const { tenantDatabases } = await import('@rsm/database/master/schema');
     const { eq } = await import('drizzle-orm');
 
-    const user = await getSessionUser(req);
-    if (!user) {
+    const userId = req.session?.userId;
+    const organizationId = req.session?.organizationId;
+
+    if (!userId || !organizationId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const [tenant] = await db
+    const masterDb = await getMasterDb();
+    const [tenant] = await masterDb
       .select()
       .from(tenantDatabases)
-      .where(eq(tenantDatabases.organizationId, user.organizationId))
+      .where(eq(tenantDatabases.organizationId, organizationId))
       .limit(1);
 
     if (!tenant) {
@@ -321,20 +323,22 @@ router.post('/client-logo', uploadAvatar.single('file'), async (req: any, res) =
       return res.status(400).json({ error: 'No file provided' });
     }
 
-    const { getSessionUser } = await import('../lib/session');
-    const { db } = await import('@rsm/database');
+    const { getMasterDb } = await import('@rsm/database/connection');
     const { tenantDatabases } = await import('@rsm/database/master/schema');
     const { eq } = await import('drizzle-orm');
 
-    const user = await getSessionUser(req);
-    if (!user) {
+    const userId = req.session?.userId;
+    const organizationId = req.session?.organizationId;
+
+    if (!userId || !organizationId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const [tenant] = await db
+    const masterDb = await getMasterDb();
+    const [tenant] = await masterDb
       .select()
       .from(tenantDatabases)
-      .where(eq(tenantDatabases.organizationId, user.organizationId))
+      .where(eq(tenantDatabases.organizationId, organizationId))
       .limit(1);
 
     if (!tenant) {

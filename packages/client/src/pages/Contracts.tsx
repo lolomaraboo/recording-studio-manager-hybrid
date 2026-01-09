@@ -17,7 +17,7 @@ export function Contracts() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { data: contracts, isLoading: contractsLoading } = trpc.contracts.list.useQuery({ limit: 100 });
+  const { data: contracts, isLoading: contractsLoading } = trpc.contracts.list.useQuery();
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
 
   // Create a map of client IDs to client names

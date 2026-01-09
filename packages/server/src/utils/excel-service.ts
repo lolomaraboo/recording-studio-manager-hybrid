@@ -68,7 +68,7 @@ export async function clientsToExcel(clients: Client[]): Promise<Buffer> {
  */
 export async function excelToClients(fileBuffer: Buffer): Promise<Partial<Client>[]> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(fileBuffer);
+  await workbook.xlsx.load(fileBuffer as any);
 
   const worksheet = workbook.getWorksheet('Clients') || workbook.worksheets[0];
   const clients: Partial<Client>[] = [];

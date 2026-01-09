@@ -795,11 +795,12 @@ export const clientPortalBookingRouter = router({
 
               // Log refund transaction
               await tenantDb.insert(paymentTransactions).values({
+                clientId: lastPayment.clientId,
                 sessionId: input.bookingId,
-                type: "refund",
-                amount: refund.amount / 100,
+                paymentType: "refund",
+                amount: (refund.amount / 100).toString(),
                 currency: refund.currency,
-                status: refund.status === "succeeded" ? "completed" : "pending",
+                status: refund.status === "succeeded" ? "succeeded" : "pending",
                 stripePaymentIntentId: lastPayment.stripePaymentIntentId,
                 metadata: JSON.stringify({
                   refund_id: refund.id,

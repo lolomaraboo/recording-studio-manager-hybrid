@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Server } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Services() {

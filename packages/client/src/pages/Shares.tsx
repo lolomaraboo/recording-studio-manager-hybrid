@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +35,6 @@ import {
   Copy,
   Trash2,
   Eye,
-  Download,
   Clock,
   Check,
   ArrowLeft,
@@ -204,7 +203,7 @@ export default function Shares() {
   };
 
   const activeShares = shares.filter((s) => s.status === "active");
-  const expiredShares = shares.filter((s) => s.status === "expired" || s.status === "revoked");
+  const expiredShares = shares.filter((s) => s.status === "expired" || (s as any).status === "revoked");
 
   return (
     <div className="container pt-2 pb-4 px-2">
@@ -476,7 +475,7 @@ export default function Shares() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleEditShare(share)}
+                              onClick={() => handleEditShare(share as any)}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -583,7 +582,7 @@ export default function Shares() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleEditShare(share)}
+                            onClick={() => handleEditShare(share as any)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>

@@ -76,8 +76,6 @@ export function EnrichedClientInfo({
   onAddContact,
   onDeleteContact,
 }: EnrichedClientInfoProps) {
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -161,22 +159,6 @@ export function EnrichedClientInfo({
     const emails = [...(client.emails || [])];
     emails[index] = { ...emails[index], [field]: value };
     onUpdate({ emails });
-  };
-
-  const addWebsite = () => {
-    const websites = [...(client.websites || []), { type: "website", url: "" }];
-    onUpdate({ websites });
-  };
-
-  const removeWebsite = (index: number) => {
-    const websites = (client.websites || []).filter((_, i) => i !== index);
-    onUpdate({ websites });
-  };
-
-  const updateWebsite = (index: number, field: keyof Website, value: string) => {
-    const websites = [...(client.websites || [])];
-    websites[index] = { ...websites[index], [field]: value };
-    onUpdate({ websites });
   };
 
   const addCustomField = () => {

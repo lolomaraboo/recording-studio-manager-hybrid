@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getMasterDb } from '@rsm/database/connection';
 import { createClient } from 'redis';
+import { sql } from 'drizzle-orm';
 
 /**
  * Health Check Routes
@@ -32,7 +33,7 @@ router.get('/health/db', async (_req, res) => {
     const masterDb = await getMasterDb();
 
     // Simple ping using raw SQL query
-    await masterDb.$client.unsafe('SELECT 1');
+    await masterDb.execute(sql`SELECT 1`);
 
     res.status(200).json({
       status: 'ok',
@@ -100,7 +101,7 @@ router.get('/health/full', async (_req, res) => {
   // Check PostgreSQL
   try {
     const masterDb = await getMasterDb();
-    await masterDb.$client.unsafe('SELECT 1');
+    await masterDb.execute(sql`SELECT 1`);
     checks.database.status = 'ok';
   } catch (error: any) {
     checks.database.status = 'error';

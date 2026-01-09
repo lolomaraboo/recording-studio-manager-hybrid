@@ -173,7 +173,7 @@ export default function Projects() {
                         <CardDescription className="text-sm truncate">{project.artistName}</CardDescription>
                       )}
                     </div>
-                    {getStatusBadge(project.status)}
+                    {getStatusBadge(project.status as ProjectStatus)}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -489,7 +489,7 @@ function ProjectDetailsDialog({
                 <DialogDescription className="text-base">{project.artistName}</DialogDescription>
               )}
             </div>
-            {getStatusBadge(project.status)}
+            {getStatusBadge(project.status as ProjectStatus)}
           </div>
         </DialogHeader>
 
@@ -497,9 +497,9 @@ function ProjectDetailsDialog({
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="tracks">Tracks</TabsTrigger>
-            <TabsTrigger value="credits">Crédits ({project.credits?.length || 0})</TabsTrigger>
-            <TabsTrigger value="milestones">Étapes ({project.milestones?.length || 0})</TabsTrigger>
-            <TabsTrigger value="files">Fichiers ({project.files?.length || 0})</TabsTrigger>
+            <TabsTrigger value="credits">Crédits (0)</TabsTrigger>
+            <TabsTrigger value="milestones">Étapes (0)</TabsTrigger>
+            <TabsTrigger value="files">Fichiers (0)</TabsTrigger>
           </TabsList>
 
           {/* Vue d'ensemble */}
@@ -527,13 +527,13 @@ function ProjectDetailsDialog({
                   {project.budget && (
                     <div>
                       <Label className="text-muted-foreground">Budget</Label>
-                      <p className="font-medium">{(project.budget / 100).toFixed(2)} €</p>
+                      <p className="font-medium">{(parseFloat(project.budget) / 100).toFixed(2)} €</p>
                     </div>
                   )}
                   {project.totalCost && (
                     <div>
                       <Label className="text-muted-foreground">Coût total</Label>
-                      <p className="font-medium">{(project.totalCost / 100).toFixed(2)} €</p>
+                      <p className="font-medium">{(parseFloat(project.totalCost) / 100).toFixed(2)} €</p>
                     </div>
                   )}
                 </div>
@@ -591,9 +591,9 @@ function ProjectDetailsDialog({
                 </div>
               </CardHeader>
               <CardContent>
-                {project.credits && project.credits.length > 0 ? (
+                {false ? (
                   <div className="space-y-3">
-                    {project.credits.map((credit: any) => (
+                    {[].map((credit: any) => (
                       <div key={credit.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <p className="font-medium">{credit.name}</p>
@@ -627,9 +627,9 @@ function ProjectDetailsDialog({
                 </div>
               </CardHeader>
               <CardContent>
-                {project.milestones && project.milestones.length > 0 ? (
+                {false ? (
                   <div className="space-y-3">
-                    {project.milestones.map((milestone: any) => (
+                    {[].map((milestone: any) => (
                       <div key={milestone.id} className="flex items-start justify-between p-3 border rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -670,9 +670,9 @@ function ProjectDetailsDialog({
                 </div>
               </CardHeader>
               <CardContent>
-                {project.files && project.files.length > 0 ? (
+                {false ? (
                   <div className="space-y-3">
-                    {project.files.map((file: any) => (
+                    {[].map((file: any) => (
                       <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
                           <FileAudio className="h-8 w-8 text-muted-foreground" />

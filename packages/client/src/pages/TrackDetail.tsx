@@ -26,7 +26,6 @@ import { AudioPlayer } from "@/components/AudioPlayer";
 import { WaveformPlayer } from "@/components/WaveformPlayer";
 import { TrackComments } from "@/components/TrackComments";
 import { UpgradeModal } from "@/components/UpgradeModal";
-import type { CommentMarker } from "@/components/WaveformPlayer";
 
 const statusLabels: Record<string, { label: string; variant: any }> = {
   recording: { label: "Enregistrement", variant: "outline" },
@@ -46,7 +45,6 @@ export default function TrackDetail() {
   // Comments state
   const [selectedVersion, setSelectedVersion] = useState<'demo' | 'roughMix' | 'finalMix' | 'master'>('master');
   const [newCommentTimestamp, setNewCommentTimestamp] = useState<number | null>(null);
-  const [waveformPlayerRef, setWaveformPlayerRef] = useState<any>(null);
 
   // Fetch track data
   const { data: track, isLoading, refetch } = trpc.projects.tracks.get.useQuery(

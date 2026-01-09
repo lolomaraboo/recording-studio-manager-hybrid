@@ -33,6 +33,7 @@ import {
   Calendar,
   FileText,
   Star,
+  Users,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -508,10 +509,10 @@ export default function ClientDetail() {
                   <div className="mt-6 pt-6 border-t">
                     <h3 className="text-sm font-semibold mb-4">Informations enrichies</h3>
                     <EnrichedClientInfo
-                      client={formData}
+                      client={formData as any}
                       isEditing={isEditing}
-                      onUpdate={handleUpdateField}
-                      contacts={clientWithContacts?.contacts || []}
+                      onUpdate={handleUpdateField as any}
+                      contacts={clientWithContacts?.contacts as any || []}
                       onAddContact={(contact) => {
                         addContactMutation.mutate({
                           clientId: Number(id),
