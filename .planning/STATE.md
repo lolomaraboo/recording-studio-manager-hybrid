@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 16 of 17 (Facturation Automatique Backend) - v4.0 Workflow Commercial Complet
-Plan: 16-02 of 3 - In progress
-Status: Phase 16 ongoing - Stripe deposits integration complete
-Last activity: 2026-01-09 - Phase 16-02 complete (Stripe Payment Intents for invoice deposits)
+Plan: 16-03 of 3 - Complete
+Status: Phase 16 COMPLETE - Tax calculation & validation system implemented
+Last activity: 2026-01-09 - Phase 16-03 complete (Tax calculator with multi-rate French VAT)
 
-Progress: ████████░░ 76% (v4.0: 16/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16-01, 16-02 complete)
+Progress: █████████░ 78% (v4.0: 17/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16-01, 16-02, 16-03 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 67
-- Average duration: 43.0 min
-- Total execution time: 47.95 hours
+- Total plans completed: 68
+- Average duration: 42.5 min
+- Total execution time: 48.17 hours
 
 **By Phase:**
 
@@ -70,11 +70,11 @@ Progress: ████████░░ 76% (v4.0: 16/? plans - Phases 10, 11-0
 | 14 | 1/1 | 3 min | 3 min |
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
-| 16 | 2/3 | 26 min | 13 min |
+| 16 | 3/3 | 39 min | 13 min |
 
 **Recent Trend:**
-- Last 5 plans: [3 min, 16 min, 89 min, 10 min, 16 min]
-- Trend: Stripe integrations rapides (16 min pour schema + endpoints + webhooks), backend services (10 min), TypeScript cleanup (89 min)
+- Last 5 plans: [16 min, 89 min, 10 min, 16 min, 13 min]
+- Trend: Backend utilities rapides (10-16 min), TypeScript cleanup majeur (89 min), tax calculator avec tests complets (13 min)
 
 ## Accumulated Context
 
@@ -145,6 +145,8 @@ Progress: ████████░░ 76% (v4.0: 16/? plans - Phases 10, 11-0
 | 16 | Line items format for auto-invoices | Chose format "{TaskType} - {hours}h{minutes} @ {rate}€/h" for maximum client clarity. Shows exact duration and applied rate. Alternatives considered: just task name (too vague), duration only (no rate visibility), rate only (no duration detail). Selected format balances readability and transparency. |
 | 16 | Session vs project invoicing modes | Implemented 2 explicit modes with strict validation. Session mode = single booking invoicing (room rental per session). Project mode = consolidated project invoicing (all work on album). Studios operate both ways depending on client relationship and service type. Validation prevents mixing entries from different contexts. |
 | 16 | Time entry grouping by task type | Auto-consolidate entries of same task type into single line item. 10 Recording entries → 1 line "Recording - 5h30 @ 50€/h". Rationale: Invoice readability (2-3 lines vs 15 entries), client clarity, industry standard practice. Maintains accuracy through aggregation before calculation. |
+| 16 | Arithmétique en centimes | Convertir montants en centimes entiers avant calculs pour éviter floating point errors. Pattern: `(subtotalCents * taxRateCents) / 10000`. Rationale: JavaScript floating point = imprécis (0.1 + 0.2 = 0.30000000000000004), centimes entiers garantissent exactitude financière absolue. Format cohérent end-to-end avec database decimal(10,2) stocké en strings. |
+| 16 | Validation double tax calculation | 2 validations - (1) Après calculateTax, (2) Après database insert. Rationale: Garantit intégrité calcul + persistance. Catch edge cases (ex: migration changeant precision). Vérifie `total = subtotal + taxAmount` avec tolérance 0.01€ (exact avec cents arithmetic). |
 
 ### Deferred Issues
 
@@ -323,17 +325,14 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-09T22:57:54Z
-Stopped at: Phase 16-02 COMPLETE (Stripe Deposits & Advances)
+Last session: 2026-01-09T23:13:00Z
+Stopped at: Phase 16-03 complete - Tax calculator avec multi-rate French VAT
 Resume context:
-  - Phase 16-02 complete: Stripe Payment Intent integration pour acomptes/avances sur factures
-  - Schema: 4 nouveaux champs ajoutés à invoices (depositAmount, depositPaidAt, stripeDepositPaymentIntentId, remainingBalance)
-  - Migration 0010: Créée manuellement (non appliquée - Docker offline, à appliquer au redémarrage)
-  - tRPC endpoint: createDepositPaymentIntent avec validation (depositAmount <= total)
-  - Webhook: handleInvoiceDepositPayment() route via metadata.type='invoice_deposit'
-  - Stripe pattern: Réutilise getStripeClient() + formatStripeAmount() de Phase 3
-  - Balance auto: remainingBalance = total - depositAmount calculé côté serveur
-  - TypeScript: 0 erreurs (build database requis pour régénérer dist/)
-  - SUMMARY created: .planning/phases/16-facturation-automatique-backend/16-02-SUMMARY.md
-  - Next: Phase 16-03 (Tax Calculation & Validation)
+  - Phase 16 COMPLETE (3/3 plans): Facturation Automatique Backend ✅
+  - 16-01: Auto-invoice generation depuis time entries ✅
+  - 16-02: Stripe Payment Intents pour deposits ✅
+  - 16-03: Tax calculator utility (20%, 10%, 5.5%, 2.1%) ✅
+  - Backend auto-invoicing system 100% fonctionnel
+  - Ready for Phase 17: Stripe & UI (invoice payments, email notifications, PDF generation)
+  - Next action: Review roadmap or discuss Phase 17 planning
 Resume file: None

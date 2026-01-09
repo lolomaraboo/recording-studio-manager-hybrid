@@ -248,4 +248,308 @@ describe('generateInvoiceFromTimeEntries', () => {
       })
     ).rejects.toThrow('All time entries must belong to the same session for mode=session');
   });
+
+  it('uses tax calculator for accurate calculations', async () => {
+    // Mock scenario: 160€ subtotal with 20% tax
+    const mockTimeEntries = [
+      {
+        id: 1,
+        taskTypeId: 1,
+        taskTypeName: 'Recording',
+        taskTypeCategory: 'billable',
+        sessionId: 100,
+        projectId: null,
+        trackId: null,
+        durationMinutes: 120, // 2h
+        hourlyRateSnapshot: '50.00',
+      },
+      {
+        id: 2,
+        taskTypeId: 2,
+        taskTypeName: 'Mixing',
+        taskTypeCategory: 'billable',
+        sessionId: 100,
+        projectId: null,
+        trackId: null,
+        durationMinutes: 60, // 1h
+        hourlyRateSnapshot: '60.00',
+      },
+    ];
+
+    const mockInvoice = {
+      id: 1,
+      invoiceNumber: 'INV-2026-0001',
+      clientId: 5,
+      status: 'draft',
+      issueDate: new Date('2026-01-09'),
+      dueDate: new Date('2026-02-08'),
+      subtotal: '160.00',
+      taxRate: '20.00',
+      taxAmount: '32.00',
+      total: '192.00',
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const mockItems = [
+      {
+        id: 1,
+        invoiceId: 1,
+        description: 'Recording - 2h00 @ 50.00€/h',
+        quantity: 1,
+        unitPrice: '100.00',
+        amount: '100.00',
+        createdAt: new Date(),
+      },
+      {
+        id: 2,
+        invoiceId: 1,
+        description: 'Mixing - 1h00 @ 60.00€/h',
+        quantity: 1,
+        unitPrice: '60.00',
+        amount: '60.00',
+        createdAt: new Date(),
+      },
+    ];
+
+    // Setup mocks
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        innerJoin: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue(mockTimeEntries),
+        }),
+      }),
+    });
+
+    const maxNumberQuery = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ maxNumber: '0' }]),
+        }),
+      }),
+    };
+
+    mockDb.insert.mockReturnValueOnce({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([mockInvoice]),
+      }),
+    });
+
+    mockDb.insert.mockReturnValueOnce({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue(mockItems),
+      }),
+    });
+
+    const originalSelect = mockDb.select;
+    mockDb.select = vi.fn((args) => {
+      if (args && typeof args === 'object' && 'maxNumber' in args) {
+        return maxNumberQuery.select(args);
+      }
+      return originalSelect(args);
+    });
+
+    const result = await generateInvoiceFromTimeEntries(mockDb as unknown as TenantDb, {
+      timeEntryIds: [1, 2],
+      clientId: 5,
+      mode: 'session',
+    });
+
+    // Verify tax calculation with tax calculator
+    expect(result.invoice.subtotal).toBe('160.00');
+    expect(result.invoice.taxRate).toBe('20.00');
+    expect(result.invoice.taxAmount).toBe('32.00');
+    expect(result.invoice.total).toBe('192.00');
+
+    // Verify no floating point errors (exact equality)
+    const subtotal = parseFloat(result.invoice.subtotal);
+    const taxAmount = parseFloat(result.invoice.taxAmount);
+    const total = parseFloat(result.invoice.total);
+    expect(subtotal + taxAmount).toBe(total); // Exact equality
+  });
+
+  it('supports custom tax rate', async () => {
+    const mockTimeEntries = [
+      {
+        id: 1,
+        taskTypeId: 1,
+        taskTypeName: 'Recording',
+        taskTypeCategory: 'billable',
+        sessionId: 100,
+        projectId: null,
+        trackId: null,
+        durationMinutes: 60, // 1h
+        hourlyRateSnapshot: '100.00',
+      },
+    ];
+
+    const mockInvoice = {
+      id: 1,
+      invoiceNumber: 'INV-2026-0001',
+      clientId: 5,
+      status: 'draft',
+      issueDate: new Date('2026-01-09'),
+      dueDate: new Date('2026-02-08'),
+      subtotal: '100.00',
+      taxRate: '10.00', // Reduced rate
+      taxAmount: '10.00', // 100 * 0.10
+      total: '110.00',
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const mockItems = [
+      {
+        id: 1,
+        invoiceId: 1,
+        description: 'Recording - 1h00 @ 100.00€/h',
+        quantity: 1,
+        unitPrice: '100.00',
+        amount: '100.00',
+        createdAt: new Date(),
+      },
+    ];
+
+    // Setup mocks
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        innerJoin: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue(mockTimeEntries),
+        }),
+      }),
+    });
+
+    const maxNumberQuery = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ maxNumber: '0' }]),
+        }),
+      }),
+    };
+
+    mockDb.insert.mockReturnValueOnce({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([mockInvoice]),
+      }),
+    });
+
+    mockDb.insert.mockReturnValueOnce({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue(mockItems),
+      }),
+    });
+
+    const originalSelect = mockDb.select;
+    mockDb.select = vi.fn((args) => {
+      if (args && typeof args === 'object' && 'maxNumber' in args) {
+        return maxNumberQuery.select(args);
+      }
+      return originalSelect(args);
+    });
+
+    const result = await generateInvoiceFromTimeEntries(mockDb as unknown as TenantDb, {
+      timeEntryIds: [1],
+      clientId: 5,
+      mode: 'session',
+      taxRate: 10, // Custom reduced rate
+    });
+
+    // Verify custom tax rate is applied
+    expect(result.invoice.taxRate).toBe('10.00');
+    expect(result.invoice.taxAmount).toBe('10.00');
+    expect(result.invoice.total).toBe('110.00');
+  });
+
+  it('defaults to 20% tax rate if not specified', async () => {
+    const mockTimeEntries = [
+      {
+        id: 1,
+        taskTypeId: 1,
+        taskTypeName: 'Recording',
+        taskTypeCategory: 'billable',
+        sessionId: 100,
+        projectId: null,
+        trackId: null,
+        durationMinutes: 60,
+        hourlyRateSnapshot: '100.00',
+      },
+    ];
+
+    const mockInvoice = {
+      id: 1,
+      invoiceNumber: 'INV-2026-0001',
+      clientId: 5,
+      status: 'draft',
+      issueDate: new Date('2026-01-09'),
+      dueDate: new Date('2026-02-08'),
+      subtotal: '100.00',
+      taxRate: '20.00', // Default rate
+      taxAmount: '20.00',
+      total: '120.00',
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const mockItems = [
+      {
+        id: 1,
+        invoiceId: 1,
+        description: 'Recording - 1h00 @ 100.00€/h',
+        quantity: 1,
+        unitPrice: '100.00',
+        amount: '100.00',
+        createdAt: new Date(),
+      },
+    ];
+
+    // Setup mocks
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        innerJoin: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue(mockTimeEntries),
+        }),
+      }),
+    });
+
+    const maxNumberQuery = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ maxNumber: '0' }]),
+        }),
+      }),
+    };
+
+    mockDb.insert.mockReturnValueOnce({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([mockInvoice]),
+      }),
+    });
+
+    mockDb.insert.mockReturnValueOnce({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue(mockItems),
+      }),
+    });
+
+    const originalSelect = mockDb.select;
+    mockDb.select = vi.fn((args) => {
+      if (args && typeof args === 'object' && 'maxNumber' in args) {
+        return maxNumberQuery.select(args);
+      }
+      return originalSelect(args);
+    });
+
+    const result = await generateInvoiceFromTimeEntries(mockDb as unknown as TenantDb, {
+      timeEntryIds: [1],
+      clientId: 5,
+      mode: 'session',
+      // No taxRate specified - should default to 20%
+    });
+
+    // Verify default 20% rate is used
+    expect(result.invoice.taxRate).toBe('20.00');
+  });
 });

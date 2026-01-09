@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import { eq, and, inArray, desc, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import type { TenantDb } from '@rsm/database/connection';
 import {
   invoices,
@@ -9,6 +9,7 @@ import {
   type Invoice,
   type InvoiceItem,
 } from '@rsm/database/tenant';
+import { calculateTax, getDefaultTaxRate, validateTaxCalculation } from './tax-calculator';
 
 interface GenerateInvoiceOptions {
   timeEntryIds: number[];
@@ -148,10 +149,15 @@ export async function generateInvoiceFromTimeEntries(
     };
   });
 
-  // 7. Calculate financial totals
+  // 7. Calculate financial totals using tax calculator
   const subtotal = lineItems.reduce((sum, item) => sum + parseFloat(item.amount), 0);
-  const taxAmount = subtotal * (taxRate / 100);
-  const total = subtotal + taxAmount;
+
+  // Use tax calculator for robust calculation
+  const taxRateToUse = taxRate ?? getDefaultTaxRate();
+  const taxResult = calculateTax(subtotal, taxRateToUse);
+
+  // Validate calculation
+  validateTaxCalculation(taxResult);
 
   // 8. Generate invoice number
   const currentYear = new Date().getFullYear();
@@ -181,10 +187,10 @@ export async function generateInvoiceFromTimeEntries(
       status: 'draft',
       issueDate,
       dueDate,
-      subtotal: subtotal.toFixed(2),
-      taxRate: taxRate.toFixed(2),
-      taxAmount: taxAmount.toFixed(2),
-      total: total.toFixed(2),
+      subtotal: taxResult.subtotal,
+      taxRate: taxResult.taxRate,
+      taxAmount: taxResult.taxAmount,
+      total: taxResult.total,
       notes: notes || null,
     })
     .returning();
@@ -202,6 +208,14 @@ export async function generateInvoiceFromTimeEntries(
       }))
     )
     .returning();
+
+  // 12. Final validation before returning
+  validateTaxCalculation({
+    subtotal: createdInvoice.subtotal,
+    taxRate: createdInvoice.taxRate,
+    taxAmount: createdInvoice.taxAmount,
+    total: createdInvoice.total,
+  });
 
   return {
     invoice: createdInvoice,
