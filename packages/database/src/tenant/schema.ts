@@ -206,6 +206,25 @@ export type InvoiceItem = typeof invoiceItems.$inferSelect;
 export type InsertInvoiceItem = typeof invoiceItems.$inferInsert;
 
 /**
+ * Invoice Relations
+ */
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  client: one(clients, {
+    fields: [invoices.clientId],
+    references: [clients.id],
+  }),
+  items: many(invoiceItems),
+  timeEntries: many(timeEntries),
+}));
+
+export const invoiceItemsRelations = relations(invoiceItems, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceItems.invoiceId],
+    references: [invoices.id],
+  }),
+}));
+
+/**
  * Equipment table (Tenant DB)
  * Studio equipment, gear, and instruments
  */
@@ -1072,6 +1091,9 @@ export const timeEntries = pgTable("time_entries", {
   // Manual adjustments
   manuallyAdjusted: boolean("manually_adjusted").notNull().default(false), // True if user edited start/end times after auto-tracking
 
+  // Invoicing
+  invoiceId: integer("invoice_id").references(() => invoices.id, { onDelete: "set null" }), // Links to invoice if time has been invoiced
+
   // Notes
   notes: text("notes"), // Optional notes about this time entry
 
@@ -1106,6 +1128,10 @@ export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
     fields: [timeEntries.trackId],
     references: [tracks.id],
   }),
+  invoice: one(invoices, {
+    fields: [timeEntries.invoiceId],
+    references: [invoices.id],
+  }),
 }));
 
 export const taskTypesRelations = relations(taskTypes, ({ many }) => ({
@@ -1127,6 +1153,10 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
-export const projectsRelations = relations(projects, ({ many }) => ({
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  client: one(clients, {
+    fields: [projects.clientId],
+    references: [clients.id],
+  }),
   sessions: many(sessions),
 }));

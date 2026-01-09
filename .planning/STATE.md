@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 15.5 of 17 (TypeScript Cleanup) - v4.0 Workflow Commercial Complet
-Plan: 15.5-01 of 1 - COMPLETE
-Status: Phase 15.5 complete - Type safety 100% restaurée (316 erreurs → 0)
-Last activity: 2026-01-09 - Phase 15.5-01 complete (TypeScript cleanup: 0 errors server + client)
+Phase: 16 of 17 (Facturation Automatique Backend) - v4.0 Workflow Commercial Complet
+Plan: 16-01 of 1 - COMPLETE
+Status: Phase 16 complete - Invoice generation from time entries operational
+Last activity: 2026-01-09 - Phase 16-01 complete (Auto-invoice backend service + tRPC endpoints)
 
-Progress: ████████░░ 70% (v4.0: 14/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5 complete)
+Progress: ████████░░ 75% (v4.0: 15/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 65
-- Average duration: 43.9 min
-- Total execution time: 47.51 hours
+- Total plans completed: 66
+- Average duration: 43.4 min
+- Total execution time: 47.68 hours
 
 **By Phase:**
 
@@ -70,10 +70,11 @@ Progress: ████████░░ 70% (v4.0: 14/? plans - Phases 10, 11-0
 | 14 | 1/1 | 3 min | 3 min |
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
+| 16 | 1/1 | 10 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: [7 min, 90 min, 3 min, 16 min, 89 min]
-- Trend: TypeScript cleanup comprehensive (89 min pour 316 erreurs), schema migrations rapides (3-16 min), UI implementations medium (16-90 min)
+- Last 5 plans: [90 min, 3 min, 16 min, 89 min, 10 min]
+- Trend: Backend services rapides (10 min pour service + tests + endpoints), TypeScript cleanup comprehensive (89 min), schema migrations rapides (3-16 min)
 
 ## Accumulated Context
 
@@ -141,6 +142,9 @@ Progress: ████████░░ 70% (v4.0: 14/? plans - Phases 10, 11-0
 | 13 | Multi-context time tracking (trackId support) | Extended time tracking from session/project to also support track-level timing. User requested "on doit tout pouvoir timer" - studios bill at different granularities (session=room rental, project=album, track=individual song work). Added trackId column, XOR validation, migration created. Maximum billing flexibility. |
 | 14 | Optional session-project linkage (nullable FK) | Sessions can optionally belong to a project via projectId column. Nullable FK with SET NULL on delete ensures sessions survive project deletion (historical session records preserved). Supports dual workflows: standalone sessions (hourly bookings) OR project-linked sessions (album recording). Backend ready for Phase 15 UI adaptation. |
 | 15 | Display project ID instead of title in Sessions list | Sessions.tsx shows "Projet #{id}" instead of project title because sessions.list backend doesn't JOIN projects table. Trade-off: Simplicity Phase 15 (UI only, 16 min) vs perfectionism (backend modification + LEFT JOIN = out of scope, +2-3h). Functional but sub-optimal UX. Future improvement: Modify sessions router to include project.title in response. |
+| 16 | Line items format for auto-invoices | Chose format "{TaskType} - {hours}h{minutes} @ {rate}€/h" for maximum client clarity. Shows exact duration and applied rate. Alternatives considered: just task name (too vague), duration only (no rate visibility), rate only (no duration detail). Selected format balances readability and transparency. |
+| 16 | Session vs project invoicing modes | Implemented 2 explicit modes with strict validation. Session mode = single booking invoicing (room rental per session). Project mode = consolidated project invoicing (all work on album). Studios operate both ways depending on client relationship and service type. Validation prevents mixing entries from different contexts. |
+| 16 | Time entry grouping by task type | Auto-consolidate entries of same task type into single line item. 10 Recording entries → 1 line "Recording - 5h30 @ 50€/h". Rationale: Invoice readability (2-3 lines vs 15 entries), client clarity, industry standard practice. Maintains accuracy through aggregation before calculation. |
 
 ### Deferred Issues
 
@@ -319,16 +323,17 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-09T22:05:17Z
-Stopped at: Phase 15.5-01 COMPLETE (TypeScript Cleanup)
+Last session: 2026-01-09T22:41:55Z
+Stopped at: Phase 16-01 COMPLETE (Auto-Invoice Generation Backend)
 Resume context:
-  - Phase 15.5 complete: Type safety 100% restaurée (316 erreurs → 0)
-  - Server: 0 TypeScript errors (44→0) - Drizzle queries, session types, schema fields corrigés
-  - Client: 0 TypeScript errors (272→0) - Schema fields alignment, type conversions, unused vars cleaned
-  - Drizzle types regenerated with trackId/projectId from migrations 0007/0008
-  - Production builds succeed for all packages
-  - No technical debt: No @ts-ignore, strategic as any only where unavoidable
-  - All packages strict mode TypeScript compliant
-  - SUMMARY created: .planning/phases/15.5-typescript-cleanup/15.5-01-SUMMARY.md
-  - Next: Phase 16 (Facturation Automatique Temps Réel - Backend Integration)
+  - Phase 16 complete: Service de génération d'invoices depuis time entries opérationnel
+  - Backend: generateInvoiceFromTimeEntries service + 2 tRPC endpoints (generateFromTimeEntries, getUninvoicedTimeEntries)
+  - Tests: 4 unit tests passing (grouping, calculations, validations, error handling)
+  - Schema: invoiceId FK ajouté à time_entries, relations bidirectionnelles configurées
+  - Migration 0009: Créée et validée (non appliquée car Docker offline - à appliquer au prochain démarrage)
+  - TypeScript: Clean pour fonctionnalités implémentées (4 errors pré-existantes hors scope)
+  - Line items: Format "{TaskType} - {hours}h{minutes} @ {rate}€/h" pour clarté client
+  - Modes: session (facturation unique session) ET project (consolidation projet) supportés
+  - SUMMARY created: .planning/phases/16-facturation-automatique-backend/16-01-SUMMARY.md
+  - Next: Phase 16-02 (Stripe Deposits & Advances UI)
 Resume file: None
