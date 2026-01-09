@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 17 of 17 (Facturation Automatique Stripe UI) - v4.0 Workflow Commercial Complet
-Plan: 17-01 of 3 - Complete
-Status: Phase 17 IN PROGRESS - Stripe Checkout Sessions & Webhooks implemented
-Last activity: 2026-01-09 - Phase 17-01 complete (Stripe Checkout + Webhook idempotency)
+Plan: 17-02 of 3 - Complete
+Status: Phase 17 IN PROGRESS - Email Notifications & PDF Generation complete
+Last activity: 2026-01-09 - Phase 17-02 complete (Resend + PDFKit + S3 integration)
 
-Progress: █████████░ 80% (v4.0: 18/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16-01, 16-02, 16-03, 17-01 complete)
+Progress: █████████░ 90% (v4.0: 19/21 plans - Phases 10, 11, 11.5, 12, 13, 14, 15, 15.5, 16, 17-01, 17-02 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 69
-- Average duration: 41.9 min
-- Total execution time: 48.27 hours
+- Total plans completed: 70
+- Average duration: 41.5 min
+- Total execution time: 48.48 hours
 
 **By Phase:**
 
@@ -71,11 +71,11 @@ Progress: █████████░ 80% (v4.0: 18/? plans - Phases 10, 11-0
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
 | 16 | 3/3 | 39 min | 13 min |
-| 17 | 1/3 | 6 min | 6 min |
+| 17 | 2/3 | 19 min | 9.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [89 min, 10 min, 16 min, 13 min, 6 min]
-- Trend: Stripe integration rapide (6 min - webhook handlers + idempotency), backend utilities 10-16 min, tax/payment logic 13-16 min
+- Last 5 plans: [10 min, 16 min, 13 min, 6 min, 13 min]
+- Trend: Email/PDF integration rapide (13 min - Resend + PDFKit + S3), Stripe webhooks 6 min, backend APIs 10-16 min
 
 ## Accumulated Context
 
@@ -151,6 +151,10 @@ Progress: █████████░ 80% (v4.0: 18/? plans - Phases 10, 11-0
 | 17 | Stripe Checkout Sessions over Payment Element | Utilisé mode 'payment' avec invoice_creation auto pour génération PDF. Rationale: Stripe-hosted page = moins de PCI compliance overhead, invoice PDF auto-généré, redirect URLs simples. Alternative (Payment Element embedded) = plus de frontend complexity + PCI scope. |
 | 17 | Idempotency via event tracking table | Table stripe_webhook_events avec eventId unique + processedAt timestamp. Rationale: Industry standard pattern, garantit qu'un webhook ne soit jamais traité 2x même si Stripe retry. Alternative (Redis cache) = moins durable, alternative (no idempotency) = risque double payment. |
 | 17 | Database transactions for webhook handlers | Wrapper status update + event tracking dans tenantDb.transaction(). Rationale: Garantit atomicité - si event tracking fail, status update rollback (et vice-versa). Évite états inconsistants. |
+| 17 | Resend over SendGrid for email | React Email integration, simpler API, 3k free emails/month. Rationale: Time-to-market faster, modern DX, sufficient free tier for MVP. Alternative (SendGrid) = plus features mais setup complexe, alternative (self-hosted SMTP) = maintenance overhead. |
+| 17 | PDFKit over Puppeteer for PDF generation | Programmatic layout <100ms, lightweight 20MB RAM, no browser overhead. Rationale: MVP speed critical, simple A4 invoices suffisent, no need HTML/CSS rendering. Alternative (Puppeteer) = 500MB RAM + Chromium, alternative (react-pdf) = JSX overhead but cleaner syntax. |
+| 17 | AWS S3 over filesystem for PDF storage | Scalable cloud-native storage, signed URLs with expiry, encryption at rest. Rationale: Docker/Heroku require cloud storage, S3 industry standard, 1-year lifecycle policy for tax retention. Alternative (filesystem) = ne scale pas multi-server, alternative (Cloudinary) = trop cher pour PDFs. |
+| 17 | Upload PDF before email send | Guarantee attachment availability, avoid broken links if S3 fails. Rationale: User experience priority - email with attachment OR no email, never email without attachment. If S3 fails, email send also fails (logged for retry). |
 
 ### Deferred Issues
 
@@ -329,15 +333,17 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-09T23:35:50Z
-Stopped at: Phase 17-01 complete - Stripe Checkout Sessions & Webhook idempotency
+Last session: 2026-01-09T23:54:26Z
+Stopped at: Phase 17-02 complete - Email Notifications & PDF Generation
 Resume context:
-  - Phase 17 IN PROGRESS (1/3 plans): Facturation Automatique Stripe UI
-  - 17-01: Stripe Checkout Sessions + Webhook handlers avec idempotency ✅
-  - createPaymentSession tRPC mutation (full payment OR deposits)
-  - handleCheckoutSessionCompleted routing (invoices vs bookings)
-  - stripe_webhook_events table pour idempotency garantie
-  - Database transactions for atomic invoice status updates
-  - Ready for 17-02: Email Notifications & PDF Generation
-  - Next action: `/gsd:execute-plan .planning/phases/17-facturation-automatique-stripe-ui/17-02-PLAN.md`
+  - Phase 17 IN PROGRESS (2/3 plans): Facturation Automatique Stripe UI
+  - 17-01: Stripe Checkout Sessions + Webhook idempotency ✅
+  - 17-02: Resend + PDFKit + S3 integration ✅
+  - Resend email service (sendInvoiceEmail, InvoiceEmail.tsx React template)
+  - PDFKit PDF generation (<100ms, professional A4 layout)
+  - AWS S3 storage (uploadInvoicePDF, getInvoicePDFUrl with signed URLs)
+  - Email + PDF integrated in webhooks (checkout.session.completed, payment_intent.failed)
+  - Manual send mutation (invoices.sendInvoice) + download query (invoices.downloadPDF)
+  - Ready for 17-03: Client Portal Invoice Payment UI
+  - Next action: `/gsd:plan-phase 17` to break down 17-03 (React frontend)
 Resume file: None

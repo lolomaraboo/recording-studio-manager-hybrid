@@ -882,13 +882,15 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 3.14. Améliorations UI | v3.0 | 4/4 | ✅ Complete | 2026-01-05 |
 | **v4.0 - Workflow Commercial Complet (IN PROGRESS)** | | | | |
 | 10. Système Devis - Backend | v4.0 | 3/6 | ✅ Complete | 2026-01-05 |
-| 11. Système Devis - Frontend | v4.0 | 0/1 | ⏳ Planned | - |
-| 12. Tasks Chronométrées - Timer | v4.0 | 0/? | Not started | - |
-| 13. Tasks Chronométrées - UI | v4.0 | 0/? | Not started | - |
-| 14. Architecture Flexible - Backend | v4.0 | 0/? | Not started | - |
-| 15. Architecture Flexible - UI | v4.0 | 0/? | Not started | - |
-| 16. Facturation Auto - Backend | v4.0 | 0/? | Not started | - |
-| 17. Facturation Auto - Stripe | v4.0 | 0/? | Not started | - |
+| 11. Système Devis - Frontend | v4.0 | 1/1 | ✅ Complete | 2026-01-06 |
+| 11.5. Catalogue Services | v4.0 | 3/3 | ✅ Complete | 2026-01-06 |
+| 12. Tasks Chronométrées - Timer | v4.0 | 3/3 | ✅ Complete | 2026-01-07 |
+| 13. Tasks Chronométrées - UI | v4.0 | 1/1 | ✅ Complete | 2026-01-07 |
+| 14. Architecture Flexible - Backend | v4.0 | 1/1 | ✅ Complete | 2026-01-07 |
+| 15. Architecture Flexible - UI | v4.0 | 1/1 | ✅ Complete | 2026-01-07 |
+| 15.5. TypeScript Cleanup 316 errors | v4.0 | 1/1 | ✅ Complete | 2026-01-09 |
+| 16. Facturation Auto - Backend | v4.0 | 3/3 | ✅ Complete | 2026-01-09 |
+| 17. Facturation Auto - Stripe UI | v4.0 | 2/3 | ⏳ In Progress | - |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -897,7 +899,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
-**v4.0 Total**: 3/? plans (Phase 10 complete - 47 min, Phase 11 planned)
+**v4.0 Total**: 20/21 plans (Phases 10-17 - 19/20 complete, Phase 17-03 remaining)
 **v1.0 Total**: 0/17 plans (deferred after v4.0)
 
 ---
@@ -1101,18 +1103,14 @@ Plans:
 
 **Depends on**: Phase 16
 
-**Research**: Likely (Stripe Checkout Sessions, webhook handling for payments)
+**Research**: Completed (Resend email, PDFKit, AWS S3, Stripe Checkout Sessions)
 
-**Research topics**:
-- Stripe Checkout Sessions for invoice payments
-- Webhook handling (payment_intent.succeeded, payment_intent.failed)
-- Email notification templates (invoice sent, payment received)
-- Invoice PDF generation for email attachments
-
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 17-01: TBD (run /gsd:plan-phase 17 to break down)
+- [x] 17-01: Stripe Checkout Sessions + Webhook idempotency (Completed 2026-01-09 - 6 min)
+- [x] 17-02: Email Notifications & PDF Generation (Resend + PDFKit + S3) (Completed 2026-01-09 - 13 min)
+- [ ] 17-03: Client Portal Invoice Payment UI (React frontend)
 
 ---
 
