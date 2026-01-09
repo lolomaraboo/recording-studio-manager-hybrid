@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq, and, inArray, desc } from 'drizzle-orm';
+import Stripe from 'stripe';
 import { router, protectedProcedure } from '../_core/trpc';
 import { invoices, timeEntries, clients } from '@rsm/database/tenant';
 import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
@@ -348,6 +349,75 @@ export const invoicesRouter = router({
       return {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id,
+      };
+    }),
+
+  /**
+   * Create Stripe Checkout Session for invoice payment
+   */
+  createPaymentSession: protectedProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get invoice
+      const invoice = await tenantDb.query.invoices.findFirst({
+        where: eq(invoices.id, input.invoiceId),
+      });
+
+      if (!invoice) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Invoice not found' });
+      }
+
+      // Validate invoice status - cannot pay already paid invoices
+      if (invoice.status === 'paid') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invoice is already paid',
+        });
+      }
+
+      const stripe = getStripeClient();
+      const appUrl = process.env.APP_URL || 'http://localhost:5174';
+
+      // Determine payment amount: deposit or full
+      const isDeposit = invoice.depositAmount && parseFloat(invoice.depositAmount) > 0;
+      const paymentAmount = isDeposit
+        ? parseFloat(invoice.depositAmount)
+        : parseFloat(invoice.total);
+
+      // Create single line item for invoice (line items detail will be in Stripe invoice PDF)
+      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `Facture ${invoice.invoiceNumber}`,
+              description: invoice.notes || undefined,
+            },
+            unit_amount: formatStripeAmount(paymentAmount),
+          },
+          quantity: 1,
+        },
+      ];
+
+      // Create Checkout Session
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: lineItems,
+        metadata: {
+          invoiceId: invoice.id.toString(),
+          organizationId: ctx.organizationId.toString(),
+          isDeposit: isDeposit ? 'true' : 'false',
+        },
+        invoice_creation: { enabled: true },
+        success_url: `${appUrl}/invoices/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appUrl}/invoices?canceled=true`,
+      });
+
+      return {
+        sessionId: session.id,
+        checkoutUrl: session.url,
       };
     }),
 });

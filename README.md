@@ -131,6 +131,53 @@ pnpm --filter database test:coverage
 
 ---
 
+## Stripe Webhooks - Tests Locaux
+
+### Installation Stripe CLI
+
+```bash
+# macOS
+brew install stripe/stripe-cli/stripe
+
+# Autres plateformes
+# Voir: https://stripe.com/docs/stripe-cli
+```
+
+### Configuration
+
+1. **Login Stripe CLI:**
+   ```bash
+   stripe login
+   ```
+
+2. **Forward webhooks vers localhost:**
+   ```bash
+   stripe listen --forward-to http://localhost:3001/api/webhooks/stripe
+   ```
+
+3. **Copier webhook secret:** Ajouter à `.env` comme `STRIPE_WEBHOOK_SECRET`
+
+### Tests d'Events
+
+```bash
+# Test checkout.session.completed
+stripe trigger checkout.session.completed
+
+# Test payment_intent.succeeded
+stripe trigger payment_intent.succeeded
+
+# Test payment_intent.payment_failed
+stripe trigger payment_intent.payment_failed
+```
+
+### Vérification
+
+Après trigger event, vérifier logs backend:
+- `[Stripe Webhook] checkout.session.completed` + invoice status updated
+- Idempotency: Re-trigger même event → "already processed"
+
+---
+
 ## Scripts Database
 
 ```bash

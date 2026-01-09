@@ -8,6 +8,7 @@ import {
   clients,
   rooms,
   invoices,
+  stripeWebhookEvents,
 } from "@rsm/database/tenant/schema";
 import { organizations } from "@rsm/database/master/schema";
 import { eq, and } from "drizzle-orm";
@@ -26,15 +27,44 @@ import {
  * Stripe Webhook Handler
  *
  * Processes Stripe webhook events:
- * - checkout.session.completed: Create payment transaction record
- * - payment_intent.succeeded: Update booking status
+ * - checkout.session.completed: Create payment transaction record OR invoice payment
+ * - payment_intent.succeeded: Update booking status OR invoice status
  * - charge.refunded: Handle refunds
  *
  * Security:
  * - Verifies webhook signature
  * - Validates organization_id from metadata
  * - Logs all webhook events
+ * - Idempotency via stripe_webhook_events table
  */
+
+/**
+ * Check and record idempotency for webhook events
+ *
+ * Returns true if event already processed, false if new event
+ */
+async function checkIdempotency(tenantDb: any, eventId: string, eventType: string, invoiceId?: number): Promise<boolean> {
+  // Check if event already processed
+  const existing = await tenantDb.query.stripeWebhookEvents.findFirst({
+    where: eq(stripeWebhookEvents.eventId, eventId),
+  });
+
+  if (existing) {
+    console.log(`[Stripe Webhook] Event ${eventId} already processed at ${existing.processedAt}`);
+    return true;
+  }
+
+  // Record new event
+  await tenantDb.insert(stripeWebhookEvents).values({
+    eventId,
+    eventType,
+    invoiceId: invoiceId || null,
+    processedAt: new Date(),
+  });
+
+  console.log(`[Stripe Webhook] Event ${eventId} recorded for idempotency tracking`);
+  return false;
+}
 
 /**
  * Main webhook handler endpoint
@@ -142,9 +172,8 @@ export async function handleStripeWebhook(req: Request, res: Response) {
  * - Payment is successfully authorized
  *
  * Actions:
- * - Create payment transaction record
- * - Link to booking via metadata
- * - Log activity
+ * - Route to invoice payment handler if invoiceId in metadata
+ * - Otherwise handle booking payment (legacy logic)
  */
 async function handleCheckoutSessionCompleted(event: Stripe.Event) {
   const session = event.data.object as Stripe.Checkout.Session;
@@ -152,12 +181,36 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
   console.log(`[Stripe Webhook] Processing checkout.session.completed: ${session.id}`);
 
   // Extract metadata
-  const organizationId = parseInt(session.metadata?.organization_id || "0");
+  const organizationId = parseInt(session.metadata?.organizationId || session.metadata?.organization_id || "0");
+  const invoiceId = parseInt(session.metadata?.invoiceId || "0");
+  const isDeposit = session.metadata?.isDeposit === 'true';
+
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organizationId in checkout session metadata");
+    throw new Error("Missing organizationId in checkout session metadata");
+  }
+
+  const tenantDb = await getTenantDb(organizationId);
+
+  // Idempotency check
+  const alreadyProcessed = await checkIdempotency(tenantDb, event.id, event.type, invoiceId || undefined);
+  if (alreadyProcessed) {
+    return; // Event already processed, skip
+  }
+
+  // Route based on payment type
+  if (invoiceId) {
+    // Handle invoice payment
+    await handleInvoiceCheckoutPayment(tenantDb, session, invoiceId, isDeposit);
+    return;
+  }
+
+  // Legacy booking payment logic
   const bookingId = parseInt(session.metadata?.booking_id || "0");
   const clientId = parseInt(session.metadata?.client_id || "0");
   const paymentType = session.metadata?.payment_type || "unknown"; // "deposit" | "balance"
 
-  if (!organizationId || !bookingId || !clientId) {
+  if (!bookingId || !clientId) {
     console.error("[Stripe Webhook] Missing required metadata in checkout session:", {
       organizationId,
       bookingId,
@@ -166,8 +219,6 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     });
     throw new Error("Missing required metadata in checkout session");
   }
-
-  const tenantDb = await getTenantDb(organizationId);
 
   // Get booking with client and room details for email
   const bookingList = await tenantDb
@@ -317,6 +368,80 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
   }
 
   console.log(`[Stripe Webhook] Successfully processed checkout.session.completed for booking ${bookingId}`);
+}
+
+/**
+ * Handle invoice payment via Checkout Session
+ *
+ * Triggered when:
+ * - Customer completes invoice payment in Stripe Checkout
+ *
+ * Actions:
+ * - Update invoice status (PAID or PARTIALLY_PAID)
+ * - Record payment amount and timestamp
+ */
+async function handleInvoiceCheckoutPayment(
+  tenantDb: any,
+  session: Stripe.Checkout.Session,
+  invoiceId: number,
+  isDeposit: boolean
+) {
+  console.log(`[Stripe Webhook] Processing invoice checkout payment for invoice ${invoiceId}`);
+
+  // Get invoice
+  const invoice = await tenantDb.query.invoices.findFirst({
+    where: eq(invoices.id, invoiceId),
+  });
+
+  if (!invoice) {
+    console.error(`[Stripe Webhook] Invoice ${invoiceId} not found`);
+    throw new Error(`Invoice ${invoiceId} not found`);
+  }
+
+  // Get payment intent to get exact amount paid
+  const stripe = getStripeClient();
+  const paymentIntent = await stripe.paymentIntents.retrieve(
+    session.payment_intent as string
+  );
+
+  const amountPaid = parseStripeAmount(paymentIntent.amount);
+
+  // Update invoice in database transaction for atomicity
+  await tenantDb.transaction(async (tx: any) => {
+    if (isDeposit) {
+      // Partial payment (deposit)
+      await tx
+        .update(invoices)
+        .set({
+          status: 'partially_paid' as any,
+          paidAmount: amountPaid.toFixed(2),
+          paidAt: new Date(),
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: paymentIntent.id,
+          updatedAt: new Date(),
+        })
+        .where(eq(invoices.id, invoiceId));
+
+      console.log(`[Stripe Webhook] Invoice ${invoiceId} marked as PARTIALLY_PAID (deposit: €${amountPaid})`);
+    } else {
+      // Full payment
+      await tx
+        .update(invoices)
+        .set({
+          status: 'paid' as any,
+          paidAmount: amountPaid.toFixed(2),
+          paidAt: new Date(),
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: paymentIntent.id,
+          updatedAt: new Date(),
+        })
+        .where(eq(invoices.id, invoiceId));
+
+      console.log(`[Stripe Webhook] Invoice ${invoiceId} marked as PAID (€${amountPaid})`);
+    }
+  });
+
+  console.log(`[Stripe Webhook] ✅ Invoice ${invoiceId} payment processed successfully`);
 }
 
 /**
@@ -553,24 +678,47 @@ async function handleChargeRefunded(event: Stripe.Event) {
  * - Payment fails (card declined, insufficient funds, etc.)
  *
  * Actions:
- * - Create failed payment transaction record
- * - Log failure
+ * - Update invoice status to PAYMENT_FAILED (if invoice payment)
+ * - OR create failed payment transaction record (if booking payment)
  */
 async function handlePaymentIntentFailed(event: Stripe.Event) {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
   console.log(`[Stripe Webhook] Processing payment_intent.payment_failed: ${paymentIntent.id}`);
 
-  const organizationId = parseInt(paymentIntent.metadata?.organization_id || "0");
-  const bookingId = parseInt(paymentIntent.metadata?.booking_id || "0");
-  const clientId = parseInt(paymentIntent.metadata?.client_id || "0");
+  const metadata = paymentIntent.metadata;
+  const organizationId = parseInt(metadata?.organizationId || metadata?.organization_id || "0");
+  const invoiceId = parseInt(metadata?.invoiceId || "0");
 
-  if (!organizationId || !bookingId || !clientId) {
-    console.error("[Stripe Webhook] Missing metadata in failed payment intent");
+  if (!organizationId) {
+    console.error("[Stripe Webhook] Missing organizationId in failed payment intent metadata");
     return;
   }
 
   const tenantDb = await getTenantDb(organizationId);
+
+  // Handle invoice payment failure
+  if (invoiceId) {
+    await tenantDb
+      .update(invoices)
+      .set({
+        status: 'payment_failed' as any,
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, invoiceId));
+
+    console.log(`[Stripe Webhook] Invoice ${invoiceId} marked as PAYMENT_FAILED`);
+    return;
+  }
+
+  // Legacy booking payment logic
+  const bookingId = parseInt(metadata?.booking_id || "0");
+  const clientId = parseInt(metadata?.client_id || "0");
+
+  if (!bookingId || !clientId) {
+    console.error("[Stripe Webhook] Missing metadata in failed payment intent");
+    return;
+  }
 
   // Check if payment transaction already exists
   const existingTransaction = await tenantDb

@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 16 of 17 (Facturation Automatique Backend) - v4.0 Workflow Commercial Complet
-Plan: 16-03 of 3 - Complete
-Status: Phase 16 COMPLETE - Tax calculation & validation system implemented
-Last activity: 2026-01-09 - Phase 16-03 complete (Tax calculator with multi-rate French VAT)
+Phase: 17 of 17 (Facturation Automatique Stripe UI) - v4.0 Workflow Commercial Complet
+Plan: 17-01 of 3 - Complete
+Status: Phase 17 IN PROGRESS - Stripe Checkout Sessions & Webhooks implemented
+Last activity: 2026-01-09 - Phase 17-01 complete (Stripe Checkout + Webhook idempotency)
 
-Progress: █████████░ 78% (v4.0: 17/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16-01, 16-02, 16-03 complete)
+Progress: █████████░ 80% (v4.0: 18/? plans - Phases 10, 11-01, 11.5, 12, 13, 14, 15, 15.5, 16-01, 16-02, 16-03, 17-01 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 68
-- Average duration: 42.5 min
-- Total execution time: 48.17 hours
+- Total plans completed: 69
+- Average duration: 41.9 min
+- Total execution time: 48.27 hours
 
 **By Phase:**
 
@@ -71,10 +71,11 @@ Progress: █████████░ 78% (v4.0: 17/? plans - Phases 10, 11-0
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
 | 16 | 3/3 | 39 min | 13 min |
+| 17 | 1/3 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: [16 min, 89 min, 10 min, 16 min, 13 min]
-- Trend: Backend utilities rapides (10-16 min), TypeScript cleanup majeur (89 min), tax calculator avec tests complets (13 min)
+- Last 5 plans: [89 min, 10 min, 16 min, 13 min, 6 min]
+- Trend: Stripe integration rapide (6 min - webhook handlers + idempotency), backend utilities 10-16 min, tax/payment logic 13-16 min
 
 ## Accumulated Context
 
@@ -147,6 +148,9 @@ Progress: █████████░ 78% (v4.0: 17/? plans - Phases 10, 11-0
 | 16 | Time entry grouping by task type | Auto-consolidate entries of same task type into single line item. 10 Recording entries → 1 line "Recording - 5h30 @ 50€/h". Rationale: Invoice readability (2-3 lines vs 15 entries), client clarity, industry standard practice. Maintains accuracy through aggregation before calculation. |
 | 16 | Arithmétique en centimes | Convertir montants en centimes entiers avant calculs pour éviter floating point errors. Pattern: `(subtotalCents * taxRateCents) / 10000`. Rationale: JavaScript floating point = imprécis (0.1 + 0.2 = 0.30000000000000004), centimes entiers garantissent exactitude financière absolue. Format cohérent end-to-end avec database decimal(10,2) stocké en strings. |
 | 16 | Validation double tax calculation | 2 validations - (1) Après calculateTax, (2) Après database insert. Rationale: Garantit intégrité calcul + persistance. Catch edge cases (ex: migration changeant precision). Vérifie `total = subtotal + taxAmount` avec tolérance 0.01€ (exact avec cents arithmetic). |
+| 17 | Stripe Checkout Sessions over Payment Element | Utilisé mode 'payment' avec invoice_creation auto pour génération PDF. Rationale: Stripe-hosted page = moins de PCI compliance overhead, invoice PDF auto-généré, redirect URLs simples. Alternative (Payment Element embedded) = plus de frontend complexity + PCI scope. |
+| 17 | Idempotency via event tracking table | Table stripe_webhook_events avec eventId unique + processedAt timestamp. Rationale: Industry standard pattern, garantit qu'un webhook ne soit jamais traité 2x même si Stripe retry. Alternative (Redis cache) = moins durable, alternative (no idempotency) = risque double payment. |
+| 17 | Database transactions for webhook handlers | Wrapper status update + event tracking dans tenantDb.transaction(). Rationale: Garantit atomicité - si event tracking fail, status update rollback (et vice-versa). Évite états inconsistants. |
 
 ### Deferred Issues
 
@@ -325,14 +329,15 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-09T23:13:00Z
-Stopped at: Phase 16-03 complete - Tax calculator avec multi-rate French VAT
+Last session: 2026-01-09T23:35:50Z
+Stopped at: Phase 17-01 complete - Stripe Checkout Sessions & Webhook idempotency
 Resume context:
-  - Phase 16 COMPLETE (3/3 plans): Facturation Automatique Backend ✅
-  - 16-01: Auto-invoice generation depuis time entries ✅
-  - 16-02: Stripe Payment Intents pour deposits ✅
-  - 16-03: Tax calculator utility (20%, 10%, 5.5%, 2.1%) ✅
-  - Backend auto-invoicing system 100% fonctionnel
-  - Ready for Phase 17: Stripe & UI (invoice payments, email notifications, PDF generation)
-  - Next action: Review roadmap or discuss Phase 17 planning
+  - Phase 17 IN PROGRESS (1/3 plans): Facturation Automatique Stripe UI
+  - 17-01: Stripe Checkout Sessions + Webhook handlers avec idempotency ✅
+  - createPaymentSession tRPC mutation (full payment OR deposits)
+  - handleCheckoutSessionCompleted routing (invoices vs bookings)
+  - stripe_webhook_events table pour idempotency garantie
+  - Database transactions for atomic invoice status updates
+  - Ready for 17-02: Email Notifications & PDF Generation
+  - Next action: `/gsd:execute-plan .planning/phases/17-facturation-automatique-stripe-ui/17-02-PLAN.md`
 Resume file: None

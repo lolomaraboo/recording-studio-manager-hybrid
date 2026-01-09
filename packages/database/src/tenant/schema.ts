@@ -1167,3 +1167,19 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   }),
   sessions: many(sessions),
 }));
+
+/**
+ * Stripe Webhook Events table (Tenant DB)
+ * Tracks processed webhook events for idempotency
+ */
+export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
+  id: serial("id").primaryKey(),
+  eventId: varchar("event_id", { length: 255 }).notNull().unique(),
+  eventType: varchar("event_type", { length: 100 }).notNull(),
+  processedAt: timestamp("processed_at").notNull().defaultNow(),
+  invoiceId: integer("invoice_id").references(() => invoices.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
+export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
