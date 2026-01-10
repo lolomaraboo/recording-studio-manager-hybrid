@@ -26,9 +26,9 @@
 ## Current Position
 
 Phase: 17 of 17 (Facturation Automatique Stripe UI) - v4.0 Workflow Commercial Complet
-Plan: 17-03-FIX of 4 - Complete
-Status: Phase 17 UAT - E2E test route paths fixed, auth persistence bug discovered
-Last activity: 2026-01-10 - Phase 17-03-FIX complete (route paths corrected, auth bug exposed)
+Plan: 17-03-FIX-2 of 4 - Complete
+Status: Phase 17 UAT - Authentication fixed (1/8 tests passing), invoice UI tests need fixing
+Last activity: 2026-01-10 - Phase 17-03-FIX-2 complete (login 200 OK, localStorage persists, schema fixed)
 
 Progress: ██████████ 100% (v4.0: 21/21 plans + 1 FIX - Phases 10-17 code complete, UAT blocked)
 
