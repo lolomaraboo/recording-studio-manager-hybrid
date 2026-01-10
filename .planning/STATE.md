@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 17 of 17 (Facturation Automatique Stripe UI) - v4.0 Workflow Commercial Complet
-Plan: 17-03 of 3 - Complete
-Status: Phase 17 COMPLETE ✅ - Client Portal Invoice Payment UI complete
-Last activity: 2026-01-10 - Phase 17-03 complete (Client Portal Invoice UI avec Stripe Checkout)
+Plan: 17-03-FIX of 4 - Complete
+Status: Phase 17 UAT - E2E test route paths fixed, auth persistence bug discovered
+Last activity: 2026-01-10 - Phase 17-03-FIX complete (route paths corrected, auth bug exposed)
 
-Progress: ██████████ 100% (v4.0: 21/21 plans - Phases 10-17 ALL COMPLETE ✅)
+Progress: ██████████ 100% (v4.0: 21/21 plans + 1 FIX - Phases 10-17 code complete, UAT blocked)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 71
-- Average duration: 42.2 min
-- Total execution time: 49.45 hours
+- Total plans completed: 72
+- Average duration: 41.3 min
+- Total execution time: 49.5 hours
 
 **By Phase:**
 
@@ -71,11 +71,11 @@ Progress: ██████████ 100% (v4.0: 21/21 plans - Phases 10-17 
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
 | 16 | 3/3 | 39 min | 13 min |
-| 17 | 3/3 | 77 min | 25.7 min |
+| 17 | 4/4 | 80 min | 20.0 min |
 
 **Recent Trend:**
-- Last 5 plans: [16 min, 13 min, 6 min, 13 min, 58 min]
-- Trend: Phase 17 complete - Stripe webhooks 6 min, Email/PDF integration 13 min, Client Portal UI 58 min (React frontend avec corrections backend)
+- Last 5 plans: [13 min, 6 min, 13 min, 58 min, 3 min]
+- Trend: Phase 17 UAT - Stripe complete (6/13/58 min), route path fix exposed deeper auth bug (3 min FIX), new fix plan needed
 
 ## Accumulated Context
 
@@ -157,6 +157,7 @@ Progress: ██████████ 100% (v4.0: 21/21 plans - Phases 10-17 
 | 17 | Upload PDF before email send | Guarantee attachment availability, avoid broken links if S3 fails. Rationale: User experience priority - email with attachment OR no email, never email without attachment. If S3 fails, email send also fails (logged for retry). |
 | 17 | Badge colors via className custom | shadcn/ui Badge ne supporte pas variants "success"/"warning", utilisé className avec bg-green-500 (PAID) et bg-orange-500 (PARTIALLY_PAID). Alternative (créer nouveaux variants dans badge.tsx) = overhead maintenance, alternative (utiliser default partout) = moins de clarté visuelle. |
 | 17 | invoices.get enrichi avec items | Query get ne chargeait pas line items → impossible d'afficher détail facture. Ajout `with: { items: true, client: true }` pour cohérence avec autres queries enrichies du router. Critique pour UX client. |
+| 17-FIX | Stop at architectural boundary | Route path fix (17-03-FIX) complete, but tests exposed Client Portal auth persistence bug. Applied Rule 4 (architectural decision): stop fix plan, create new plan for auth issue rather than expanding scope. Rationale: GSD best practice = narrow scope fixes, defer discovered issues. Auth system modification = architectural change requiring separate investigation (session cookies, ProtectedClientRoute, auth context). |
 
 ### Deferred Issues
 
@@ -319,7 +320,8 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 - ✅ Debug logging removed from context.ts
 - ✅ Session cookie fix verified (authentication working)
 
-**Still outstanding (non-blocking):**
+**Still outstanding:**
+- ⚠️ **BLOCKER (Phase 17 UAT):** Client Portal authentication persistence bug - E2E tests 6/8 failing, session not persisting after login, requires 17-03-FIX-2 plan
 - ✅ Phase 5 Item 11 identity RÉSOLU - Item 11 = Documentation Phase 5 (FAIT Session 4), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
 - Sentry DSN environment variables need to be added when project created
 - Debug logging cleanup in context.ts (after auth verification - ISSUE-006)
@@ -335,17 +337,16 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-10T01:06:38Z
-Stopped at: Phase 17-03 complete - Client Portal Invoice Payment UI
+Last session: 2026-01-10T10:57:54Z
+Stopped at: Phase 17-03-FIX complete - E2E test route paths corrected
 Resume context:
-  - Phase 17 COMPLETE ✅ (3/3 plans): Facturation Automatique Stripe UI
-  - 17-01: Stripe Checkout Sessions + Webhook idempotency ✅
-  - 17-02: Resend + PDFKit + S3 integration ✅
-  - 17-03: Client Portal Invoice Payment UI ✅
-  - Client Portal: Invoices list, detail page, Pay Now button, Success/Cancel pages
-  - Stripe Checkout redirect integration opérationnelle
-  - PDF download via signed URLs S3
-  - Backend invoices.get enrichi avec line items
-  - **v4.0 MILESTONE COMPLETE** - Workflow commercial end-to-end fonctionnel
-  - Next action: `/gsd:complete-milestone` pour archiver v4.0 et préparer v1.0 (Marketing & Launch)
+  - Phase 17-03-FIX COMPLETE ✅: Route paths fixed (/client/ → /client-portal/)
+  - Tests now use correct routes matching App.tsx configuration
+  - **New blocker discovered:** Client Portal auth persistence bug
+  - Test results: 2/8 passing (login works, but session doesn't persist for subsequent pages)
+  - Tests redirect to login page instead of showing invoice pages after successful auth
+  - Root cause: Session cookies or ProtectedClientRoute auth check failing
+  - **Next action:** Create 17-03-FIX-2 plan for authentication persistence investigation
+  - Analysis: Auth system modification = architectural (30-60 min debugging + fix)
+  - v4.0 code complete, UAT blocked pending auth fix
 Resume file: None

@@ -1111,8 +1111,9 @@ Plans:
 - [x] 17-01: Stripe Checkout Sessions + Webhook idempotency (Completed 2026-01-09 - 6 min)
 - [x] 17-02: Email Notifications & PDF Generation (Resend + PDFKit + S3) (Completed 2026-01-09 - 13 min)
 - [x] 17-03: Client Portal Invoice Payment UI (React frontend) (Completed 2026-01-10 - 58 min)
+- [x] 17-03-FIX: Fix E2E test route paths (Completed 2026-01-10 - 3 min) ⚠️ Exposed auth persistence bug
 
-**Status**: ✅ Complete (All 3 plans finished - 77 min total)
+**Status**: ✅ Complete (3 plans finished - 77 min total) | ⚠️ UAT blocked by auth bug (17-03-FIX-2 needed)
 
 ---
 
