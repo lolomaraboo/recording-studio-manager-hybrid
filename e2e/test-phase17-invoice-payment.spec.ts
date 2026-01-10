@@ -102,6 +102,14 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
   });
 
   test('should login to Client Portal successfully', async ({ page }) => {
+    // Listen to browser console
+    page.on('console', (msg) => {
+      console.log(`BROWSER: ${msg.type()}: ${msg.text()}`);
+    });
+    page.on('pageerror', (error) => {
+      console.error(`PAGE ERROR: ${error.message}`);
+    });
+
     await page.goto('http://localhost:5174/client-portal/login');
 
     // Fill login form
@@ -114,7 +122,18 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     // Wait for redirect to Client Portal Dashboard
     await page.waitForURL(/\/client-portal/, { timeout: 5000 });
 
+    // DEBUG: Check localStorage in passing test
+    await page.waitForTimeout(1000);
+    const storage = await page.evaluate(() => {
+      return {
+        token: localStorage.getItem('client_portal_session_token'),
+        client: localStorage.getItem('client_portal_client_data'),
+      };
+    });
+    console.log('DEBUG: localStorage in Test 1:', storage);
+
     // Verify we're logged in
+    console.log('DEBUG: Final URL:', page.url());
     expect(page.url()).toMatch(/\/client-portal/);
 
     console.log('✅ Test 1: Login successful');
@@ -128,8 +147,29 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/client-portal/, { timeout: 5000 });
 
+    // Wait for React to finish hydrating
+    await page.waitForTimeout(1000);
+
+    // DEBUG: Check localStorage after login
+    const storageAfterLogin = await page.evaluate(() => {
+      return {
+        token: localStorage.getItem('client_portal_session_token'),
+        client: localStorage.getItem('client_portal_client_data'),
+      };
+    });
+    console.log('DEBUG: localStorage after login:', storageAfterLogin);
+
     // Navigate to invoices
     await page.goto('http://localhost:5174/client-portal/invoices');
+
+    // DEBUG: Check localStorage after goto
+    const storageAfterGoto = await page.evaluate(() => {
+      return {
+        token: localStorage.getItem('client_portal_session_token'),
+        client: localStorage.getItem('client_portal_client_data'),
+      };
+    });
+    console.log('DEBUG: localStorage after goto:', storageAfterGoto);
 
     // Wait for invoice list to load
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
