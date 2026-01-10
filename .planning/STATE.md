@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 17 of 17 (Facturation Automatique Stripe UI) - v4.0 Workflow Commercial Complet
-Plan: 17-02 of 3 - Complete
-Status: Phase 17 IN PROGRESS - Email Notifications & PDF Generation complete
-Last activity: 2026-01-09 - Phase 17-02 complete (Resend + PDFKit + S3 integration)
+Plan: 17-03 of 3 - Complete
+Status: Phase 17 COMPLETE ✅ - Client Portal Invoice Payment UI complete
+Last activity: 2026-01-10 - Phase 17-03 complete (Client Portal Invoice UI avec Stripe Checkout)
 
-Progress: █████████░ 90% (v4.0: 19/21 plans - Phases 10, 11, 11.5, 12, 13, 14, 15, 15.5, 16, 17-01, 17-02 complete)
+Progress: ██████████ 100% (v4.0: 21/21 plans - Phases 10-17 ALL COMPLETE ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 70
-- Average duration: 41.5 min
-- Total execution time: 48.48 hours
+- Total plans completed: 71
+- Average duration: 42.2 min
+- Total execution time: 49.45 hours
 
 **By Phase:**
 
@@ -71,11 +71,11 @@ Progress: █████████░ 90% (v4.0: 19/21 plans - Phases 10, 11,
 | 15 | 1/1 | 16 min | 16 min |
 | 15.5 | 1/1 | 89 min | 89 min |
 | 16 | 3/3 | 39 min | 13 min |
-| 17 | 2/3 | 19 min | 9.5 min |
+| 17 | 3/3 | 77 min | 25.7 min |
 
 **Recent Trend:**
-- Last 5 plans: [10 min, 16 min, 13 min, 6 min, 13 min]
-- Trend: Email/PDF integration rapide (13 min - Resend + PDFKit + S3), Stripe webhooks 6 min, backend APIs 10-16 min
+- Last 5 plans: [16 min, 13 min, 6 min, 13 min, 58 min]
+- Trend: Phase 17 complete - Stripe webhooks 6 min, Email/PDF integration 13 min, Client Portal UI 58 min (React frontend avec corrections backend)
 
 ## Accumulated Context
 
@@ -155,6 +155,8 @@ Progress: █████████░ 90% (v4.0: 19/21 plans - Phases 10, 11,
 | 17 | PDFKit over Puppeteer for PDF generation | Programmatic layout <100ms, lightweight 20MB RAM, no browser overhead. Rationale: MVP speed critical, simple A4 invoices suffisent, no need HTML/CSS rendering. Alternative (Puppeteer) = 500MB RAM + Chromium, alternative (react-pdf) = JSX overhead but cleaner syntax. |
 | 17 | AWS S3 over filesystem for PDF storage | Scalable cloud-native storage, signed URLs with expiry, encryption at rest. Rationale: Docker/Heroku require cloud storage, S3 industry standard, 1-year lifecycle policy for tax retention. Alternative (filesystem) = ne scale pas multi-server, alternative (Cloudinary) = trop cher pour PDFs. |
 | 17 | Upload PDF before email send | Guarantee attachment availability, avoid broken links if S3 fails. Rationale: User experience priority - email with attachment OR no email, never email without attachment. If S3 fails, email send also fails (logged for retry). |
+| 17 | Badge colors via className custom | shadcn/ui Badge ne supporte pas variants "success"/"warning", utilisé className avec bg-green-500 (PAID) et bg-orange-500 (PARTIALLY_PAID). Alternative (créer nouveaux variants dans badge.tsx) = overhead maintenance, alternative (utiliser default partout) = moins de clarté visuelle. |
+| 17 | invoices.get enrichi avec items | Query get ne chargeait pas line items → impossible d'afficher détail facture. Ajout `with: { items: true, client: true }` pour cohérence avec autres queries enrichies du router. Critique pour UX client. |
 
 ### Deferred Issues
 
@@ -333,17 +335,17 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-09T23:54:26Z
-Stopped at: Phase 17-02 complete - Email Notifications & PDF Generation
+Last session: 2026-01-10T01:06:38Z
+Stopped at: Phase 17-03 complete - Client Portal Invoice Payment UI
 Resume context:
-  - Phase 17 IN PROGRESS (2/3 plans): Facturation Automatique Stripe UI
+  - Phase 17 COMPLETE ✅ (3/3 plans): Facturation Automatique Stripe UI
   - 17-01: Stripe Checkout Sessions + Webhook idempotency ✅
   - 17-02: Resend + PDFKit + S3 integration ✅
-  - Resend email service (sendInvoiceEmail, InvoiceEmail.tsx React template)
-  - PDFKit PDF generation (<100ms, professional A4 layout)
-  - AWS S3 storage (uploadInvoicePDF, getInvoicePDFUrl with signed URLs)
-  - Email + PDF integrated in webhooks (checkout.session.completed, payment_intent.failed)
-  - Manual send mutation (invoices.sendInvoice) + download query (invoices.downloadPDF)
-  - Ready for 17-03: Client Portal Invoice Payment UI
-  - Next action: `/gsd:plan-phase 17` to break down 17-03 (React frontend)
+  - 17-03: Client Portal Invoice Payment UI ✅
+  - Client Portal: Invoices list, detail page, Pay Now button, Success/Cancel pages
+  - Stripe Checkout redirect integration opérationnelle
+  - PDF download via signed URLs S3
+  - Backend invoices.get enrichi avec line items
+  - **v4.0 MILESTONE COMPLETE** - Workflow commercial end-to-end fonctionnel
+  - Next action: `/gsd:complete-milestone` pour archiver v4.0 et préparer v1.0 (Marketing & Launch)
 Resume file: None

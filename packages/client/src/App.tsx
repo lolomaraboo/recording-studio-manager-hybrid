@@ -58,6 +58,9 @@ import BookingDetail from './pages/client-portal/BookingDetail';
 import Profile from './pages/client-portal/Profile';
 import ClientProjects from './pages/client-portal/ClientProjects';
 import ClientInvoices from './pages/client-portal/ClientInvoices';
+import ClientInvoiceDetail from './pages/client-portal/ClientInvoiceDetail';
+import InvoicePaymentSuccess from './pages/client-portal/InvoicePaymentSuccess';
+import InvoicePaymentCanceled from './pages/client-portal/InvoicePaymentCanceled';
 import PaymentHistory from './pages/client-portal/PaymentHistory';
 import MagicLinkVerify from './pages/auth/MagicLinkVerify';
 import {
@@ -114,6 +117,9 @@ function App() {
             <Route path="bookings/:id" element={<BookingDetail />} />
             <Route path="projects" element={<ClientProjects />} />
             <Route path="invoices" element={<ClientInvoices />} />
+            <Route path="invoices/:id" element={<ClientInvoiceDetail />} />
+            <Route path="invoices/success" element={<InvoicePaymentSuccess />} />
+            <Route path="invoices/canceled" element={<InvoicePaymentCanceled />} />
             <Route path="payments" element={<PaymentHistory />} />
             <Route path="profile" element={<Profile />} />
           </Route>

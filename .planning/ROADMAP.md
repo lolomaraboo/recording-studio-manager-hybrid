@@ -899,7 +899,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
-**v4.0 Total**: 20/21 plans (Phases 10-17 - 19/20 complete, Phase 17-03 remaining)
+**v4.0 Total**: 21/21 plans ✅ COMPLETE (Phases 10-17 finished - 77 min Phase 17 total)
 **v1.0 Total**: 0/17 plans (deferred after v4.0)
 
 ---
@@ -1110,7 +1110,9 @@ Plans:
 Plans:
 - [x] 17-01: Stripe Checkout Sessions + Webhook idempotency (Completed 2026-01-09 - 6 min)
 - [x] 17-02: Email Notifications & PDF Generation (Resend + PDFKit + S3) (Completed 2026-01-09 - 13 min)
-- [ ] 17-03: Client Portal Invoice Payment UI (React frontend)
+- [x] 17-03: Client Portal Invoice Payment UI (React frontend) (Completed 2026-01-10 - 58 min)
+
+**Status**: ✅ Complete (All 3 plans finished - 77 min total)
 
 ---
 

@@ -59,6 +59,10 @@ export const invoicesRouter = router({
 
       const invoice = await tenantDb.query.invoices.findFirst({
         where: eq(invoices.id, input.id),
+        with: {
+          items: true,
+          client: true,
+        },
       });
 
       if (!invoice) {
