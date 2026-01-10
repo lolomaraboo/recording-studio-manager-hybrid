@@ -56,6 +56,7 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
         INSERT INTO client_portal_accounts (client_id, email, password_hash, email_verified, is_active)
         VALUES (${client.id}, ${TEST_CLIENT_EMAIL}, ${passwordHash}, true, true)
         ON CONFLICT (email) DO UPDATE SET
+          client_id = ${client.id},
           password_hash = ${passwordHash},
           email_verified = true,
           is_active = true,
@@ -110,6 +111,21 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
       console.error(`PAGE ERROR: ${error.message}`);
     });
 
+    // Listen to network requests
+    page.on('request', (request) => {
+      if (request.url().includes('clientPortalAuth.login')) {
+        console.log(`REQUEST: ${request.method()} ${request.url()}`);
+        console.log(`REQUEST BODY:`, request.postData());
+      }
+    });
+    page.on('response', async (response) => {
+      if (response.url().includes('clientPortalAuth.login')) {
+        console.log(`RESPONSE: ${response.status()} ${response.statusText()}`);
+        const body = await response.text().catch(() => 'Could not read body');
+        console.log(`RESPONSE BODY:`, body);
+      }
+    });
+
     await page.goto('http://localhost:5174/client-portal/login');
 
     // Fill login form
@@ -119,8 +135,8 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     // Submit
     await page.click('button[type="submit"]');
 
-    // Wait for redirect to Client Portal Dashboard
-    await page.waitForURL(/\/client-portal/, { timeout: 5000 });
+    // Wait for redirect to Client Portal Dashboard (NOT /client-portal/login)
+    await page.waitForURL(/\/client-portal\/?$/, { timeout: 5000 });
 
     // DEBUG: Check localStorage in passing test
     await page.waitForTimeout(1000);
