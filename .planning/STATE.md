@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 17 of 17 (Facturation Automatique Stripe UI) - v4.0 Workflow Commercial Complet
-Plan: 17-03-FIX-3 of 4 - Complete
-Status: Phase 17 UAT - Invoice rendering fixed (Expected: 8/8 tests passing), ready for final validation
-Last activity: 2026-01-15 - Phase 17-03-FIX-3 complete (organizationId fallback added, tests updated)
+Plan: 17-03-FIX-4 of 4 - Investigation Complete
+Status: Phase 17 UAT - localStorage issue solved, session persistence architectural issue identified
+Last activity: 2026-01-15 - Phase 17-03-FIX-4 investigation (13 min) - API-based test setup recommended
 
-Progress: ██████████ 100% (v4.0: 21/21 plans + 3 FIX - Phases 10-17 complete, UAT validation pending)
+Progress: ██████████ 100% (v4.0: 21/21 plans + 4 FIX - Code complete, UAT needs architectural fix)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 73
-- Average duration: 40.8 min
-- Total execution time: 49.6 hours
+- Total plans completed: 74
+- Average duration: 40.4 min
+- Total execution time: 49.8 hours
 
 **By Phase:**
 
@@ -74,8 +74,8 @@ Progress: ██████████ 100% (v4.0: 21/21 plans + 3 FIX - Phase
 | 17 | 4/4 | 80 min | 20.0 min |
 
 **Recent Trend:**
-- Last 5 plans: [6 min, 13 min, 58 min, 3 min, 6 min]
-- Trend: Phase 17 UAT fixes complete - route paths (3 min FIX), auth schema (6 min FIX-2), invoice rendering (6 min FIX-3). Ready for E2E validation.
+- Last 5 plans: [13 min, 58 min, 3 min, 6 min, 13 min]
+- Trend: Phase 17 UAT investigation complete - 4 FIX plans (3/6/6/13 min). localStorage solved, session persistence architectural issue identified.
 
 ## Accumulated Context
 
@@ -337,16 +337,16 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-15T07:08:23Z
-Stopped at: Phase 17-03-FIX-3 complete - Invoice rendering issue fixed
+Last session: 2026-01-15T08:02:14Z
+Stopped at: Phase 17-03-FIX-4 investigation complete - localStorage solved, session persistence issue identified
 Resume context:
-  - Phase 17-03-FIX-3 COMPLETE ✅: Invoice list rendering fixed
-  - Root cause: Missing organizationId fallback in dashboard endpoints
-  - Applied `organizationId || 1` to all 11 client portal dashboard endpoints
-  - Added login flow to success/cancel page tests (Tests 7-8)
-  - Expected test results: 8/8 passing (up from 1/8)
-  - **Next action:** Run E2E tests to verify all 8 tests pass
-  - Command: `npx playwright test e2e/test-phase17-invoice-payment.spec.ts`
-  - If tests pass (8/8): Phase 17 UAT complete, ready for v4.0 milestone completion
-  - Commits: 978aad3 (organizationId fallback), 945b1bf (test auth), c098bc9 (SUMMARY)
+  - Phase 17-03-FIX-4 COMPLETE ✅: localStorage persistence investigation (13 min)
+  - ✅ localStorage timing race condition FIXED: Added waitForFunction to ensure token written before navigation
+  - ⚠️ **Deeper issue discovered:** Session persistence architectural problem
+  - Test creates client/invoice via direct DB INSERT but session doesn't persist
+  - Root cause: Transaction isolation or emailVerified check preventing session creation
+  - **Recommendation:** API-based test setup (call registration/login APIs instead of direct DB manipulation)
+  - Test results: Still 3/8 passing (localStorage fixed but session issue remains)
+  - **Next action:** Decide approach - (A) API-based test rewrite, (B) Accept manual UAT, or (C) Fix session persistence
+  - Commits: dac156b (localStorage investigation), 2a0ca88 (tRPC router fix)
 Resume file: None
