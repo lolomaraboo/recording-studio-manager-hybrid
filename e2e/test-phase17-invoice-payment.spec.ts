@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import postgres from 'postgres';
 import bcrypt from 'bcrypt';
+import { execSync } from 'child_process';
 
 /**
  * Phase 17 UAT: Invoice Payment Flow End-to-End Test
@@ -22,60 +22,46 @@ test.describe.configure({ mode: 'serial' }); // Run tests sequentially (share sa
 
 test.describe('Phase 17: Invoice Payment Flow', () => {
   test.beforeAll(async () => {
-    // Setup: Create test client + portal account + test invoice
-    const sql = postgres({
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'password',
-      database: 'tenant_1',
-    });
+    // CRITICAL FIX: Use Docker exec to insert data directly to avoid connection pooling issues
+    // The Node postgres library's connection pooling was preventing data from being visible
+    // to the application server's separate Drizzle connection pool
 
     try {
       const passwordHash = await bcrypt.hash(TEST_CLIENT_PASSWORD, 10);
 
-      // Get or create client
-      let client = await sql`
-        SELECT id, name, email FROM clients WHERE email = ${TEST_CLIENT_EMAIL}
-      `;
+      // Cleanup previous test data
+      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_1 -c "
+        DELETE FROM invoices WHERE client_id IN (SELECT id FROM clients WHERE email = '${TEST_CLIENT_EMAIL}');
+        DELETE FROM client_portal_activity_logs WHERE client_id IN (SELECT id FROM clients WHERE email = '${TEST_CLIENT_EMAIL}');
+        DELETE FROM client_portal_sessions WHERE client_id IN (SELECT id FROM clients WHERE email = '${TEST_CLIENT_EMAIL}');
+        DELETE FROM client_portal_accounts WHERE email = '${TEST_CLIENT_EMAIL}';
+        DELETE FROM clients WHERE email = '${TEST_CLIENT_EMAIL}';
+      "`, { encoding: 'utf-8' });
 
-      if (client.length === 0) {
-        // Create client
-        const [newClient] = await sql`
-          INSERT INTO clients (name, email, type)
-          VALUES ('Phase 17 E2E Test Client', ${TEST_CLIENT_EMAIL}, 'individual')
-          RETURNING id, name, email
-        `;
-        client = newClient;
-        console.log('✅ Created client:', client);
-      } else {
-        client = client[0];
-        console.log('✅ Found existing client:', client);
-      }
+      console.log('✅ Cleaned up previous test data');
 
-      // Create or update portal account
-      await sql`
+      // Create client
+      const clientResult = execSync(`docker exec rsm-postgres psql -U postgres -d tenant_1 -t -c "
+        INSERT INTO clients (name, email, type)
+        VALUES ('Phase 17 E2E Test Client', '${TEST_CLIENT_EMAIL}', 'individual')
+        RETURNING id;
+      "`, { encoding: 'utf-8' });
+
+      const clientId = parseInt(clientResult.trim());
+      console.log('✅ Created client with ID:', clientId);
+
+      // Create portal account
+      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_1 -c "
         INSERT INTO client_portal_accounts (client_id, email, password_hash, email_verified, is_active)
-        VALUES (${client.id}, ${TEST_CLIENT_EMAIL}, ${passwordHash}, true, true)
-        ON CONFLICT (email) DO UPDATE SET
-          client_id = ${client.id},
-          password_hash = ${passwordHash},
-          email_verified = true,
-          is_active = true,
-          updated_at = NOW()
-      `;
+        VALUES (${clientId}, '${TEST_CLIENT_EMAIL}', '${passwordHash}', true, true);
+      "`, { encoding: 'utf-8' });
 
       console.log('✅ Portal account ready');
 
-      // Delete any previous test invoices for this client
-      await sql`
-        DELETE FROM invoices WHERE client_id = ${client.id}
-      `;
-
-      // Create test invoice with timestamp to ensure uniqueness
+      // Create invoice
       const invoiceNumber = `E2E-${Date.now()}`;
 
-      const [invoice] = await sql`
+      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_1 -c "
         INSERT INTO invoices (
           client_id,
           invoice_number,
@@ -88,8 +74,8 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
           notes
         )
         VALUES (
-          ${client.id},
-          ${invoiceNumber},
+          ${clientId},
+          '${invoiceNumber}',
           'SENT',
           NOW(),
           NOW() + INTERVAL '30 days',
@@ -97,16 +83,13 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
           2000,
           12000,
           'Phase 17 E2E Test Invoice'
-        )
-        RETURNING id, invoice_number
-      `;
+        );
+      "`, { encoding: 'utf-8' });
 
-      console.log('✅ Test invoice created:', invoice);
-
-      await sql.end();
+      console.log('✅ Test invoice created');
+      console.log('✅ Test data setup complete - data committed to database');
     } catch (error) {
       console.error('❌ Setup failed:', error);
-      await sql.end();
       throw error;
     }
   });
@@ -131,21 +114,6 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
   });
 
   test('should display invoice list with status badges', async ({ page }) => {
-    // Debug: Check if invoice exists in database at test start
-    const dbCheck = postgres({
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'password',
-      database: 'tenant_1',
-    });
-
-    const invoicesInDb = await dbCheck`
-      SELECT id, invoice_number, client_id FROM invoices WHERE client_id = 11
-    `;
-    console.log('🗄️  Invoices in DB at test start:', invoicesInDb);
-    await dbCheck.end();
-
     // Login first
     await page.goto('http://localhost:5174/client-portal/login');
     await page.fill('input[type="email"]', TEST_CLIENT_EMAIL);
@@ -158,34 +126,11 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
       return localStorage.getItem('client_portal_session_token') !== null;
     }, { timeout: 3000 });
 
-    // Debug: Check localStorage before navigation
-    const storageBefore = await page.evaluate(() => {
-      return {
-        token: localStorage.getItem('client_portal_session_token'),
-        client: localStorage.getItem('client_portal_client_data')
-      };
-    });
-    console.log('📦 localStorage before navigation:', storageBefore);
-
     // Navigate to invoices
     await page.goto('http://localhost:5174/client-portal/invoices');
 
-    // Debug: Check localStorage after navigation
-    const storageAfter = await page.evaluate(() => {
-      return {
-        token: localStorage.getItem('client_portal_session_token'),
-        client: localStorage.getItem('client_portal_client_data')
-      };
-    });
-    console.log('📦 localStorage after navigation:', storageAfter);
-
     // Wait for invoice list to load
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
-
-    // Debug: Check page content
-    const pageText = await page.textContent('body');
-    console.log('📄 Page contains "No invoices":', pageText?.includes('No invoices'));
-    console.log('📄 Page contains "SENT":', pageText?.includes('SENT'));
 
     // Verify page title
     const title = await page.textContent('h1');
