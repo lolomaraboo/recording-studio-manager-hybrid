@@ -5,13 +5,18 @@ import { Button } from '@/components/ui/button';
 import { FileText, Download, CreditCard, ArrowLeft } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
+import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 
 export default function ClientInvoiceDetail() {
   const params = useParams();
   const navigate = useNavigate();
   const invoiceId = Number(params.id);
+  const { sessionToken } = useClientPortalAuth();
 
-  const { data: invoice, isLoading } = trpc.invoices.get.useQuery({ id: invoiceId });
+  const { data: invoice, isLoading } = trpc.clientPortalDashboard.getInvoice.useQuery(
+    { sessionToken: sessionToken || '', invoiceId },
+    { enabled: !!sessionToken }
+  );
   const { mutateAsync: createPaymentSession } = trpc.invoices.createPaymentSession.useMutation();
   const downloadPDFQuery = trpc.invoices.downloadPDF.useQuery({ invoiceId }, { enabled: false });
 

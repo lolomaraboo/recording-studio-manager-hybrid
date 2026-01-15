@@ -3,9 +3,14 @@ import { Badge } from '@/components/ui/badge';
 import { FileText } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { useNavigate } from 'react-router-dom';
+import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 
 export default function ClientInvoices() {
-  const { data: invoices, isLoading } = trpc.invoices.list.useQuery();
+  const { sessionToken } = useClientPortalAuth();
+  const { data: invoices, isLoading } = trpc.clientPortalDashboard.listInvoices.useQuery(
+    { sessionToken: sessionToken || '' },
+    { enabled: !!sessionToken }
+  );
   const navigate = useNavigate();
 
   const getStatusBadge = (status: string) => {
