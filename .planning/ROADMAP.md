@@ -890,7 +890,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 15. Architecture Flexible - UI | v4.0 | 1/1 | ✅ Complete | 2026-01-07 |
 | 15.5. TypeScript Cleanup 316 errors | v4.0 | 1/1 | ✅ Complete | 2026-01-09 |
 | 16. Facturation Auto - Backend | v4.0 | 3/3 | ✅ Complete | 2026-01-09 |
-| 17. Facturation Auto - Stripe UI | v4.0 | 2/3 | ⏳ In Progress | - |
+| 17. Facturation Auto - Stripe UI | v4.0 | 7/7 | ✅ Complete | 2026-01-15 |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -899,7 +899,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
-**v4.0 Total**: 21/21 plans ✅ COMPLETE (Phases 10-17 finished - 77 min Phase 17 total)
+**v4.0 Total**: 24/24 plans ✅ COMPLETE (Phases 10-17 finished - 127 min Phase 17 total)
 **v1.0 Total**: 0/17 plans (deferred after v4.0)
 
 ---
@@ -1105,7 +1105,7 @@ Plans:
 
 **Research**: Completed (Resend email, PDFKit, AWS S3, Stripe Checkout Sessions)
 
-**Plans**: 3 plans
+**Plans**: 7 plans (3 base + 4 FIX)
 
 Plans:
 - [x] 17-01: Stripe Checkout Sessions + Webhook idempotency (Completed 2026-01-09 - 6 min)
@@ -1113,10 +1113,12 @@ Plans:
 - [x] 17-03: Client Portal Invoice Payment UI (React frontend) (Completed 2026-01-10 - 58 min)
 - [x] 17-03-FIX: Fix E2E test route paths (Completed 2026-01-10 - 3 min)
 - [x] 17-03-FIX-2: Fix Client Portal authentication persistence (Completed 2026-01-10 - 6 min)
-- [x] 17-03-FIX-3: Fix invoice rendering tRPC router (Completed 2026-01-15 - 6 min)
+- [x] 17-03-FIX-3: Fix invoice rendering and E2E tests (Completed 2026-01-15 - 28 min)
 - [x] 17-03-FIX-4: localStorage persistence investigation (Completed 2026-01-15 - 13 min)
 
-**Status**: ✅ Code Complete (3 base + 4 FIX plans - 105 min total) | ⚠️ UAT blocked by session persistence architectural issue
+**Status**: ✅ Complete (All 7 plans finished - 127 min total)
+
+**UAT Validation**: All 8 Phase 17 E2E tests passing (100%)
 
 ---
 
