@@ -285,7 +285,14 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
   });
 
   test('should display success page route', async ({ page }) => {
-    // Directly navigate to success page (simulates Stripe redirect back)
+    // Login first (success page is protected)
+    await page.goto('http://localhost:5174/client-portal/login');
+    await page.fill('input[type="email"]', TEST_CLIENT_EMAIL);
+    await page.fill('input[type="password"]', TEST_CLIENT_PASSWORD);
+    await page.click('button[type="submit"]');
+    await page.waitForURL(/\/client-portal\/?$/, { timeout: 5000 });
+
+    // Navigate to success page (simulates Stripe redirect back)
     await page.goto('http://localhost:5174/client-portal/invoices/success?session_id=test_session_123');
 
     // Wait for page load
@@ -295,11 +302,18 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     const url = page.url();
     expect(url).toContain('/client-portal/invoices/success');
 
-    console.log('✅ Test 7: Success page route exists');
+    console.log('✅ Test 7: Success page route accessible after login');
   });
 
   test('should display cancel page route', async ({ page }) => {
-    // Directly navigate to cancel page
+    // Login first (cancel page is protected)
+    await page.goto('http://localhost:5174/client-portal/login');
+    await page.fill('input[type="email"]', TEST_CLIENT_EMAIL);
+    await page.fill('input[type="password"]', TEST_CLIENT_PASSWORD);
+    await page.click('button[type="submit"]');
+    await page.waitForURL(/\/client-portal\/?$/, { timeout: 5000 });
+
+    // Navigate to cancel page
     await page.goto('http://localhost:5174/client-portal/invoices/canceled');
 
     // Wait for page load
@@ -309,6 +323,6 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     const url = page.url();
     expect(url).toContain('/client-portal/invoices/canceled');
 
-    console.log('✅ Test 8: Cancel page route exists');
+    console.log('✅ Test 8: Cancel page route accessible after login');
   });
 });
