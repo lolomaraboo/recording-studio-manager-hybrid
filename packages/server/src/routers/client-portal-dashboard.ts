@@ -77,10 +77,8 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      // Multi-tenant: Fallback to org 1 for development (matching login behavior)
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -150,10 +148,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -229,10 +224,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -281,10 +273,8 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      // Multi-tenant: Fallback to org 1 for development (matching login behavior)
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -360,10 +350,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -423,10 +410,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -478,10 +462,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -533,10 +514,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -597,10 +575,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -652,10 +627,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
@@ -701,10 +673,7 @@ export const clientPortalDashboardRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+      const organizationId = (ctx.req.session as any).organizationId || 1;
 
       const clientId = await validateClientSession(
         organizationId,
