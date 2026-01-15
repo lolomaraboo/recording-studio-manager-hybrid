@@ -40,61 +40,72 @@ async function injectSessionToken(page: any) {
   }, { token: TEST_SESSION_TOKEN, clientId: TEST_CLIENT_ID, email: TEST_CLIENT_EMAIL });
 }
 
+// Helper function to execute psql commands with Homebrew PostgreSQL
+// Uses tenant_1 (organizationId=1) which matches the default in client portal
+function psqlExec(sql: string): string {
+  const psqlPath = '/opt/homebrew/opt/postgresql@17/bin/psql';
+  return execSync(`${psqlPath} -d tenant_1 -c "${sql}"`, { encoding: 'utf-8' });
+}
+
+function psqlExecQuery(sql: string): string {
+  const psqlPath = '/opt/homebrew/opt/postgresql@17/bin/psql';
+  return execSync(`${psqlPath} -d tenant_1 -t -c "${sql}"`, { encoding: 'utf-8' });
+}
+
 test.describe('Phase 17: Invoice Payment Flow', () => {
   test.beforeAll(async () => {
-    // CRITICAL FIX: Use Docker exec to insert data directly to avoid connection pooling issues
-    // The Node postgres library's connection pooling was preventing data from being visible
-    // to the application server's separate Drizzle connection pool
+    // Uses Homebrew PostgreSQL (localhost:5432) for development
+    // This matches the database that the Express server connects to
 
     try {
       const passwordHash = await bcrypt.hash(TEST_CLIENT_PASSWORD, 10);
 
-      // Cleanup previous test data (use tenant_3 - matches dev mode organizationId)
-      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_3 -c "
+      // Cleanup previous test data (use tenant_1 - organizationId=1 is the default)
+      psqlExec(`
         DELETE FROM invoices WHERE client_id IN (SELECT id FROM clients WHERE email = '${TEST_CLIENT_EMAIL}');
         DELETE FROM client_portal_activity_logs WHERE client_id IN (SELECT id FROM clients WHERE email = '${TEST_CLIENT_EMAIL}');
         DELETE FROM client_portal_sessions WHERE client_id IN (SELECT id FROM clients WHERE email = '${TEST_CLIENT_EMAIL}');
         DELETE FROM client_portal_accounts WHERE email = '${TEST_CLIENT_EMAIL}';
         DELETE FROM clients WHERE email = '${TEST_CLIENT_EMAIL}';
-      "`, { encoding: 'utf-8' });
+      `);
 
       console.log('✅ Cleaned up previous test data');
 
       // Create client
-      const clientResult = execSync(`docker exec rsm-postgres psql -U postgres -d tenant_3 -t -c "
+      const clientResult = psqlExecQuery(`
         INSERT INTO clients (name, email, type)
         VALUES ('Phase 17 E2E Test Client', '${TEST_CLIENT_EMAIL}', 'individual')
         RETURNING id;
-      "`, { encoding: 'utf-8' });
+      `);
 
       const clientId = parseInt(clientResult.trim());
       console.log('✅ Created client with ID:', clientId);
       TEST_CLIENT_ID = clientId;
 
       // Create portal account
-      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_3 -c "
+      psqlExec(`
         INSERT INTO client_portal_accounts (client_id, email, password_hash, email_verified, is_active)
         VALUES (${clientId}, '${TEST_CLIENT_EMAIL}', '${passwordHash}', true, true);
-      "`, { encoding: 'utf-8' });
+      `);
 
       console.log('✅ Portal account ready');
 
-      // WORKAROUND: Create session manually (Drizzle INSERT fails silently in server)
+      // Create session manually (direct DB insert for E2E testing)
       // Generate secure token (same as backend generateSecureToken())
       TEST_SESSION_TOKEN = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_3 -c "
+      psqlExec(`
         INSERT INTO client_portal_sessions (client_id, token, expires_at, ip_address, user_agent)
         VALUES (${clientId}, '${TEST_SESSION_TOKEN}', '${expiresAt.toISOString()}', '127.0.0.1', 'Playwright E2E Test');
-      "`, { encoding: 'utf-8' });
+      `);
 
       console.log('✅ Session created manually (token:', TEST_SESSION_TOKEN.substring(0, 8) + '...)');
 
       // Create invoice
       const invoiceNumber = `E2E-${Date.now()}`;
 
-      execSync(`docker exec rsm-postgres psql -U postgres -d tenant_3 -c "
+      psqlExec(`
         INSERT INTO invoices (
           client_id,
           invoice_number,
@@ -117,7 +128,7 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
           12000,
           'Phase 17 E2E Test Invoice'
         );
-      "`, { encoding: 'utf-8' });
+      `);
 
       console.log('✅ Test invoice created');
       console.log('✅ Test data setup complete - data committed to database');
@@ -142,6 +153,19 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
   });
 
   test('should display invoice list with status badges', async ({ page }) => {
+    // Capture console errors
+    const consoleErrors: string[] = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    // Capture page errors
+    page.on('pageerror', error => {
+      console.log('❌ PAGE ERROR:', error.message);
+    });
+
     // Inject session token
     await injectSessionToken(page);
 
@@ -149,19 +173,26 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     await page.goto('http://localhost:5174/client-portal/invoices');
 
     // Wait for invoice list to load
-    await page.waitForSelector('text=My Invoices', { timeout: 5000 });
+    await page.waitForSelector('text=My Invoices', { timeout: 10000 });
+
+    // Wait for invoice data to load (Loading... disappears)
+    await page.waitForTimeout(3000);
 
     // Verify page title
     const title = await page.textContent('h1');
     expect(title).toContain('Invoices');
 
-    // Verify at least one invoice exists
-    const invoiceCount = await page.locator('[href*="/client-portal/invoices/"]').count();
+    // Verify at least one invoice exists (look for "Invoice #" text instead of href)
+    const invoiceCount = await page.locator('text=/Invoice #/').count();
     expect(invoiceCount).toBeGreaterThan(0);
 
     // Verify status badge exists
     const hasBadge = await page.locator('text=SENT').isVisible();
     expect(hasBadge).toBeTruthy();
+
+    if (consoleErrors.length > 0) {
+      console.log('🐛 Console errors:', consoleErrors);
+    }
 
     console.log('✅ Test 2: Invoice list displays correctly');
   });
@@ -173,13 +204,14 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     // Go to invoices list
     await page.goto('http://localhost:5174/client-portal/invoices');
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
+    await page.waitForTimeout(2000); // Wait for data to load
 
-    // Click first invoice
-    const firstInvoice = page.locator('[href*="/client-portal/invoices/"]').first();
+    // Click first invoice (uses onClick, not href)
+    const firstInvoice = page.locator('text=/Invoice #/').first();
     await firstInvoice.click();
 
     // Wait for detail page
-    await page.waitForURL(/\/client\/invoices\/\d+/, { timeout: 5000 });
+    await page.waitForURL(/\/client-portal\/invoices\/\d+/, { timeout: 5000 });
 
     // Verify invoice number is displayed
     const invoiceNumber = await page.textContent('text=/Invoice #/');
@@ -208,10 +240,11 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     // Find SENT invoice
     const sentInvoice = page.locator('text=SENT').first();
     if (await sentInvoice.isVisible()) {
-      const invoiceRow = sentInvoice.locator('xpath=ancestor::*[@href]').first();
+      // Click the parent row (uses onClick, not href)
+      const invoiceRow = sentInvoice.locator('xpath=ancestor::div[contains(@class, "cursor-pointer")]').first();
       await invoiceRow.click();
 
-      await page.waitForURL(/\/client\/invoices\/\d+/, { timeout: 5000 });
+      await page.waitForURL(/\/client-portal\/invoices\/\d+/, { timeout: 5000 });
 
       // Verify Pay Now button exists
       const payButton = page.locator('button:has-text("Pay Now")');
@@ -231,13 +264,15 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
 
     await page.goto('http://localhost:5174/client-portal/invoices');
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
+    await page.waitForTimeout(2000); // Wait for data to load
 
-    const firstInvoice = page.locator('[href*="/client-portal/invoices/"]').first();
+    const firstInvoice = page.locator('text=/Invoice #/').first();
     await firstInvoice.click();
-    await page.waitForURL(/\/client\/invoices\/\d+/, { timeout: 5000 });
+    await page.waitForURL(/\/client-portal\/invoices\/\d+/, { timeout: 5000 });
 
-    // Check for Download PDF button
+    // Wait for Download PDF button to appear (wait for API data to load)
     const downloadButton = page.locator('button:has-text("Download PDF")');
+    await downloadButton.waitFor({ state: 'visible', timeout: 5000 });
     const exists = await downloadButton.count();
 
     expect(exists).toBeGreaterThan(0);
@@ -256,9 +291,10 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     // Find SENT invoice and click
     const sentInvoice = page.locator('text=SENT').first();
     if (await sentInvoice.isVisible()) {
-      const invoiceRow = sentInvoice.locator('xpath=ancestor::*[@href]').first();
+      // Click the parent row (uses onClick, not href)
+      const invoiceRow = sentInvoice.locator('xpath=ancestor::div[contains(@class, "cursor-pointer")]').first();
       await invoiceRow.click();
-      await page.waitForURL(/\/client\/invoices\/\d+/, { timeout: 5000 });
+      await page.waitForURL(/\/client-portal\/invoices\/\d+/, { timeout: 5000 });
 
       const payButton = page.locator('button:has-text("Pay Now")');
 
