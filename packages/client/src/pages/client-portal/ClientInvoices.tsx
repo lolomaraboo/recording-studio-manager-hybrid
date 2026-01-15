@@ -7,11 +7,13 @@ import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
 
 export default function ClientInvoices() {
   const { sessionToken } = useClientPortalAuth();
-  const { data: invoices, isLoading } = trpc.clientPortalDashboard.listInvoices.useQuery(
+  const { data: invoicesData, isLoading } = trpc.clientPortalDashboard.listInvoices.useQuery(
     { sessionToken: sessionToken || '' },
     { enabled: !!sessionToken }
   );
   const navigate = useNavigate();
+
+  const invoices = invoicesData?.invoices || [];
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { variant: 'secondary' | 'default' | 'destructive' | 'outline'; className?: string }> = {
@@ -39,13 +41,13 @@ export default function ClientInvoices() {
         <CardContent>
           {isLoading ? (
             <div>Loading...</div>
-          ) : invoices?.length === 0 ? (
+          ) : invoices.length === 0 ? (
             <div className="text-center py-6 text-muted-foreground">
               No invoices yet.
             </div>
           ) : (
             <div className="divide-y">
-              {invoices?.map((invoice) => (
+              {invoices.map((invoice) => (
                 <div
                   key={invoice.id}
                   onClick={() => navigate(`/client-portal/invoices/${invoice.id}`)}

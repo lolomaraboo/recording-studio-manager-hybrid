@@ -13,12 +13,16 @@ export default function ClientInvoiceDetail() {
   const invoiceId = Number(params.id);
   const { sessionToken } = useClientPortalAuth();
 
-  const { data: invoice, isLoading } = trpc.clientPortalDashboard.getInvoice.useQuery(
+  const { data, isLoading } = trpc.clientPortalDashboard.getInvoice.useQuery(
     { sessionToken: sessionToken || '', invoiceId },
     { enabled: !!sessionToken }
   );
   const { mutateAsync: createPaymentSession } = trpc.invoices.createPaymentSession.useMutation();
   const downloadPDFQuery = trpc.invoices.downloadPDF.useQuery({ invoiceId }, { enabled: false });
+
+  // Extract invoice and items from response
+  const invoice = data?.invoice;
+  const items = data?.items || [];
 
   const handlePayNow = async () => {
     try {
@@ -103,7 +107,7 @@ export default function ClientInvoiceDetail() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {invoice.items?.map((item: any) => (
+              {items.map((item: any) => (
                 <div key={item.id} className="flex justify-between">
                   <div>
                     <div className="font-medium">{item.description}</div>
