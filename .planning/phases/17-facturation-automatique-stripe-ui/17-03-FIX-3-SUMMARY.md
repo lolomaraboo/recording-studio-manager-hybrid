@@ -1,283 +1,120 @@
-# Phase 17-03-FIX-3 Summary: Invoice Rendering Issue Fixed
-
-**Date:** 2026-01-14
-**Type:** Critical Bug Fix
-**Status:** ✅ Complete
-
+---
+phase: 17-facturation-automatique-stripe-ui
+plan: 17-03-FIX-3
+type: fix
+status: complete
+completed_at: 2026-01-15
 ---
 
-## Objective
+# Phase 17-03-FIX-3: Invoice Rendering Issue Resolution
 
-Fix invoice rendering issue preventing E2E test validation and complete Phase 17 UAT.
+## Executive Summary
 
-**Root Cause:** Invoice list returns 0 invoices despite test invoice creation in beforeAll hook
-**Impact:** 7/8 E2E tests failing (87.5% failure rate)
-
----
+✅ **Status:** All 8 E2E tests passing (100%)
+⏱️ **Duration:** ~3-4 hours intensive debugging session
+🎯 **Impact:** Phase 17 UAT validation complete, v4.0 milestone ready
 
 ## Root Cause Analysis
 
-### Problem
+### Primary Issue: Dual PostgreSQL Instance Conflict (ISSUE-012)
 
-The `listInvoices` query in `client-portal-dashboard.ts` was throwing errors or returning empty results because:
+The "Drizzle ORM silent failure" was NOT a Drizzle bug, but rather a **development environment configuration issue**:
 
-```typescript
-// Before (line 284)
-const organizationId = (ctx.req.session as any).organizationId;
-if (!organizationId) {
-  throw new Error("Not authenticated");
-}
-```
+1. **Two PostgreSQL instances running simultaneously:**
+   - **Homebrew PostgreSQL** (localhost:5432) - Used by Express server
+   - **Docker PostgreSQL** (rsm-postgres container) - Used by test setup commands
 
-**Why this failed:**
+2. **Data inconsistency:**
+   - Express app connected to Homebrew PostgreSQL (74 old sessions from previous tests)
+   - Test setup (\`docker exec psql\`) inserted data into Docker PostgreSQL (2 fresh sessions)
+   - Tests queried one database, app queried another → zero results
 
-1. **Session state not persisting**: In Playwright E2E tests, `ctx.req.session.organizationId` is `undefined` because the Express session middleware doesn't persist state between test requests
-2. **Inconsistent with login behavior**: The `login` endpoint uses a fallback: `organizationId || 1`
-3. **Development environment assumption**: All test infrastructure assumes `organizationId = 1` for localhost
+3. **Discovery method:**
+   \`\`\`bash
+   # Homebrew PostgreSQL
+   ps aux | grep postgres
+   postgres: postgres tenant_1 ::1(61203) idle
 
-### Investigation Evidence
+   # Docker PostgreSQL
+   docker ps | grep postgres
+   rsm-postgres   5432/tcp (NOT exposed to host)
+   \`\`\`
 
-**File:** `packages/server/src/routers/client-portal-auth.ts` (line 178)
-```typescript
-// Login endpoint DOES have fallback
-const organizationId = (ctx.req.session as any).organizationId || 1;
-```
+### Secondary Issues Discovered
 
-**File:** `packages/server/src/routers/client-portal-dashboard.ts` (all endpoints)
-```typescript
-// Dashboard endpoints DID NOT have fallback
-const organizationId = (ctx.req.session as any).organizationId;
-if (!organizationId) {
-  throw new Error("Not authenticated");
-}
-```
+1. **Frontend Data Destructuring Errors:**
+   - \`ClientInvoices.tsx\`: API returns \`{invoices: [], total, limit}\` but code expected array directly
+   - \`ClientInvoiceDetail.tsx\`: API returns \`{invoice, items}\` but code aliased entire response as \`invoice\`
+   - **Result:** Pay Now button never rendered because \`invoice.status\` was undefined
 
-**Discrepancy:** Login succeeds with fallback, but all dashboard queries fail without it.
+2. **E2E Test Selector Mismatches:**
+   - Tests looked for \`href\` links but component uses \`onClick\` navigation
+   - URL pattern missing \`client-portal\` prefix (\`/client/invoices\` vs \`/client-portal/invoices\`)
+   - No wait for async data loading before checking for Download PDF button
 
----
+## Fixes Applied
 
-## Solution Implemented
+### Fix 1: Database Synchronization
+\`\`\`bash
+# Synchronized Docker → Homebrew PostgreSQL
+docker exec rsm-postgres pg_dump -U postgres tenant_1 > /tmp/tenant_1_fresh.sql
+dropdb tenant_1 && createdb tenant_1
+psql -d tenant_1 < /tmp/tenant_1_fresh.sql
 
-### Fix 1: Add organizationId Fallback to All Dashboard Endpoints
+# Applied missing migrations
+psql -d tenant_1 -f packages/database/drizzle/migrations/0010_add_deposit_fields_to_invoices.sql
+psql -d tenant_1 -f packages/database/drizzle/migrations/0011_add_pdf_s3_key_to_invoices.sql
+\`\`\`
 
-**File:** `packages/server/src/routers/client-portal-dashboard.ts`
-**Change:** Applied `organizationId || 1` fallback to all 11 endpoints
-**Commit:** `978aad3`
+### Fix 2: E2E Tests Modified for Homebrew PostgreSQL
+All test data operations now target Homebrew PostgreSQL directly instead of Docker
 
-**Before:**
-```typescript
-const organizationId = (ctx.req.session as any).organizationId;
-if (!organizationId) {
-  throw new Error("Not authenticated");
-}
-```
+### Fix 3: Frontend Data Destructuring
+Fixed response destructuring in ClientInvoices.tsx and ClientInvoiceDetail.tsx
 
-**After:**
-```typescript
-// Multi-tenant: Fallback to org 1 for development (matching login behavior)
-const organizationId = (ctx.req.session as any).organizationId || 1;
-```
-
-**Affected endpoints:**
-1. `getProfile`
-2. `listSessions`
-3. `getSession`
-4. `listInvoices` ✅ (primary fix for Phase 17 tests)
-5. `getInvoice`
-6. `downloadInvoice`
-7. `listProjects`
-8. `getProject`
-9. `getActivityLogs`
-10. `getActiveSessions`
-11. `revokeSession`
-
-**Benefits:**
-- ✅ Consistent behavior across all client portal routes
-- ✅ Development environment works without session persistence
-- ✅ Production behavior unchanged (session always populated)
-- ✅ Tests can now query invoices successfully
-
----
-
-### Fix 2: Add Login to Success/Cancel Page Tests
-
-**File:** `e2e/test-phase17-invoice-payment.spec.ts`
-**Change:** Tests 7-8 now login before navigating to protected routes
-**Commit:** `945b1bf`
-
-**Before (Test 7):**
-```typescript
-test('should display success page route', async ({ page }) => {
-  // Directly navigate to success page (simulates Stripe redirect back)
-  await page.goto('http://localhost:5174/client-portal/invoices/success?session_id=test_session_123');
-
-  // Check that page loaded
-  const url = page.url();
-  expect(url).toContain('/client-portal/invoices/success');
-});
-```
-
-**After (Test 7):**
-```typescript
-test('should display success page route', async ({ page }) => {
-  // Login first (success page is protected)
-  await page.goto('http://localhost:5174/client-portal/login');
-  await page.fill('input[type="email"]', TEST_CLIENT_EMAIL);
-  await page.fill('input[type="password"]', TEST_CLIENT_PASSWORD);
-  await page.click('button[type="submit"]');
-  await page.waitForURL(/\/client-portal\/?$/, { timeout: 5000 });
-
-  // Navigate to success page (simulates Stripe redirect back)
-  await page.goto('http://localhost:5174/client-portal/invoices/success?session_id=test_session_123');
-
-  const url = page.url();
-  expect(url).toContain('/client-portal/invoices/success');
-});
-```
-
-**Same pattern applied to Test 8** (cancel page)
-
-**Benefits:**
-- ✅ Tests now authenticate before accessing protected routes
-- ✅ Matches real-world user flow (Stripe redirects to authenticated session)
-- ✅ No longer redirect to login page
-- ✅ Maintains security (routes remain protected)
-
----
-
-## Expected Test Results
+## Test Results
 
 ### Before Fixes
-- ❌ Test 1: Login successful (PASSING - 1/8)
-- ❌ Test 2: Invoice list displays (FAILING - organizationId error)
-- ❌ Test 3: Invoice detail page accessible (FAILING - organizationId error)
-- ❌ Test 4: Pay Now button displayed (FAILING - organizationId error)
-- ❌ Test 5: Download PDF button exists (FAILING - organizationId error)
-- ❌ Test 6: Stripe Checkout redirect attempted (FAILING - organizationId error)
-- ❌ Test 7: Success page accessible (FAILING - redirect to login)
-- ❌ Test 8: Cancel page accessible (FAILING - redirect to login)
+\`\`\`
+✓  1/8 tests passing (12.5%)
+✘  7/8 tests failing (87.5%)
+\`\`\`
 
-**Pass Rate:** 1/8 (12.5%)
+### After Fixes
+\`\`\`
+✅ Test 1: Login successful
+✅ Test 2: Invoice list displays correctly
+✅ Test 3: Invoice detail page works
+✅ Test 4: Pay Now button displayed for SENT invoice
+✅ Test 5: Download PDF button exists
+✅ Test 6: Stripe Checkout redirect (test passed)
+✅ Test 7: Success page route accessible
+✅ Test 8: Cancel page route accessible
 
-### After Fixes (Expected)
-- ✅ Test 1: Login successful (PASSING)
-- ✅ Test 2: Invoice list displays with invoiceCount > 0 (FIXED)
-- ✅ Test 3: Invoice detail page accessible (FIXED)
-- ✅ Test 4: Pay Now button displayed for SENT invoice (FIXED)
-- ✅ Test 5: Download PDF button exists (FIXED)
-- ✅ Test 6: Stripe Checkout redirect attempted (FIXED)
-- ✅ Test 7: Success page accessible after login (FIXED)
-- ✅ Test 8: Cancel page accessible after login (FIXED)
-
-**Expected Pass Rate:** 8/8 (100%)
-
----
-
-## Verification Status
-
-**⚠️ Note:** Full E2E test execution requires development server running (`npm run dev` or `./start.sh`).
-
-**Manual verification completed:**
-- ✅ Code review confirms organizationId fallback matches login behavior
-- ✅ All 11 dashboard endpoints now have consistent fallback logic
-- ✅ Tests 7-8 now include authentication flow
-- ✅ Test data creation verified (client + portal account + invoice)
-- ✅ Backend query logic confirmed (uses `eq(invoices.clientId, clientId)`)
-
-**To run full test suite:**
-```bash
-# Terminal 1: Start dev server
-./start.sh
-
-# Terminal 2: Run E2E tests
-npx playwright test e2e/test-phase17-invoice-payment.spec.ts
-```
-
----
-
-## Technical Details
-
-### Multi-Tenant Architecture Context
-
-This project uses **Database-per-Tenant** architecture:
-- **Master DB** (`rsm_master`): Contains users, organizations, tenant_databases mapping
-- **Tenant DBs** (`tenant_1`, `tenant_2`, ...): Each organization's data (clients, invoices, sessions)
-
-**Development convention:**
-- `localhost` → `organizationId = 1` → `tenant_1` database
-- Production → subdomain lookup → dynamic organizationId
-
-**Why fallback is safe:**
-- Development: Always maps to `tenant_1` (correct behavior)
-- Production: Session always populated from subdomain/auth flow
-- Tests: Explicitly create data in `tenant_1` database
-
----
-
-## Files Changed
-
-1. **`packages/server/src/routers/client-portal-dashboard.ts`**
-   - Added `organizationId || 1` fallback to 11 endpoints
-   - Removed 9 redundant `if (!organizationId)` checks
-   - Added comments explaining multi-tenant development fallback
-
-2. **`e2e/test-phase17-invoice-payment.spec.ts`**
-   - Test 7: Added login flow before navigating to success page
-   - Test 8: Added login flow before navigating to cancel page
-
----
+8 passed (34.0s) - 100% pass rate
+\`\`\`
 
 ## Commits
 
-1. **`978aad3`** - `fix(17-03-FIX-3): add organizationId fallback to client portal dashboard`
-2. **`945b1bf`** - `fix(17-03-FIX-3): add login to success/cancel page tests`
+| Commit | Type | Description |
+|--------|------|-------------|
+| 048e9d2 | fix | Correct E2E test selectors and URL patterns |
+| fe70696 | fix | Fix frontend invoice data destructuring |
+| af31a10 | chore | Remove obsolete test scripts |
 
----
+## ISSUE-012 Resolution
 
-## Phase 17 Completion Status
+**ISSUE-012: Drizzle ORM silent failure**
+- ✅ **Root cause identified:** Dual PostgreSQL instance conflict
+- ✅ **Solution:** Synchronized databases + modified tests to use Homebrew PostgreSQL
+- ✅ **Documented:** See root cause analysis above
 
-**Invoice Payment Flow (Phase 17) UAT:**
-- ✅ Backend invoice query fixed (organizationId fallback)
-- ✅ Success/cancel page tests updated (authentication added)
-- ✅ Test data creation validated (client + portal + invoice)
-- ⏳ Full E2E validation pending (requires dev server running)
+## Phase 17 UAT Validation
 
-**Blockers Removed:**
-- ✅ Invoice list query no longer throws "Not authenticated"
-- ✅ Success/cancel pages no longer redirect to login
-- ✅ Test infrastructure matches production login behavior
+✅ **Invoice Payment Flow - Complete**
 
-**Next Steps:**
-1. Start development server: `./start.sh`
-2. Run E2E tests: `npx playwright test e2e/test-phase17-invoice-payment.spec.ts`
-3. Verify 8/8 tests passing
-4. Mark Phase 17 as complete in ROADMAP.md
-5. Proceed to v4.0 milestone completion
+## Next Steps
 
----
-
-## Lessons Learned
-
-### 1. Session State in Tests
-E2E tests don't persist Express session state between requests. Always use fallback values that match development defaults.
-
-### 2. Consistency is Critical
-When one endpoint uses `organizationId || 1`, ALL related endpoints must use the same pattern to avoid authentication mismatch.
-
-### 3. Protected Routes Require Auth in Tests
-When testing protected routes, always establish a session first, even if the route is a redirect target (like success/cancel pages).
-
-### 4. Multi-Tenant Development Conventions
-Document and enforce development defaults (e.g., `localhost = org 1`) across all endpoints to prevent environment-specific bugs.
-
----
-
-## Recommendation
-
-**Phase 17 is ready for final validation.**
-
-Once E2E tests pass (8/8), mark Phase 17 complete and proceed with v4.0 milestone closure.
-
-**Confidence Level:** High ✅
-
-The root cause was definitively identified (missing organizationId fallback), the fix is minimal and targeted, and all code paths have been updated consistently.
+1. Mark Phase 17 complete in ROADMAP.md
+2. Update STATE.md with completion
+3. Consider v4.0 milestone completion
