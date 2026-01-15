@@ -14,8 +14,11 @@ import bcrypt from 'bcrypt';
  * 6. Success/Cancel pages
  */
 
-const TEST_CLIENT_EMAIL = 'test-phase17@playwright.local';
-const TEST_CLIENT_PASSWORD = 'PlaywrightTest123!';
+// Test credentials (creates its own client+account in beforeAll)
+const TEST_CLIENT_EMAIL = 'phase17-e2e@test.local';
+const TEST_CLIENT_PASSWORD = 'TestPass123!';
+
+test.describe.configure({ mode: 'serial' }); // Run tests sequentially (share same test data)
 
 test.describe('Phase 17: Invoice Payment Flow', () => {
   test.beforeAll(async () => {
@@ -29,29 +32,28 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     });
 
     try {
-      // Generate bcrypt hash for password
       const passwordHash = await bcrypt.hash(TEST_CLIENT_PASSWORD, 10);
 
-      // Check if client exists
+      // Get or create client
       let client = await sql`
         SELECT id, name, email FROM clients WHERE email = ${TEST_CLIENT_EMAIL}
       `;
 
       if (client.length === 0) {
-        // Create new client
+        // Create client
         const [newClient] = await sql`
           INSERT INTO clients (name, email, type)
-          VALUES ('Playwright Test Client', ${TEST_CLIENT_EMAIL}, 'individual')
+          VALUES ('Phase 17 E2E Test Client', ${TEST_CLIENT_EMAIL}, 'individual')
           RETURNING id, name, email
         `;
         client = newClient;
+        console.log('✅ Created client:', client);
       } else {
         client = client[0];
+        console.log('✅ Found existing client:', client);
       }
 
-      console.log('✅ Client ready:', client);
-
-      // Create portal account
+      // Create or update portal account
       await sql`
         INSERT INTO client_portal_accounts (client_id, email, password_hash, email_verified, is_active)
         VALUES (${client.id}, ${TEST_CLIENT_EMAIL}, ${passwordHash}, true, true)
@@ -63,10 +65,17 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
           updated_at = NOW()
       `;
 
-      console.log('✅ Portal account created');
+      console.log('✅ Portal account ready');
 
-      // Create test invoice
+      // Delete any previous test invoices for this client
       await sql`
+        DELETE FROM invoices WHERE client_id = ${client.id}
+      `;
+
+      // Create test invoice with timestamp to ensure uniqueness
+      const invoiceNumber = `E2E-${Date.now()}`;
+
+      const [invoice] = await sql`
         INSERT INTO invoices (
           client_id,
           invoice_number,
@@ -80,19 +89,19 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
         )
         VALUES (
           ${client.id},
-          'PW-' || LPAD(FLOOR(RANDOM() * 10000)::TEXT, 4, '0'),
+          ${invoiceNumber},
           'SENT',
           NOW(),
           NOW() + INTERVAL '30 days',
           10000,
           2000,
           12000,
-          'Test invoice for Phase 17 UAT'
+          'Phase 17 E2E Test Invoice'
         )
-        ON CONFLICT (invoice_number) DO NOTHING
+        RETURNING id, invoice_number
       `;
 
-      console.log('✅ Test invoice created');
+      console.log('✅ Test invoice created:', invoice);
 
       await sql.end();
     } catch (error) {
@@ -122,6 +131,21 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
   });
 
   test('should display invoice list with status badges', async ({ page }) => {
+    // Debug: Check if invoice exists in database at test start
+    const dbCheck = postgres({
+      host: 'localhost',
+      port: 5432,
+      user: 'postgres',
+      password: 'password',
+      database: 'tenant_1',
+    });
+
+    const invoicesInDb = await dbCheck`
+      SELECT id, invoice_number, client_id FROM invoices WHERE client_id = 11
+    `;
+    console.log('🗄️  Invoices in DB at test start:', invoicesInDb);
+    await dbCheck.end();
+
     // Login first
     await page.goto('http://localhost:5174/client-portal/login');
     await page.fill('input[type="email"]', TEST_CLIENT_EMAIL);
@@ -129,11 +153,39 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/client-portal/, { timeout: 5000 });
 
+    // Wait for localStorage to be written (fixes race condition)
+    await page.waitForFunction(() => {
+      return localStorage.getItem('client_portal_session_token') !== null;
+    }, { timeout: 3000 });
+
+    // Debug: Check localStorage before navigation
+    const storageBefore = await page.evaluate(() => {
+      return {
+        token: localStorage.getItem('client_portal_session_token'),
+        client: localStorage.getItem('client_portal_client_data')
+      };
+    });
+    console.log('📦 localStorage before navigation:', storageBefore);
+
     // Navigate to invoices
     await page.goto('http://localhost:5174/client-portal/invoices');
 
+    // Debug: Check localStorage after navigation
+    const storageAfter = await page.evaluate(() => {
+      return {
+        token: localStorage.getItem('client_portal_session_token'),
+        client: localStorage.getItem('client_portal_client_data')
+      };
+    });
+    console.log('📦 localStorage after navigation:', storageAfter);
+
     // Wait for invoice list to load
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
+
+    // Debug: Check page content
+    const pageText = await page.textContent('body');
+    console.log('📄 Page contains "No invoices":', pageText?.includes('No invoices'));
+    console.log('📄 Page contains "SENT":', pageText?.includes('SENT'));
 
     // Verify page title
     const title = await page.textContent('h1');
