@@ -16,7 +16,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { cn, getInitials } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -512,7 +512,7 @@ export function Clients() {
                           <div className="flex items-center gap-3">
                             {/* Prominent avatar - primary visual anchor */}
                             <Avatar className="h-12 w-12">
-                              <AvatarImage src={client.type === 'company' ? client.logoUrl : client.avatarUrl} />
+                              <AvatarImage src={client.type === 'company' ? (client.logoUrl ?? undefined) : (client.avatarUrl ?? undefined)} />
                               <AvatarFallback className="text-sm font-semibold">
                                 {getInitials(client.name)}
                               </AvatarFallback>
@@ -597,7 +597,10 @@ export function Clients() {
                       {/* Particuliers Column */}
                       <div className="space-y-4">
                         <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                          <h3 className="font-semibold">Particuliers</h3>
+                          <h3 className="font-semibold flex items-center gap-2">
+                            <Users className="h-5 w-5 text-primary" />
+                            Particuliers
+                          </h3>
                           <Badge variant="secondary">
                             {filteredClients.filter(c => c.type === 'individual').length}
                           </Badge>
@@ -606,48 +609,115 @@ export function Clients() {
                           {filteredClients
                             .filter(c => c.type === 'individual')
                             .map((client) => (
-                              <Card key={client.id} className="hover:shadow-md transition-shadow">
+                              <Card key={client.id} className="hover:shadow-lg transition-shadow">
                                 <CardHeader className="pb-2">
-                                  <div className="flex items-start justify-between">
-                                    <CardTitle className="text-sm flex items-center gap-2">
-                                      {client.name}
-                                      {client.accountsReceivable > 1000000 && (
-                                        <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                  <div className="flex items-start gap-3">
+                                    {/* Compact avatar - secondary to content */}
+                                    <Avatar className="h-8 w-8">
+                                      <AvatarImage src={client.avatarUrl ?? undefined} />
+                                      <AvatarFallback className="text-xs font-semibold">
+                                        {getInitials(client.name)}
+                                      </AvatarFallback>
+                                    </Avatar>
+
+                                    <div className="flex-1 min-w-0">
+                                      <CardTitle className="text-sm flex items-center gap-2">
+                                        <span className="truncate">{client.name}</span>
+                                        {client.accountsReceivable > 100000 && (
+                                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                        )}
+                                      </CardTitle>
+                                      {client.artistName && (
+                                        <CardDescription className="text-xs truncate">
+                                          {client.artistName}
+                                        </CardDescription>
                                       )}
-                                    </CardTitle>
+                                    </div>
                                   </div>
-                                  {client.artistName && (
-                                    <CardDescription className="text-xs">
-                                      {client.artistName}
-                                    </CardDescription>
-                                  )}
                                 </CardHeader>
-                                <CardContent className="space-y-2">
+
+                                <CardContent className="space-y-3">
+                                  {/* Full contact info section */}
                                   <div className="space-y-1 text-xs">
-                                    {/* Afficher téléphone */}
-                                    {client.phone ? (
-                                      <div className="flex items-center gap-1 text-muted-foreground">
-                                        <Phone className="h-3 w-3" />
-                                        <a href={`tel:${client.phone}`} className="hover:underline">
+                                    {client.phone && (
+                                      <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Phone className="h-3 w-3 flex-shrink-0" />
+                                        <a
+                                          href={`tel:${client.phone}`}
+                                          className="hover:underline"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
                                           {client.phone}
                                         </a>
                                       </div>
-                                    ) : null}
-
-                                    {/* Afficher email principal */}
-                                    {client.email ? (
-                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                                    )}
+                                    {client.email && (
+                                      <div className="flex items-center gap-2 text-muted-foreground">
                                         <Mail className="h-3 w-3 flex-shrink-0" />
-                                        <a href={`mailto:${client.email}`} className="hover:underline truncate">
+                                        <a
+                                          href={`mailto:${client.email}`}
+                                          className="hover:underline truncate"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
                                           {client.email}
                                         </a>
                                       </div>
-                                    ) : null}
+                                    )}
+                                    {client.city && (
+                                      <div className="flex items-center gap-2 text-muted-foreground">
+                                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                                        <span className="truncate">{client.city}</span>
+                                      </div>
+                                    )}
                                   </div>
-                                  <Button asChild variant="outline" size="sm" className="w-full mt-2">
+
+                                  {/* Workflow indicators - Extended context */}
+                                  <div className="space-y-2 text-xs border-t pt-2">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-muted-foreground">Sessions:</span>
+                                      <span className="font-medium">{client.sessionsCount}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-muted-foreground">Dernière session:</span>
+                                      <span className="font-medium">
+                                        {client.lastSessionAt
+                                          ? format(new Date(client.lastSessionAt), "dd MMM yyyy", { locale: fr })
+                                          : "Jamais"
+                                        }
+                                      </span>
+                                    </div>
+                                    {client.accountsReceivable > 0 && (
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">Comptes débiteurs:</span>
+                                        <span
+                                          className={cn(
+                                            "font-medium",
+                                            client.accountsReceivable > 100000 ? "text-orange-600" : ""
+                                          )}
+                                        >
+                                          {(client.accountsReceivable / 100).toFixed(2)}€
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Notes preview (if exists) */}
+                                  {client.notes && (
+                                    <div className="text-xs text-muted-foreground border-t pt-2">
+                                      <p className="line-clamp-2">{client.notes}</p>
+                                    </div>
+                                  )}
+
+                                  {/* Action button - more descriptive */}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    asChild
+                                  >
                                     <Link to={`/clients/${client.id}`}>
                                       <Eye className="h-3 w-3 mr-2" />
-                                      Voir
+                                      Voir détails complet
                                     </Link>
                                   </Button>
                                 </CardContent>
@@ -664,7 +734,10 @@ export function Clients() {
                       {/* Entreprises Column */}
                       <div className="space-y-4">
                         <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                          <h3 className="font-semibold">Entreprises</h3>
+                          <h3 className="font-semibold flex items-center gap-2">
+                            <Building2 className="h-5 w-5 text-primary" />
+                            Entreprises
+                          </h3>
                           <Badge variant="secondary">
                             {filteredClients.filter(c => c.type === 'company').length}
                           </Badge>
@@ -673,48 +746,115 @@ export function Clients() {
                           {filteredClients
                             .filter(c => c.type === 'company')
                             .map((client) => (
-                              <Card key={client.id} className="hover:shadow-md transition-shadow">
+                              <Card key={client.id} className="hover:shadow-lg transition-shadow">
                                 <CardHeader className="pb-2">
-                                  <div className="flex items-start justify-between">
-                                    <CardTitle className="text-sm flex items-center gap-2">
-                                      {client.name}
-                                      {client.accountsReceivable > 1000000 && (
-                                        <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                  <div className="flex items-start gap-3">
+                                    {/* Compact avatar - secondary to content */}
+                                    <Avatar className="h-8 w-8">
+                                      <AvatarImage src={client.logoUrl ?? undefined} />
+                                      <AvatarFallback className="text-xs font-semibold">
+                                        {getInitials(client.name)}
+                                      </AvatarFallback>
+                                    </Avatar>
+
+                                    <div className="flex-1 min-w-0">
+                                      <CardTitle className="text-sm flex items-center gap-2">
+                                        <span className="truncate">{client.name}</span>
+                                        {client.accountsReceivable > 100000 && (
+                                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                        )}
+                                      </CardTitle>
+                                      {client.artistName && (
+                                        <CardDescription className="text-xs truncate">
+                                          {client.artistName}
+                                        </CardDescription>
                                       )}
-                                    </CardTitle>
+                                    </div>
                                   </div>
-                                  {client.artistName && (
-                                    <CardDescription className="text-xs">
-                                      {client.artistName}
-                                    </CardDescription>
-                                  )}
                                 </CardHeader>
-                                <CardContent className="space-y-2">
+
+                                <CardContent className="space-y-3">
+                                  {/* Full contact info section */}
                                   <div className="space-y-1 text-xs">
-                                    {/* Afficher téléphone */}
-                                    {client.phone ? (
-                                      <div className="flex items-center gap-1 text-muted-foreground">
-                                        <Phone className="h-3 w-3" />
-                                        <a href={`tel:${client.phone}`} className="hover:underline">
+                                    {client.phone && (
+                                      <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Phone className="h-3 w-3 flex-shrink-0" />
+                                        <a
+                                          href={`tel:${client.phone}`}
+                                          className="hover:underline"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
                                           {client.phone}
                                         </a>
                                       </div>
-                                    ) : null}
-
-                                    {/* Afficher email principal */}
-                                    {client.email ? (
-                                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                                    )}
+                                    {client.email && (
+                                      <div className="flex items-center gap-2 text-muted-foreground">
                                         <Mail className="h-3 w-3 flex-shrink-0" />
-                                        <a href={`mailto:${client.email}`} className="hover:underline truncate">
+                                        <a
+                                          href={`mailto:${client.email}`}
+                                          className="hover:underline truncate"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
                                           {client.email}
                                         </a>
                                       </div>
-                                    ) : null}
+                                    )}
+                                    {client.city && (
+                                      <div className="flex items-center gap-2 text-muted-foreground">
+                                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                                        <span className="truncate">{client.city}</span>
+                                      </div>
+                                    )}
                                   </div>
-                                  <Button asChild variant="outline" size="sm" className="w-full mt-2">
+
+                                  {/* Workflow indicators - Extended context */}
+                                  <div className="space-y-2 text-xs border-t pt-2">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-muted-foreground">Sessions:</span>
+                                      <span className="font-medium">{client.sessionsCount}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-muted-foreground">Dernière session:</span>
+                                      <span className="font-medium">
+                                        {client.lastSessionAt
+                                          ? format(new Date(client.lastSessionAt), "dd MMM yyyy", { locale: fr })
+                                          : "Jamais"
+                                        }
+                                      </span>
+                                    </div>
+                                    {client.accountsReceivable > 0 && (
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">Comptes débiteurs:</span>
+                                        <span
+                                          className={cn(
+                                            "font-medium",
+                                            client.accountsReceivable > 100000 ? "text-orange-600" : ""
+                                          )}
+                                        >
+                                          {(client.accountsReceivable / 100).toFixed(2)}€
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Notes preview (if exists) */}
+                                  {client.notes && (
+                                    <div className="text-xs text-muted-foreground border-t pt-2">
+                                      <p className="line-clamp-2">{client.notes}</p>
+                                    </div>
+                                  )}
+
+                                  {/* Action button - more descriptive */}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    asChild
+                                  >
                                     <Link to={`/clients/${client.id}`}>
                                       <Eye className="h-3 w-3 mr-2" />
-                                      Voir
+                                      Voir détails complet
                                     </Link>
                                   </Button>
                                 </CardContent>
