@@ -86,15 +86,15 @@
 
 ## Progress Overview
 
-**Overall Progress:** 0/58 pages tested (0%)
+**Overall Progress:** 1/58 pages tested (2%)
 
 - [ ] **Admin Dashboard** - 0/44 pages tested (0%)
 - [ ] **Client Portal** - 0/7 pages tested (0%)
 - [ ] **Super Admin** - 0/4 pages tested (0%)
-- [ ] **Public/Auth** - 0/4 pages tested (0%)
+- [ ] **Public/Auth** - 1/4 pages tested (25%) - 1 FAIL
 
 **Bugs Found:**
-- P0: 0
+- P0: 1 (BUG-001)
 - P1: 0
 - P2: 0
 - P3: 0
@@ -223,7 +223,7 @@
 | # | Page | Route | Status | Bugs | Notes |
 |---|------|-------|--------|------|-------|
 | 56 | Public Landing | `/landing` or `/` | ⏳ Pending | - | If exists |
-| 57 | Signup | `/signup` | ⏳ Pending | - | Registration form |
+| 57 | Signup | `/register` | ❌ FAIL | BUG-001 | Registration fails (SQL error) |
 | 58 | Login (Admin) | `/login` | ⏳ Pending | - | Admin login |
 | 59 | Password Reset | `/reset-password` | ⏳ Pending | - | Forgot password |
 
@@ -444,22 +444,90 @@ Schema definition in `packages/database/src/master/schema.ts` includes Stripe bi
 ## Summary Statistics
 
 **Testing Progress:**
-- Pages tested: 0/58 (0%)
+- Pages tested: 1/58 (2%)
 - Pages passing: 0
-- Pages failing: 0
+- Pages failing: 1 (Signup/Register)
 - Pages N/A: 0
 
 **Bug Statistics:**
-- P0 bugs: 0
+- P0 bugs: 1 (BUG-001: Registration échoue)
 - P1 bugs: 0
 - P2 bugs: 0
 - P3 bugs: 0
-- **Total bugs:** 0
+- **Total bugs:** 1
 
 **Phase 18 Status:**
 - ❌ **NOT COMPLETE** (P0/P1/P2 must be 0)
-- Blocking bugs: N/A
-- Estimated fix time: N/A
+- Blocking bugs: BUG-001 (Registration)
+- Estimated fix time: 30-60 min (auth.register mutation fix)
+
+---
+
+## Bugs Discovered
+
+### BUG-001: Registration échoue - erreur SQL d'insertion dans organizations
+
+**Severity:** 🔴 P0 - BLOCKER
+**Location:** `/register` - Registration page
+**Component:** `packages/server/src/routers/auth.ts` (auth.register mutation)
+**Discovered:** 2026-01-15 16:21:16 (Phase 18-02 Task 1)
+
+**Steps to Reproduce:**
+1. Navigate to http://localhost:5174/register
+2. Fill in form:
+   - Full Name: "Test User Phase 18"
+   - Email: "test-phase18-1768529963@example.com"
+   - Password: "TestPassword123!"
+   - Confirm Password: "TestPassword123!"
+   - Studio Name: "Phase 18 Test Studio"
+3. Click "Create Account" button
+4. Observe error in console
+
+**Expected:**
+- User account created successfully
+- Organization created with new user as owner
+- Tenant database provisioned
+- User redirected to dashboard (auto-login)
+
+**Actual:**
+- Registration fails silently (stays on registration page)
+- Console error: "Registration error: TRPCClientError: Failed query: insert into "organizations"..."
+- Server log shows SQL INSERT failure with owner_id = 3 (user doesn't exist yet)
+
+**Root Cause:**
+Registration flow attempts to insert organization with `owner_id = 3` before creating the user. The user creation should happen FIRST, then the organization should be created with the newly created user's ID.
+
+**Console Error:**
+```
+Registration error: TRPCClientError: Failed query: insert into "organizations" ("id", "name", "slug", "subdomain", "owner_id", ...) values (default, $1, $2, $3, $4, ...)
+params: Phase 18 Test Studio,phase-18-test-studio,phase-18-test-studio,3
+```
+
+**Server Log:**
+```
+[TRPC Error] {
+  type: 'mutation',
+  path: 'auth.register',
+  error: 'Failed query: insert into "organizations" ... params: Phase 18 Test Studio,phase-18-test-studio,phase-18-test-studio,3'
+}
+```
+
+**Impact:**
+- **CRITICAL**: New users cannot sign up
+- Application completely unusable for new customers
+- Blocks all new tenant onboarding
+- Blocks Phase 18 testing (cannot create test accounts)
+
+**Fix Required:**
+1. Review `packages/server/src/routers/auth.ts` register mutation
+2. Ensure user is created FIRST with INSERT RETURNING id
+3. Use returned user.id for organization owner_id
+4. Verify transaction atomicity (rollback on failure)
+5. Test with fresh database
+
+**Workaround:** None available
+
+**Related:** Blocks all Phase 18 testing that requires logged-in user
 
 ---
 
