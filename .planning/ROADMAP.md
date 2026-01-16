@@ -1208,57 +1208,57 @@ Plans:
 
 ---
 
-### Phase 18.1: Fix Database Initialization - Resolve schema/migrations desync blocking all testing (INSERTED)
+### Phase 18.1: Docker to Native PostgreSQL Migration - Simplify architecture and sync Phase 10-17 schema (INSERTED - SCOPE EXPANDED)
 
-**Goal**: Fix schema/migrations desynchronization preventing local database initialization and blocking Phase 18 testing
+**Goal**: Migrate both local and VPS environments from Docker PostgreSQL to native PostgreSQL, adding missing Phase 10-17 tables
 
 **Depends on**: Phase 18 (discovered during 18-02 execution)
 
-**Research**: Unlikely (Drizzle ORM migrations, schema sync)
+**Research**: Complete (database inventory audit performed)
 
-**Plans**: 1 plan
+**Plans**: 3 plans
 
 Plans:
-- [ ] 18.1-01: Sync schema/migrations/init script - generate migration 0001, update init.ts, test fresh DB (4 tasks)
+- [ ] 18.1-01: Fix Local Native PostgreSQL + Generate Migrations - Add to PATH, generate migrations for Phase 10-17, fix rsm_master (add 2 tables), rebuild tenant_1 clean, test app (5 tasks)
+- [ ] 18.1-02: Migrate VPS Docker → Native - Backup, export Docker data, import to native, apply migrations, update config, test production (6 tasks + 2 checkpoints)
+- [ ] 18.1-03: Cleanup Docker Containers - Remove Docker postgres (local + VPS), update docker-compose, finalize docs (4 tasks + 1 checkpoint)
 
 **Status**: ⏳ Ready for execution
 
 **Details**:
 
-**Problem Discovered:**
-- BUG-001 (P0): Cannot initialize local database for testing
-- Master DB schema in TypeScript includes Stripe billing columns (stripe_customer_id, stripe_subscription_id, subscription_status, current_period_end, logo_url)
-- Master DB migration (0000_massive_zodiak.sql) missing these columns
-- Init script expects complete schema, fails with "column does not exist" errors
-- Blocks all Phase 18 testing locally
+**Problem Discovered (Expanded):**
+- PostgreSQL 17 already installed locally (Homebrew) but schema incomplete (5/7 master tables, tenant_1 corrupted)
+- VPS has native PostgreSQL 16 installed but unused (Docker has data)
+- BOTH environments missing Phase 10-17 tables (7 tables total: 1 master + 6 tenant)
+- No migrations generated since Dec 15, 2025 (Phase 3) - Phases 10-17 modified schema.ts but never ran `pnpm db:generate`
+- Docker PostgreSQL adds unnecessary overhead (~200MB RAM, slower I/O, complex debugging)
 
-**Root Cause:**
-Schema definition in `packages/database/src/master/schema.ts` includes columns not present in migrations, likely due to:
-- Missing migration file for Stripe billing additions
-- Out-of-date migrations
-- Schema drift over time
+**Architecture Before:**
+- Local: Native PostgreSQL 17 (broken) + Docker rsm-postgres (corrupted)
+- VPS: Native PostgreSQL 16 (unused) + Docker rsm-postgres (has data)
 
-**Impact:**
-- Cannot test application locally
-- Blocks Phase 18-02 (manual testing)
-- Production might be affected if deployed with incomplete migrations
+**Architecture After:**
+- Local: Native PostgreSQL 17 only (fixed, 7 master + 30 tenant tables)
+- VPS: Native PostgreSQL 16 only (migrated, 7 master + 30 tenant tables × 13 tenants)
+- Docker: Removed entirely
 
-**Fix Scope:**
-- Generate missing migrations or create manual migration
-- Sync master schema with TypeScript definitions
-- Verify init script works end-to-end
-- Document database setup process
-- Test on fresh database
+**Benefits:**
+- Simpler architecture (one PostgreSQL per environment)
+- Better performance (no Docker overhead)
+- Easier debugging (direct psql access)
+- Schema synchronized with Phase 17 code
+- Phase 18-02 testing unblocked after completion
 
 **Success Criteria:**
-- ✅ Master DB initializes successfully from scratch
-- ✅ All schema columns match TypeScript definitions
-- ✅ Init script completes without errors
-- ✅ Test user created with Organization 16 data
-- ✅ Application can connect and authenticate
-- ✅ Ready to resume Phase 18-02 testing
+- ✅ Local native PostgreSQL fixed (7 master + 30 tenant tables)
+- ✅ VPS migrated from Docker to native (all data preserved)
+- ✅ Phase 10-17 migrations generated and applied (7 new tables)
+- ✅ Docker PostgreSQL removed (both environments)
+- ✅ Documentation updated (new architecture documented)
+- ✅ Phase 18-02 testing unblocked
 
-**Rationale**: P0 blocker discovered during Phase 18-02 environment setup. Must fix database initialization before any testing can proceed. Schema/migrations desync is critical infrastructure issue that could affect production deployments.
+**Rationale**: P0 blocker discovered during Phase 18-02 - local database initialization failed. Audit revealed BOTH local and VPS missing Phase 10-17 tables (7 tables), no migrations generated since Dec 15. Decision to migrate entirely to native PostgreSQL simplifies architecture long-term (removes Docker overhead, easier debugging). Since no production customers yet, safe to do invasive migration now.
 
 ---
 
