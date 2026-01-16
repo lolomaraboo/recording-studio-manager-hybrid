@@ -52,8 +52,8 @@ const trpcClient = trpc.createClient({
             ...options?.headers,
             // Dev mode: bypass auth with test headers
             ...(import.meta.env.DEV && {
-              'x-test-user-id': '1',
-              'x-test-org-id': '1',  // TEMPORARY FIX for BUG-002: Changed from '3' to '1' to match existing test org
+              'x-test-user-id': '4',  // admin@test-studio-ui.com
+              'x-test-org-id': '16',  // Test Studio UI organization
             }),
           },
         })
