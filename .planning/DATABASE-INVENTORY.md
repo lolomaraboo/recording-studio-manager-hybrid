@@ -126,20 +126,50 @@ Based on audit findings, **RECOMMENDED APPROACH:**
 | **Local Native** | ❌ NOT RUNNING | - | ❌ Not needed |
 | **VPS Native** | ❓ UNKNOWN | - | Check if exists |
 
-### 2. Immediate Fix Strategy
+### 2. Schema Comparison Table
 
-**Problem:** Local Docker rsm_master is empty, causing all dev work to fail.
+| Component | Code (schema.ts) | VPS Docker | Local Docker | Status |
+|-----------|------------------|------------|--------------|--------|
+| **Master Tables** | 7 tables | 6 tables | 0 tables | 🔴 |
+| - ai_credits | ✅ Defined | ❌ Missing | ❌ Missing | CRITICAL |
+| **Tenant Tables** | 30 tables | 24 tables | 29 tables (mixed) | 🔴 |
+| - client_contacts | ✅ Defined | ❌ Missing | ❌ Missing | Phase 3.9 |
+| - service_catalog | ✅ Defined | ❌ Missing | ❌ Missing | Phase 11.5 |
+| - stripe_webhook_events | ✅ Defined | ❌ Missing | ❌ Missing | Phase 17 |
+| - task_types | ✅ Defined | ❌ Missing | ❌ Missing | Phase 12 |
+| - time_entries | ✅ Defined | ❌ Missing | ❌ Missing | Phase 13 |
+| - track_comments | ✅ Defined | ❌ Missing | ❌ Missing | Phase 5 |
+| **Migrations** | 1 file (Dec 15) | Applied Dec 15 | Never applied | 🔴 |
 
-**Solution:** Rebuild local dev database using VPS production schema as reference
+### 3. Revised Fix Strategy
+
+**Problem (Updated):** BOTH Local AND Production are missing Phase 10-17 tables.
+
+**Root Issue:** Drizzle migrations were never generated after Phase 3 (Dec 15). Phases 10-17 modified schema.ts but never ran `pnpm db:generate`.
+
+**Solution:** Generate ALL missing migrations, then apply to both environments.
 
 **Steps:**
-1. ✅ **Backup VPS production** (if not already done)
-2. 🔧 **Destroy local Docker databases** (drop rsm_master, tenant_*)
-3. 🔧 **Apply migrations to empty local rsm_master** (from drizzle/migrations/master/)
-4. 🔧 **Run init script** (creates master schema + seed data)
-5. 🔧 **Create test tenant** (tenant_1 with ONLY tenant tables)
-6. ✅ **Verify separation** (master tables in rsm_master, tenant tables in tenant_1)
-7. ✅ **Test application** (can connect and query both databases)
+
+**PHASE 1: Generate Missing Migrations**
+1. 🔧 Run `pnpm db:generate` to create migration for Phase 10-17 changes
+2. ✅ Review generated SQL (should add 7 tables: 1 master + 6 tenant)
+3. ✅ Commit new migration file(s)
+
+**PHASE 2: Fix Local Docker (Dev Environment)**
+1. 🔧 Backup (if needed): `docker exec rsm-postgres pg_dump -U postgres rsm_master > backup_local.sql`
+2. 🔧 Drop corrupted databases: `docker exec rsm-postgres psql -U postgres -c "DROP DATABASE tenant_1; DROP DATABASE tenant_3;"`
+3. 🔧 Recreate rsm_master clean: `docker exec rsm-postgres psql -U postgres -c "DROP DATABASE rsm_master; CREATE DATABASE rsm_master;"`
+4. 🔧 Apply ALL migrations: `DATABASE_URL="postgresql://postgres:password@rsm-postgres:5432/rsm_master" pnpm db:migrate`
+5. 🔧 Run init script: `DATABASE_URL="postgresql://postgres:password@rsm-postgres:5432/rsm_master" pnpm db:init`
+6. ✅ Verify: Check rsm_master has 7 tables, tenant_1 has 30 tables (separated correctly)
+
+**PHASE 3: Update VPS Production (CAREFUL)**
+1. ✅ **CRITICAL:** Backup production first: `ssh root@vps "docker exec rsm-postgres pg_dumpall > backup_prod_$(date +%Y%m%d).sql"`
+2. 🔧 Apply NEW migration to rsm_master: `pnpm db:migrate` (adds ai_credits)
+3. 🔧 For EACH tenant DB, apply tenant migrations (adds 6 tables)
+4. ✅ Verify: Check production data intact + new tables exist
+5. ✅ Test: Ensure application works with new schema
 
 ### 3. Long-term Strategy
 
@@ -169,15 +199,36 @@ Code change → Update schema.ts → pnpm db:generate → Apply locally → Test
 
 ### 🔴 What's Broken
 
-- Local Docker rsm_master is COMPLETELY EMPTY (0 tables)
-- Local Docker tenant_1 has CORRUPTED schema (master + tenant tables mixed)
-- Cannot run Phase 18-02 tests locally until fixed
+**Local Docker:**
+- rsm_master: COMPLETELY EMPTY (0 tables) ❌
+- tenant_1: CORRUPTED - Has 29 tables mixing BOTH master and tenant tables ❌
+- Missing 6 Phase 10-17 tables (clientContacts, serviceCatalog, stripeWebhookEvents, taskTypes, timeEntries, trackComments)
+
+**VPS Docker (Production):**
+- rsm_master: Missing `ai_credits` table (defined in schema.ts) ⚠️
+- tenant_2-12: Missing 6 Phase 10-17 tables ⚠️:
+  1. `client_contacts` (Phase 3.9 - Client contacts for companies)
+  2. `service_catalog` (Phase 11.5 - Service templates)
+  3. `stripe_webhook_events` (Phase 17 - Idempotency tracking)
+  4. `task_types` (Phase 12 - Task categories for time tracking)
+  5. `time_entries` (Phase 13 - Time tracking records)
+  6. `track_comments` (Phase 5 - Track feedback/notes)
 
 ### 🎯 Root Cause
 
-**Schema drift** - Local development database was never properly initialized or got corrupted during development.
+**CONFIRMED:** Both environments stopped at Phase 10 (early January 2026).
 
-Production is fine because it was deployed with proper migrations from the start.
+**Timeline:**
+- Dec 15, 2025: Migration `0000_massive_zodiak.sql` created (Phase 3)
+- Jan 5-15, 2026: Phases 10-17 developed (6 new tenant tables + ai_credits master table)
+- **NO NEW MIGRATIONS GENERATED** since Dec 15
+- Databases deployed from old migration, never updated with Phase 10-17 schema changes
+
+**Evidence:**
+- Only 1 migration exists: `0000_massive_zodiak.sql` (Dec 15)
+- TypeScript schema.ts has 7 master + 30 tenant tables (Phase 17 complete)
+- VPS DB has 6 master + 24 tenant tables (Phase 10 state)
+- Local DB is corrupted (master empty, tenant_1 mixed schema)
 
 ---
 
