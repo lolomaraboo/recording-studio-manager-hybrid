@@ -86,9 +86,9 @@
 
 ## Progress Overview
 
-**Overall Progress:** 1/58 pages tested (2%)
+**Overall Progress:** 2/58 pages tested (3%)
 
-- [ ] **Admin Dashboard** - 1/44 pages tested (2%) - Dashboard ⚠️ PASS avec réserves (BUG-004)
+- [ ] **Admin Dashboard** - 2/44 pages tested (5%) - Dashboard ✅ PASS, Clients ✅ PASS
 - [ ] **Client Portal** - 0/7 pages tested (0%)
 - [ ] **Super Admin** - 0/4 pages tested (0%)
 - [ ] **Public/Auth** - 0/4 pages tested (0%)
@@ -96,7 +96,7 @@
 **Bugs Found:**
 - P0: 0 (BUG-001 ✅ Fixed Phase 18.1, BUG-003 ✅ Fixed Phase 18.2)
 - P1: 0
-- P2: 1 (BUG-004 - SSE Notifications)
+- P2: 0 (BUG-004 ✅ Fixed commit 14ec3e9)
 - P3: 2 (Sentry DSN warning, React Router future flags)
 
 **Phase 18 Complete:** ❌ (Requires P0/P1/P2 = 0)
@@ -146,8 +146,8 @@
 
 | # | Page | Route | Status | Bugs | Notes |
 |---|------|-------|--------|------|-------|
-| 1 | Dashboard | `/` | ⏳ Pending | - | Main analytics view |
-| 2 | Clients - List | `/clients` | ⏳ Pending | - | Table/Grid/Kanban modes |
+| 1 | Dashboard | `/` | ✅ PASS | BUG-004 ✅ Fixed | Main analytics view |
+| 2 | Clients - List | `/clients` | ✅ PASS | - | Table/Grid/Kanban modes |
 | 3 | Clients - Detail | `/clients/:id` | ⏳ Pending | - | Client info + tabs |
 | 4 | Clients - Create | `/clients/new` | ⏳ Pending | - | Multi-tab form (vCard) |
 | 5 | Sessions - List | `/sessions` | ⏳ Pending | - | Calendar + list view |
