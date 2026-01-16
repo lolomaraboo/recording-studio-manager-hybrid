@@ -56,11 +56,26 @@ Assign clear purposes:
 
 ### Local Native PostgreSQL
 
-**Connection:** `postgresql://postgres:password@localhost:5432`
+**Connection:** `postgresql://localhost:5432` (no password needed)
 
-**Status:** ❌ NOT ACCESSIBLE / NOT RUNNING
+**Status:** ✅ RUNNING (PostgreSQL 17.7 Homebrew)
 
-**Role:** ❌ NOT IN USE
+**Service:** ✅ Started via Homebrew LaunchAgent
+
+**Path:** `/opt/homebrew/opt/postgresql@17/bin/psql` (not in PATH)
+
+**Databases:**
+- ✅ rsm_master - 5 tables (users, organizations, invitations, organization_members, tenant_databases)
+- ✅ tenant_1 - 29 tables (MIXED master + tenant tables) ❌ CORRUPTED
+- ✅ tenant_2, 3, 4 - Not audited yet
+
+**Issues Found:**
+- ⚠️ **MISSING:** subscription_plans table in rsm_master (should be 6 tables, not 5)
+- ⚠️ **MISSING:** ai_credits table in rsm_master (should be 7 tables total)
+- 🔴 **CORRUPTED:** tenant_1 has BOTH master tables (invitations, organization_members, organizations, subscription_plans, tenant_databases, users) AND tenant tables
+- Same corruption as Docker local - master/tenant tables mixed
+
+**Role:** 🟡 DEVELOPMENT (PARTIALLY WORKING - needs schema fixes)
 
 ---
 
@@ -121,18 +136,19 @@ Based on audit findings, **RECOMMENDED APPROACH:**
 
 | Environment | Status | Role | Action Required |
 |-------------|--------|------|-----------------|
-| **Local Docker** | 🔴 BROKEN | Development | 🔧 REBUILD from scratch |
-| **VPS Docker** | 🟢 HEALTHY | Production | ✅ Keep as-is (reference) |
-| **Local Native** | ❌ NOT RUNNING | - | ❌ Not needed |
-| **VPS Native** | ❓ UNKNOWN | - | Check if exists |
+| **Local Native** | 🟡 PARTIALLY WORKING | Development | 🔧 FIX corrupted tenant_1, add missing tables |
+| **Local Docker** | 🔴 BROKEN | - | ❌ REMOVE (redundant with native) |
+| **VPS Native** | ✅ INSTALLED | - | 🔧 MIGRATE data from Docker |
+| **VPS Docker** | 🟢 HEALTHY | Production (current) | 🔧 MIGRATE out, then remove |
 
 ### 2. Schema Comparison Table
 
-| Component | Code (schema.ts) | VPS Docker | Local Docker | Status |
-|-----------|------------------|------------|--------------|--------|
-| **Master Tables** | 7 tables | 6 tables | 0 tables | 🔴 |
-| - ai_credits | ✅ Defined | ❌ Missing | ❌ Missing | CRITICAL |
-| **Tenant Tables** | 30 tables | 24 tables | 29 tables (mixed) | 🔴 |
+| Component | Code (schema.ts) | VPS Docker | Local Native | Local Docker | Status |
+|-----------|------------------|------------|--------------|--------------|--------|
+| **Master Tables** | 7 tables | 6 tables | 5 tables | 0 tables | 🔴 |
+| - subscription_plans | ✅ Defined | ✅ Present | ❌ Missing | ❌ Missing | MISSING Local |
+| - ai_credits | ✅ Defined | ❌ Missing | ❌ Missing | ❌ Missing | CRITICAL |
+| **Tenant Tables** | 30 tables | 24 tables | 29 (mixed) | 29 (mixed) | 🔴 |
 | - client_contacts | ✅ Defined | ❌ Missing | ❌ Missing | Phase 3.9 |
 | - service_catalog | ✅ Defined | ❌ Missing | ❌ Missing | Phase 11.5 |
 | - stripe_webhook_events | ✅ Defined | ❌ Missing | ❌ Missing | Phase 17 |
