@@ -86,15 +86,15 @@
 
 ## Progress Overview
 
-**Overall Progress:** 1/58 pages tested (2%)
+**Overall Progress:** 2/58 pages tested (3%)
 
 - [ ] **Admin Dashboard** - 0/44 pages tested (0%)
 - [ ] **Client Portal** - 0/7 pages tested (0%)
 - [ ] **Super Admin** - 0/4 pages tested (0%)
-- [ ] **Public/Auth** - 1/4 pages tested (25%) - 1 FAIL
+- [ ] **Public/Auth** - 2/4 pages tested (50%) - 2 FAIL
 
 **Bugs Found:**
-- P0: 1 (BUG-001)
+- P0: 2 (BUG-001, BUG-002)
 - P1: 0
 - P2: 0
 - P3: 0
@@ -224,7 +224,7 @@
 |---|------|-------|--------|------|-------|
 | 56 | Public Landing | `/landing` or `/` | ⏳ Pending | - | If exists |
 | 57 | Signup | `/register` | ❌ FAIL | BUG-001 | Registration fails (SQL error) |
-| 58 | Login (Admin) | `/login` | ⏳ Pending | - | Admin login |
+| 58 | Login (Admin) | `/login` | ❌ FAIL | BUG-002 | Dev mode org ID 3 doesn't exist |
 | 59 | Password Reset | `/reset-password` | ⏳ Pending | - | Forgot password |
 
 ---
@@ -444,22 +444,22 @@ Schema definition in `packages/database/src/master/schema.ts` includes Stripe bi
 ## Summary Statistics
 
 **Testing Progress:**
-- Pages tested: 1/58 (2%)
+- Pages tested: 2/58 (3%)
 - Pages passing: 0
-- Pages failing: 1 (Signup/Register)
+- Pages failing: 2 (Signup/Register, Login)
 - Pages N/A: 0
 
 **Bug Statistics:**
-- P0 bugs: 1 (BUG-001: Registration échoue)
+- P0 bugs: 2 (BUG-001: Registration échoue, BUG-002: Dev mode org ID hardcoded)
 - P1 bugs: 0
 - P2 bugs: 0
 - P3 bugs: 0
-- **Total bugs:** 1
+- **Total bugs:** 2
 
 **Phase 18 Status:**
 - ❌ **NOT COMPLETE** (P0/P1/P2 must be 0)
-- Blocking bugs: BUG-001 (Registration)
-- Estimated fix time: 30-60 min (auth.register mutation fix)
+- Blocking bugs: BUG-001 (Registration), BUG-002 (Dev mode auth)
+- Estimated fix time: 60-90 min (auth.register + main.tsx fix)
 
 ---
 
@@ -528,6 +528,79 @@ params: Phase 18 Test Studio,phase-18-test-studio,phase-18-test-studio,3
 **Workaround:** None available
 
 **Related:** Blocks all Phase 18 testing that requires logged-in user
+
+---
+
+### BUG-002: Dev mode hardcode organizationId=3 inexistante
+
+**Severity:** 🔴 P0 - BLOCKER
+**Location:** `/login` + ALL authenticated routes
+**Component:** `packages/client/src/main.tsx` (tRPC client headers configuration, line 56)
+**Discovered:** 2026-01-15 16:28:45 (Phase 18-02 Task 1)
+
+**Steps to Reproduce:**
+1. Navigate to http://localhost:5174/login
+2. Fill in valid credentials (email: `alice@studiopro.com`, password: `password`)
+3. Click "Login" button
+4. Observe login fails with "Invalid credentials"
+5. Check server logs showing `organizationId: 3` not found
+
+**Expected:**
+- Dev mode uses existing organization from database
+- Login succeeds with valid credentials
+- User redirected to dashboard
+
+**Actual:**
+- Client always sends `x-test-org-id: '3'` header in dev mode
+- Organization 3 doesn't exist in local database (only org 1 exists)
+- Server fails to fetch organization, login fails
+- All authenticated requests fail with organization not found
+
+**Root Cause:**
+`packages/client/src/main.tsx` line 56 hardcodes:
+```typescript
+'x-test-org-id': '3',  // ❌ Organization 3 doesn't exist!
+```
+
+Should dynamically use existing organization or be configurable via `.env`.
+
+**Console Error:**
+```
+Login error: TRPCClientError: Invalid credentials
+```
+
+**Server Log:**
+```
+[Auth Debug] Dev mode bypass: { userId: 1, organizationId: 3 }
+[TRPC Error] {
+  type: 'query',
+  path: 'auth.me',
+  error: 'Failed query: select ... from "organizations" where "organizations"."id" = $1'
+  params: 3,1
+}
+```
+
+**Impact:**
+- **CRITICAL**: Authentication completely broken in dev mode
+- Cannot login to test application locally
+- ALL authenticated routes return 401/404
+- Blocks 100% of Phase 18 testing
+- Blocks local development for all developers
+
+**Fix Required:**
+1. Change `x-test-org-id` from `'3'` to `'1'` (quick fix)
+2. OR make it configurable via `VITE_TEST_ORG_ID` env var (proper fix)
+3. OR remove dev mode bypass headers entirely and use real session auth
+4. Update local database OR update hardcoded value to match
+
+**Workaround:**
+Option A: Change line 56 from `'3'` to `'1'` in main.tsx
+Option B: Create organization 3 in database
+
+**Related:**
+- Blocks ALL testing after BUG-001
+- Makes application completely unusable in dev mode
+- Connected to BUG-001 (registration also uses wrong org ID)
 
 ---
 
