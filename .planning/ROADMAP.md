@@ -1331,6 +1331,46 @@ During Phase 18-02 environment setup, discovered SYSTEMATIC schema/migration des
 
 ---
 
+### Phase 18.3: Database Reset for Testing Environment (INSERTED)
+
+**Goal**: Clean database reset to establish stable testing environment for Phase 18-02 manual testing
+
+**Depends on**: Phase 18.2 (schema migrations applied)
+
+**Research**: Unlikely (standard PostgreSQL database operations)
+
+**Plans**: 1 plan
+
+Plans:
+- [x] 18.3-01: Database Reset for Testing Environment (67 min) ✅
+
+**Details**:
+
+**Problem**: Previous session chaos with multiple organizations (3, 16), inconsistent tenant mappings, invalid credentials, missing tables. User extremely frustrated after spending entire day on database issues instead of testing.
+
+**User Request**: "ON REPART SUR DU NEUF!!!!" - Complete fresh start with clean, simple configuration.
+
+**Required Actions**:
+1. Drop all tenant databases (tenant_1, tenant_3, tenant_16)
+2. Reset rsm_master completely
+3. Run pnpm db:migrate + pnpm db:init
+4. Create ONE tenant with test data
+5. Document credentials CLEARLY in .continue-here.md
+6. Validate login works
+7. ONLY THEN start Phase 18-02 testing
+
+**Success Criteria**:
+- [ ] All old tenant databases dropped
+- [ ] rsm_master rebuilt clean
+- [ ] Migrations applied successfully
+- [ ] One tenant created with test data
+- [ ] Login credentials documented and validated
+- [ ] Environment ready for Phase 18-02 (< 5 minutes setup)
+
+**Rationale**: URGENT - Phase 18-02 manual testing completely blocked by database configuration chaos. User spent entire previous session debugging database instead of testing pages. Clean reset is fastest path to working environment. Since no production customers yet, safe to wipe and rebuild local development database.
+
+---
+
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
 **Milestone Goal:** Marketing-ready platform with public landing page, onboarding, documentation, and production hardening (Phases 4-8 deferred until after v4.0 workflow features)

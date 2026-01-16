@@ -26,11 +26,11 @@
 ## Current Position
 
 Phase: 18 of 18 (Audit Complet Toutes Pages - Zero Bug)
-Plan: 18-02 of 3 - Environment Ready, Manual Testing in Progress
-Status: Manual testing phase (human execution required)
-Last activity: 2026-01-16 - Phase 18-02 setup complete, ready for comprehensive manual testing
+Plan: 18.3-01 of 1 - Database Reset Complete, Manual Testing Ready
+Status: Database reset complete, ready for Phase 18-02 manual testing
+Last activity: 2026-01-16 - Phase 18.3-01 complete, clean database with ONE tenant, test data seeded
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅)
 
 ## Performance Metrics
 
@@ -75,10 +75,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18 | 2/3 | 8 min | 4 min |
 | 18.1 | 1/3 | 7 min | 7 min |
 | 18.2 | 1/3 | 4 min | 4 min |
+| 18.3 | 1/1 | 67 min | 67 min |
 
 **Recent Trend:**
-- Last 5 plans: [6 min, 13 min, 7 min, 4 min, 1 min]
-- Trend: Phase 18-02 environment setup complete (1 min). All systems operational, ready for manual testing execution.
+- Last 5 plans: [13 min, 7 min, 4 min, 1 min, 67 min]
+- Trend: Phase 18.3-01 complete (67 min). Nuclear database reset resolved schema mismatches, ONE tenant with test data, ready for Phase 18-02 testing.
 
 ## Accumulated Context
 
@@ -179,6 +180,7 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 ### Roadmap Evolution
 
+- **2026-01-16:** Phase 18.3 inserted after Phase 18.2: "Database Reset for Testing Environment" (URGENT) - Complete clean reset to unblock Phase 18-02 manual testing after database chaos
 - **2026-01-05:** Milestone v4.0 created: Workflow Commercial Complet, 8 phases (Phase 10-17)
   - Features: Système de Devis complet, Tasks Chronométrées, Architecture Session/Project Flexible, Facturation Automatique Temps Réel
   - Business rationale: Complete commercial workflow (quote → invoice) before marketing push
@@ -305,6 +307,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Blocks: ~40% of Phase 18-02 testing (sessions, invoices, time tracking, reports pages)
   - Fix scope: Generate tenant migrations, apply to tenant_1 and tenant_16, verify all affected tables
   - Priority: P0 BLOCKER - No workaround, must fix before Phase 18-02 can proceed
+- **2026-01-16:** Phase 18.3 inserted after Phase 18.2 - "Database Reset for Testing Environment" (URGENT - P0 BLOCKER)
+  - Reason: User extremely frustrated with database chaos - "on a passé la journée sur la db... ON REPART SUR DU NEUF!!!!!!!"
+  - Impact: Phase 18-02 completely blocked by inconsistent tenant configuration (multiple orgs, wrong mappings, missing tables)
+  - Root cause: Init scripts (src/scripts/init.ts) created before Phase 10-17 - missing subscription_plans, ai_credits, Stripe columns, vCard fields, quotes, time_entries, service_catalog
+  - Solution: Nuclear reset - drop ALL tenants, rebuild rsm_master with migrations, create ONE fresh tenant (tenant_1), seed test data
+  - Result: Clean slate - 1 master DB (7 tables), 1 tenant DB (30+ tables), zero schema mismatches, test data seeded
+  - Priority: P0 BLOCKER - User cannot proceed with manual testing until database clean
 
 ### Blockers/Concerns Carried Forward
 
@@ -355,6 +364,19 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 - ✅ Sessions and invoices queries working (0 PostgreSQL errors)
 - ✅ Phase 18-02 testing fully unblocked (~40% of scope restored)
 
+**Resolved in Phase 18.3:**
+- ✅ Database chaos blocker fixed (nuclear reset complete)
+- ✅ All old tenants dropped (tenant_2 removed, tenant_1/3/16 already gone)
+- ✅ rsm_master rebuilt with 7 tables (master migrations 0000-0002 applied)
+- ✅ Master schema includes Phase 10-17 additions (subscription_plans, ai_credits, Stripe columns)
+- ✅ tenant_1 created fresh with 30+ tables (tenant migrations 0000-0010 applied)
+- ✅ Tenant schema includes all Phase 10-17 additions (vCard fields, quotes, time_entries, etc.)
+- ✅ Test data seeded (5 clients, 4 rooms, 6 equipment, 4 sessions, 3 projects, etc.)
+- ✅ Environment validated (backend running, frontend accessible, DB connection verified)
+- ✅ Credentials documented in .continue-here.md
+- ✅ Zero schema mismatches - both databases match current schema.ts
+- ✅ Phase 18-02 testing fully unblocked (clean database with ONE tenant)
+
 **Still outstanding:**
 - ⚠️ **BLOCKER (Phase 17 UAT):** Client Portal authentication persistence bug - E2E tests 6/8 failing, session not persisting after login, requires 17-03-FIX-2 plan
 - ✅ Phase 5 Item 11 identity RÉSOLU - Item 11 = Documentation Phase 5 (FAIT Session 4), Item 12 = Tests E2E (optionnel, 100% fonctionnel sans)
@@ -372,23 +394,22 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-16T08:30:00Z
-Stopped at: Phase 18-02 BLOCKED - Database Reset Required
+Last session: 2026-01-16T10:59:00Z
+Stopped at: Phase 18.3-01 COMPLETE ✅ - Database Reset Complete, Ready for Phase 18-02 Testing
 Resume context:
   - Phase 18-01 COMPLETE ✅: Test Matrix created (TEST-MATRIX.md with 58 pages)
-  - Phase 18-02 BLOCKED 🚫: Database configuration chaos blocking all testing
-    - Previous session: 2/58 pages tested (Dashboard ✅, Clients List ✅)
-    - Current session: 0/58 pages tested - 100% time spent on DB issues
-    - **BLOCKER:** Multiple tenants/orgs with inconsistent configuration
-    - User extremely frustrated: "on a passé la journée sur la db"
-  - **Next:** MUST complete database reset BEFORE resuming testing
-    1. Drop all tenant databases (tenant_1, tenant_3, tenant_16)
-    2. Reset rsm_master completely
-    3. Run pnpm db:migrate + pnpm db:init
-    4. Create ONE tenant with test data
-    5. Document credentials clearly in .continue-here.md
-    6. Validate login works
-    7. ONLY THEN start testing Clients section
-  - **Critical:** Read .continue-here.md completely before doing ANYTHING
-  - **User expectation:** Next session starts with clean database, testing begins within 5 minutes
-Resume file: .planning/phases/18-audit-complet-toutes-pages-zero-bug/.continue-here.md
+  - Phase 18-02 BLOCKED 🚫 → Phase 18.3-01 EXECUTED → BLOCKER RESOLVED ✅
+    - **Problem:** Database chaos (multiple tenants, schema mismatches, invalid credentials)
+    - **Solution:** Nuclear reset - dropped all tenants, rebuilt master, created ONE tenant (tenant_1)
+    - **Result:** Clean database - 1 master DB (7 tables), 1 tenant DB (30+ tables), test data seeded
+  - Phase 18.3-01 COMPLETE ✅: Database reset for testing environment
+    - rsm_master: 7 tables with Phase 10-17 schema (subscription_plans, ai_credits, Stripe columns)
+    - tenant_1: 30+ tables with complete current schema (all migrations 0000-0010 applied)
+    - Test data: 5 clients, 4 rooms, 6 equipment, 4 sessions, 3 projects, etc.
+    - Credentials documented: alice@studiopro.com (User ID: 3, Org ID: 1)
+    - Environment validated: Backend running (port 3001), Frontend accessible (port 5174)
+  - **Next:** Resume Phase 18-02 manual testing
+    - Start with: Clients section (page 3/58)
+    - Test Matrix: .planning/phases/18-audit-complet-toutes-pages-zero-bug/TEST-MATRIX.md
+    - Resume file: .planning/phases/18.3-database-reset-testing-environment/.continue-here.md
+  - **User expectation met:** Database clean, testing can begin within 2 minutes (environment already running)
