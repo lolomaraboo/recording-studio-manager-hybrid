@@ -1208,6 +1208,60 @@ Plans:
 
 ---
 
+### Phase 18.1: Fix Database Initialization - Resolve schema/migrations desync blocking all testing (INSERTED)
+
+**Goal**: Fix schema/migrations desynchronization preventing local database initialization and blocking Phase 18 testing
+
+**Depends on**: Phase 18 (discovered during 18-02 execution)
+
+**Research**: Unlikely (Drizzle ORM migrations, schema sync)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 18.1-01: Sync schema/migrations/init script - generate migration 0001, update init.ts, test fresh DB (4 tasks)
+
+**Status**: ⏳ Ready for execution
+
+**Details**:
+
+**Problem Discovered:**
+- BUG-001 (P0): Cannot initialize local database for testing
+- Master DB schema in TypeScript includes Stripe billing columns (stripe_customer_id, stripe_subscription_id, subscription_status, current_period_end, logo_url)
+- Master DB migration (0000_massive_zodiak.sql) missing these columns
+- Init script expects complete schema, fails with "column does not exist" errors
+- Blocks all Phase 18 testing locally
+
+**Root Cause:**
+Schema definition in `packages/database/src/master/schema.ts` includes columns not present in migrations, likely due to:
+- Missing migration file for Stripe billing additions
+- Out-of-date migrations
+- Schema drift over time
+
+**Impact:**
+- Cannot test application locally
+- Blocks Phase 18-02 (manual testing)
+- Production might be affected if deployed with incomplete migrations
+
+**Fix Scope:**
+- Generate missing migrations or create manual migration
+- Sync master schema with TypeScript definitions
+- Verify init script works end-to-end
+- Document database setup process
+- Test on fresh database
+
+**Success Criteria:**
+- ✅ Master DB initializes successfully from scratch
+- ✅ All schema columns match TypeScript definitions
+- ✅ Init script completes without errors
+- ✅ Test user created with Organization 16 data
+- ✅ Application can connect and authenticate
+- ✅ Ready to resume Phase 18-02 testing
+
+**Rationale**: P0 blocker discovered during Phase 18-02 environment setup. Must fix database initialization before any testing can proceed. Schema/migrations desync is critical infrastructure issue that could affect production deployments.
+
+---
+
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
 **Milestone Goal:** Marketing-ready platform with public landing page, onboarding, documentation, and production hardening (Phases 4-8 deferred until after v4.0 workflow features)
