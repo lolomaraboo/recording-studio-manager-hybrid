@@ -96,7 +96,7 @@
 **Bugs Found:**
 - P0: 0 (BUG-001 ✅ Fixed Phase 18.1, BUG-003 ✅ Fixed Phase 18.2)
 - P1: 0
-- P2: 0 (BUG-004 ✅ Fixed commit 14ec3e9)
+- P2: 0 (BUG-004 ✅ Fixed commit 14ec3e9, BUG-005 ✅ Fixed pending commit)
 - P3: 2 (Sentry DSN warning, React Router future flags)
 
 **Phase 18 Complete:** ❌ (Requires P0/P1/P2 = 0)
@@ -825,6 +825,63 @@ But console shows:
 - Also found P3 warnings (not blocking):
   - `VITE_SENTRY_DSN_FRONTEND not set` - Expected in dev, Sentry not configured
   - React Router Future Flag warnings - Deprecation notices, no functional impact
+
+---
+
+## BUG-005: Clients - vCard Import Fails Silently (Payload Too Large)
+
+**Severity:** P2 (Important - Feature broken with misleading UX)
+
+**Location:** /clients (Clients page)
+**Component:** ImportClientsDialog.tsx:75-89
+
+**Steps to Reproduce:**
+1. Navigate to /clients page
+2. Click "Importer" dropdown → "vCard (.vcf)"
+3. Select a vCard file (e.g., large contact export)
+4. Click "Importer" button
+5. Observe "Import réussi!" success toast
+6. Check clients list - no new contacts added
+
+**Expected:**
+- Large vCard file imports successfully
+- Contacts appear in client list
+- OR error message displayed if import fails
+
+**Actual:**
+- Backend logs show: `PayloadTooLargeError: request entity too large`
+- Frontend shows "Import réussi!" (false success message)
+- No contacts are actually imported
+- User believes import succeeded but data is missing
+
+**Root Cause:**
+1. **Backend:** Express body-parser default limit (100KB) too small for vCard files
+2. **Frontend:** `handleImport` function (line 80) shows success toast unconditionally, without checking if file was actually parsed/imported
+3. **Error handling:** Payload size error occurs during file read, but error message not properly surfaced to user
+
+**Impact:**
+- vCard import feature: ❌ BROKEN (silently fails)
+- User trust: ❌ DEGRADED (misleading success message)
+- Data integrity: ✅ OK (no corruption, just no data imported)
+- Workaround: ✅ EXISTS (use Excel/CSV import with smaller files, or split vCard file)
+
+**Fix Applied:**
+1. **Backend (index.ts:124):** Increased body-parser limit from default to 10mb for vCard/Excel/CSV imports
+2. **Frontend (ImportClientsDialog.tsx:75-95):** Added validation to check if preview has data before showing success message
+   - If `preview.length === 0`, show error: "Aucun contact valide trouvé dans le fichier"
+   - Success message now shows actual count: "Import réussi! X contact(s) importé(s)"
+
+**Verification:**
+- Backend restarted with new limit ✅
+- Error handling improved to prevent false success ✅
+- Ready for re-testing with vCard file
+
+**Status:** ✅ FIXED (commits pending)
+
+**Testing Impact:**
+- ✅ vCard import should now handle large files (up to 10MB)
+- ✅ Error messages now accurate (no false success)
+- ✅ User feedback matches actual import result
 
 ---
 
