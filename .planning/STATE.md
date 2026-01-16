@@ -294,6 +294,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Blocks: All Phase 18 testing (cannot login, cannot test any pages)
   - Fix scope: Generate missing migration, sync schema, verify init script end-to-end, test fresh database setup
   - Priority: P0 BLOCKER - Must fix before any Phase 18 testing can proceed
+- **2026-01-16:** Phase 18.2 inserted after Phase 18.1 - "Fix Systematic Schema/Migration Desync - Generate and apply missing tenant migrations" (URGENT - P0 BLOCKER)
+  - Reason: BUG-003 discovered during Phase 18-02 environment setup - systematic desync affecting tenant tables (sessions, invoices, musicians)
+  - Impact: Sessions and invoices queries 100% broken - missing 13 columns total across 3 tables
+  - Root cause: Phases 10-17 modified schema.ts but never ran `pnpm db:generate` - migrations never created
+  - Blocks: ~40% of Phase 18-02 testing (sessions, invoices, time tracking, reports pages)
+  - Fix scope: Generate tenant migrations, apply to tenant_1 and tenant_16, verify all affected tables
+  - Priority: P0 BLOCKER - No workaround, must fix before Phase 18-02 can proceed
 
 ### Blockers/Concerns Carried Forward
 

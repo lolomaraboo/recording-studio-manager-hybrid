@@ -1262,6 +1262,75 @@ Plans:
 
 ---
 
+### Phase 18.2: Fix Systematic Schema/Migration Desync - Generate and apply missing tenant migrations (INSERTED)
+
+**Goal**: Generate missing tenant migrations for schema changes made in Phases 10-17 and apply to all tenant databases
+
+**Depends on**: Phase 18.1 (database infrastructure fixed)
+
+**Research**: Unlikely (standard Drizzle migration generation + application)
+
+**Plans**: 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 18.2 to break down)
+
+**Details**:
+
+**Problem Discovered (BUG-003 - P0 BLOCKER):**
+During Phase 18-02 environment setup, discovered SYSTEMATIC schema/migration desync affecting multiple tenant tables. TypeScript schema definitions evolved during Phases 10-17 but migrations were NEVER generated.
+
+**Affected Tables (Confirmed):**
+1. **sessions** - Missing 6 columns:
+   - `project_id` (integer, FK to projects)
+   - `deposit_amount` (numeric)
+   - `deposit_paid` (boolean)
+   - `payment_status` (varchar 50)
+   - `stripe_checkout_session_id` (varchar 255)
+   - `stripe_payment_intent_id` (varchar 255)
+
+2. **invoices** - Missing 6 columns:
+   - `deposit_amount` (numeric)
+   - `deposit_paid_at` (timestamp)
+   - `stripe_deposit_payment_intent_id` (varchar 255)
+   - `remaining_balance` (numeric)
+   - `pdf_s3_key` (varchar 500)
+   - `sent_at` (timestamp)
+
+3. **musicians** - Missing 1 column:
+   - `talent_type` (varchar 100)
+
+**Root Cause:**
+- Phases 10-17 modified `packages/database/src/tenant/schema.ts` directly
+- `pnpm db:generate` was NEVER run to create migration files
+- TypeScript code expects columns that don't exist in databases
+- All tenant databases (tenant_1, tenant_16, production tenants) affected
+
+**Impact:**
+- Blocks ~40% of Phase 18-02 testing (sessions, invoices, time tracking pages)
+- 100% of sessions queries fail (TRPC error: column "project_id" does not exist)
+- 100% of invoices queries fail (TRPC error: column "deposit_amount" does not exist)
+- No workaround available - must fix schema desync
+
+**Fix Required:**
+1. Run `pnpm db:generate` to create missing tenant migrations
+2. Apply new migrations to tenant_1 (local testing database)
+3. Apply new migrations to tenant_16 (Test Studio UI)
+4. Document migration strategy for production tenants
+5. Verify all affected tables synchronized
+
+**Success Criteria:**
+- [ ] Tenant migrations generated for all Phase 10-17 schema changes
+- [ ] tenant_1 database synchronized (all columns present)
+- [ ] tenant_16 database synchronized (all columns present)
+- [ ] Sessions list loads successfully (no column errors)
+- [ ] Invoices list loads successfully (no column errors)
+- [ ] Phase 18-02 testing can proceed
+
+**Rationale**: URGENT BLOCKER discovered during Phase 18-02 - sessions and invoices pages completely broken due to missing database columns. This is a systemic issue affecting ALL tenant databases. Must fix before any meaningful testing can continue. Root cause: Development workflow error where schema.ts was modified but migrations never generated. Demonstrates importance of strict migration discipline in multi-tenant architectures.
+
+---
+
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
 **Milestone Goal:** Marketing-ready platform with public landing page, onboarding, documentation, and production hardening (Phases 4-8 deferred until after v4.0 workflow features)
