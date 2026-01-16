@@ -112,7 +112,7 @@ export function Dashboard() {
     { id: 'upcoming-sessions', title: 'Sessions à venir', visible: true },
     { id: 'pending-invoices', title: 'Factures en attente', visible: true },
     { id: 'alerts', title: 'Alertes & Rappels', visible: true },
-    { id: 'weekly-revenue', title: 'Revenus hebdomadaires', visible: true },
+    { id: 'weekly-revenue', title: 'Comptes débiteurs', visible: true },
     { id: 'top-clients', title: 'Top Clients', visible: true },
     { id: 'equipment-maintenance', title: 'Équipement en maintenance', visible: true },
     { id: 'unread-messages', title: 'Messages non lus', visible: true },
@@ -537,19 +537,15 @@ function renderWidget(
         <div>
           <CardTitle className="text-lg mb-4 flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Revenus hebdomadaires
+            Comptes débiteurs
           </CardTitle>
           <div className="text-center py-3">
             <div className="text-3xl font-bold">
-              {((stats?.revenueThisMonth || 0) / 100).toFixed(2)}€
+              {((stats?.pendingInvoicesTotal || 0) / 100).toFixed(2)}€
             </div>
-            <div className="text-sm text-muted-foreground mt-1">Ce mois</div>
-            {revenueTrend !== 0 && (
-              <div className={`flex items-center justify-center gap-1 text-sm mt-1 ${revenueTrend > 0 ? "text-green-500" : "text-red-500"}`}>
-                {revenueTrend > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                <span>{Math.abs(revenueTrend).toFixed(1)}% vs mois dernier</span>
-              </div>
-            )}
+            <div className="text-sm text-muted-foreground mt-1">
+              {stats?.pendingInvoicesCount || 0} facture(s) impayée(s)
+            </div>
           </div>
         </div>
       );
