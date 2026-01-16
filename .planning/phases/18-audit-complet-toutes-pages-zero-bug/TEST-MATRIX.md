@@ -450,16 +450,18 @@ Schema definition in `packages/database/src/master/schema.ts` includes Stripe bi
 - Pages N/A: 0
 
 **Bug Statistics:**
-- P0 bugs: 2 (BUG-001: Registration échoue, BUG-002: Dev mode org ID hardcoded)
+- P0 bugs: 2 (BUG-001: Registration SQL error, BUG-003: Systematic schema desync)
 - P1 bugs: 0
 - P2 bugs: 0
 - P3 bugs: 0
-- **Total bugs:** 2
+- **Total bugs:** 3 (1 resolved: BUG-002)
 
 **Phase 18 Status:**
 - ❌ **NOT COMPLETE** (P0/P1/P2 must be 0)
-- Blocking bugs: BUG-001 (Registration), BUG-002 (Dev mode auth)
-- Estimated fix time: 60-90 min (auth.register + main.tsx fix)
+- Blocking bugs: BUG-003 (Systematic schema desync)
+- Resolved bugs: BUG-001 (Registration - needs code fix), BUG-002 (Dev mode auth - FIXED)
+- Environment setup: ✅ COMPLETE (Database initialized, org 16 ready, dashboard accessible)
+- Estimated remaining fix time: 4-6 hours (systematic schema migration generation + application)
 
 ---
 
@@ -601,6 +603,135 @@ Option B: Create organization 3 in database
 - Blocks ALL testing after BUG-001
 - Makes application completely unusable in dev mode
 - Connected to BUG-001 (registration also uses wrong org ID)
+
+**Resolution:** ✅ FIXED in commit `abdf26c`
+- Changed `x-test-org-id` from '1' to '16' (Test Studio UI organization)
+- Changed `x-test-user-id` from '1' to '4' (admin@test-studio-ui.com)
+- Organization 16 created with complete tenant_16 database
+- Dashboard now loads successfully with test data
+
+---
+
+### BUG-003: Systematic Schema/Migration Desync - Tenant Tables
+
+**Severity:** 🔴 P0 - BLOCKER
+**Location:** Multiple tenant database tables
+**Component:** `packages/database/drizzle/migrations/tenant/*` + `packages/database/src/tenant/schema.ts`
+**Discovered:** 2026-01-15 16:40:00 (Phase 18-02 Task 1 - Dashboard loading)
+
+**Scope:**
+This is a SYSTEMATIC issue affecting multiple tenant tables. TypeScript schema definitions include columns that don't exist in the database migrations.
+
+**Affected Tables (Confirmed):**
+1. **sessions** - Missing columns:
+   - `project_id` (integer, FK to projects)
+   - `deposit_amount` (numeric)
+   - `deposit_paid` (boolean)
+   - `payment_status` (varchar 50)
+   - `stripe_checkout_session_id` (varchar 255)
+   - `stripe_payment_intent_id` (varchar 255)
+
+2. **invoices** - Missing columns:
+   - `deposit_amount` (numeric)
+   - `deposit_paid_at` (timestamp)
+   - `stripe_deposit_payment_intent_id` (varchar 255)
+   - `remaining_balance` (numeric)
+   - `pdf_s3_key` (varchar 500)
+   - `sent_at` (timestamp)
+
+3. **musicians** - Missing column:
+   - `talent_type` (varchar)
+
+**Likely Affected Tables (Not Yet Tested):**
+- quotes
+- contracts
+- projects
+- tracks
+- invoices
+- Any table with Stripe integration
+- Any table with file storage (S3 keys)
+
+**Steps to Reproduce:**
+1. Navigate to dashboard http://localhost:5174
+2. Open browser DevTools console
+3. Observe tRPC errors:
+   ```
+   [TRPC Error] path: 'sessions.list'
+   error: 'Failed query: select ... "project_id", "deposit_amount", "deposit_paid",
+          "payment_status", "stripe_checkout_session_id", "stripe_payment_intent_id" ...
+          from "sessions"'
+   ```
+
+**Expected:**
+- All columns in TypeScript schema exist in database
+- Migrations create complete schema matching TypeScript definitions
+- Dashboard widgets load data successfully
+
+**Actual:**
+- TypeScript schema evolved (added Stripe, deposits, S3 features)
+- Migrations NOT updated to match schema changes
+- Queries fail because columns don't exist
+- Dashboard widgets show "no data" despite 8 sessions existing in DB
+
+**Root Cause:**
+Schema definitions were updated to add new features (Stripe payments, deposit tracking, file storage) but corresponding migration files were NEVER GENERATED or were generated but not applied to existing tenant databases.
+
+This is different from BUG-001 (master DB schema desync) - this affects ALL tenant databases across ALL organizations.
+
+**Impact:**
+- **CRITICAL**: Core features completely non-functional
+- Sessions list: ❌ BROKEN
+- Invoices list: ❌ BROKEN
+- Dashboard widgets: ⚠️ PARTIAL (counts work, details fail)
+- ANY query selecting these tables: ❌ FAILS
+- Blocks testing of:
+  - Sessions (pages 6-9)
+  - Invoices (pages 19-22)
+  - Time Tracking (pages 23-25)
+  - Reports (pages 26-28)
+  - Possibly 20-30 more pages
+
+**Database Evidence:**
+```sql
+-- sessions table (actual structure)
+\d sessions
+-- Missing: project_id, deposit_amount, deposit_paid, payment_status,
+--          stripe_checkout_session_id, stripe_payment_intent_id
+
+-- invoices table (actual structure)
+\d invoices
+-- Missing: deposit_amount, deposit_paid_at, stripe_deposit_payment_intent_id,
+--          remaining_balance, pdf_s3_key, sent_at
+```
+
+**Fix Required:**
+1. **Generate new migration** from current schema:
+   ```bash
+   pnpm db:generate
+   ```
+2. **Review generated migration** - ensure it adds missing columns
+3. **Apply to ALL tenant databases**:
+   - tenant_1
+   - tenant_16
+   - Any others in production
+4. **Document schema evolution** process to prevent future desync
+5. **Add CI check** to detect schema/migration mismatches
+
+**Workaround:**
+NONE - Cannot test affected features until migrations applied
+
+**Related:**
+- BUG-001: Master DB had similar schema desync (Stripe columns)
+- Suggests project-wide schema management issues
+- Indicates missing CI/CD validation for schema consistency
+
+**Status:** 🔧 NEEDS FIX (Rule 1: Auto-fix bugs - but this requires careful migration generation)
+
+**Priority Justification:**
+- Blocks ~40% of application testing (20+ pages)
+- Production risk: If deployed, customer data queries will fail
+- Affects ALL organizations (multi-tenant impact)
+- No workaround available
 
 ---
 
