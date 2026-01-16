@@ -455,13 +455,17 @@ export function Clients() {
                               {client.email && (
                                 <div className="flex items-center gap-1 text-muted-foreground">
                                   <Mail className="h-3 w-3" />
-                                  {client.email}
+                                  <a href={`mailto:${client.email}`} className="hover:underline">
+                                    {client.email}
+                                  </a>
                                 </div>
                               )}
                               {client.phone && (
                                 <div className="flex items-center gap-1 text-muted-foreground">
                                   <Phone className="h-3 w-3" />
-                                  {client.phone}
+                                  <a href={`tel:${client.phone}`} className="hover:underline">
+                                    {client.phone}
+                                  </a>
                                 </div>
                               )}
                             </div>
@@ -529,7 +533,9 @@ export function Clients() {
                               {client.phone ? (
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <Phone className="h-3 w-3 flex-shrink-0" />
-                                  <span>{client.phone}</span>
+                                  <a href={`tel:${client.phone}`} className="hover:underline">
+                                    {client.phone}
+                                  </a>
                                 </div>
                               ) : null}
 
@@ -537,7 +543,9 @@ export function Clients() {
                               {client.email ? (
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <Mail className="h-3 w-3 flex-shrink-0" />
-                                  <span className="truncate">{client.email}</span>
+                                  <a href={`mailto:${client.email}`} className="hover:underline truncate">
+                                    {client.email}
+                                  </a>
                                 </div>
                               ) : null}
 
@@ -600,7 +608,9 @@ export function Clients() {
                                     {client.phone ? (
                                       <div className="flex items-center gap-1 text-muted-foreground">
                                         <Phone className="h-3 w-3" />
-                                        <span>{client.phone}</span>
+                                        <a href={`tel:${client.phone}`} className="hover:underline">
+                                          {client.phone}
+                                        </a>
                                       </div>
                                     ) : null}
 
@@ -608,7 +618,9 @@ export function Clients() {
                                     {client.email ? (
                                       <div className="flex items-center gap-1 text-muted-foreground truncate">
                                         <Mail className="h-3 w-3 flex-shrink-0" />
-                                        <span className="truncate">{client.email}</span>
+                                        <a href={`mailto:${client.email}`} className="hover:underline truncate">
+                                          {client.email}
+                                        </a>
                                       </div>
                                     ) : null}
                                   </div>
@@ -663,7 +675,9 @@ export function Clients() {
                                     {client.phone ? (
                                       <div className="flex items-center gap-1 text-muted-foreground">
                                         <Phone className="h-3 w-3" />
-                                        <span>{client.phone}</span>
+                                        <a href={`tel:${client.phone}`} className="hover:underline">
+                                          {client.phone}
+                                        </a>
                                       </div>
                                     ) : null}
 
@@ -671,7 +685,9 @@ export function Clients() {
                                     {client.email ? (
                                       <div className="flex items-center gap-1 text-muted-foreground truncate">
                                         <Mail className="h-3 w-3 flex-shrink-0" />
-                                        <span className="truncate">{client.email}</span>
+                                        <a href={`mailto:${client.email}`} className="hover:underline truncate">
+                                          {client.email}
+                                        </a>
                                       </div>
                                     ) : null}
                                   </div>
