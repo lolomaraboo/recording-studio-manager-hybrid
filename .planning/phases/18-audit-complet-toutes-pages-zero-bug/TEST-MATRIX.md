@@ -806,20 +806,20 @@ But console shows:
 **Related:**
 - None (isolated to notification system)
 
-**Status:** 🐛 OPEN - Needs investigation
+**Status:** ✅ FIXED (commit 14ec3e9)
 
-**Priority Justification (P2 not P1):**
-- Dashboard works perfectly without SSE ✅
-- All data displays correctly ✅
-- Feature is accessible (notifications via bell icon) ✅
-- BUT: Real-time updates are missing ❌
-- BUT: Console pollution affects developer experience ❌
-- Important UX issue but not blocking any critical workflow
+**Fix Applied:**
+1. **Root Cause Identified:** EventSource API cannot send custom headers (x-test-user-id, x-test-org-id) in dev mode, causing 401 Unauthorized errors
+2. **Solution:** Use query parameters instead of headers for dev mode authentication
+3. **Frontend Fix (NotificationCenter.tsx):** Append `?userId=4&orgId=16` to SSE URL when `import.meta.env.DEV`
+4. **Backend Fix (index.ts):** Modified `/api/notifications/stream` endpoint to accept query params with fallback chain: query params → headers → session
+5. **Verification:** Console cleared after 15s shows no new SSE errors, backend logs confirm successful connection
 
 **Testing Impact:**
-- Does NOT block testing other pages
-- Dashboard itself is testable and functional
-- Can continue testing remaining 57 pages
+- ✅ SSE connection now works in dev mode
+- ✅ Real-time notifications functional
+- ✅ Console clean (no error spam)
+- ✅ Dashboard fully operational
 
 **Additional Notes:**
 - Also found P3 warnings (not blocking):
