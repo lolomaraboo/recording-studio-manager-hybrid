@@ -75,9 +75,15 @@ export function ImportClientsDialog({ open, onClose, format, onImportComplete }:
   const handleImport = async () => {
     if (!file) return;
 
+    // Check if file was successfully parsed (preview has data)
+    if (preview.length === 0) {
+      toast.error('Aucun contact valide trouvé dans le fichier');
+      return;
+    }
+
     setImporting(true);
     try {
-      toast.success('Import réussi!');
+      toast.success(`Import réussi! ${preview.length} contact(s) importé(s)`);
       onImportComplete();
       setFile(null);
       setPreview([]);

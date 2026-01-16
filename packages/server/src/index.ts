@@ -121,7 +121,7 @@ async function main() {
     handleStripeWebhook
   );
 
-  app.use(express.json());
+  app.use(express.json({ limit: '10mb' })); // Increased for vCard/Excel/CSV imports
 
   // Enable trust proxy for secure cookies behind Nginx reverse proxy
   app.set('trust proxy', 1);
