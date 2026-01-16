@@ -556,6 +556,19 @@ export function Clients() {
                               </div>
                             )}
 
+                            {client.email && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Mail className="h-3 w-3 flex-shrink-0" />
+                                <a
+                                  href={`mailto:${client.email}`}
+                                  className="hover:underline truncate"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {client.email}
+                                </a>
+                              </div>
+                            )}
+
                             {/* Stats badges - compact indicators */}
                             <div className="flex gap-2 flex-wrap">
                               <Badge variant="outline" className="text-xs">
