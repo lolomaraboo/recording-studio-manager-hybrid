@@ -1141,11 +1141,11 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 18-01: Test Matrix & Checklist Creation (58 pages × comprehensive criteria)
-- [ ] 18-02: Execute Manual Tests with MCP Chrome (Admin Dashboard 44 pages + Client Portal 7 + Super Admin 4 + Public 4)
+- [x] 18-01: Test Matrix & Checklist Creation (58 pages × comprehensive criteria) ✅ Complete (20 min - 2026-01-15)
+- [ ] 18-02: Execute Manual Tests with MCP Chrome (Admin Dashboard 44 pages + Client Portal 7 + Super Admin 4 + Public 4) - BLOCKED by BUG-001, unblocked by Phase 18.1-01
 - [ ] 18-03: Document & Fix ALL Bugs (P0/P1/P2 - zero-bug strict)
 
-**Status**: ⏳ Planning
+**Status**: ⏳ In Progress (1/3 plans complete, ready to resume 18-02)
 
 **Details**:
 
@@ -1219,11 +1219,11 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [x] 18.1-01: Fix Local Native PostgreSQL + Generate Migrations - Add to PATH, generate migrations for Phase 10-17, fix rsm_master (add 2 tables), rebuild tenant_1 clean, test app (5 tasks) ✅ Complete (7 min)
-- [ ] 18.1-02: Migrate VPS Docker → Native - Backup, export Docker data, import to native, apply migrations, update config, test production (6 tasks + 2 checkpoints)
-- [ ] 18.1-03: Cleanup Docker Containers - Remove Docker postgres (local + VPS), update docker-compose, finalize docs (4 tasks + 1 checkpoint)
+- [x] 18.1-01: Fix Local Native PostgreSQL + Generate Migrations - Add to PATH, generate migrations for Phase 10-17, fix rsm_master (add 2 tables), rebuild tenant_1 clean, test app (5 tasks) ✅ Complete (7 min - 2026-01-16)
+- [ ] 18.1-02: Migrate VPS Docker → Native - DEFERRED (not blocking Phase 18-02 testing)
+- [ ] 18.1-03: Cleanup Docker Containers - DEFERRED (not blocking Phase 18-02 testing)
 
-**Status**: ⏳ In progress (1/3 plans complete)
+**Status**: ✅ Blocker Fixed (Phase 18-02 unblocked, VPS migration deferred)
 
 **Details**:
 
