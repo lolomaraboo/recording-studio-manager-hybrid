@@ -372,20 +372,23 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-16T07:47:32Z
-Stopped at: Phase 18-02 Manual Testing Paused - Clients Section Incomplete (Page 2/58)
+Last session: 2026-01-16T08:30:00Z
+Stopped at: Phase 18-02 BLOCKED - Database Reset Required
 Resume context:
   - Phase 18-01 COMPLETE ✅: Test Matrix created (TEST-MATRIX.md with 58 pages)
-  - Phase 18-02 IN PROGRESS ⏸️: Manual testing started, 2/58 pages tested (3%)
-    - ✅ Page 1: Dashboard - PASS
-    - ✅ Page 2: Clients List - PASS
-    - ⏸️ PAUSED before Clients Detail/Create/Edit (pages 3-5)
-    - 0 bugs found so far (P0/P1/P2/P3 all at 0)
-  - **Next:** Continue Clients section testing (3 pages remaining)
-    - Clients Detail (`/clients/:id`)
-    - Clients Create (`/clients/create`)
-    - Clients Edit (`/clients/:id/edit`)
-    - Then continue to Sessions (4 pages)
-  - **Note:** Phase 18-02 is human-executed manual testing - Claude guides, user tests
-  - Environment ready: localhost:5174 running, admin@test-studio-ui.com logged in
+  - Phase 18-02 BLOCKED 🚫: Database configuration chaos blocking all testing
+    - Previous session: 2/58 pages tested (Dashboard ✅, Clients List ✅)
+    - Current session: 0/58 pages tested - 100% time spent on DB issues
+    - **BLOCKER:** Multiple tenants/orgs with inconsistent configuration
+    - User extremely frustrated: "on a passé la journée sur la db"
+  - **Next:** MUST complete database reset BEFORE resuming testing
+    1. Drop all tenant databases (tenant_1, tenant_3, tenant_16)
+    2. Reset rsm_master completely
+    3. Run pnpm db:migrate + pnpm db:init
+    4. Create ONE tenant with test data
+    5. Document credentials clearly in .continue-here.md
+    6. Validate login works
+    7. ONLY THEN start testing Clients section
+  - **Critical:** Read .continue-here.md completely before doing ANYTHING
+  - **User expectation:** Next session starts with clean database, testing begins within 5 minutes
 Resume file: .planning/phases/18-audit-complet-toutes-pages-zero-bug/.continue-here.md
