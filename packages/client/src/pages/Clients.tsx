@@ -509,33 +509,35 @@ export function Clients() {
                       {filteredClients.map((client) => (
                       <Card key={client.id} className="hover:shadow-md transition-shadow">
                         <CardHeader className="pb-3">
-                          <div className="flex items-center gap-3">
-                            {/* Prominent avatar - primary visual anchor */}
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage src={client.type === 'company' ? (client.logoUrl ?? undefined) : (client.avatarUrl ?? undefined)} />
-                              <AvatarFallback className="text-sm font-semibold">
-                                {getInitials(client.name)}
-                              </AvatarFallback>
-                            </Avatar>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                              {/* Prominent avatar - primary visual anchor */}
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src={client.type === 'company' ? (client.logoUrl ?? undefined) : (client.avatarUrl ?? undefined)} />
+                                <AvatarFallback className="text-sm font-semibold">
+                                  {getInitials(client.name)}
+                                </AvatarFallback>
+                              </Avatar>
 
-                            <div className="flex-1 min-w-0">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <span className="truncate">{client.name}</span>
-                                {client.accountsReceivable > 100000 && (
-                                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                  <span className="truncate">{client.name}</span>
+                                  {client.accountsReceivable > 100000 && (
+                                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                  )}
+                                </CardTitle>
+                                {client.artistName && (
+                                  <CardDescription className="text-sm truncate">
+                                    {client.artistName}
+                                  </CardDescription>
                                 )}
-                              </CardTitle>
-                              {client.artistName && (
-                                <CardDescription className="text-sm truncate">
-                                  {client.artistName}
-                                </CardDescription>
-                              )}
+                              </div>
                             </div>
 
                             {/* Type badge - visual category indicator */}
                             <Badge
                               variant={client.type === 'company' ? 'default' : 'secondary'}
-                              className="flex-shrink-0"
+                              className="w-fit"
                             >
                               {client.type === 'company' ? 'Entreprise' : 'Particulier'}
                             </Badge>
