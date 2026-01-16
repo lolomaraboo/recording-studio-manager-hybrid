@@ -14,19 +14,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { trpc } from "@/lib/trpc";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { ImportClientsDialog } from "@/components/ImportClientsDialog";
 
 type ViewMode = 'table' | 'grid' | 'kanban';
+type SortField = 'name' | 'type' | 'sessions' | 'accountsReceivable' | 'lastSession';
+type SortOrder = 'asc' | 'desc';
 
 export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importFormat, setImportFormat] = useState<'vcard' | 'excel' | 'csv'>('vcard');
   const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
@@ -44,7 +48,10 @@ export function Clients() {
       clients?.map((client) => {
         const clientSessions = sessions?.filter((s) => s.clientId === client.id) || [];
         const clientInvoices = invoices?.filter((inv) => inv.clientId === client.id) || [];
-        const revenue = clientInvoices.reduce((sum, inv) => sum + parseFloat(inv.total || "0"), 0);
+
+        // Calculate accounts receivable (unpaid invoices only)
+        const unpaidInvoices = clientInvoices.filter((inv) => inv.status === 'sent' || inv.status === 'overdue');
+        const accountsReceivable = unpaidInvoices.reduce((sum, inv) => sum + parseFloat(inv.total || "0"), 0);
 
         // Find last session
         const sortedSessions = clientSessions.sort(
@@ -55,25 +62,77 @@ export function Clients() {
         return {
           ...client,
           sessionsCount: clientSessions.length,
-          revenue: revenue * 100, // Convert to cents for consistency
+          accountsReceivable: accountsReceivable * 100, // Convert to cents for consistency
           lastSessionAt: lastSession?.startTime || null,
         };
       }) || []
     );
   }, [clients, sessions, invoices]);
 
-  // Filter clients by search query
+  // Filter and sort clients
   const filteredClients = useMemo(() => {
-    if (!searchQuery) return clientsWithStats;
+    let result = clientsWithStats;
 
-    const query = searchQuery.toLowerCase();
-    return clientsWithStats.filter(
-      (client) =>
-        client.name.toLowerCase().includes(query) ||
-        client.email?.toLowerCase().includes(query) ||
-        client.artistName?.toLowerCase().includes(query)
-    );
-  }, [clientsWithStats, searchQuery]);
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (client) =>
+          client.name.toLowerCase().includes(query) ||
+          client.email?.toLowerCase().includes(query) ||
+          client.artistName?.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort
+    result = [...result].sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'type':
+          aValue = a.type;
+          bValue = b.type;
+          break;
+        case 'sessions':
+          aValue = a.sessionsCount;
+          bValue = b.sessionsCount;
+          break;
+        case 'accountsReceivable':
+          aValue = a.accountsReceivable;
+          bValue = b.accountsReceivable;
+          break;
+        case 'lastSession':
+          aValue = a.lastSessionAt ? new Date(a.lastSessionAt).getTime() : 0;
+          bValue = b.lastSessionAt ? new Date(b.lastSessionAt).getTime() : 0;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [clientsWithStats, searchQuery, sortField, sortOrder]);
+
+  // Handle column sort
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field with default asc order
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
 
   // Export handlers
   const handleExport = async (format: 'vcard' | 'excel' | 'csv') => {
@@ -264,21 +323,21 @@ export function Clients() {
                     size="sm"
                     onClick={() => setViewMode('table')}
                   >
-                    <TableIcon className="h-4 w-4" />
+                    <TableIcon className="h-3 w-3" />
                   </Button>
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setViewMode('grid')}
                   >
-                    <Grid className="h-4 w-4" />
+                    <Grid className="h-3 w-3" />
                   </Button>
                   <Button
                     variant={viewMode === 'kanban' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setViewMode('kanban')}
                   >
-                    <Columns className="h-4 w-4" />
+                    <Columns className="h-3 w-3" />
                   </Button>
                 </div>
               </div>
@@ -298,12 +357,72 @@ export function Clients() {
                       <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Type</TableHead>
+                        <TableHead
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => handleSort('name')}
+                        >
+                          <div className="flex items-center gap-1">
+                            Client
+                            {sortField === 'name' ? (
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                            ) : (
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => handleSort('type')}
+                        >
+                          <div className="flex items-center gap-1">
+                            Type
+                            {sortField === 'type' ? (
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                            ) : (
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                            )}
+                          </div>
+                        </TableHead>
                         <TableHead>Contact</TableHead>
-                        <TableHead>Sessions</TableHead>
-                        <TableHead>Revenus</TableHead>
-                        <TableHead>Dernière session</TableHead>
+                        <TableHead
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => handleSort('sessions')}
+                        >
+                          <div className="flex items-center gap-1">
+                            Sessions
+                            {sortField === 'sessions' ? (
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                            ) : (
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => handleSort('accountsReceivable')}
+                        >
+                          <div className="flex items-center gap-1">
+                            Comptes débiteurs
+                            {sortField === 'accountsReceivable' ? (
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                            ) : (
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => handleSort('lastSession')}
+                        >
+                          <div className="flex items-center gap-1">
+                            Dernière session
+                            {sortField === 'lastSession' ? (
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                            ) : (
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                            )}
+                          </div>
+                        </TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -316,7 +435,7 @@ export function Clients() {
                                 <div className="font-medium flex items-center gap-2">
                                   {client.name}
                                   {/* VIP indicator - TODO: add isVip field to schema */}
-                                  {client.revenue > 1000000 && (
+                                  {client.accountsReceivable > 1000000 && (
                                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                                   )}
                                 </div>
@@ -352,7 +471,7 @@ export function Clients() {
                           </TableCell>
                           <TableCell>
                             <div className="font-medium">
-                              {(client.revenue / 100).toFixed(2)}€
+                              {(client.accountsReceivable / 100).toFixed(2)}€
                             </div>
                           </TableCell>
                           <TableCell>
@@ -367,7 +486,7 @@ export function Clients() {
                           <TableCell className="text-right">
                             <Button variant="ghost" size="icon" asChild>
                               <Link to={`/clients/${client.id}`}>
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-3 w-3" />
                               </Link>
                             </Button>
                           </TableCell>
@@ -388,7 +507,7 @@ export function Clients() {
                             <div className="flex-1">
                               <CardTitle className="text-base flex items-center gap-2">
                                   {client.name}
-                                  {client.revenue > 1000000 && (
+                                  {client.accountsReceivable > 1000000 && (
                                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                                   )}
                                 </CardTitle>
@@ -464,7 +583,7 @@ export function Clients() {
                                   <div className="flex items-start justify-between">
                                     <CardTitle className="text-sm flex items-center gap-2">
                                       {client.name}
-                                      {client.revenue > 1000000 && (
+                                      {client.accountsReceivable > 1000000 && (
                                         <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                                       )}
                                     </CardTitle>
@@ -527,7 +646,7 @@ export function Clients() {
                                   <div className="flex items-start justify-between">
                                     <CardTitle className="text-sm flex items-center gap-2">
                                       {client.name}
-                                      {client.revenue > 1000000 && (
+                                      {client.accountsReceivable > 1000000 && (
                                         <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                                       )}
                                     </CardTitle>
