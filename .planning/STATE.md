@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 19 of 19 (Différencier Vues Grid/Kanban Clients)
-Plan: 19-02 of 4 - Grid View Compact Scanning Complete
-Status: Phase 19 in progress - Grid view refactored with avatars
-Last activity: 2026-01-16 - Phase 19-02 complete, compact Grid view with prominent avatars and stats badges
+Plan: 19-03 of 4 - Kanban View Workflow Management Complete
+Status: Phase 19 in progress - Kanban view refactored with expanded cards
+Last activity: 2026-01-16 - Phase 19-03 complete, expanded Kanban view with full contact info and workflow indicators
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 2/4 plans (19-01 ✅, 19-02 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 3/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 78
-- Average duration: 38.5 min
-- Total execution time: 50.1 hours
+- Total plans completed: 79
+- Average duration: 38.1 min
+- Total execution time: 50.2 hours
 
 **By Phase:**
 
@@ -76,11 +76,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.1 | 1/3 | 7 min | 7 min |
 | 18.2 | 1/3 | 4 min | 4 min |
 | 18.3 | 1/1 | 67 min | 67 min |
-| 19 | 2/4 | 4 min | 2 min |
+| 19 | 3/4 | 8 min | 2.7 min |
 
 **Recent Trend:**
-- Last 5 plans: [7 min, 4 min, 1 min, 67 min, 3 min]
-- Trend: Phase 19-02 complete (3 min). Grid view refactored with avatars, responsive columns, and stats badges for quick scanning.
+- Last 5 plans: [4 min, 1 min, 67 min, 3 min, 4 min]
+- Trend: Phase 19-03 complete (4 min). Kanban view refactored with expanded cards, full contact info, workflow indicators, and notes preview.
 
 ## Accumulated Context
 
@@ -168,6 +168,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 19-02 | VIP threshold reduced to >1000€ | Changed from >10000€ to >1000€ for more relevant high-value client threshold. Rationale: Consistency with Table view, earlier warning for significant receivables. 1000€ is meaningful threshold for recording studios. |
 | 19-02 | Grid layout 4 columns on xl screens | Added xl:grid-cols-4 to maximize density on large displays (1920px+). Rationale: Studio managers often use large monitors, can handle more dense layouts. Maintains readability with proper card sizing. |
 | 19-02 | Avatar h-12 sizing for prominence | Used h-12 w-12 (48px) for Avatar component as primary visual anchor. Rationale: Research-backed size provides prominence without overwhelming card. Balance between visibility and card content space. |
+| 19-03 | Compact avatar in Kanban (h-8 vs Grid h-12) | Kanban shows expanded context where avatar is secondary identifier, Grid uses prominent avatar for quick scanning. Rationale: Content hierarchy - Kanban prioritizes workflow info over visual identification. |
+| 19-03 | Full contact display in Kanban | Phone, email, city with MapPin icon for complete workflow context. Rationale: Kanban users need all contact methods at glance for workflow decisions (vs Grid minimal contact for scanning). |
+| 19-03 | Workflow indicators section | Sessions count + last session date + receivables with border-t separation. Rationale: Key workflow metrics for client management, visual separation creates clear content zones. |
+| 19-03 | Button text "Voir détails complet" in Kanban | More descriptive than Grid "Voir". Rationale: Emphasizes detail page provides even more information beyond expanded Kanban card. |
+| 19-03 | VIP threshold 100€ consistency | Reduced from 1000€ to match Grid and Table views. Rationale: Cross-view consistency, more meaningful warning threshold for recording studios. |
 
 ### Deferred Issues
 
@@ -398,22 +403,21 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-16T23:13:38Z
-Stopped at: Phase 19-02 COMPLETE ✅ - Grid view refactored
+Last session: 2026-01-16T23:22:15Z
+Stopped at: Phase 19-03 COMPLETE ✅ - Kanban view refactored
 Resume context:
-  - Phase 19-02 COMPLETE ✅: Grid view refactored with avatars and stats badges
+  - Phase 19-03 COMPLETE ✅: Kanban view refactored with expanded cards
     - **Accomplishments:**
-      - ✅ Responsive 3-4 column grid layout (xl:grid-cols-4)
-      - ✅ Prominent Avatar component (h-12 w-12) with initials fallback
-      - ✅ Minimal contact info (phone only) for quick scanning
-      - ✅ Stats badges for sessions count and accounts receivable
-      - ✅ Color-coded warnings for high-value clients (>1000€)
-      - ✅ Bug fix: Added avatarUrl and logoUrl to clients.list query
+      - ✅ Column headers with Users and Building2 icons (h-5 w-5 text-primary)
+      - ✅ Compact Avatar (h-8 w-8) with initials fallback - content-focused
+      - ✅ Full contact info (phone, email, city with MapPin icon)
+      - ✅ Workflow indicators section (sessions, last session date, receivables)
+      - ✅ Notes preview with line-clamp-2 truncation
+      - ✅ Button text "Voir détails complet" (descriptive vs Grid "Voir")
+      - ✅ hover:shadow-lg effect (emphasizes expanded nature vs Grid shadow-md)
+      - ✅ TypeScript fix: null to undefined conversion for Avatar src
     - **Files modified:**
       - packages/client/src/pages/Clients.tsx
-      - packages/server/src/routers/clients.ts
-  - **Next:** Phase 19-03 - Refactor Kanban view for detailed information
-    - Apply Avatar pattern to both Particuliers and Entreprises columns
-    - Add all enriched contact info (phones array, emails array, websites)
-    - Add all stats badges (sessions, invoices, projects, receivables)
-    - Update button text to "Voir détails" (vs Grid "Voir")
+  - **Next:** Phase 19-04 - Final view enhancements (if needed)
+    - Review all 3 views for consistency and polish
+    - Add any missing features or refinements
