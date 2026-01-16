@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { trpc } from "@/lib/trpc";
+import { cn, getInitials } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { format } from "date-fns";
@@ -503,66 +505,84 @@ export function Clients() {
 
                   {/* Grid View */}
                   {viewMode === 'grid' && (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                       {filteredClients.map((client) => (
                       <Card key={client.id} className="hover:shadow-md transition-shadow">
                         <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            {/* Prominent avatar - primary visual anchor */}
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={client.type === 'company' ? client.logoUrl : client.avatarUrl} />
+                              <AvatarFallback className="text-sm font-semibold">
+                                {getInitials(client.name)}
+                              </AvatarFallback>
+                            </Avatar>
+
+                            <div className="flex-1 min-w-0">
                               <CardTitle className="text-base flex items-center gap-2">
-                                  {client.name}
-                                  {client.accountsReceivable > 1000000 && (
-                                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                                  )}
-                                </CardTitle>
-                                {client.artistName && (
-                                  <CardDescription className="text-sm mt-1">
-                                    {client.artistName}
-                                  </CardDescription>
+                                <span className="truncate">{client.name}</span>
+                                {client.accountsReceivable > 100000 && (
+                                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                                 )}
-                              </div>
-                              <Badge variant="outline" className="capitalize">
-                                {client.type === "company" ? "Entreprise" : "Particulier"}
-                              </Badge>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            {/* Contact Info enrichi */}
-                            <div className="space-y-2 text-sm">
-                              {/* Téléphone */}
-                              {client.phone ? (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <Phone className="h-3 w-3 flex-shrink-0" />
-                                  <a href={`tel:${client.phone}`} className="hover:underline">
-                                    {client.phone}
-                                  </a>
-                                </div>
-                              ) : null}
-
-                              {/* Email */}
-                              {client.email ? (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <Mail className="h-3 w-3 flex-shrink-0" />
-                                  <a href={`mailto:${client.email}`} className="hover:underline truncate">
-                                    {client.email}
-                                  </a>
-                                </div>
-                              ) : null}
-
-                              {/* Adresse si présente */}
-                              {(client.city || client.address) && (
-                                <div className="flex items-start gap-2 text-muted-foreground">
-                                  <Phone className="h-3 w-3 flex-shrink-0 mt-0.5" />
-                                  <span className="text-xs">{client.city || client.address}</span>
-                                </div>
+                              </CardTitle>
+                              {client.artistName && (
+                                <CardDescription className="text-sm truncate">
+                                  {client.artistName}
+                                </CardDescription>
                               )}
                             </div>
 
-                            {/* Actions */}
-                            <Button asChild variant="outline" size="sm" className="w-full">
+                            {/* Type badge - visual category indicator */}
+                            <Badge
+                              variant={client.type === 'company' ? 'default' : 'secondary'}
+                              className="flex-shrink-0"
+                            >
+                              {client.type === 'company' ? 'Entreprise' : 'Particulier'}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                          <CardContent className="space-y-2">
+                            {/* Primary contact only - minimal scanning */}
+                            {client.phone && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Phone className="h-3 w-3 flex-shrink-0" />
+                                <a
+                                  href={`tel:${client.phone}`}
+                                  className="hover:underline truncate"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {client.phone}
+                                </a>
+                              </div>
+                            )}
+
+                            {/* Stats badges - compact indicators */}
+                            <div className="flex gap-2 flex-wrap">
+                              <Badge variant="outline" className="text-xs">
+                                {client.sessionsCount} sessions
+                              </Badge>
+                              {client.accountsReceivable > 0 && (
+                                <Badge
+                                  variant="outline"
+                                  className={cn(
+                                    "text-xs",
+                                    client.accountsReceivable > 100000 ? "text-orange-600 border-orange-600" : ""
+                                  )}
+                                >
+                                  {(client.accountsReceivable / 100).toFixed(0)}€
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* Minimal action button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full"
+                              asChild
+                            >
                               <Link to={`/clients/${client.id}`}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                Voir détails
+                                <Eye className="h-3 w-3 mr-1" /> Voir
                               </Link>
                             </Button>
                           </CardContent>
