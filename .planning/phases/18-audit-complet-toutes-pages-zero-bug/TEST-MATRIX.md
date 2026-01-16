@@ -399,6 +399,48 @@ TypeError: Cannot read property 'email' of undefined
 
 ---
 
+## Bugs Discovered
+
+### BUG-001: Database Schema/Migrations Desynchronized (P0)
+
+**Severity:** P0 - Blocker
+**Location:** Database initialization
+**Component:** packages/database/migrations + schema
+
+**Discovered During:** Plan 18-02 environment setup
+**Discovery:** Cannot initialize local database for testing - schema mismatch
+
+**Steps to Reproduce:**
+1. Drop and recreate rsm_master database
+2. Run `pnpm db:migrate`
+3. Run `DATABASE_URL="..." pnpm --filter database db:init`
+4. Observe error: "column 'stripe_customer_id' of relation 'organizations' does not exist"
+
+**Expected:**
+- Migrations should create all schema columns
+- Init script should match current schema
+- Database should initialize successfully
+
+**Actual:**
+- Migration creates partial schema (missing Stripe billing columns)
+- Init script expects complete schema with all columns
+- Database initialization fails, blocking all testing
+
+**Root Cause:**
+Schema definition in `packages/database/src/master/schema.ts` includes Stripe billing columns, but migrations don't create them (likely missing migration file or out-of-date migrations).
+
+**Impact:**
+- Cannot test application locally
+- Blocks all Phase 18 testing
+- Production might be affected if deployed with incomplete migrations
+
+**Fix Applied:**
+[To be documented after fix]
+
+**Status:** 🔧 Fixing now (Rule 1: Auto-fix bugs)
+
+---
+
 ## Summary Statistics
 
 **Testing Progress:**

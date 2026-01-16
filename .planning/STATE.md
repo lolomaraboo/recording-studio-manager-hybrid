@@ -286,6 +286,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Impact: Catch UI bugs, inconsistencies, broken features across 45 pages (Admin 37, Client Portal 5, Super Admin 3)
   - Scope: Manual testing of all pages, forms, navigation, error states, responsive, dark mode
   - Priority: QUALITY GATE - Ensure flawless UI before Phase 4 drives traffic
+- **2026-01-16:** Phase 18.1 inserted after Phase 18 - "Fix Database Initialization - Resolve schema/migrations desync blocking all testing" (URGENT - P0 BLOCKER)
+  - Reason: BUG-001 discovered during Phase 18-02 environment setup - cannot initialize local database for testing
+  - Impact: Master DB schema/migrations desynchronized - TypeScript schema includes Stripe billing columns (stripe_customer_id, stripe_subscription_id, subscription_status, current_period_end, logo_url) but migration file missing these columns
+  - Root cause: Schema drift - packages/database/src/master/schema.ts vs drizzle/migrations/master/0000_massive_zodiak.sql mismatch
+  - Blocks: All Phase 18 testing (cannot login, cannot test any pages)
+  - Fix scope: Generate missing migration, sync schema, verify init script end-to-end, test fresh database setup
+  - Priority: P0 BLOCKER - Must fix before any Phase 18 testing can proceed
 
 ### Blockers/Concerns Carried Forward
 
