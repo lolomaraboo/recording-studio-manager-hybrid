@@ -460,16 +460,29 @@ export const clientsRouter = router({
       // Import all
       const imported = await Promise.all(
         parsedClients.map(async (clientData) => {
-          const [newClient] = await tenantDb
-            .insert(clients)
-            .values({
-              ...clientData,
-              isActive: true,
-              portalAccess: false,
-            } as any)
-            .returning();
+          try {
+            console.log('[importVCard] Inserting client:', JSON.stringify(clientData, null, 2));
+            const [newClient] = await tenantDb
+              .insert(clients)
+              .values({
+                ...clientData,
+                isActive: true,
+                portalAccess: false,
+              } as any)
+              .returning();
 
-          return newClient;
+            return newClient;
+          } catch (error: any) {
+            console.error('[importVCard] Insert failed for client:', clientData.name);
+            console.error('[importVCard] Error:', error);
+            console.error('[importVCard] Error message:', error.message);
+            console.error('[importVCard] Error code:', error.code);
+            console.error('[importVCard] Error detail:', error.detail);
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: `Erreur lors de l'import du client "${clientData.name}": ${error.message || error}`,
+            });
+          }
         })
       );
 
