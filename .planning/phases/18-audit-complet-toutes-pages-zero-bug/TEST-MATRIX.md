@@ -86,18 +86,18 @@
 
 ## Progress Overview
 
-**Overall Progress:** 2/58 pages tested (3%)
+**Overall Progress:** 1/58 pages tested (2%)
 
-- [ ] **Admin Dashboard** - 0/44 pages tested (0%)
+- [ ] **Admin Dashboard** - 1/44 pages tested (2%) - Dashboard ⚠️ PASS avec réserves (BUG-004)
 - [ ] **Client Portal** - 0/7 pages tested (0%)
 - [ ] **Super Admin** - 0/4 pages tested (0%)
-- [ ] **Public/Auth** - 2/4 pages tested (50%) - 2 FAIL
+- [ ] **Public/Auth** - 0/4 pages tested (0%)
 
 **Bugs Found:**
-- P0: 2 (BUG-001, BUG-002)
+- P0: 0 (BUG-001 ✅ Fixed Phase 18.1, BUG-003 ✅ Fixed Phase 18.2)
 - P1: 0
-- P2: 0
-- P3: 0
+- P2: 1 (BUG-004 - SSE Notifications)
+- P3: 2 (Sentry DSN warning, React Router future flags)
 
 **Phase 18 Complete:** ❌ (Requires P0/P1/P2 = 0)
 
@@ -732,6 +732,99 @@ NONE - Cannot test affected features until migrations applied
 - Production risk: If deployed, customer data queries will fail
 - Affects ALL organizations (multi-tenant impact)
 - No workaround available
+
+---
+
+## BUG-004: Dashboard - SSE Connection Error (Notifications temps réel)
+
+**Severity:** P2 (Important - UX issue, not blocking)
+
+**Location:** / (Dashboard)
+**Component:** NotificationCenter.tsx:75
+
+**Steps to Reproduce:**
+1. Navigate to dashboard http://localhost:5174
+2. Login as admin@test-studio-ui.com
+3. Open browser DevTools console (F12)
+4. Observe repeated error messages:
+   ```
+   [ERROR] [SSE] Connection error, retrying...
+     at NotificationCenter.tsx:75:20
+   ```
+
+**Expected:**
+- SSE (Server-Sent Events) connection establishes successfully
+- Notifications update in real-time without errors
+- Console remains clean (no repeated errors)
+
+**Actual:**
+- SSE connection fails repeatedly
+- Error message appears every few seconds in console
+- Notifications component keeps retrying connection indefinitely
+- Console polluted with repeated error logs
+
+**Root Cause:**
+NotificationCenter.tsx attempts to establish SSE connection to backend notification stream, but:
+- Backend SSE endpoint may not be running/configured
+- Connection URL may be incorrect
+- CORS/auth headers may be missing for SSE requests
+
+**Impact:**
+- Dashboard functionality: ✅ WORKS (data loads, widgets display correctly)
+- Notifications display: ✅ WORKS (can see notifications via manual tRPC queries)
+- Real-time updates: ❌ BROKEN (notifications don't update live)
+- Console: ❌ POLLUTED (error spam reduces debugging visibility)
+- User experience: ⚠️ DEGRADED (no live notification updates)
+
+**Visual Evidence:**
+Dashboard loads correctly with all widgets displaying data:
+- Statistiques Rapides: 5 Clients, 4 Salles, 8 Équipement, 4 Projets ✅
+- Sessions today/upcoming ✅
+- Factures en attente: 2 factures ✅
+- Revenus: 18.24€ ✅
+
+But console shows:
+```
+[16:41:07] [ERROR] [SSE] Connection error, retrying...
+[16:41:48] [ERROR] [SSE] Connection error, retrying...
+[16:43:01] [ERROR] [SSE] Connection error, retrying...
+... (repeated indefinitely)
+```
+
+**Workaround:**
+- Notifications still work via manual refresh
+- Dashboard remains fully functional
+- Users can click notification bell to fetch latest
+
+**Fix Required:**
+1. Check backend SSE endpoint configuration
+2. Verify SSE route exists in server (e.g., `/api/notifications/stream`)
+3. Ensure CORS allows SSE connections
+4. Add SSE connection error handling with exponential backoff
+5. Consider graceful degradation: disable SSE if backend doesn't support it
+
+**Related:**
+- None (isolated to notification system)
+
+**Status:** 🐛 OPEN - Needs investigation
+
+**Priority Justification (P2 not P1):**
+- Dashboard works perfectly without SSE ✅
+- All data displays correctly ✅
+- Feature is accessible (notifications via bell icon) ✅
+- BUT: Real-time updates are missing ❌
+- BUT: Console pollution affects developer experience ❌
+- Important UX issue but not blocking any critical workflow
+
+**Testing Impact:**
+- Does NOT block testing other pages
+- Dashboard itself is testable and functional
+- Can continue testing remaining 57 pages
+
+**Additional Notes:**
+- Also found P3 warnings (not blocking):
+  - `VITE_SENTRY_DSN_FRONTEND not set` - Expected in dev, Sentry not configured
+  - React Router Future Flag warnings - Deprecation notices, no functional impact
 
 ---
 
