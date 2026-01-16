@@ -129,9 +129,69 @@ completed: 2026-01-16
 
 **Note:** Plan 18-02 is inherently a manual testing plan. The automated portion (Task 1: Environment Setup) was completed. The remaining 8 tasks require human execution with browser interaction, which is the intended design of this plan.
 
+## Testing Progress Update (Post-Setup)
+
+### Dashboard Testing (Page 1/58) ✅ COMPLETE
+
+**Status:** PASS with 1 bug found and fixed
+
+**Visual Testing:**
+- All widgets display correctly ✅
+- Statistiques Rapides: 5 Clients, 4 Salles, 8 Équipement, 4 Projets ✅
+- Sessions today/upcoming display correctly ✅
+- Factures en attente: 2 factures, 13.44€ ✅
+- Revenus: 18.24€ ce mois ✅
+- Layout and spacing correct ✅
+
+**Console Testing (MCP Chrome DevTools):**
+- Found BUG-004: "[SSE] Connection error, retrying..." repeating indefinitely
+- Root cause: EventSource API cannot send custom headers in dev mode
+- Auth mechanism (x-test-user-id, x-test-org-id) failed for SSE endpoint
+
+### BUG-004: SSE Connection Error - FIXED ✅
+
+**Debugging Session:**
+
+1. **Identification (commit 3411c3a):**
+   - Used MCP Chrome to inspect console
+   - Found 27 repeated SSE connection errors
+   - Documented in TEST-MATRIX.md as P2 (Important UX issue)
+
+2. **Investigation:**
+   - Read NotificationCenter.tsx - EventSource using relative URL "/api/notifications/stream"
+   - Tested endpoint directly: 401 Unauthorized
+   - Read backend index.ts - endpoint exists and requires auth
+   - Discovered EventSource API limitation: cannot send custom headers
+   - Found tRPC uses x-test-user-id headers but EventSource can't
+
+3. **Solution (commit 14ec3e9):**
+   - **Frontend (NotificationCenter.tsx):** Append query params `?userId=4&orgId=16` in dev mode
+   - **Backend (index.ts):** Modified SSE endpoint to accept query params with fallback chain: query → headers → session
+   - Added logging: `[SSE Auth Debug] Dev mode bypass: { userId, organizationId, source }`
+
+4. **Verification:**
+   - Console cleared and monitored for 15 seconds
+   - No new SSE errors appeared ✅
+   - Backend logs confirm: `[SSE] Client connected: 4-16-1768542121644 (total: 1)` ✅
+   - Real-time notifications now functional ✅
+
+**Commits:**
+- `14ec3e9` - fix(18-02): resolve SSE auth in dev mode (BUG-004)
+- `019ad73` - docs(18-02): mark BUG-004 as fixed in TEST-MATRIX
+
+**Testing Statistics:**
+- Pages tested: 1/58 (1.7%)
+- Bugs found: 1 (BUG-004)
+- Bugs fixed: 1 (BUG-004)
+- Pass rate: 100% (1/1 pages)
+
 ## Issues Encountered
 
-**None** - All systems operational and ready for manual testing.
+### BUG-004: SSE Connection Error ✅ FIXED
+- **Severity:** P2 (Important - UX issue, not blocking)
+- **Status:** Fixed in commit 14ec3e9
+- **Impact:** Real-time notifications now working
+- **Documentation:** TEST-MATRIX.md updated with fix details
 
 **Blockers resolved in previous plans:**
 - ✅ BUG-001 (Phase 18.1-01): Master DB schema desync fixed
