@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 18 of 18 (Audit Complet Toutes Pages - Zero Bug)
-Plan: 18.3-01 of 1 - Database Reset Complete, Manual Testing Ready
-Status: Database reset complete, ready for Phase 18-02 manual testing
-Last activity: 2026-01-16 - Phase 18.3-01 complete, clean database with ONE tenant, test data seeded
+Phase: 19 of 19 (Différencier Vues Grid/Kanban Clients)
+Plan: 19-02 of 4 - Grid View Compact Scanning Complete
+Status: Phase 19 in progress - Grid view refactored with avatars
+Last activity: 2026-01-16 - Phase 19-02 complete, compact Grid view with prominent avatars and stats badges
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 2/4 plans (19-01 ✅, 19-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 77
-- Average duration: 38.9 min
-- Total execution time: 50.0 hours
+- Total plans completed: 78
+- Average duration: 38.5 min
+- Total execution time: 50.1 hours
 
 **By Phase:**
 
@@ -76,10 +76,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.1 | 1/3 | 7 min | 7 min |
 | 18.2 | 1/3 | 4 min | 4 min |
 | 18.3 | 1/1 | 67 min | 67 min |
+| 19 | 2/4 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: [13 min, 7 min, 4 min, 1 min, 67 min]
-- Trend: Phase 18.3-01 complete (67 min). Nuclear database reset resolved schema mismatches, ONE tenant with test data, ready for Phase 18-02 testing.
+- Last 5 plans: [7 min, 4 min, 1 min, 67 min, 3 min]
+- Trend: Phase 19-02 complete (3 min). Grid view refactored with avatars, responsive columns, and stats badges for quick scanning.
 
 ## Accumulated Context
 
@@ -164,6 +165,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 17-FIX | Stop at architectural boundary | Route path fix (17-03-FIX) complete, but tests exposed Client Portal auth persistence bug. Applied Rule 4 (architectural decision): stop fix plan, create new plan for auth issue rather than expanding scope. Rationale: GSD best practice = narrow scope fixes, defer discovered issues. Auth system modification = architectural change requiring separate investigation (session cookies, ProtectedClientRoute, auth context). |
 | 18.2 | Manual migration creation for invoices | Created migration 0010 manually instead of `pnpm db:generate` due to Drizzle interactive prompt blocking automation. Rationale: Faster and more reliable for 6 known columns. Interactive prompt asked about quote_items.service_template_id (unrelated to our fix), would require debugging Drizzle internals. |
 | 18.2 | Applied missing migrations to tenant_16 | tenant_16 (created by setup-org-16.sh) was missing migrations 0003 (sessions payment fields), 0008 (project_id), and 0010 (invoices). Applied all 3 to synchronize with schema.ts. Rationale: tenant_16 is critical for Phase 18-02 testing (org ID 16 used in dev mode headers), must be fully functional. |
+| 19-02 | VIP threshold reduced to >1000€ | Changed from >10000€ to >1000€ for more relevant high-value client threshold. Rationale: Consistency with Table view, earlier warning for significant receivables. 1000€ is meaningful threshold for recording studios. |
+| 19-02 | Grid layout 4 columns on xl screens | Added xl:grid-cols-4 to maximize density on large displays (1920px+). Rationale: Studio managers often use large monitors, can handle more dense layouts. Maintains readability with proper card sizing. |
+| 19-02 | Avatar h-12 sizing for prominence | Used h-12 w-12 (48px) for Avatar component as primary visual anchor. Rationale: Research-backed size provides prominence without overwhelming card. Balance between visibility and card content space. |
 
 ### Deferred Issues
 
@@ -394,24 +398,22 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-15T23:45:00Z
-Stopped at: Phase 18-02 IN PROGRESS ⏸️ - Page 3/58 ready to test (Clients Detail)
+Last session: 2026-01-16T23:13:38Z
+Stopped at: Phase 19-02 COMPLETE ✅ - Grid view refactored
 Resume context:
-  - Phase 18.3-01 COMPLETE ✅: Database reset complete (tenant_1 with test data)
-  - Phase 18-02 IN PROGRESS ⏸️: Task 2/9 - Manual testing started (2/58 pages tested)
-    - **Completed:**
-      - ✅ Page 1: Dashboard - PASS (no bugs)
-      - ✅ Page 2: Clients List - PASS (no bugs)
-    - **Next page:**
-      - ⏳ Page 3: Clients - Detail (`/clients/:id`) - User was about to start Group A checks
-    - **Testing approach:**
-      - MANUAL testing with Claude as guide
-      - 27 checks per page (9 Functionality, 10 UI/UX, 8 Interactions)
-      - Bug documentation: BUGS-PHASE-18.md + GitHub Issues immediately
-    - **Progress:** 2/58 pages tested (3%), 0 bugs found
-  - **Next:** Resume Page 3 testing
-    - Navigate to `/clients/:id` (click any client from list)
-    - Claude provides Group A (Functionality) checks
-    - User validates and reports results
-    - Resume file: .planning/phases/18-audit-complet-toutes-pages-zero-bug/.continue-here-18-02-v2.md
-  - **Estimated remaining:** 56 pages × ~3-5 min avg = 2-3 days intensive testing
+  - Phase 19-02 COMPLETE ✅: Grid view refactored with avatars and stats badges
+    - **Accomplishments:**
+      - ✅ Responsive 3-4 column grid layout (xl:grid-cols-4)
+      - ✅ Prominent Avatar component (h-12 w-12) with initials fallback
+      - ✅ Minimal contact info (phone only) for quick scanning
+      - ✅ Stats badges for sessions count and accounts receivable
+      - ✅ Color-coded warnings for high-value clients (>1000€)
+      - ✅ Bug fix: Added avatarUrl and logoUrl to clients.list query
+    - **Files modified:**
+      - packages/client/src/pages/Clients.tsx
+      - packages/server/src/routers/clients.ts
+  - **Next:** Phase 19-03 - Refactor Kanban view for detailed information
+    - Apply Avatar pattern to both Particuliers and Entreprises columns
+    - Add all enriched contact info (phones array, emails array, websites)
+    - Add all stats badges (sessions, invoices, projects, receivables)
+    - Update button text to "Voir détails" (vs Grid "Voir")
