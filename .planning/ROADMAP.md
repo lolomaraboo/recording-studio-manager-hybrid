@@ -880,7 +880,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 3.12. Modes d'affichage multiples | v3.0 | 1/1 | ✅ Complete | 2026-01-04 |
 | 3.13. Validation UI Complète | v3.0 | 2/2 | ✅ Complete | 2026-01-04 |
 | 3.14. Améliorations UI | v3.0 | 4/4 | ✅ Complete | 2026-01-05 |
-| **v4.0 - Workflow Commercial Complet (IN PROGRESS)** | | | | |
+| **v4.0 - Workflow Commercial Complet (COMPLETE)** | | | | |
 | 10. Système Devis - Backend | v4.0 | 3/6 | ✅ Complete | 2026-01-05 |
 | 11. Système Devis - Frontend | v4.0 | 1/1 | ✅ Complete | 2026-01-06 |
 | 11.5. Catalogue Services | v4.0 | 3/3 | ✅ Complete | 2026-01-06 |
@@ -891,6 +891,8 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 15.5. TypeScript Cleanup 316 errors | v4.0 | 1/1 | ✅ Complete | 2026-01-09 |
 | 16. Facturation Auto - Backend | v4.0 | 3/3 | ✅ Complete | 2026-01-09 |
 | 17. Facturation Auto - Stripe UI | v4.0 | 7/7 | ✅ Complete | 2026-01-15 |
+| **v4.1 - Quality Assurance (IN PROGRESS)** | | | | |
+| 18. Audit Complet Toutes Pages | v4.1 | 0/3 | ⏳ Planning | - |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -899,8 +901,9 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 8. Launch Ready | v1.0 | 0/3 | Deferred | - |
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
-**v4.0 Total**: 24/24 plans ✅ COMPLETE (Phases 10-17 finished - 127 min Phase 17 total)
-**v1.0 Total**: 0/17 plans (deferred after v4.0)
+**v4.0 Total**: 24/24 plans ✅ SHIPPED 2026-01-15 (Phases 10-17 finished)
+**v4.1 Total**: 0/3 plans (Phase 18 - Quality Assurance)
+**v1.0 Total**: 0/17 plans (deferred after v4.1)
 
 ---
 
@@ -923,8 +926,9 @@ Success criteria (from PROJECT.md):
 ## Milestones
 
 - ✅ **v3.0 - Foundation & Polish** - Phases 1-3.14 (shipped 2026-01-05)
-- 🚧 **v4.0 - Workflow Commercial Complet** - Phases 10-17 (in progress)
-- 📋 **v1.0 - Marketing & Launch** - Phases 4-8 (deferred after v4.0)
+- ✅ **v4.0 - Workflow Commercial Complet** - Phases 10-17 (shipped 2026-01-15)
+- 🚧 **v4.1 - Quality Assurance** - Phase 18 (in progress)
+- 📋 **v1.0 - Marketing & Launch** - Phases 4-8 (deferred after v4.1)
 
 ---
 
@@ -1122,7 +1126,89 @@ Plans:
 
 ---
 
-## 📋 v1.0 - Marketing & Launch (Deferred After v4.0)
+## 🚧 v4.1 - Quality Assurance (In Progress)
+
+**Milestone Goal:** Comprehensive audit of all 58 pages to ensure zero-bug production quality before marketing launch
+
+### Phase 18: Audit Complet Toutes Pages - Zero Bug
+
+**Goal**: Manual audit of all 58 pages (Admin Dashboard, Client Portal, Super Admin, Public/Auth) - validate functionality, UI/UX, and every interaction - zero bugs P0/P1/P2 tolerated
+
+**Depends on**: Phase 17 (v4.0 complete)
+
+**Research**: Unlikely (manual testing methodology, existing patterns from Phase 3.4/3.13)
+
+**Plans**: 3 plans
+
+Plans:
+- [ ] 18-01: Test Matrix & Checklist Creation (58 pages × comprehensive criteria)
+- [ ] 18-02: Execute Manual Tests with MCP Chrome (Admin Dashboard 44 pages + Client Portal 7 + Super Admin 4 + Public 4)
+- [ ] 18-03: Document & Fix ALL Bugs (P0/P1/P2 - zero-bug strict)
+
+**Status**: ⏳ Planning
+
+**Details**:
+
+**Scope - 58 Pages Total:**
+1. **Admin Dashboard (44 pages)**
+   - Dashboard, Clients (List/Detail/Create/Edit), Sessions, Projects, Tracks, Quotes, Invoices, Time Tracking, Reports, Analytics, Team, Rooms, Equipment, Settings, etc.
+
+2. **Client Portal (7 pages)**
+   - Login, Dashboard, Invoices (List/Detail/Payment), Profile, Activity Logs
+
+3. **Super Admin (4 pages)**
+   - Services Monitoring, Database Management, System Logs
+
+4. **Public/Auth (4 pages)**
+   - Landing, Signup, Login, Password Reset
+
+**Validation Criteria (A+B+C):**
+
+**A) Fonctionnalité Complète**
+- All CRUD operations work (Create, Read, Update, Delete)
+- Forms submit correctly with validation
+- Data displays accurately
+- API calls succeed (no 4xx/5xx errors)
+- No JavaScript console errors
+
+**B) UI/UX Quality**
+- Design cohérent (icons text-primary, cards pb-3, container spacing)
+- Buttons accessible and properly placed
+- Responsive mobile (all pages usable on small screens)
+- Dark mode works without visual bugs
+- Loading states present
+- Empty states informative
+- Error messages clear
+
+**C) Audit Approfondi**
+- Every button clickable and functional
+- Every form field validates correctly
+- Every link navigates properly
+- Every modal opens/closes
+- Every dropdown populates
+- Every table sorts/filters
+- Every workflow end-to-end (ex: Create Quote → Send → Accept → Convert to Project)
+
+**Testing Approach:**
+- Manual testing with MCP Chrome DevTools
+- Detailed checklist per page (functionality, UI, interactions)
+- Document ALL errors found (severity P0/P1/P2/P3)
+- Fix ALL P0/P1/P2 bugs before completion
+- Screenshots for visual bugs
+
+**Success Criteria:**
+- ✅ 0 bugs P0 (bloquants - app broken)
+- ✅ 0 bugs P1 (critiques - major features broken)
+- ✅ 0 bugs P2 (importants - minor features broken or poor UX)
+- ✅ All 58 pages tested and validated
+- ✅ All workflows end-to-end validated
+- ✅ Production-ready quality achieved
+
+**Rationale**: Before marketing launch (v1.0), guarantee zero-bug quality across entire application. v4.0 added major features (Quotes, Time Tracking, Invoices) - must validate no regressions in existing features and new features work flawlessly. This comprehensive audit ensures professional production quality worthy of commercial launch.
+
+---
+
+## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
 **Milestone Goal:** Marketing-ready platform with public landing page, onboarding, documentation, and production hardening (Phases 4-8 deferred until after v4.0 workflow features)
 
