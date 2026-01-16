@@ -237,13 +237,31 @@ async function main() {
 
   // SSE Streaming endpoint for real-time notifications
   app.get('/api/notifications/stream', async (req, res) => {
-    // Check authentication via session
-    if (!req.session || !req.session.userId || !req.session.organizationId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    let userId: number | undefined;
+    let organizationId: number | undefined;
+
+    // Development mode: check for test headers or query params
+    const testUserId = req.headers['x-test-user-id'] as string | undefined;
+    const testOrgId = req.headers['x-test-org-id'] as string | undefined;
+    const queryUserId = req.query.userId as string | undefined;
+    const queryOrgId = req.query.orgId as string | undefined;
+
+    if (process.env.NODE_ENV === 'development' && (testUserId || queryUserId) && (testOrgId || queryOrgId)) {
+      // Dev mode bypass with test headers or query params (EventSource doesn't support headers)
+      userId = parseInt(testUserId || queryUserId!);
+      organizationId = parseInt(testOrgId || queryOrgId!);
+      console.log('[SSE Auth Debug] Dev mode bypass:', { userId, organizationId, source: testUserId ? 'headers' : 'query' });
+    } else if (req.session && req.session.userId && req.session.organizationId) {
+      // Normal flow: Get user from session
+      userId = req.session.userId;
+      organizationId = req.session.organizationId;
+      console.log('[SSE Auth Debug] Session auth:', { userId, organizationId });
     }
 
-    const userId = req.session.userId;
-    const organizationId = req.session.organizationId;
+    // Check authentication
+    if (!userId || !organizationId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
     // Setup SSE headers
     res.setHeader('Content-Type', 'text/event-stream');

@@ -54,7 +54,13 @@ export function NotificationCenter() {
 
   // Connexion SSE pour les notifications en temps réel
   useEffect(() => {
-    const eventSource = new EventSource("/api/notifications/stream");
+    // Use relative URL so Vite proxy forwards to backend with credentials
+    // In dev mode, pass test credentials as query params (EventSource doesn't support headers)
+    let url = "/api/notifications/stream";
+    if (import.meta.env.DEV) {
+      url += "?userId=4&orgId=16"; // admin@test-studio-ui.com, Test Studio UI
+    }
+    const eventSource = new EventSource(url);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
