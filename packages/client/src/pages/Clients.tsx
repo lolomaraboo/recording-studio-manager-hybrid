@@ -16,7 +16,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { cn, getInitials } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin, Copy } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -25,6 +25,30 @@ import { ImportClientsDialog } from "@/components/ImportClientsDialog";
 type ViewMode = 'table' | 'grid' | 'kanban';
 type SortField = 'name' | 'type' | 'sessions' | 'accountsReceivable' | 'lastSession';
 type SortOrder = 'asc' | 'desc';
+
+/**
+ * Copy button for email/phone with toast feedback
+ */
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copié!`);
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-5 w-5 p-0"
+      onClick={handleCopy}
+      title={`Copier ${label.toLowerCase()}`}
+    >
+      <Copy className="h-3 w-3" />
+    </Button>
+  );
+}
 
 export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -471,6 +495,7 @@ export function Clients() {
                                   <a href={`mailto:${client.email}`} className="hover:underline">
                                     {client.email}
                                   </a>
+                                  <CopyButton text={client.email} label="Email" />
                                 </div>
                               )}
                               {client.phone && (
@@ -479,6 +504,7 @@ export function Clients() {
                                   <a href={`tel:${client.phone}`} className="hover:underline">
                                     {client.phone}
                                   </a>
+                                  <CopyButton text={client.phone} label="Téléphone" />
                                 </div>
                               )}
                             </div>
@@ -573,6 +599,7 @@ export function Clients() {
                                 >
                                   {client.phone}
                                 </a>
+                                <CopyButton text={client.phone} label="Téléphone" />
                               </div>
                             )}
 
@@ -586,6 +613,7 @@ export function Clients() {
                                 >
                                   {client.email}
                                 </a>
+                                <CopyButton text={client.email} label="Email" />
                               </div>
                             )}
 
@@ -682,6 +710,7 @@ export function Clients() {
                                         >
                                           {client.phone}
                                         </a>
+                                        <CopyButton text={client.phone} label="Téléphone" />
                                       </div>
                                     )}
                                     {client.email && (
@@ -694,6 +723,7 @@ export function Clients() {
                                         >
                                           {client.email}
                                         </a>
+                                        <CopyButton text={client.email} label="Email" />
                                       </div>
                                     )}
                                     {client.city && (
@@ -819,6 +849,7 @@ export function Clients() {
                                         >
                                           {client.phone}
                                         </a>
+                                        <CopyButton text={client.phone} label="Téléphone" />
                                       </div>
                                     )}
                                     {client.email && (
@@ -831,6 +862,7 @@ export function Clients() {
                                         >
                                           {client.email}
                                         </a>
+                                        <CopyButton text={client.email} label="Email" />
                                       </div>
                                     )}
                                     {client.city && (
