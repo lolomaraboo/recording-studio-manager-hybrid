@@ -1562,3 +1562,53 @@ Plans:
 - **Current:** Cannot sell to enterprise (>100 employees)
 - **With v2.0:** Enterprise-ready, reseller channel opens ($1M+ potential)
 - **Break-even:** 20-28 enterprise customers @ €199/month (12-18 months)
+
+### Phase 18.4: Music Profile for Artists (INSERTED)
+
+**Goal**: Add comprehensive music profile fields to client records for recording studio management - genres, instruments, streaming links, industry info
+
+**Depends on**: Phase 21.1 (authentication bugs fixed, can resume testing)
+
+**Research**: Complete (JSONB arrays with GIN indexes, shadcn multi-select, URL validation patterns)
+
+**Plans**: 3 plans
+
+Plans:
+- [ ] 18.4-01: Add music profile schema + migration (genres/instruments JSONB, streaming URLs, industry fields)
+- [ ] 18.4-02: Create MusicProfileSection UI component (genre/instrument multi-select, 6 streaming platforms, industry info)
+- [ ] 18.4-03: Integrate filters + genre distribution widget (Clients list filters, Dashboard stats)
+
+**Status**: Planned
+
+**Details**:
+
+**Problem (BUG-006 - P1 Critical):**
+Recording Studio Manager app has ZERO music-related fields for artist clients. Discovered during Phase 18-02 manual testing. User: "le bug est trop important pour le faire après" - critical missing feature for core domain.
+
+**Missing Fields:**
+- Genre(s), instruments, vocal range, skill level
+- Streaming platforms (Spotify, Apple Music, SoundCloud, YouTube, Bandcamp, Deezer)
+- Industry info (label, distributor, manager, publisher, performance rights society)
+
+**Solution Architecture:**
+1. **Schema**: 15 new nullable columns in clients table (3 JSONB arrays, 12 varchar/text)
+2. **JSONB arrays with GIN indexes**: PostgreSQL `@>` operator for genre/instrument filtering
+3. **Multi-select UI**: shadcn-multi-select-component with creatable entries (50 preset genres)
+4. **Backward compatible**: All fields nullable, existing clients unaffected
+
+**Migration Strategy (Development):**
+Use "increment tenant number" pattern (create tenant_4, tenant_5 vs debugging migrations). Per DEVELOPMENT-WORKFLOW.md, this is 30 seconds vs 2-3 hours debugging.
+
+**Success Criteria:**
+- [ ] Artists have complete music profile fields in database
+- [ ] Genre/instrument multi-select working in UI
+- [ ] Streaming platform URLs editable and validated
+- [ ] Can filter clients by genre and instrument
+- [ ] Dashboard shows genre distribution stats
+- [ ] Zero P0/P1/P2 bugs introduced
+
+**Estimated Effort:** 2-3 hours total (research complete, ~1.5-2h execution)
+
+**Rationale**: P1 severity bug discovered during comprehensive audit (Phase 18). Recording studio app without music profile = car dealership CRM without tracking which cars customers buy. Must fix before continuing Phase 18-02 testing. User explicitly requested immediate fix vs deferring.
+
+---
