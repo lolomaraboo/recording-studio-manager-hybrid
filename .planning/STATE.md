@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 20.1 of 20.1 (Corriger Architecture Contacts + Boutons Copier)
-Plan: 20.1-02 of 2 - Phase 20.1 COMPLETE ✅
-Status: Phase 20.1 complete - Complete many-to-many contact architecture (backend + frontend), Kanban member display with star icons
-Last activity: 2026-01-17 - Phase 20.1-02 complete, Kanban view displays detailed member lists with primary contact star icons, clickable profile links, conditional API loading
+Phase: 21 of 21 (Audit et Correction Scripts Base de Données)
+Plan: 21-01 of 1 - Phase 21-01 COMPLETE ✅
+Status: Phase 21-01 complete - Database scripts audit: 5 working, 3 partial, 5 obsolete (38% obsolete validates increment tenant pattern)
+Last activity: 2026-01-17 - Phase 21-01 complete, audit-report.md (632 lines), README.md updated, all 13 scripts audited against current schema (7 master + 31 tenant tables)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 1/1 plans (21-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 83
-- Average duration: 36.4 min
-- Total execution time: 50.7 hours
+- Total plans completed: 84
+- Average duration: 36.2 min
+- Total execution time: 50.8 hours
 
 **By Phase:**
 
@@ -79,10 +79,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 19 | 4/4 | 11 min | 2.8 min |
 | 20 | 1/1 | 3 min | 3 min |
 | 20.1 | 2/2 | 15 min | 7.5 min |
+| 21 | 1/1 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 3 min, 3 min, 11 min, 4 min]
-- Trend: Phase 20.1 COMPLETE (15 min total). Complete many-to-many contact architecture: backend (company_members table) + frontend (Kanban member display with star icons).
+- Last 5 plans: [3 min, 3 min, 11 min, 4 min, 6 min]
+- Trend: Phase 21-01 COMPLETE (6 min). Database scripts audit: 13 scripts audited, 5 working (38%), 3 partial (23%), 5 obsolete (38%). FIX category 100% obsolete validates "increment tenant number" pattern success. Evidence: Phase 18 wasted 80+ min debugging migrations.
 
 ## Accumulated Context
 
@@ -189,6 +190,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 20.1-02 | Multi-condition enabled flag for tRPC queries | Prevent unnecessary API calls with compound enabled condition: `viewMode === 'kanban' && client.type === 'company' && contactsCount > 0`. Rationale: Only loads members when actually needed (Kanban view, company clients, has contacts). Performance optimization: 3 API calls instead of potentially dozens for Table/Grid views or individual clients. |
 | 20.1-02 | Truncate class for member overflow | Applied `truncate` class to member names and roles to prevent card layout breaking. Rationale: Long names ("Alexandre Grand - Ingénieur du son principal et mixage") could overflow card width. Truncate ensures ellipsis on overflow for consistent card sizing. |
 | 20.1-02 | stopPropagation on member links | Added `onClick={(e) => e.stopPropagation()}` to member Link components. Rationale: Prevents card click events from interfering with member link navigation. User clicks member name → profile page, not card background behavior. Ensures predictable click targets in nested interactive elements. |
+| 21-01 | Evidence-based script audit (test results required) | Document actual test execution results (ERROR messages, missing columns) not just status markers. Rationale: Proves obsolescence with concrete evidence, enables informed decisions. Impact: Audit credibility increased, developers understand WHY scripts obsolete (e.g., "ERROR: column project_id does not exist", "missing 16 tables"). Alternative rejected: Simple WORKING/BROKEN classification without evidence. |
+| 21-01 | Keep production deploy scripts unchanged despite migration-based approach | deploy-master.sh and deploy-tenants.sh marked WORKING despite using migrations. Rationale: Production tenants have migration history (can't skip migrations), sequential application correct for incremental updates, different from dev tenant creation. Impact: 2/2 DEPLOY scripts remain production-ready, production workflow unchanged. Alternative rejected: Deprecate ALL migration-based scripts uniformly. |
+| 21-01 | Categorize scripts by use case (5 categories) | Group scripts into INIT/SEED/FIX/DEPLOY/MONITOR categories. Rationale: Clear purpose identification, reveals patterns (FIX 100% obsolete validates increment tenant), enables targeted recommendations. Impact: Category summaries show working/obsolete counts, critical gaps surface. Alternative rejected: Flat alphabetical list (no pattern insight). |
 
 ### Deferred Issues
 
@@ -431,34 +435,26 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-17T08:00:01Z
-Stopped at: Phase 20.1-02 COMPLETE ✅ - Kanban member list display complete
+Last session: 2026-01-17T07:34:20Z
+Stopped at: Phase 21-01 COMPLETE ✅ - Database scripts audit complete
 Resume context:
-  - Phase 20.1 COMPLETE ✅✅: Complete many-to-many contact architecture (backend + frontend)
-    - **Phase 20.1-01 Accomplishments (11 min):**
-      - ✅ Database: company_members table with FK constraints and indexes (migration 0011)
-      - ✅ tenant_3: Created fresh tenant from scratch with new schema (30 tables)
-      - ✅ Test data: 5 individual clients, 3 companies, 7 company-member relationships, 3 rooms
-      - ✅ Backend: getMembers endpoint, contactsCount now uses company_members
-      - ✅ Frontend: CopyButton component added to Table/Grid/Kanban views (email/phone)
-    - **Phase 20.1-02 Accomplishments (4 min):**
-      - ✅ Kanban view: Replaced "3 contacts" badge with detailed member list
-      - ✅ Primary contact: ⭐ yellow star icon for visual identification
-      - ✅ Clickable members: Each member links to their profile page (`/clients/{id}`)
-      - ✅ Roles displayed: Shows role when present (e.g., "Productrice", "Ingénieur du son")
-      - ✅ Conditional loading: Only loads members in Kanban view for companies with contacts
-      - ✅ Performance: 3 API calls total (vs dozens if not optimized)
-    - **Files modified in 20.1-02:**
-      - packages/client/src/pages/Clients.tsx (getCompanyMembers hook, IIFE pattern, member list rendering)
-    - **Key patterns established:**
-      - IIFE for conditional hook usage without violating Rules of Hooks
-      - Multi-condition enabled flags for tRPC query optimization
-      - stopPropagation for nested interactive elements (card vs member link)
-  - **Architecture Complete:**
-    - Backend: company_members many-to-many table ✅
-    - Backend: getMembers endpoint with sorting ✅
-    - Frontend: Table view (count badge) ✅
-    - Frontend: Grid view (count badge) ✅
-    - Frontend: Kanban view (detailed member list) ✅
-    - UX: Copy-to-clipboard in all views ✅
-  - **Next:** Phase 20.1 is complete. No further work planned for contact architecture.
+  - Phase 21-01 COMPLETE ✅: Database Scripts Audit (6 min)
+    - **Accomplishments:**
+      - ✅ Audited all 13 scripts against current schema (7 master + 31 tenant tables)
+      - ✅ Status: 5 WORKING (38%), 3 PARTIAL (23%), 5 OBSOLETE (38%)
+      - ✅ Created audit-report.md (632 lines, complete analysis)
+      - ✅ Updated README.md (Phase 21 audit summary, best practices, script status table)
+      - ✅ Categorized by use case: INIT (1/2 working), SEED (1/4), FIX (0/3), DEPLOY (2/2), MONITOR (1/2)
+    - **Key Validation:**
+      - ✅ FIX category 100% obsolete proves "increment tenant number" pattern success
+      - ✅ Phase 18.1-18.3 wasted 80+ min debugging migrations vs 30 sec new pattern
+      - ✅ Evidence-based findings: ERROR messages, missing columns, deprecated tables
+    - **Files created:**
+      - packages/database/scripts/audit-report.md (comprehensive analysis)
+    - **Files modified:**
+      - packages/database/scripts/README.md (audit summary, best practices, status table)
+    - **Recommended Actions (Phase 21-02):**
+      - Archive 5 obsolete scripts (init-tenant.ts, add-new-tenant-tables.sql, fix-*.sql)
+      - Update 3 partial scripts (seed-tenant-3.ts, migrate-status.sh, setup-test-studio-ui.sql)
+      - Create unified tenant creation script (generalize create-tenant-3.ts)
+  - **Next:** Phase 21-02 will archive obsolete scripts, update partial scripts, create unified tenant creation tool.
