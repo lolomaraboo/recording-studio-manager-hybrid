@@ -905,14 +905,14 @@ export function Clients() {
                                     <div className="space-y-2 border-t pt-2">
                                       <h4 className="text-xs font-semibold">Contacts de l'entreprise</h4>
                                       {contactsMap.get(client.id)
-                                        .sort((a, b) => {
+                                        .sort((a: any, b: any) => {
                                           // Primary contact first
                                           if (a.isPrimary && !b.isPrimary) return -1;
                                           if (!a.isPrimary && b.isPrimary) return 1;
                                           // Then alphabetically by lastName
                                           return a.lastName.localeCompare(b.lastName);
                                         })
-                                        .map((contact) => (
+                                        .map((contact: any) => (
                                           <div key={contact.id} className="text-xs space-y-1 bg-muted/50 p-2 rounded">
                                             {/* Name with primary star */}
                                             <div className="font-medium flex items-center gap-1">
