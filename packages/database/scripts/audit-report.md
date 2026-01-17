@@ -123,17 +123,21 @@ const [emma] = await tenantSql`
 
 **Status:** ✅ **WORKING** (Production deployment script - migration-based is correct here)
 
-**Schema Version:** Current (master migrations 0000-0002)
+**Schema Version:** Current (master migrations 0000-0003)
 
 **Issues Found:** None - Production migrations should be applied sequentially
 
-**Test Result:**
+**Test Result (Phase 21-03):**
 ```bash
-# Script logic verified
-✅ Reads migrations from drizzle/migrations/master/
-✅ Applies each .sql file in order
-✅ Validates table count (expected: 7 tables)
-✅ Confirms foreign key count
+# Tested on rsm_master_deploy_test (2026-01-17)
+✅ Database created and migrations applied successfully
+✅ All 4 migration files applied (0000-0003)
+✅ Final table count: 7 (users, organizations, organization_members, invitations,
+   tenant_databases, subscription_plans, ai_credits)
+✅ Zero errors during deployment
+✅ Script cleanup: Test database dropped successfully
+
+Result: 🎉 Master DB deployment completed successfully!
 ```
 
 **Action Required:** **KEEP AS-IS** - Production migrations require sequential application
@@ -150,13 +154,17 @@ const [emma] = await tenantSql`
 
 **Issues Found:** None - Batch deployment script for production
 
-**Test Result:**
+**Test Result (Phase 21-03):**
 ```bash
-# Script logic verified
-✅ Iterates over tenant list (tenant_1, tenant_2, tenant_3)
-✅ Applies migrations to each tenant database
-✅ Shows before/after table counts
-✅ Tracks success/failure per tenant
+# Tested on tenant_deploy_test (2026-01-17)
+✅ Database created and migrations applied successfully
+✅ All 12 migration files applied (0000-0011)
+✅ Final table count: 31 (clients, sessions, invoices, projects, tracks, rooms,
+   equipment, service_catalog, time_entries, quotes, company_members, etc.)
+✅ Zero errors during deployment
+✅ Script cleanup: Test database dropped successfully
+
+Result: 🎉 All tenant deployments completed successfully!
 ```
 
 **Action Required:** **KEEP AS-IS** - Production batch migration tool
