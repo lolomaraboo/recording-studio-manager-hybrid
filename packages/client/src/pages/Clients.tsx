@@ -224,10 +224,24 @@ export function Clients() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
-        (client) =>
-          client.name.toLowerCase().includes(query) ||
-          client.email?.toLowerCase().includes(query) ||
-          client.artistName?.toLowerCase().includes(query)
+        (client) => {
+          // Search in basic client fields
+          const matchesBasicFields =
+            client.name.toLowerCase().includes(query) ||
+            client.email?.toLowerCase().includes(query) ||
+            client.artistName?.toLowerCase().includes(query);
+
+          // For companies: also search in contact names
+          if (client.type === 'company') {
+            const contacts = contactsByCompany.get(client.id);
+            const matchesContactName = contacts?.some(contact =>
+              contact.memberName.toLowerCase().includes(query)
+            );
+            return matchesBasicFields || matchesContactName;
+          }
+
+          return matchesBasicFields;
+        }
       );
     }
 
@@ -267,7 +281,7 @@ export function Clients() {
     });
 
     return result;
-  }, [clientsWithStats, searchQuery, sortField, sortOrder]);
+  }, [clientsWithStats, searchQuery, sortField, sortOrder, contactsByCompany]);
 
   // Handle column sort
   const handleSort = (field: SortField) => {
