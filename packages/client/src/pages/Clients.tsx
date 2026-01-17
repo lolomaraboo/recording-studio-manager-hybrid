@@ -22,7 +22,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { cn, getInitials } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin, Copy } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Pencil, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin, Copy } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -544,7 +544,7 @@ export function Clients() {
                             )}
                           </div>
                         </TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -636,12 +636,19 @@ export function Clients() {
                               <span className="text-sm text-muted-foreground">Jamais</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" asChild>
-                              <Link to={`/clients/${client.id}`}>
-                                <Eye className="h-3 w-3" />
-                              </Link>
-                            </Button>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button variant="ghost" size="icon" asChild>
+                                <Link to={`/clients/${client.id}/edit`}>
+                                  <Pencil className="h-3 w-3" />
+                                </Link>
+                              </Button>
+                              <Button variant="ghost" size="icon" asChild>
+                                <Link to={`/clients/${client.id}`}>
+                                  <Eye className="h-3 w-3" />
+                                </Link>
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
