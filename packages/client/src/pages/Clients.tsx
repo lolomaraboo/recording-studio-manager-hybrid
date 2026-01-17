@@ -490,7 +490,7 @@ export function Clients() {
                           onClick={() => handleSort('type')}
                         >
                           <div className="flex items-center gap-1">
-                            Type
+                            Contact
                             {sortField === 'type' ? (
                               sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                             ) : (
@@ -498,8 +498,7 @@ export function Clients() {
                             )}
                           </div>
                         </TableHead>
-                        <TableHead>Contacts</TableHead>
-                        <TableHead>Contact</TableHead>
+                        <TableHead>Email / Téléphone</TableHead>
                         <TableHead
                           className="cursor-pointer hover:bg-accent"
                           onClick={() => handleSort('sessions')}
@@ -520,9 +519,9 @@ export function Clients() {
                           <div className="flex items-center gap-1">
                             Comptes débiteurs
                             {sortField === 'accountsReceivable' ? (
-                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                              sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
                             ) : (
-                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                              <ArrowUpDown className="h-4 w-4 opacity-30" />
                             )}
                           </div>
                         </TableHead>
@@ -533,9 +532,9 @@ export function Clients() {
                           <div className="flex items-center gap-1">
                             Dernière session
                             {sortField === 'lastSession' ? (
-                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                              sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
                             ) : (
-                              <ArrowUpDown className="h-3 w-3 opacity-30" />
+                              <ArrowUpDown className="h-4 w-4 opacity-30" />
                             )}
                           </div>
                         </TableHead>
@@ -562,16 +561,17 @@ export function Clients() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <CompanyBadge
-                              clientType={client.type}
-                              companies={companiesByMember.get(client.id) || []}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            {client.type === 'company' && client.contactsCount > 0 && (
-                              <Badge variant="outline">
-                                {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
-                              </Badge>
+                            {client.type === 'individual' ? (
+                              <CompanyBadge
+                                clientType={client.type}
+                                companies={companiesByMember.get(client.id) || []}
+                              />
+                            ) : (
+                              client.contactsCount > 0 && (
+                                <Badge variant="outline">
+                                  {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                </Badge>
+                              )
                             )}
                           </TableCell>
                           <TableCell>

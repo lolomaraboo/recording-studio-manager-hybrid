@@ -228,6 +228,35 @@ Toujours avec traduction FR et couleur dynamique.
 - Hover states pour interactivité
 - Padding cellules standard (géré par shadcn/ui)
 
+#### Icônes de tri (TableHead)
+
+**Pattern standard pour colonnes triables:**
+```tsx
+<TableHead
+  className="cursor-pointer hover:bg-accent"
+  onClick={() => handleSort('fieldName')}
+>
+  <div className="flex items-center gap-1">
+    Nom Colonne
+    {sortField === 'fieldName' ? (
+      sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+    ) : (
+      <ArrowUpDown className="h-4 w-4 opacity-30" />
+    )}
+  </div>
+</TableHead>
+```
+
+**Taille icônes de tri:**
+- **Colonnes standards** (Client, Type, Sessions): `h-3 w-3` (12px × 12px)
+- **Colonnes texte long** (Comptes débiteurs, Dernière session): `h-4 w-4` (16px × 16px)
+- Gap: `gap-1` entre texte et icône
+
+**Rationale:**
+- `h-3 w-3` suffisant pour colonnes courtes/moyennes
+- `h-4 w-4` nécessaire pour colonnes à texte long (meilleure visibilité)
+- Équilibre visuel adaptatif selon la largeur du header
+
 ### 6. Widgets Draggables (Dashboard uniquement)
 
 ```tsx
