@@ -892,8 +892,8 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 16. Facturation Auto - Backend | v4.0 | 3/3 | ✅ Complete | 2026-01-09 |
 | 17. Facturation Auto - Stripe UI | v4.0 | 7/7 | ✅ Complete | 2026-01-15 |
 | **v4.1 - Quality Assurance (IN PROGRESS)** | | | | |
-| 18. Audit Complet Toutes Pages | v4.1 | 0/3 | ⏳ Planning | - |
-| 20. Affichage Contacts Multiples | v4.1 | 0/1 | ⏳ Planned | - |
+| 18. Audit Complet Toutes Pages | v4.1 | 1/3 | ⏸️ Paused | 2026-01-15 |
+| 20. Affichage Contacts Multiples | v4.1 | 1/1 | ✅ Complete | 2026-01-16 |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -903,7 +903,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
 **v4.0 Total**: 24/24 plans ✅ SHIPPED 2026-01-15 (Phases 10-17 finished)
-**v4.1 Total**: 0/3 plans (Phase 18 - Quality Assurance)
+**v4.1 Total**: 2/4 plans (Phase 18: 1/3, Phase 20: 1/1 ✅)
 **v1.0 Total**: 0/17 plans (deferred after v4.1)
 
 ---
@@ -1383,9 +1383,9 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 20-01-PLAN.md — Display multiple contacts in Table/Grid/Kanban views
+- [x] 20-01-PLAN.md — Display multiple contacts in Table/Grid/Kanban views (Completed 2026-01-16 - 3 min)
 
-**Status**: Not started
+**Status**: ✅ Complete (1/1 plans finished - 3 min total)
 
 **Details**:
 
