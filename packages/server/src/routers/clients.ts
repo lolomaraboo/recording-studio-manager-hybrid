@@ -36,7 +36,7 @@ export const clientsRouter = router({
       const tenantDb = await ctx.getTenantDb();
       const { limit = 50, offset = 0 } = input || {};
 
-      // Get clients with notes metadata
+      // Get clients with notes metadata and contacts count
       const clientsList = await tenantDb
         .select({
           id: clients.id,
@@ -57,11 +57,13 @@ export const clientsRouter = router({
           logoUrl: clients.logoUrl,
           createdAt: clients.createdAt,
           updatedAt: clients.updatedAt,
-          notesCount: sql<number>`CAST(COUNT(${clientNotes.id}) AS INTEGER)`,
+          notesCount: sql<number>`CAST(COUNT(DISTINCT ${clientNotes.id}) AS INTEGER)`,
           lastNoteDate: sql<Date | null>`MAX(${clientNotes.createdAt})`,
+          contactsCount: sql<number>`CAST(COUNT(DISTINCT ${clientContacts.id}) AS INTEGER)`,
         })
         .from(clients)
         .leftJoin(clientNotes, eq(clients.id, clientNotes.clientId))
+        .leftJoin(clientContacts, eq(clients.id, clientContacts.clientId))
         .groupBy(clients.id)
         .limit(limit)
         .offset(offset);
