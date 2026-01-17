@@ -1426,10 +1426,16 @@ Enrichir les trois vues clients (Table/Grid/Kanban) pour afficher:
 - Script interdependencies and execution order
 - Test data generation strategies for current schema
 
-**Plans**: TBD plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 21 to break down)
+- [ ] 21-01: Audit all scripts against current schema - compatibility matrix (audit-report.md)
+- [ ] 21-02: Create updated init scripts (create-tenant, seed-base, seed-realistic)
+- [ ] 21-03: Archive obsolete scripts and update documentation
+
+
+
+
 
 **Status**: Not started
 
