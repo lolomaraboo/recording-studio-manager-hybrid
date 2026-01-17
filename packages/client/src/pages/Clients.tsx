@@ -134,12 +134,12 @@ export function Clients() {
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
 
-  // Load ALL company members (Kanban and Table views)
+  // Load ALL company members (Kanban, Table, and Grid views)
   // Single query prevents React Hooks violation
   // Filtered client-side by companyId in render
   const allMembersQuery = trpc.clients.getAllMembers.useQuery(
     undefined,
-    { enabled: viewMode === 'kanban' || viewMode === 'table' }
+    { enabled: viewMode === 'kanban' || viewMode === 'table' || viewMode === 'grid' }
   );
 
   // Load companies for contacts (for Type column badge)
@@ -731,9 +731,34 @@ export function Clients() {
                                 companies={companiesByMember.get(client.id) || []}
                               />
                               {client.type === 'company' && client.contactsCount > 0 && (
-                                <Badge variant="outline" className="text-xs w-fit">
-                                  {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
-                                </Badge>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Badge variant="outline" className="text-xs w-fit cursor-pointer">
+                                      {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                    </Badge>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto">
+                                    <div className="space-y-1">
+                                      {contactsByCompany.get(client.id)?.map((contact, idx) => {
+                                        // Find the contact's memberId from allMembersQuery
+                                        const memberData = allMembersQuery.data?.find(
+                                          m => m.companyId === client.id && m.memberName === contact.memberName
+                                        );
+                                        return (
+                                          <Link
+                                            key={idx}
+                                            to={`/clients/${memberData?.memberId}`}
+                                            className="flex items-center gap-1 text-sm hover:bg-accent p-1 rounded transition-colors"
+                                          >
+                                            {contact.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                                            <span className="font-medium">{contact.memberName}</span>
+                                            {contact.role && <span className="text-muted-foreground">- {contact.role}</span>}
+                                          </Link>
+                                        );
+                                      })}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               )}
                             </div>
                           </div>
