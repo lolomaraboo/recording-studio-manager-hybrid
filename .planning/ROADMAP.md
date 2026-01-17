@@ -1575,7 +1575,7 @@ Plans:
 
 Plans:
 - [ ] 18.4-01: Add music profile schema + migration (genres/instruments JSONB, streaming URLs, industry fields)
-- [ ] 18.4-02: Create MusicProfileSection UI component (genre/instrument multi-select, 6 streaming platforms, industry info)
+- [ ] 18.4-02: Create MusicProfileSection UI component (genre/instrument multi-select, 11 streaming platforms, industry info)
 - [ ] 18.4-03: Integrate filters + genre distribution widget (Clients list filters, Dashboard stats)
 
 **Status**: Planned
@@ -1591,7 +1591,7 @@ Recording Studio Manager app has ZERO music-related fields for artist clients. D
 - Industry info (label, distributor, manager, publisher, performance rights society)
 
 **Solution Architecture:**
-1. **Schema**: 15 new nullable columns in clients table (3 JSONB arrays, 12 varchar/text)
+1. **Schema**: 19 new nullable columns in clients table (2 JSONB arrays, 17 varchar/text)
 2. **JSONB arrays with GIN indexes**: PostgreSQL `@>` operator for genre/instrument filtering
 3. **Multi-select UI**: shadcn-multi-select-component with creatable entries (50 preset genres)
 4. **Backward compatible**: All fields nullable, existing clients unaffected
