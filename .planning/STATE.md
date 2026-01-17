@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 19 of 19 (Différencier Vues Grid/Kanban Clients)
-Plan: 19-04 of 4 - Phase 19 COMPLETE ✅
-Status: Phase 19 complete - All client views tested and validated
-Last activity: 2026-01-16 - Phase 19-04 complete, comprehensive responsive testing and visual polish verification
+Phase: 20 of 20 (Affichage Contacts Multiples Entreprises)
+Plan: 20-01 of 1 - Phase 20 COMPLETE ✅
+Status: Phase 20 complete - Multiple contacts visible in all client views
+Last activity: 2026-01-17 - Phase 20-01 complete, contact count badges in Table/Grid, full contact list in Kanban with copy-to-clipboard
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 80
-- Average duration: 37.8 min
-- Total execution time: 50.3 hours
+- Total plans completed: 81
+- Average duration: 37.4 min
+- Total execution time: 50.4 hours
 
 **By Phase:**
 
@@ -77,10 +77,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.2 | 1/3 | 4 min | 4 min |
 | 18.3 | 1/1 | 67 min | 67 min |
 | 19 | 4/4 | 11 min | 2.8 min |
+| 20 | 1/1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: [1 min, 67 min, 3 min, 4 min, 3 min]
-- Trend: Phase 19 COMPLETE (3 min). Responsive testing validated all breakpoints, avatar fallbacks working, visual polish verified, user approved.
+- Last 5 plans: [67 min, 3 min, 4 min, 3 min, 3 min]
+- Trend: Phase 20 COMPLETE (3 min). Contact display across all views, copy-to-clipboard implemented, batch loading optimized.
 
 ## Accumulated Context
 
@@ -176,6 +177,10 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 19-04 | Email display in Grid view | Added email below phone in Grid view during testing. Rationale: User requested more contact info visibility, email is critical contact method, implemented with Mail icon and mailto link with truncation. |
 | 19-04 | Type badge repositioning in Grid | Moved badge from inline with name to separate line below. Rationale: Reduces horizontal crowding, allows full name display, better visual hierarchy and readability at all breakpoints. |
 | 19-04 | Kanban shadow-lg emphasis | Kanban cards use shadow-lg vs Grid shadow-md. Rationale: Emphasizes "context-rich" nature of Kanban view vs "compact scanning" Grid, clear visual differentiation between view purposes. |
+| 20-01 | COUNT(DISTINCT) for multi-JOIN accuracy | Changed notesCount and contactsCount to use COUNT(DISTINCT) instead of COUNT. Rationale: Multiple LEFT JOINs can create duplicate rows - DISTINCT prevents overcounting when client has both notes AND contacts. |
+| 20-01 | Conditional Kanban contact loading | Batch contact queries enabled only when viewMode === 'kanban'. Rationale: Avoids loading contacts when Table/Grid view active, reduces unnecessary API calls. |
+| 20-01 | Scoped copy-to-clipboard Phase 20 | Copy icons only in Clients.tsx Kanban view. Rationale: Plan specified "Phase 20 scope only" - universal copy feature across all pages (ClientDetail, Sessions, Invoices) deferred to future enhancement. |
+| 20-01 | Primary contact sorting | Sort by isPrimary DESC, lastName ASC. Rationale: Primary contact always appears first (most important for workflows), others alphabetically for consistency and predictability. |
 
 ### Deferred Issues
 
@@ -192,6 +197,12 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 ### Roadmap Evolution
 
+- **2026-01-16:** Phase 20 added after Phase 18.3: "Affichage Contacts Multiples Entreprises" (ADDED)
+  - Reason: Contacts multiples (client_contacts table) ne s'affichent pas dans les listes clients
+  - Impact: Entreprises avec 4-6 contacts invisibles dans Table/Grid/Kanban views
+  - Discovery: Testing with real data (Mélodie Productions SAS, Midnight Groove Collective)
+  - Solution: Enrichir les 3 vues pour afficher nombre de contacts + liste noms + contact principal
+  - Priority: UX enhancement - contacts invisibles depuis Phase 3.9.4 implementation
 - **2026-01-16:** Phase 18.3 inserted after Phase 18.2: "Database Reset for Testing Environment" (URGENT) - Complete clean reset to unblock Phase 18-02 manual testing after database chaos
 - **2026-01-05:** Milestone v4.0 created: Workflow Commercial Complet, 8 phases (Phase 10-17)
   - Features: Système de Devis complet, Tasks Chronométrées, Architecture Session/Project Flexible, Facturation Automatique Temps Réel
@@ -406,24 +417,26 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-16T23:56:27Z
-Stopped at: Phase 19-04 COMPLETE ✅ - Responsive testing and visual polish
+Last session: 2026-01-17T02:05:58Z
+Stopped at: Phase 20-01 COMPLETE ✅ - Multiple contacts display implementation
 Resume context:
-  - Phase 19 COMPLETE ✅: All client views (Table/Grid/Kanban) tested and validated
-    - **Phase 19-04 Accomplishments:**
-      - ✅ Responsive testing: 5 breakpoints validated (1920px → 375px)
-      - ✅ Avatar fallback verified: getInitials() working for 5 test clients (JL, MD, PS, SM, TB)
-      - ✅ Visual polish complete: hover states, icon sizing, spacing, color coding
-      - ✅ TypeScript 0 errors: pnpm check passed
-      - ✅ User approval obtained: Manual testing with MCP Chrome DevTools
-      - ✅ Documentation created: RESPONSIVE-TESTING-RESULTS.md, AVATAR-FALLBACK-TEST.md, VISUAL-POLISH-VERIFICATION.md
-    - **Additional enhancements:**
-      - Email display added to Grid view (commit 767c0b7)
-      - Type badge moved to separate line in Grid view (commit fe9338d)
+  - Phase 20 COMPLETE ✅: Multiple contacts from client_contacts table now visible across all client views
+    - **Phase 20-01 Accomplishments:**
+      - ✅ Backend extended: contactsCount via LEFT JOIN COUNT(DISTINCT clientContacts.id)
+      - ✅ Table view: "X contact(s)" badge for companies with contacts
+      - ✅ Grid view: Contact count badge below type badge
+      - ✅ Kanban view: Full contact list with name, title, email, phone
+      - ✅ Primary contact marked with ⭐ icon and sorted first
+      - ✅ Copy-to-clipboard: Email and phone copy buttons with toast feedback
+      - ✅ Performance: Batch contact loading only when Kanban view active
+      - ✅ TypeScript 0 errors, production build succeeds
+      - ✅ Duration: 3 minutes (3 tasks, 2 files, 3 atomic commits)
     - **Files modified:**
-      - packages/client/src/pages/Clients.tsx (email + badge repositioning)
-      - .planning/phases/19-differencier-vues-grid-kanban-clients/19-04-SUMMARY.md
+      - packages/server/src/routers/clients.ts (contactsCount query)
+      - packages/client/src/pages/Clients.tsx (badges + Kanban contacts section)
+      - .planning/phases/20-affichage-contacts-multiples-entreprises/20-01-SUMMARY.md
   - **Next:** Phase 18-02 - Manual UI validation (resumed after database reset)
-    - Test all 45+ pages systematically
+    - Test all 45+ pages systematically including new contact display features
+    - Verify contact functionality with Organization 16 test data
     - Document any UI issues or inconsistencies
     - Validate responsive behavior and dark mode
