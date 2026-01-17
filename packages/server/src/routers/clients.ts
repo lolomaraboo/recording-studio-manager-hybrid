@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { eq, desc, sql, inArray } from 'drizzle-orm';
+import { eq, desc, sql, inArray, asc } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
-import { clients, clientNotes, clientContacts } from '@rsm/database/tenant';
+import { clients, clientNotes, clientContacts, companyMembers } from '@rsm/database/tenant';
 import { clientToVCard, parseVCardFile } from '../utils/vcard-service';
 import { clientsToExcel, excelToClients, generateExcelTemplate } from '../utils/excel-service';
 import { clientsToCSV, csvToClients } from '../utils/csv-service';
@@ -36,7 +36,7 @@ export const clientsRouter = router({
       const tenantDb = await ctx.getTenantDb();
       const { limit = 50, offset = 0 } = input || {};
 
-      // Get clients with notes metadata and contacts count
+      // Get clients with notes metadata and members count
       const clientsList = await tenantDb
         .select({
           id: clients.id,
@@ -59,11 +59,11 @@ export const clientsRouter = router({
           updatedAt: clients.updatedAt,
           notesCount: sql<number>`CAST(COUNT(DISTINCT ${clientNotes.id}) AS INTEGER)`,
           lastNoteDate: sql<Date | null>`MAX(${clientNotes.createdAt})`,
-          contactsCount: sql<number>`CAST(COUNT(DISTINCT ${clientContacts.id}) AS INTEGER)`,
+          contactsCount: sql<number>`CAST(COUNT(DISTINCT ${companyMembers.id}) AS INTEGER)`,
         })
         .from(clients)
         .leftJoin(clientNotes, eq(clients.id, clientNotes.clientId))
-        .leftJoin(clientContacts, eq(clients.id, clientContacts.clientId))
+        .leftJoin(companyMembers, eq(clients.id, companyMembers.companyClientId))
         .groupBy(clients.id)
         .limit(limit)
         .offset(offset);
@@ -102,6 +102,43 @@ export const clientsRouter = router({
         ...client,
         clientNotes: recentNotes,
       };
+    }),
+
+  /**
+   * Get members of a company (many-to-many)
+   * Returns individual clients linked to this company via company_members table
+   */
+  getMembers: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get all members linked to this company
+      const members = await tenantDb
+        .select({
+          id: companyMembers.id,
+          role: companyMembers.role,
+          isPrimary: companyMembers.isPrimary,
+          member: {
+            id: clients.id,
+            name: clients.name,
+            firstName: clients.firstName,
+            lastName: clients.lastName,
+            email: clients.email,
+            phone: clients.phone,
+            avatarUrl: clients.avatarUrl,
+          },
+        })
+        .from(companyMembers)
+        .innerJoin(clients, eq(companyMembers.memberClientId, clients.id))
+        .where(eq(companyMembers.companyClientId, input.companyId))
+        .orderBy(
+          desc(companyMembers.isPrimary),
+          asc(clients.lastName),
+          asc(clients.name)
+        );
+
+      return members;
     }),
 
   /**
