@@ -893,6 +893,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 17. Facturation Auto - Stripe UI | v4.0 | 7/7 | ✅ Complete | 2026-01-15 |
 | **v4.1 - Quality Assurance (IN PROGRESS)** | | | | |
 | 18. Audit Complet Toutes Pages | v4.1 | 0/3 | ⏳ Planning | - |
+| 20. Affichage Contacts Multiples | v4.1 | 0/1 | ⏳ Planned | - |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -1270,7 +1271,7 @@ Plans:
 
 **Research**: Unlikely (standard Drizzle migration generation + application)
 
-**Plans**: 0 plans
+**Plans**: 1 plan
 
 Plans:
 - [ ] TBD (run /gsd:plan-phase 18.2 to break down)
@@ -1370,6 +1371,47 @@ Plans:
 **Rationale**: URGENT - Phase 18-02 manual testing completely blocked by database configuration chaos. User spent entire previous session debugging database instead of testing pages. Clean reset is fastest path to working environment. Since no production customers yet, safe to wipe and rebuild local development database.
 
 ---
+
+### Phase 20: Affichage Contacts Multiples Entreprises
+
+**Goal**: Afficher les contacts multiples (client_contacts) dans les vues Table/Grid/Kanban pour les entreprises et groupes
+
+**Depends on**: Phase 18.3 (database reset complete)
+
+**Research**: Unlikely (UI enhancement using existing component patterns)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 20-01-PLAN.md — Display multiple contacts in Table/Grid/Kanban views
+
+**Status**: Not started
+
+**Details**:
+
+**Problem Discovered:**
+Les contacts créés via la table `client_contacts` (pour les entreprises de type "company") ne s'affichent pas dans la liste des clients. Actuellement seules les informations du client principal (table `clients`) sont visibles.
+
+**Impact:**
+- Les entreprises comme "Mélodie Productions SAS" (4 contacts) ne montrent pas leurs contacts
+- Les groupes musicaux comme "Midnight Groove Collective" (6 musiciens) ne montrent pas leurs membres
+- Impossible de voir qui contacter dans une entreprise depuis la liste clients
+
+**Solution Requise:**
+Enrichir les trois vues clients (Table/Grid/Kanban) pour afficher:
+- Le nombre de contacts associés (ex: "4 contacts")
+- Liste des noms des contacts (ex: "Philippe Moreau, Sophie Laurent, ...")
+- Indicateur visuel du contact principal (is_primary)
+
+**Success Criteria:**
+- [ ] Table view affiche le nombre de contacts
+- [ ] Grid view affiche les contacts avec leur rôle
+- [ ] Kanban view affiche la liste complète des contacts
+- [ ] Contact principal identifié visuellement
+- [ ] Cliquable pour voir le détail complet
+
+**Rationale**: Phase 3.9.4 a ajouté le support des contacts multiples (client_contacts) mais l'UI n'a jamais été mise à jour pour les afficher dans les listes. Actuellement les contacts sont invisibles sauf sur la page de détail du client. Problème découvert lors de tests avec données réelles (entreprises avec 4-6 contacts).
+
 
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
