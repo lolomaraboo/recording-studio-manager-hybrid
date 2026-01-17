@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 21 of 21 (Audit et Correction Scripts Base de Données)
-Plan: 21-01 of 1 - Phase 21-01 COMPLETE ✅
-Status: Phase 21-01 complete - Database scripts audit: 5 working, 3 partial, 5 obsolete (38% obsolete validates increment tenant pattern)
-Last activity: 2026-01-17 - Phase 21-01 complete, audit-report.md (632 lines), README.md updated, all 13 scripts audited against current schema (7 master + 31 tenant tables)
+Plan: 21-02 of 2 - Phase 21-02 COMPLETE ✅
+Status: Phase 21 complete - Init scripts created (create-tenant auto-increment + validation, seed-base-data 20 records, seed-realistic-data 60-78 records faker.js)
+Last activity: 2026-01-17 - Phase 21-02 complete, 3 init scripts created (1532 lines), @faker-js/faker installed, INTERVAL workarounds for postgres.js, table count validation prevents silent migration failures
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 1/1 plans (21-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 2/2 plans (21-01 ✅, 21-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 84
-- Average duration: 36.2 min
-- Total execution time: 50.8 hours
+- Total plans completed: 85
+- Average duration: 35.8 min
+- Total execution time: 50.9 hours
 
 **By Phase:**
 
@@ -79,11 +79,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 19 | 4/4 | 11 min | 2.8 min |
 | 20 | 1/1 | 3 min | 3 min |
 | 20.1 | 2/2 | 15 min | 7.5 min |
-| 21 | 1/1 | 6 min | 6 min |
+| 21 | 2/2 | 16 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: [3 min, 3 min, 11 min, 4 min, 6 min]
-- Trend: Phase 21-01 COMPLETE (6 min). Database scripts audit: 13 scripts audited, 5 working (38%), 3 partial (23%), 5 obsolete (38%). FIX category 100% obsolete validates "increment tenant number" pattern success. Evidence: Phase 18 wasted 80+ min debugging migrations.
+- Last 5 plans: [3 min, 11 min, 4 min, 6 min, 10 min]
+- Trend: Phase 21-02 COMPLETE (10 min). Init scripts created: create-tenant (auto-increment + validation), seed-base-data (20 records), seed-realistic-data (60-78 records faker.js). INTERVAL workarounds for postgres.js. Table count validation prevents silent migration failures.
 
 ## Accumulated Context
 
@@ -435,10 +435,10 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-17T07:34:20Z
-Stopped at: Phase 21-01 COMPLETE ✅ - Database scripts audit complete
+Last session: 2026-01-17T08:42:26Z
+Stopped at: Phase 21-02 COMPLETE ✅ - Init scripts creation complete
 Resume context:
-  - Phase 21-01 COMPLETE ✅: Database Scripts Audit (6 min)
+  - Phase 21-02 COMPLETE ✅: Init Scripts Creation (10 min)
     - **Accomplishments:**
       - ✅ Audited all 13 scripts against current schema (7 master + 31 tenant tables)
       - ✅ Status: 5 WORKING (38%), 3 PARTIAL (23%), 5 OBSOLETE (38%)
