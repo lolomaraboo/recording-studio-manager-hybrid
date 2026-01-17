@@ -120,12 +120,12 @@ export function Clients() {
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
 
-  // Load ALL company members (Kanban view only)
+  // Load ALL company members (Kanban and Table views)
   // Single query prevents React Hooks violation
   // Filtered client-side by companyId in render
   const allMembersQuery = trpc.clients.getAllMembers.useQuery(
     undefined,
-    { enabled: viewMode === 'kanban' }
+    { enabled: viewMode === 'kanban' || viewMode === 'table' }
   );
 
   // Load companies for contacts (for Type column badge)
@@ -147,6 +147,24 @@ export function Clients() {
 
     return map;
   }, [companiesForContacts]);
+
+  // Map companyId → contacts[] for Contact column tooltip
+  const contactsByCompany = useMemo(() => {
+    const map = new Map<number, { memberName: string; role: string | null; isPrimary: boolean }[]>();
+
+    allMembersQuery.data?.forEach(m => {
+      if (!map.has(m.companyId)) {
+        map.set(m.companyId, []);
+      }
+      map.get(m.companyId)!.push({
+        memberName: m.memberName,
+        role: m.role,
+        isPrimary: m.isPrimary
+      });
+    });
+
+    return map;
+  }, [allMembersQuery.data]);
 
   // Export mutations
   const exportVCard = trpc.clients.exportVCard.useMutation();
@@ -485,19 +503,7 @@ export function Clients() {
                             )}
                           </div>
                         </TableHead>
-                        <TableHead
-                          className="cursor-pointer hover:bg-accent"
-                          onClick={() => handleSort('type')}
-                        >
-                          <div className="flex items-center justify-start gap-1 whitespace-nowrap">
-                            Contact
-                            {sortField === 'type' ? (
-                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
-                            ) : (
-                              <ArrowUpDown className="h-3 w-3 opacity-30" />
-                            )}
-                          </div>
-                        </TableHead>
+                        <TableHead>Contact</TableHead>
                         <TableHead>Email / Téléphone</TableHead>
                         <TableHead
                           className="cursor-pointer hover:bg-accent"
@@ -568,9 +574,26 @@ export function Clients() {
                               />
                             ) : (
                               client.contactsCount > 0 && (
-                                <Badge variant="outline">
-                                  {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
-                                </Badge>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Badge variant="outline" className="cursor-help">
+                                        {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="space-y-1">
+                                        {contactsByCompany.get(client.id)?.map((contact, idx) => (
+                                          <div key={idx} className="flex items-center gap-1 text-sm">
+                                            {contact.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                                            <span>{contact.memberName}</span>
+                                            {contact.role && <span className="text-muted-foreground">- {contact.role}</span>}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )
                             )}
                           </TableCell>
