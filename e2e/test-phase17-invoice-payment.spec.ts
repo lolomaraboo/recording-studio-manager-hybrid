@@ -1,43 +1,44 @@
 import { test, expect } from '@playwright/test';
 import bcrypt from 'bcrypt';
 import { execSync } from 'child_process';
-import crypto from 'crypto';
 
 /**
  * Phase 17 UAT: Invoice Payment Flow End-to-End Test
  *
  * Tests:
- * 1. Client Portal login
- * 2. Invoice list page display
- * 3. Invoice detail page with line items
- * 4. PDF download button
- * 5. Pay Now button (Stripe Checkout redirect)
- * 6. Success/Cancel pages
+ * 1. Client Portal login with real endpoint
+ * 2. Session persistence across page refresh
+ * 3. Invoice list page display
+ * 4. Invoice detail page with line items
+ * 5. PDF download button
+ * 6. Pay Now button (Stripe Checkout redirect)
+ * 7. Success/Cancel pages
  */
 
 // Test credentials (creates its own client+account in beforeAll)
 const TEST_CLIENT_EMAIL = 'phase17-e2e@test.local';
 const TEST_CLIENT_PASSWORD = 'TestPass123!';
 
-// Test session data (created in beforeAll)
-let TEST_SESSION_TOKEN = '';
+// Test client ID (created in beforeAll)
 let TEST_CLIENT_ID = 0;
 
 test.describe.configure({ mode: 'serial' }); // Run tests sequentially (share same test data)
 
 /**
- * Helper function to inject session token into localStorage (workaround for broken login endpoint)
+ * Helper function to login to Client Portal using real login endpoint
  */
-async function injectSessionToken(page: any) {
+async function loginToClientPortal(page: any) {
   await page.goto('http://localhost:5174/client-portal/login');
-  await page.evaluate((data: any) => {
-    localStorage.setItem('client_portal_session_token', data.token);
-    localStorage.setItem('client_portal_client_data', JSON.stringify({
-      id: data.clientId,
-      name: 'Phase 17 E2E Test Client',
-      email: data.email,
-    }));
-  }, { token: TEST_SESSION_TOKEN, clientId: TEST_CLIENT_ID, email: TEST_CLIENT_EMAIL });
+
+  // Fill in login form
+  await page.fill('input[type="email"]', TEST_CLIENT_EMAIL);
+  await page.fill('input[type="password"]', TEST_CLIENT_PASSWORD);
+
+  // Submit form
+  await page.click('button[type="submit"]');
+
+  // Wait for redirect to dashboard
+  await page.waitForURL(/\/client-portal\/?$/, { timeout: 10000 });
 }
 
 // Helper function to execute psql commands with Homebrew PostgreSQL
@@ -90,18 +91,6 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
 
       console.log('✅ Portal account ready');
 
-      // Create session manually (direct DB insert for E2E testing)
-      // Generate secure token (same as backend generateSecureToken())
-      TEST_SESSION_TOKEN = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-      psqlExec(`
-        INSERT INTO client_portal_sessions (client_id, token, expires_at, ip_address, user_agent)
-        VALUES (${clientId}, '${TEST_SESSION_TOKEN}', '${expiresAt.toISOString()}', '127.0.0.1', 'Playwright E2E Test');
-      `);
-
-      console.log('✅ Session created manually (token:', TEST_SESSION_TOKEN.substring(0, 8) + '...)');
-
       // Create invoice
       const invoiceNumber = `E2E-${Date.now()}`;
 
@@ -139,17 +128,44 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
   });
 
   test('should login to Client Portal successfully', async ({ page }) => {
-    // Inject session token
-    await injectSessionToken(page);
+    // Login using real login endpoint
+    await loginToClientPortal(page);
 
-    // Navigate to client portal (should not redirect to login)
-    await page.goto('http://localhost:5174/client-portal');
+    // Verify we're at dashboard (NOT redirected to /login)
+    expect(page.url()).toMatch(/\/client-portal\/?$/);
 
-    // Verify we're logged in (NOT redirected to /login)
+    console.log('✅ Test 1: Login successful via real endpoint');
+  });
+
+  test('should persist session across page refresh', async ({ page, context }) => {
+    // Login
+    await loginToClientPortal(page);
+
+    // Verify session cookie exists
+    const cookies = await context.cookies();
+    const sessionCookie = cookies.find(c => c.name === 'connect.sid');
+    expect(sessionCookie).toBeDefined();
+    expect(sessionCookie?.httpOnly).toBe(true);
+
+    // Refresh page
+    await page.reload();
+
+    // Should still be logged in (me query validates session cookie)
     await page.waitForURL(/\/client-portal\/?$/, { timeout: 5000 });
     expect(page.url()).toMatch(/\/client-portal/);
 
-    console.log('✅ Test 1: Login successful (token injected)');
+    // Verify NO localStorage usage
+    const localStorage = await page.evaluate(() => {
+      return {
+        sessionToken: window.localStorage.getItem('client_portal_session_token'),
+        clientData: window.localStorage.getItem('client_portal_client_data'),
+      };
+    });
+
+    expect(localStorage.sessionToken).toBeNull();
+    expect(localStorage.clientData).toBeNull();
+
+    console.log('✅ Test 2: Session persists across refresh (no localStorage)');
   });
 
   test('should display invoice list with status badges', async ({ page }) => {
@@ -167,7 +183,7 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     });
 
     // Inject session token
-    await injectSessionToken(page);
+    await loginToClientPortal(page);
 
     // Navigate to invoices
     await page.goto('http://localhost:5174/client-portal/invoices');
@@ -194,12 +210,12 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
       console.log('🐛 Console errors:', consoleErrors);
     }
 
-    console.log('✅ Test 2: Invoice list displays correctly');
+    console.log('✅ Test 3: Invoice list displays correctly');
   });
 
   test('should navigate to invoice detail and show line items', async ({ page }) => {
-    // Inject session token
-    await injectSessionToken(page);
+    // Login first
+    await loginToClientPortal(page);
 
     // Go to invoices list
     await page.goto('http://localhost:5174/client-portal/invoices');
@@ -227,12 +243,12 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
 
     expect(hasDownloadButton || hasPayButton).toBeTruthy();
 
-    console.log('✅ Test 3: Invoice detail page works');
+    console.log('✅ Test 4: Invoice detail page works');
   });
 
   test('should show Pay Now button for SENT invoices', async ({ page }) => {
-    // Inject session token
-    await injectSessionToken(page);
+    // Login first
+    await loginToClientPortal(page);
 
     await page.goto('http://localhost:5174/client-portal/invoices');
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
@@ -252,15 +268,15 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
 
       expect(isVisible).toBeTruthy();
 
-      console.log('✅ Test 4: Pay Now button displayed for SENT invoice');
+      console.log('✅ Test 5: Pay Now button displayed for SENT invoice');
     } else {
-      console.log('⚠️ Test 4 skipped: No SENT invoice found');
+      console.log('⚠️ Test 5 skipped: No SENT invoice found');
     }
   });
 
   test('should have Download PDF button', async ({ page }) => {
-    // Inject session token
-    await injectSessionToken(page);
+    // Login first
+    await loginToClientPortal(page);
 
     await page.goto('http://localhost:5174/client-portal/invoices');
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
@@ -277,13 +293,13 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
 
     expect(exists).toBeGreaterThan(0);
 
-    console.log('✅ Test 5: Download PDF button exists');
+    console.log('✅ Test 6: Download PDF button exists');
   });
 
   test('should redirect to Stripe Checkout when Pay Now clicked', async ({ page }) => {
     // This test verifies the redirect happens, but doesn't complete payment
-    // Inject session token
-    await injectSessionToken(page);
+    // Login first
+    await loginToClientPortal(page);
 
     await page.goto('http://localhost:5174/client-portal/invoices');
     await page.waitForSelector('text=My Invoices', { timeout: 5000 });
@@ -312,18 +328,18 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
         console.log('Current URL after Pay Now:', currentUrl);
 
         // With fake Stripe keys, this will likely error out, but the click should work
-        console.log('✅ Test 6: Pay Now button clickable (Stripe redirect attempted)');
+        console.log('✅ Test 7: Pay Now button clickable (Stripe redirect attempted)');
       } else {
-        console.log('⚠️ Test 6 skipped: Pay Now button not visible');
+        console.log('⚠️ Test 7 skipped: Pay Now button not visible');
       }
     } else {
-      console.log('⚠️ Test 6 skipped: No SENT invoice found');
+      console.log('⚠️ Test 7 skipped: No SENT invoice found');
     }
   });
 
   test('should display success page route', async ({ page }) => {
-    // Inject session token
-    await injectSessionToken(page);
+    // Login first
+    await loginToClientPortal(page);
 
     // Navigate to success page (simulates Stripe redirect back)
     await page.goto('http://localhost:5174/client-portal/invoices/success?session_id=test_session_123');
@@ -335,12 +351,12 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     const url = page.url();
     expect(url).toContain('/client-portal/invoices/success');
 
-    console.log('✅ Test 7: Success page route accessible after login');
+    console.log('✅ Test 8: Success page route accessible after login');
   });
 
   test('should display cancel page route', async ({ page }) => {
-    // Inject session token
-    await injectSessionToken(page);
+    // Login first
+    await loginToClientPortal(page);
 
     // Navigate to cancel page
     await page.goto('http://localhost:5174/client-portal/invoices/canceled');
@@ -352,6 +368,6 @@ test.describe('Phase 17: Invoice Payment Flow', () => {
     const url = page.url();
     expect(url).toContain('/client-portal/invoices/canceled');
 
-    console.log('✅ Test 8: Cancel page route accessible after login');
+    console.log('✅ Test 9: Cancel page route accessible after login');
   });
 });
