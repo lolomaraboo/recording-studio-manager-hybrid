@@ -92,6 +92,23 @@ export type ClientContact = typeof clientContacts.$inferSelect;
 export type InsertClientContact = typeof clientContacts.$inferInsert;
 
 /**
+ * Company Members table (Tenant DB)
+ * Many-to-many relationship between company clients and individual clients
+ */
+export const companyMembers = pgTable("company_members", {
+  id: serial("id").primaryKey(),
+  companyClientId: integer("company_client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  memberClientId: integer("member_client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 255 }), // e.g., "Directeur Général", "Lead Vocalist"
+  isPrimary: boolean("is_primary").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type CompanyMember = typeof companyMembers.$inferSelect;
+export type InsertCompanyMember = typeof companyMembers.$inferInsert;
+
+/**
  * Rooms table (Tenant DB)
  * Studio rooms/spaces for recording, mixing, mastering, etc.
  */
