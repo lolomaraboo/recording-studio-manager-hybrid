@@ -142,6 +142,35 @@ export const clientsRouter = router({
     }),
 
   /**
+   * Get ALL company members for current organization
+   * Used by Kanban view to load all members in single query (prevents React Hooks violation)
+   * Returns flattened structure for efficient client-side filtering
+   */
+  getAllMembers: protectedProcedure.query(async ({ ctx }) => {
+    const tenantDb = await ctx.getTenantDb();
+
+    const memberships = await tenantDb
+      .select({
+        companyId: companyMembers.companyClientId,
+        memberId: companyMembers.memberClientId,
+        isPrimary: companyMembers.isPrimary,
+        role: companyMembers.role,
+        memberName: clients.name,
+        memberEmail: clients.email,
+        memberPhone: clients.phone,
+      })
+      .from(companyMembers)
+      .innerJoin(clients, eq(companyMembers.memberClientId, clients.id))
+      .orderBy(
+        desc(companyMembers.isPrimary),
+        asc(clients.lastName),
+        asc(clients.name)
+      );
+
+    return memberships;
+  }),
+
+  /**
    * Create new client
    */
   create: protectedProcedure

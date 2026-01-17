@@ -62,17 +62,13 @@ export function Clients() {
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
 
-  // Load company members for Kanban view
-  // Only enabled when:
-  // - viewMode is 'kanban'
-  // - client is a company
-  // - client has contacts
-  const getCompanyMembers = (clientId: number, enabled: boolean) => {
-    return trpc.clients.getMembers.useQuery(
-      { companyId: clientId },
-      { enabled }
-    );
-  };
+  // Load ALL company members (Kanban view only)
+  // Single query prevents React Hooks violation
+  // Filtered client-side by companyId in render
+  const allMembersQuery = trpc.clients.getAllMembers.useQuery(
+    undefined,
+    { enabled: viewMode === 'kanban' }
+  );
 
   // Export mutations
   const exportVCard = trpc.clients.exportVCard.useMutation();
@@ -924,12 +920,14 @@ export function Clients() {
 
                                   {/* Company members list (Kanban view) */}
                                   {(() => {
-                                    const { data: members } = getCompanyMembers(
-                                      client.id,
-                                      viewMode === 'kanban' && client.type === 'company' && (client.contactsCount ?? 0) > 0
-                                    );
+                                    // Filter members for this company (client-side)
+                                    const members = allMembersQuery.data?.filter(
+                                      m => m.companyId === client.id
+                                    ) || [];
 
-                                    if (!members || members.length === 0) return null;
+                                    if (viewMode !== 'kanban' || client.type !== 'company' || members.length === 0) {
+                                      return null;
+                                    }
 
                                     return (
                                       <div className="border-t pt-2 space-y-1">
@@ -938,15 +936,15 @@ export function Clients() {
                                         </div>
                                         {members.map((m) => (
                                           <Link
-                                            to={`/clients/${m.member.id}`}
-                                            key={m.member.id}
+                                            to={`/clients/${m.memberId}`}
+                                            key={m.memberId}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <div className="flex items-center gap-1 text-xs hover:bg-accent p-1 rounded transition-colors">
                                               {m.isPrimary && (
                                                 <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                                               )}
-                                              <span className="font-medium truncate">{m.member.name}</span>
+                                              <span className="font-medium truncate">{m.memberName}</span>
                                               {m.role && (
                                                 <span className="text-muted-foreground truncate">- {m.role}</span>
                                               )}
