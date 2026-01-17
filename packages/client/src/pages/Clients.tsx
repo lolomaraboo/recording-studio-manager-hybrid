@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -112,9 +112,18 @@ export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importFormat, setImportFormat] = useState<'vcard' | 'excel' | 'csv'>('vcard');
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    // Restore view mode from localStorage
+    const saved = localStorage.getItem('clientsViewMode');
+    return (saved as ViewMode) || 'table';
+  });
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+  // Save view mode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('clientsViewMode', viewMode);
+  }, [viewMode]);
 
   const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
