@@ -1480,6 +1480,48 @@ packages/database/scripts/
 
 **Rationale**: Database scripts written before Phases 10-17 are incompatible with current schema (30+ tenant tables vs ~15 when scripts created). Multiple bugs traced to schema mismatches. Systematic audit prevents future "broken database" sessions. DEVELOPMENT-WORKFLOW.md recommends "increment tenant number" but scripts must still work for fresh tenant creation.
 
+---
+
+### Phase 21.1: Fix Client Portal Authentication Persistence (INSERTED)
+
+**Goal**: Fix critical authentication bug where Client Portal session is not persisted after login, causing E2E tests to fail (6/8 failing)
+
+**Depends on**: Phase 21 (database scripts audit complete)
+
+**Research**: Likely (Client Portal authentication system, session persistence, ProtectedClientRoute investigation)
+
+**Research topics**:
+- Client Portal authentication flow (login → session → redirect)
+- Session cookie configuration for client portal subdomain
+- ProtectedClientRoute implementation and auth context
+- localStorage vs cookie persistence for client sessions
+- Comparison with Admin auth (working) vs Client Portal auth (failing)
+
+**Plans**: 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 21.1 to break down)
+
+**Details**:
+[To be added during planning]
+
+**Problem Description:**
+- **Symptoms**: E2E tests 6/8 failing, Client Portal login appears successful but session not persisted
+- **Impact**: Clients cannot maintain authenticated session in production
+- **Blocker**: Phase 17 UAT validation blocked, production client portal unusable
+- **Root Cause**: Unknown - requires investigation of ProtectedClientRoute, session cookies, auth context persistence
+- **Decision Reference**: Phase 17-FIX (Rule 4 architectural boundary - stopped at auth system modification)
+
+**Success Criteria:**
+- [ ] Client Portal login persists session across page refreshes
+- [ ] ProtectedClientRoute correctly validates authenticated state
+- [ ] E2E tests pass (8/8 tests green)
+- [ ] Session cookies properly configured for client portal
+- [ ] No regressions in Admin Dashboard authentication
+
+**Rationale**: URGENT BLOCKER discovered during Phase 17 UAT testing. Client Portal authentication completely broken - users can login but session immediately lost on navigation/refresh. Affects real production clients trying to pay invoices. Must fix before any marketing launch (Phase 4-8) as client portal is core product feature. GSD Rule 4 previously deferred this fix to avoid expanding Phase 17 scope, but now requires dedicated phase.
+
+---
 
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
