@@ -62,6 +62,18 @@ export function Clients() {
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
 
+  // Load company members for Kanban view
+  // Only enabled when:
+  // - viewMode is 'kanban'
+  // - client is a company
+  // - client has contacts
+  const getCompanyMembers = (clientId: number, enabled: boolean) => {
+    return trpc.clients.getMembers.useQuery(
+      { companyId: clientId },
+      { enabled }
+    );
+  };
+
   // Export mutations
   const exportVCard = trpc.clients.exportVCard.useMutation();
   const exportExcel = trpc.clients.exportExcel.useMutation();
@@ -910,14 +922,40 @@ export function Clients() {
                                     </div>
                                   )}
 
-                                  {/* Contact count badge for companies (Kanban view) */}
-                                  {client.type === 'company' && client.contactsCount > 0 && (
-                                    <div className="border-t pt-2">
-                                      <Badge variant="outline" className="text-xs">
-                                        {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
-                                      </Badge>
-                                    </div>
-                                  )}
+                                  {/* Company members list (Kanban view) */}
+                                  {(() => {
+                                    const { data: members } = getCompanyMembers(
+                                      client.id,
+                                      viewMode === 'kanban' && client.type === 'company' && (client.contactsCount ?? 0) > 0
+                                    );
+
+                                    if (!members || members.length === 0) return null;
+
+                                    return (
+                                      <div className="border-t pt-2 space-y-1">
+                                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                                          Contacts ({members.length})
+                                        </div>
+                                        {members.map((m) => (
+                                          <Link
+                                            to={`/clients/${m.member.id}`}
+                                            key={m.member.id}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className="flex items-center gap-1 text-xs hover:bg-accent p-1 rounded transition-colors">
+                                              {m.isPrimary && (
+                                                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                              )}
+                                              <span className="font-medium truncate">{m.member.name}</span>
+                                              {m.role && (
+                                                <span className="text-muted-foreground truncate">- {m.role}</span>
+                                              )}
+                                            </div>
+                                          </Link>
+                                        ))}
+                                      </div>
+                                    );
+                                  })()}
 
                                   {/* Action button - more descriptive */}
                                   <Button
