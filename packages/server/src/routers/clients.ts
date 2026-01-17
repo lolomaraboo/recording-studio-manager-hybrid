@@ -247,6 +247,7 @@ export const clientsRouter = router({
 
       // Map ALL provided fields (no exclusions)
       const clientData: any = {
+        userId: null, // Explicitly set to null (no default in schema)
         name: input.name,
         type: input.type || 'individual',
       };
