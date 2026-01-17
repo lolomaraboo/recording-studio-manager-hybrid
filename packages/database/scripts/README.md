@@ -1,12 +1,65 @@
-# Database Migration Deployment Scripts
+# Database Scripts
 
-Automated scripts for deploying Drizzle migrations to Database-per-Tenant architecture.
+Automated scripts for database management in Database-per-Tenant architecture.
+
+## ⚠️ Phase 21 Audit Results (2026-01-17)
+
+**CRITICAL:** Many scripts are **obsolete** due to schema evolution (Phases 10-20 added 16 tables).
+
+**Script Status:**
+- ✅ **5 scripts WORKING** (38%) - deploy-master.sh, deploy-tenants.sh, create-tenant-3.ts, create-test-studio-user.sql, validate-ui-complete.sh
+- ⚠️ **3 scripts PARTIAL** (23%) - seed-tenant-3.ts, migrate-status.sh, setup-test-studio-ui.sql
+- ❌ **5 scripts OBSOLETE** (38%) - init-tenant.ts, add-new-tenant-tables.sql, fix-*.sql, add-company-with-contacts.sql
+
+**Recommended Actions:**
+1. ✅ **USE** working scripts for production deployments
+2. ⚠️ **UPDATE** partial scripts before use (see audit-report.md)
+3. ❌ **DO NOT USE** obsolete scripts (archived or deprecated)
+
+📊 **Full Audit Report:** [audit-report.md](./audit-report.md)
+
+---
 
 ## 📋 Overview
 
-This directory contains shell scripts for deploying and managing database migrations across:
-- **Master Database** (rsm_master): Platform-level tables (users, organizations, tenants)
-- **Tenant Databases** (tenant_1, tenant_2, tenant_3): Business logic tables per organization
+This directory contains scripts for deploying and managing database migrations across:
+- **Master Database** (rsm_master): Platform-level tables (users, organizations, tenants, subscription_plans, ai_credits)
+- **Tenant Databases** (tenant_N): Business logic tables per organization (clients, sessions, projects, invoices, etc.)
+
+## 🎯 Current Best Practices (Post-Audit)
+
+**Development Tenant Creation:**
+- ✅ **DO:** Use `create-tenant-3.ts` pattern (apply all migrations to fresh database)
+- ✅ **DO:** Follow "increment tenant number" pattern from [DEVELOPMENT-WORKFLOW.md](../../../.planning/DEVELOPMENT-WORKFLOW.md)
+- ❌ **DON'T:** Use `init-tenant.ts` (migration-based approach causes issues)
+- ❌ **DON'T:** Create fix scripts for schema mismatches (increment tenant number instead)
+
+**Test Data:**
+- ✅ **DO:** Use `create-test-studio-user.sql` for master DB users
+- ⚠️ **CAUTION:** `seed-tenant-3.ts` missing vCard fields (update before use)
+- ⚠️ **CAUTION:** `setup-test-studio-ui.sql` missing 16 tables (outdated)
+- ❌ **DON'T:** Use `add-company-with-contacts.sql` (uses deprecated `client_contacts` table)
+
+**Production Deployment:**
+- ✅ **DO:** Use `deploy-master.sh` and `deploy-tenants.sh` (production-ready)
+- ✅ **DO:** Test on staging first
+- ✅ **DO:** Backup before deployment
+
+**Monitoring:**
+- ✅ **DO:** Use `migrate-status.sh` for quick status check
+- ⚠️ **NOTE:** Expects 6 master / 15 tenant tables (actual: 7 / 31)
+
+**Recommended Development Pattern:**
+```bash
+# Schema changed or tenant broken? Create NEW tenant
+createdb tenant_4  # Or tenant_5, tenant_6, etc.
+cd packages/database
+DATABASE_URL="postgresql://postgres@localhost:5432/tenant_4" \
+  pnpm exec drizzle-kit push --config=drizzle.tenant.config.ts
+# Fresh schema in 30 seconds vs 2-3 hours debugging
+```
+
+---
 
 ## 🚀 Scripts
 
@@ -30,9 +83,11 @@ Check migration status across all databases.
 
 **Output:**
 - Connection status for each database
-- Table counts (master: 6, tenant: 15)
-- Foreign key counts (master: 6, tenant: 21)
+- Table counts (master: 7, tenant: 31) ⚠️ **Note:** Script expects 6/15 (outdated)
+- Foreign key counts
 - Migration status (applied, partial, or empty)
+
+⚠️ **Known Issue:** Expected counts hardcoded to Phase 10 values (6 master, 15 tenant). See [audit-report.md](./audit-report.md) for details.
 
 ---
 
@@ -65,8 +120,8 @@ DATABASE_URL="postgresql://..." ./deploy-master.sh
 - Color-coded output
 
 **Expected Result:**
-- 6 tables created
-- 6 foreign key constraints applied
+- 7 tables created (users, organizations, tenant_databases, organization_members, invitations, subscription_plans, ai_credits)
+- ~8 foreign key constraints applied
 
 ---
 
@@ -102,8 +157,8 @@ Deploy migrations to multiple tenant databases.
 - Failed tenant list
 
 **Expected Result per Tenant:**
-- 15 tables created
-- 21 foreign key constraints applied
+- 31 tables created (clients, sessions, projects, invoices, tracks, quotes, time_entries, client_portal_*, etc.)
+- ~45 foreign key constraints applied
 
 ---
 
@@ -211,51 +266,76 @@ psql postgresql://postgres:password@localhost:5432/postgres -c "CREATE DATABASE 
 
 ---
 
-## 📊 Expected Schema
+## 📊 Current Schema (Phase 21)
 
-### Master Database (6 tables)
+### Master Database (7 tables)
 
 ```
-users (8 columns)
-organizations (17 columns)
+users (27 columns)
+organizations (57 columns) - Added: Stripe billing fields (Phase 10)
 tenant_databases (4 columns)
 organization_members (5 columns)
 invitations (9 columns)
-subscription_plans (12 columns)
+subscription_plans (12 columns) - Added: Phase 11
+ai_credits (9 columns) - Added: Phase 11
 
-Foreign Keys: 6
+Foreign Keys: ~8
 - invitations → organizations, users
 - organization_members → users, organizations
 - organizations → users
 - tenant_databases → organizations
+- ai_credits → organizations
+- subscription_plans (standalone)
 ```
 
-### Tenant Database (15 tables)
+### Tenant Database (31 tables - Phases 1-20)
 
 ```
 Core Business:
-- clients (16 columns)
+- clients (53+ columns) - Added: vCard fields (Phase 20)
+- client_notes (5 columns) - Added: Phase 15
+- client_contacts (8 columns) - DEPRECATED in Phase 20
+- company_members (6 columns) - Added: Phase 20.1 (many-to-many)
 - rooms (19 columns)
-- sessions (12 columns)
+- sessions (17 columns) - Added: payment tracking (Phase 12)
 - equipment (23 columns)
 - projects (26 columns)
-- tracks (16 columns)
-
-Financial:
-- invoices (14 columns)
-- invoice_items (7 columns)
-- quotes (19 columns)
-- quote_items (9 columns)
-- contracts (20 columns)
-- expenses (19 columns)
-- payments (17 columns)
-
-Musicians:
+- tracks (39 columns) - Added: 17 Phase 5 fields (versioning, copyright, technical)
+- track_comments (16 columns) - Added: Phase 13
 - musicians (14 columns)
 - track_credits (8 columns)
 
-Foreign Keys: 21 (relationships between all entities)
+Financial:
+- invoices (19 columns) - Added: deposit fields (Phase 17)
+- invoice_items (7 columns)
+- quotes (19 columns) - Added: Phase 11
+- quote_items (9 columns) - Added: Phase 11
+- service_catalog (9 columns) - Added: Phase 11
+- contracts (20 columns)
+- expenses (19 columns)
+- payments (17 columns)
+- payment_transactions (27 columns) - Added: Phase 12
+
+Time Tracking (Phase 13):
+- task_types (9 columns)
+- time_entries (13 columns)
+
+Client Portal (Phase 14):
+- client_portal_accounts (14 columns)
+- client_portal_magic_links (9 columns)
+- client_portal_sessions (12 columns)
+- client_portal_activity_logs (11 columns)
+
+AI & System (Phase 10):
+- ai_conversations (9 columns)
+- ai_action_logs (9 columns)
+- notifications (14 columns)
+- stripe_webhook_events (5 columns) - Added: Phase 17
+
+Foreign Keys: ~45 (extensive relationships)
 ```
+
+**Schema Evolution:** See [audit-report.md](./audit-report.md) for detailed migration history (0000-0011).
 
 ---
 
@@ -359,6 +439,36 @@ git commit -m "feat(database): add new migration"
 
 ---
 
-**Last Updated:** 2025-12-15
-**Version:** 1.0.0
-**Migration Files:** 0000_massive_zodiak (master), 0000_early_charles_xavier (tenant)
+## 📋 Script Status Table
+
+Quick reference for all scripts (Phase 21 Audit - 2026-01-17):
+
+| Script | Category | Status | Action | Notes |
+|--------|----------|--------|--------|-------|
+| **create-tenant-3.ts** | INIT | ✅ WORKING | Use (can generalize) | Preferred pattern for new tenants |
+| **deploy-master.sh** | DEPLOY | ✅ WORKING | Use | Production master deployment |
+| **deploy-tenants.sh** | DEPLOY | ✅ WORKING | Use | Batch tenant deployment |
+| **create-test-studio-user.sql** | SEED | ✅ WORKING | Use | Master DB user creation |
+| **validate-ui-complete.sh** | MONITOR | ✅ WORKING | Use | UI validation tool |
+| **seed-tenant-3.ts** | SEED | ⚠️ PARTIAL | Update first | Missing vCard fields |
+| **migrate-status.sh** | MONITOR | ⚠️ PARTIAL | Update first | Hardcoded counts outdated (6→7, 15→31) |
+| **setup-test-studio-ui.sql** | SEED | ⚠️ PARTIAL | Major update needed | Missing 16 tables + columns |
+| **init-tenant.ts** | INIT | ❌ OBSOLETE | Archive | Migration-based approach deprecated |
+| **add-new-tenant-tables.sql** | FIX | ❌ OBSOLETE | Archive | Tables in base migrations now |
+| **fix-sessions-add-project-id.sql** | FIX | ❌ OBSOLETE | Archive | Column in migration 0008 |
+| **fix-tenant3-sessions-schema.sql** | FIX | ❌ OBSOLETE | Archive | Columns in migration 0003 |
+| **add-company-with-contacts.sql** | SEED | ❌ OBSOLETE | Archive | Uses deprecated `client_contacts` |
+
+**Legend:**
+- ✅ **WORKING:** Compatible with current schema, safe to use
+- ⚠️ **PARTIAL:** Works but missing recent schema additions, update before use
+- ❌ **OBSOLETE:** Broken, outdated, or redundant - do not use
+
+**See [audit-report.md](./audit-report.md) for detailed analysis.**
+
+---
+
+**Last Updated:** 2026-01-17 (Phase 21 Audit)
+**Current Schema:** 7 master tables, 31 tenant tables
+**Migration Files:** 0000-0002 (master), 0000-0011 (tenant)
+**Audit Report:** [audit-report.md](./audit-report.md)
