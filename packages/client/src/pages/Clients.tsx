@@ -719,8 +719,8 @@ export function Clients() {
                   {viewMode === 'grid' && (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                       {filteredClients.map((client) => (
-                      <Card key={client.id} className="hover:shadow-md transition-shadow">
-                        <CardHeader className="pb-3">
+                      <Card key={client.id} className="hover:shadow-md transition-shadow flex flex-col h-full">
+                        <CardHeader className="pb-3 pt-2 px-2">
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
                               {/* Prominent avatar - primary visual anchor */}
@@ -809,42 +809,42 @@ export function Clients() {
                             </div>
                           </div>
                         </CardHeader>
-                          <CardContent className="space-y-2">
-                            {/* Primary contact only - minimal scanning */}
-                            {client.phone && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Phone className="h-3 w-3 flex-shrink-0" />
-                                <a
-                                  href={`tel:${client.phone}`}
-                                  className="hover:underline truncate"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {client.phone}
-                                </a>
-                                <CopyButton text={client.phone} label="Téléphone" />
-                              </div>
-                            )}
+                          <CardContent className="flex flex-col flex-1 pb-2 px-2">
+                            <div className="flex-1 space-y-3">
+                              {/* Primary contact only - minimal scanning */}
+                              {client.phone && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Phone className="h-3 w-3 flex-shrink-0" />
+                                  <a
+                                    href={`tel:${client.phone}`}
+                                    className="hover:underline truncate"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {client.phone}
+                                  </a>
+                                  <CopyButton text={client.phone} label="Téléphone" />
+                                </div>
+                              )}
 
-                            {client.email && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Mail className="h-3 w-3 flex-shrink-0" />
-                                <a
-                                  href={`mailto:${client.email}`}
-                                  className="hover:underline truncate"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {client.email}
-                                </a>
-                                <CopyButton text={client.email} label="Email" />
-                              </div>
-                            )}
+                              {client.email && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Mail className="h-3 w-3 flex-shrink-0" />
+                                  <a
+                                    href={`mailto:${client.email}`}
+                                    className="hover:underline truncate"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {client.email}
+                                  </a>
+                                  <CopyButton text={client.email} label="Email" />
+                                </div>
+                              )}
 
-                            {/* Stats badges - compact indicators */}
-                            <div className="flex gap-2 flex-wrap">
-                              <Badge variant="outline" className="text-xs">
-                                {client.sessionsCount} sessions
-                              </Badge>
-                              {client.accountsReceivable > 0 && (
+                              {/* Stats badges - compact indicators */}
+                              <div className="flex gap-2 flex-wrap">
+                                <Badge variant="outline" className="text-xs">
+                                  {client.sessionsCount} sessions
+                                </Badge>
                                 <Badge
                                   variant="outline"
                                   className={cn(
@@ -852,22 +852,34 @@ export function Clients() {
                                     client.accountsReceivable > 100000 ? "text-orange-600 border-orange-600" : ""
                                   )}
                                 >
-                                  {(client.accountsReceivable / 100).toFixed(0)}€
+                                  {(client.accountsReceivable / 100).toFixed(0)}€ débiteur
                                 </Badge>
-                              )}
+                              </div>
                             </div>
 
-                            {/* Minimal action button */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full"
-                              asChild
-                            >
-                              <Link to={`/clients/${client.id}`}>
-                                <Eye className="h-3 w-3 mr-1" /> Voir
-                              </Link>
-                            </Button>
+                            {/* Action buttons - always at bottom */}
+                            <div className="flex gap-2 pt-4 mt-auto">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="flex-1"
+                                asChild
+                              >
+                                <Link to={`/clients/${client.id}?edit=true`}>
+                                  <Pencil className="h-3 w-3 mr-1" /> Modifier
+                                </Link>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="flex-1"
+                                asChild
+                              >
+                                <Link to={`/clients/${client.id}`}>
+                                  <Eye className="h-3 w-3 mr-1" /> Voir
+                                </Link>
+                              </Button>
+                            </div>
                           </CardContent>
                         </Card>
                       ))}

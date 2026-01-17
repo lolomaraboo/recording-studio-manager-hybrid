@@ -293,7 +293,62 @@ Toujours avec traduction FR et couleur dynamique.
 - Bug statut fixé (Badge + traduction FR)
 - Espacement symétrique avec sidebar grâce au px-2
 
-### 🔄 À Harmoniser (57 pages restantes)
+### ✅ Clients.tsx - Vue Grid (Phase 18-02)
+
+**Espacement des cartes clients (Grid view):**
+```tsx
+<Card key={client.id} className="hover:shadow-md transition-shadow flex flex-col h-full">
+  <CardHeader className="pb-3 pt-2 px-2">  // Top réduit, côtés compacts
+    {/* Avatar + nom + badge type */}
+  </CardHeader>
+  <CardContent className="flex flex-col flex-1 pb-2 px-2">
+    <div className="flex-1 space-y-3">
+      {/* Contact info + stats badges */}
+    </div>
+    {/* Boutons actions - toujours en bas */}
+    <div className="flex gap-2 pt-4 mt-auto">
+      <Button variant="ghost" size="sm" className="flex-1">Modifier</Button>
+      <Button variant="ghost" size="sm" className="flex-1">Voir</Button>
+    </div>
+  </CardContent>
+</Card>
+```
+
+**Détails clés:**
+- **Hauteur uniforme**: `h-full` sur Card + `flex flex-col` pour étirer verticalement
+- **Espacement optimisé**:
+  - `pt-2` (top header): 0.5rem - compact
+  - `pb-2` (bottom content): 0.5rem - compact
+  - `px-2` (côtés): 0.5rem - aligné avec container global
+  - `pb-3` (bottom header): 0.75rem - séparation header/content
+- **Flexbox pour boutons en bas**:
+  - `flex flex-col flex-1` sur CardContent
+  - `flex-1` sur div de contenu (prend l'espace disponible)
+  - `mt-auto` sur div de boutons (pousse en bas)
+  - `pt-4` avant boutons (séparation visuelle)
+- **Boutons sans bordure**: `variant="ghost"` (harmonisation avec Table view)
+- **Stats toujours affichées**:
+  - Badge "sessions" toujours présent
+  - Badge "débiteur" toujours présent (même si 0€)
+  - Alerte orange si débiteur > 1000€
+
+**Grille responsive:**
+```tsx
+<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+```
+- Mobile: 1 colonne
+- Tablette (md): 2 colonnes
+- Desktop (lg): 3 colonnes
+- Large (xl): 4 colonnes
+- Gap: `gap-4` (16px) entre cartes
+
+**Rationale:**
+- Hauteur uniforme évite l'effet "escalier" quand clients ont des infos différentes
+- Boutons toujours au même endroit = UX prévisible
+- Espacement compact maximise nombre de clients visibles
+- Badge "débiteur" toujours affiché = visibilité financière immédiate
+
+### 🔄 À Harmoniser (56 pages restantes)
 - Clients (3 pages)
 - Projects (pages)
 - Equipment (pages)
