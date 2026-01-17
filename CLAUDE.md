@@ -44,6 +44,48 @@ const tenantDb = await ctx.getTenantDb();
 const clients = await tenantDb.query.clients.findMany();
 ```
 
+## 🚨 CRITICAL DEVELOPMENT PATTERN
+
+**Date Added:** 2026-01-17 (Phase 20.1-01)
+
+### NEVER Fix Broken Tenant Migrations in Development
+
+**Problem:** Schema changes cause migration desynchronization → 2-3 hours debugging
+
+**Solution:** INCREMENT TENANT NUMBER instead of fixing migrations
+
+```bash
+# ❌ DON'T DO THIS (wastes hours)
+# - Debug why migration failed
+# - Try to sync schema.ts with migrations
+# - Manually fix database schema
+# - Nuclear reset database
+
+# ✅ DO THIS (30 seconds)
+# Schema changed or tenant broken? Create tenant_3, tenant_4, etc.
+# Apply current schema to NEW tenant
+# Seed fresh data
+# Continue building
+```
+
+**Why This Works:**
+- ✅ Schema always matches current TypeScript code
+- ✅ Zero migration debugging (30 sec vs 2-3 hours)
+- ✅ Realistic (production creates new tenants for new customers)
+- ✅ Old tenants = ignore, delete later if needed
+
+**Historical Cost:**
+- Phase 18.1: 7 min (DB init fix)
+- Phase 18.2: 4 min (schema desync)
+- Phase 18.3: 67 min (nuclear reset)
+- **Total wasted:** 80+ minutes over 3 days
+
+**New Pattern:** 30 seconds per new tenant ✅
+
+**Full Documentation:** See `.planning/DEVELOPMENT-WORKFLOW.md`
+
+**IMPORTANT:** This is DEVELOPMENT ONLY. Production requires progressive migrations.
+
 ## Development Commands
 
 ### Initial Setup

@@ -181,6 +181,7 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 20-01 | Conditional Kanban contact loading | Batch contact queries enabled only when viewMode === 'kanban'. Rationale: Avoids loading contacts when Table/Grid view active, reduces unnecessary API calls. |
 | 20-01 | Scoped copy-to-clipboard Phase 20 | Copy icons only in Clients.tsx Kanban view. Rationale: Plan specified "Phase 20 scope only" - universal copy feature across all pages (ClientDetail, Sessions, Invoices) deferred to future enhancement. |
 | 20-01 | Primary contact sorting | Sort by isPrimary DESC, lastName ASC. Rationale: Primary contact always appears first (most important for workflows), others alphabetically for consistency and predictability. |
+| 20.1-01 | 🚨 CRITICAL: Increment tenant number vs fix migrations | **DEVELOPMENT ONLY**: When schema changes or tenant breaks, create NEW tenant (tenant_3, tenant_4...) instead of debugging migrations. Rationale: 30 seconds vs 2-3 hours debugging. Phases 18.1/18.2/18.3 wasted 80+ minutes on migration fixes. New pattern: increment tenant, apply current schema, seed data, continue building. Old tenants = ignore/delete later. Documented in `.planning/DEVELOPMENT-WORKFLOW.md`. Production still requires progressive migrations. |
 
 ### Deferred Issues
 
