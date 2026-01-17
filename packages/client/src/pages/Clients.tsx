@@ -385,6 +385,7 @@ export function Clients() {
                             )}
                           </div>
                         </TableHead>
+                        <TableHead>Contacts</TableHead>
                         <TableHead>Contact</TableHead>
                         <TableHead
                           className="cursor-pointer hover:bg-accent"
@@ -451,6 +452,13 @@ export function Clients() {
                             <Badge variant="outline" className="capitalize">
                               {client.type === "company" ? "Entreprise" : "Particulier"}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {client.type === 'company' && client.contactsCount > 0 && (
+                              <Badge variant="outline">
+                                {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                              </Badge>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="text-sm space-y-1">
@@ -535,12 +543,19 @@ export function Clients() {
                             </div>
 
                             {/* Type badge - visual category indicator */}
-                            <Badge
-                              variant={client.type === 'company' ? 'default' : 'secondary'}
-                              className="w-fit"
-                            >
-                              {client.type === 'company' ? 'Entreprise' : 'Particulier'}
-                            </Badge>
+                            <div className="flex flex-col gap-1">
+                              <Badge
+                                variant={client.type === 'company' ? 'default' : 'secondary'}
+                                className="w-fit"
+                              >
+                                {client.type === 'company' ? 'Entreprise' : 'Particulier'}
+                              </Badge>
+                              {client.type === 'company' && client.contactsCount > 0 && (
+                                <Badge variant="outline" className="text-xs w-fit">
+                                  {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </CardHeader>
                           <CardContent className="space-y-2">
