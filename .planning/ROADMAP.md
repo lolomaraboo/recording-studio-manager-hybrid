@@ -1497,10 +1497,10 @@ packages/database/scripts/
 - localStorage vs cookie persistence for client sessions
 - Comparison with Admin auth (working) vs Client Portal auth (failing)
 
-**Plans**: 0 plans
+**Plans**: 1 plan
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 21.1 to break down)
+- [ ] 21.1-01-PLAN.md — Migrate Client Portal to express-session cookies (3 tasks: backend login/me/logout, frontend AuthContext/Navigate, E2E tests)
 
 **Details**:
 [To be added during planning]
