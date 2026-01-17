@@ -205,6 +205,12 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 ### Roadmap Evolution
 
+- **2026-01-17:** Phase 21 added after Phase 20: "Audit et Correction Scripts Base de Données" (ADDED)
+  - Reason: User concern that database scripts became obsolete since Phase 10, causing multiple bugs
+  - Impact: Scripts created before Phases 10-17 incompatible with current schema (30+ tables vs ~15 originally)
+  - Evidence: Phase 18.1-18.3 systematic schema/migration desync, tenant_3 migration fix for missing vCard columns
+  - Solution: Audit all scripts, test compatibility, update critical scripts, archive obsolete ones, document usage
+  - Priority: Quality & Maintainability - Prevent future "broken database" debugging sessions
 - **2026-01-16:** Phase 20 added after Phase 18.3: "Affichage Contacts Multiples Entreprises" (ADDED)
   - Reason: Contacts multiples (client_contacts table) ne s'affichent pas dans les listes clients
   - Impact: Entreprises avec 4-6 contacts invisibles dans Table/Grid/Kanban views

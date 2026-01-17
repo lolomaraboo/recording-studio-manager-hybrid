@@ -1412,6 +1412,71 @@ Enrichir les trois vues clients (Table/Grid/Kanban) pour afficher:
 
 **Rationale**: Phase 3.9.4 a ajouté le support des contacts multiples (client_contacts) mais l'UI n'a jamais été mise à jour pour les afficher dans les listes. Actuellement les contacts sont invisibles sauf sur la page de détail du client. Problème découvert lors de tests avec données réelles (entreprises avec 4-6 contacts).
 
+### Phase 21: Audit et Correction Scripts Base de Données
+
+**Goal**: Auditer tous les scripts database existants, identifier ceux obsolètes par rapport au schéma actuel, créer scripts mis à jour, et documenter usage correct
+
+**Depends on**: Phase 20 (contact architecture complete)
+
+**Research**: Likely (Schema compatibility analysis, script dependency mapping)
+
+**Research topics**:
+- Current database schema vs script expectations (tenant and master)
+- Migration history analysis (Phases 10-17 schema additions)
+- Script interdependencies and execution order
+- Test data generation strategies for current schema
+
+**Plans**: TBD plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 21 to break down)
+
+**Status**: Not started
+
+**Details**:
+
+**Problem Discovered:**
+User concern: "J'ai l'impression que depuis la phase 10, tous les scripts sont devenus obsolètes.. J'aimerais qu'on vérifie ça parce qu'on a des bugs qu'on avait pas avant"
+
+**Evidence of Script Obsolescence:**
+- Phase 18.1-18.3: Systematic schema/migration desync requiring manual fixes
+- tenant_3 migration fix (2026-01-16): Manual application of migration 0004 for missing vCard columns
+- Phases 10-17: Added features (quotes, time_entries, service_catalog, vCard fields, invoices columns) without always running `pnpm db:generate`
+- Init scripts created BEFORE Phase 10-17 - missing subscription_plans, ai_credits, Stripe columns, etc.
+
+**Current Script Inventory:**
+```
+packages/database/scripts/
+├── add-new-tenant-tables.sql
+├── create-tenant-3.ts
+├── fix-sessions-add-project-id.sql
+├── fix-tenant3-sessions-schema.sql
+├── init-tenant.ts
+├── seed-tenant-3.ts
+└── test-data/
+    ├── add-company-with-contacts.sql
+    ├── create-test-studio-user.sql
+    └── setup-test-studio-ui.sql
+```
+
+**Solution Scope:**
+1. **Inventory**: Document each script's purpose, dependencies, schema assumptions
+2. **Compatibility Test**: Run each script against current schema (master + tenant)
+3. **Identify Obsolete**: Mark scripts incompatible with current schema
+4. **Create Updated Scripts**: Rewrite critical scripts for current schema
+5. **Document Usage**: Create script usage guide with examples
+6. **Archive Old Scripts**: Move obsolete scripts to `scripts/archived/` with explanation
+
+**Success Criteria:**
+- [ ] All scripts tested against current schema (rsm_master + tenant_1)
+- [ ] Obsolete scripts identified and archived
+- [ ] Critical scripts updated (init-tenant, seed-tenant, test-data)
+- [ ] Script usage documentation created (`scripts/README.md`)
+- [ ] Zero PostgreSQL errors when running updated scripts
+- [ ] Test data generation works for ALL current tables
+
+**Rationale**: Database scripts written before Phases 10-17 are incompatible with current schema (30+ tenant tables vs ~15 when scripts created). Multiple bugs traced to schema mismatches. Systematic audit prevents future "broken database" sessions. DEVELOPMENT-WORKFLOW.md recommends "increment tenant number" but scripts must still work for fresh tenant creation.
+
 
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
