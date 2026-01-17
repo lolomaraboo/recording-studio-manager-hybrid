@@ -476,7 +476,7 @@ export function Clients() {
                           className="cursor-pointer hover:bg-accent"
                           onClick={() => handleSort('name')}
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-start gap-1 whitespace-nowrap">
                             Client
                             {sortField === 'name' ? (
                               sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
@@ -489,7 +489,7 @@ export function Clients() {
                           className="cursor-pointer hover:bg-accent"
                           onClick={() => handleSort('type')}
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-start gap-1 whitespace-nowrap">
                             Contact
                             {sortField === 'type' ? (
                               sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
@@ -503,7 +503,7 @@ export function Clients() {
                           className="cursor-pointer hover:bg-accent"
                           onClick={() => handleSort('sessions')}
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-start gap-1 whitespace-nowrap">
                             Sessions
                             {sortField === 'sessions' ? (
                               sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
@@ -516,12 +516,12 @@ export function Clients() {
                           className="cursor-pointer hover:bg-accent"
                           onClick={() => handleSort('accountsReceivable')}
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-start gap-1 whitespace-nowrap">
                             Comptes débiteurs
                             {sortField === 'accountsReceivable' ? (
-                              sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                             ) : (
-                              <ArrowUpDown className="h-4 w-4 opacity-30" />
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
                             )}
                           </div>
                         </TableHead>
@@ -529,12 +529,12 @@ export function Clients() {
                           className="cursor-pointer hover:bg-accent"
                           onClick={() => handleSort('lastSession')}
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-start gap-1 whitespace-nowrap">
                             Dernière session
                             {sortField === 'lastSession' ? (
-                              sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                              sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                             ) : (
-                              <ArrowUpDown className="h-4 w-4 opacity-30" />
+                              <ArrowUpDown className="h-3 w-3 opacity-30" />
                             )}
                           </div>
                         </TableHead>

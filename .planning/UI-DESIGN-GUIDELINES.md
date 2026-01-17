@@ -248,14 +248,13 @@ Toujours avec traduction FR et couleur dynamique.
 ```
 
 **Taille icônes de tri:**
-- **Colonnes standards** (Client, Type, Sessions): `h-3 w-3` (12px × 12px)
-- **Colonnes texte long** (Comptes débiteurs, Dernière session): `h-4 w-4` (16px × 16px)
+- **Toutes les colonnes**: `h-3 w-3` (12px × 12px)
 - Gap: `gap-1` entre texte et icône
 
 **Rationale:**
-- `h-3 w-3` suffisant pour colonnes courtes/moyennes
-- `h-4 w-4` nécessaire pour colonnes à texte long (meilleure visibilité)
-- Équilibre visuel adaptatif selon la largeur du header
+- Uniformité visuelle sur toutes les colonnes
+- Espacement cohérent entre texte et icône
+- Taille `h-3 w-3` suffisante pour la visibilité
 
 ### 6. Widgets Draggables (Dashboard uniquement)
 
