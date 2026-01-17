@@ -246,8 +246,8 @@ export const clientsRouter = router({
       const tenantDb = await ctx.getTenantDb();
 
       // Map ALL provided fields (no exclusions)
+      // Note: userId is intentionally omitted - PostgreSQL allows NULL by default
       const clientData: any = {
-        userId: null, // Explicitly set to null (no default in schema)
         name: input.name,
         type: input.type || 'individual',
       };
