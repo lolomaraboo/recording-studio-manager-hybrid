@@ -348,6 +348,77 @@ Toujours avec traduction FR et couleur dynamique.
 - Espacement compact maximise nombre de clients visibles
 - Badge "débiteur" toujours affiché = visibilité financière immédiate
 
+### ✅ Clients.tsx - Vue Kanban (Phase 18-02)
+
+**Espacement des cartes clients (Kanban view):**
+```tsx
+<Card key={client.id} className="hover:shadow-lg transition-shadow">
+  <CardHeader className="pb-2">
+    {/* Avatar compact h-8 + nom + badge type */}
+  </CardHeader>
+  <CardContent className="pt-2 pb-2 space-y-3">
+    {/* Contact info complet (phone, email, city) avec icônes + CopyButton */}
+    {/* Workflow indicators (sessions, dernière session, comptes débiteurs) */}
+    {/* Notes preview (if exists) */}
+    {/* Company members list (si entreprise avec contacts) */}
+
+    {/* Boutons actions - consistent avec Grid view */}
+    <div className="flex gap-2 pt-2">
+      <Button variant="ghost" size="sm" className="flex-1">Modifier</Button>
+      <Button variant="ghost" size="sm" className="flex-1">Voir</Button>
+    </div>
+  </CardContent>
+</Card>
+```
+
+**Détails clés:**
+- **Espacement optimisé (harmonisé avec Grid)**:
+  - `pt-2` (top content): 0.5rem - compact
+  - `pb-2` (bottom content): 0.5rem - compact
+  - `pb-2` (bottom header): 0.5rem - séparation minimale
+  - `space-y-3` (sections internes): 0.75rem - lisibilité
+- **Deux boutons actions**: Modifier + Voir (consistent avec Grid/Table views)
+- **Layout 2 colonnes**: Particuliers | Entreprises
+  ```tsx
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+  ```
+- **Shadow emphasis**: `shadow-lg` au hover (vs `shadow-md` dans Grid)
+  - Rationale: Kanban = cartes riches en contexte, shadow plus prononcée
+- **Avatar compact**: `h-8 w-8` (vs `h-12 w-12` dans Grid)
+  - Rationale: Kanban affiche plus d'infos textuelles, avatar secondaire
+- **Contact info complet**:
+  - Phone + CopyButton
+  - Email + CopyButton
+  - City avec MapPin icon
+- **Workflow indicators section**:
+  - Sessions count
+  - Dernière session (date formatée FR)
+  - Comptes débiteurs (si > 0€, alerte orange si > 1000€)
+  - Border-top separator pour distinction visuelle
+- **Company members** (IIFE conditional):
+  - Affichés uniquement si: `viewMode === 'kanban' && client.type === 'company' && members.length > 0`
+  - Liste des contacts avec Star icon (primary) + nom + rôle
+  - Links cliquables vers profil membre
+  - Border-top separator
+
+**Différences Grid vs Kanban:**
+
+| Aspect | Grid View | Kanban View |
+|--------|-----------|-------------|
+| **Avatar** | `h-12 w-12` (prominent) | `h-8 w-8` (compact) |
+| **Shadow** | `shadow-md` | `shadow-lg` |
+| **Contact info** | Phone OU email (conditionnel) | Phone + Email + City (complet) |
+| **Stats** | Badges inline (sessions + débiteur) | Section séparée avec border-top |
+| **Company members** | Badge count only | Liste complète avec noms + rôles |
+| **Purpose** | Scanning rapide, vue d'ensemble | Contexte étendu, workflow détaillé |
+
+**Rationale:**
+- Espacement `pt-2 pb-2` harmonisé avec Grid = cohérence visuelle
+- Deux boutons = consistency cross-views (Table/Grid/Kanban)
+- Kanban = cartes riches, Grid = cartes compactes (philosophies différentes)
+- Shadow plus prononcée dans Kanban souligne "context-rich" nature
+- Avatar plus petit libère espace pour infos textuelles essentielles
+
 ### 🔄 À Harmoniser (56 pages restantes)
 - Clients (3 pages)
 - Projects (pages)

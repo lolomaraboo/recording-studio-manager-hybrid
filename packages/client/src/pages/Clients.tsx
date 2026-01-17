@@ -927,11 +927,16 @@ export function Clients() {
                                           {client.artistName}
                                         </CardDescription>
                                       )}
+
+                                      {/* Type badge - simple display */}
+                                      <div className="mt-1">
+                                        <Badge variant="outline" className="text-xs w-fit">Particulier</Badge>
+                                      </div>
                                     </div>
                                   </div>
                                 </CardHeader>
 
-                                <CardContent className="space-y-3">
+                                <CardContent className="pt-2 pb-2 space-y-3">
                                   {/* Full contact info section */}
                                   <div className="space-y-1 text-xs">
                                     {client.phone && (
@@ -967,6 +972,38 @@ export function Clients() {
                                       </div>
                                     )}
                                   </div>
+
+                                  {/* Companies list for individuals (Kanban view) - Remontée avant workflow */}
+                                  {(() => {
+                                    // Get companies for this individual
+                                    const companies = companiesByMember.get(client.id) || [];
+
+                                    if (viewMode !== 'kanban' || client.type !== 'individual' || companies.length === 0) {
+                                      return null;
+                                    }
+
+                                    return (
+                                      <div className="border-t pt-2 space-y-1">
+                                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                                          Entreprises ({companies.length})
+                                        </div>
+                                        {companies.map((company, idx) => (
+                                          <Link
+                                            key={idx}
+                                            to={`/clients/${company.companyId}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className="flex items-center gap-1 text-xs hover:bg-accent p-1 rounded transition-colors">
+                                              {company.isPrimary && (
+                                                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                              )}
+                                              <span className="font-medium truncate">{company.companyName}</span>
+                                            </div>
+                                          </Link>
+                                        ))}
+                                      </div>
+                                    );
+                                  })()}
 
                                   {/* Workflow indicators - Extended context */}
                                   <div className="space-y-2 text-xs border-t pt-2">
@@ -1005,18 +1042,29 @@ export function Clients() {
                                     </div>
                                   )}
 
-                                  {/* Action button - more descriptive */}
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full"
-                                    asChild
-                                  >
-                                    <Link to={`/clients/${client.id}`}>
-                                      <Eye className="h-3 w-3 mr-2" />
-                                      Voir détails complet
-                                    </Link>
-                                  </Button>
+                                  {/* Action buttons - consistent with Grid view */}
+                                  <div className="flex gap-2 pt-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="flex-1"
+                                      asChild
+                                    >
+                                      <Link to={`/clients/${client.id}?edit=true`}>
+                                        <Pencil className="h-3 w-3 mr-1" /> Modifier
+                                      </Link>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="flex-1"
+                                      asChild
+                                    >
+                                      <Link to={`/clients/${client.id}`}>
+                                        <Eye className="h-3 w-3 mr-1" /> Voir
+                                      </Link>
+                                    </Button>
+                                  </div>
                                 </CardContent>
                               </Card>
                             ))}
@@ -1066,11 +1114,16 @@ export function Clients() {
                                           {client.artistName}
                                         </CardDescription>
                                       )}
+
+                                      {/* Type badge - simple display */}
+                                      <div className="mt-1">
+                                        <Badge variant="outline" className="text-xs w-fit">Entreprise</Badge>
+                                      </div>
                                     </div>
                                   </div>
                                 </CardHeader>
 
-                                <CardContent className="space-y-3">
+                                <CardContent className="pt-2 pb-2 space-y-3">
                                   {/* Full contact info section */}
                                   <div className="space-y-1 text-xs">
                                     {client.phone && (
@@ -1106,6 +1159,43 @@ export function Clients() {
                                       </div>
                                     )}
                                   </div>
+
+                                  {/* Company members list (Kanban view) - Remontée avant workflow */}
+                                  {(() => {
+                                    // Filter members for this company (client-side)
+                                    const members = allMembersQuery.data?.filter(
+                                      m => m.companyId === client.id
+                                    ) || [];
+
+                                    if (viewMode !== 'kanban' || client.type !== 'company' || members.length === 0) {
+                                      return null;
+                                    }
+
+                                    return (
+                                      <div className="border-t pt-2 space-y-1">
+                                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                                          Contacts ({members.length})
+                                        </div>
+                                        {members.map((m) => (
+                                          <Link
+                                            to={`/clients/${m.memberId}`}
+                                            key={m.memberId}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className="flex items-center gap-1 text-xs hover:bg-accent p-1 rounded transition-colors">
+                                              {m.isPrimary && (
+                                                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                              )}
+                                              <span className="font-medium truncate">{m.memberName}</span>
+                                              {m.role && (
+                                                <span className="text-muted-foreground truncate">- {m.role}</span>
+                                              )}
+                                            </div>
+                                          </Link>
+                                        ))}
+                                      </div>
+                                    );
+                                  })()}
 
                                   {/* Workflow indicators - Extended context */}
                                   <div className="space-y-2 text-xs border-t pt-2">
@@ -1144,55 +1234,29 @@ export function Clients() {
                                     </div>
                                   )}
 
-                                  {/* Company members list (Kanban view) */}
-                                  {(() => {
-                                    // Filter members for this company (client-side)
-                                    const members = allMembersQuery.data?.filter(
-                                      m => m.companyId === client.id
-                                    ) || [];
-
-                                    if (viewMode !== 'kanban' || client.type !== 'company' || members.length === 0) {
-                                      return null;
-                                    }
-
-                                    return (
-                                      <div className="border-t pt-2 space-y-1">
-                                        <div className="text-xs font-medium text-muted-foreground mb-1">
-                                          Contacts ({members.length})
-                                        </div>
-                                        {members.map((m) => (
-                                          <Link
-                                            to={`/clients/${m.memberId}`}
-                                            key={m.memberId}
-                                            onClick={(e) => e.stopPropagation()}
-                                          >
-                                            <div className="flex items-center gap-1 text-xs hover:bg-accent p-1 rounded transition-colors">
-                                              {m.isPrimary && (
-                                                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                                              )}
-                                              <span className="font-medium truncate">{m.memberName}</span>
-                                              {m.role && (
-                                                <span className="text-muted-foreground truncate">- {m.role}</span>
-                                              )}
-                                            </div>
-                                          </Link>
-                                        ))}
-                                      </div>
-                                    );
-                                  })()}
-
-                                  {/* Action button - more descriptive */}
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full"
-                                    asChild
-                                  >
-                                    <Link to={`/clients/${client.id}`}>
-                                      <Eye className="h-3 w-3 mr-2" />
-                                      Voir détails complet
-                                    </Link>
-                                  </Button>
+                                  {/* Action buttons - consistent with Grid view */}
+                                  <div className="flex gap-2 pt-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="flex-1"
+                                      asChild
+                                    >
+                                      <Link to={`/clients/${client.id}?edit=true`}>
+                                        <Pencil className="h-3 w-3 mr-1" /> Modifier
+                                      </Link>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="flex-1"
+                                      asChild
+                                    >
+                                      <Link to={`/clients/${client.id}`}>
+                                        <Eye className="h-3 w-3 mr-1" /> Voir
+                                      </Link>
+                                    </Button>
+                                  </div>
                                 </CardContent>
                               </Card>
                             ))}
