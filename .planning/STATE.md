@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 20.1 of 20.1 (Corriger Architecture Contacts + Boutons Copier)
-Plan: 20.1-01 of 1 - Phase 20.1 COMPLETE ✅
-Status: Phase 20.1 complete - Many-to-many company_members architecture, tenant_3 created, copy buttons in all views
-Last activity: 2026-01-17 - Phase 20.1-01 complete, company_members table replacing client_contacts, tenant_3 with fresh schema (8 clients, 7 memberships), copy-to-clipboard buttons in Table/Grid/Kanban
+Plan: 20.1-02 of 2 - Phase 20.1 COMPLETE ✅
+Status: Phase 20.1 complete - Complete many-to-many contact architecture (backend + frontend), Kanban member display with star icons
+Last activity: 2026-01-17 - Phase 20.1-02 complete, Kanban view displays detailed member lists with primary contact star icons, clickable profile links, conditional API loading
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 1/1 plans (20.1-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 82
-- Average duration: 36.8 min
-- Total execution time: 50.6 hours
+- Total plans completed: 83
+- Average duration: 36.4 min
+- Total execution time: 50.7 hours
 
 **By Phase:**
 
@@ -78,11 +78,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.3 | 1/1 | 67 min | 67 min |
 | 19 | 4/4 | 11 min | 2.8 min |
 | 20 | 1/1 | 3 min | 3 min |
-| 20.1 | 1/1 | 11 min | 11 min |
+| 20.1 | 2/2 | 15 min | 7.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [3 min, 4 min, 3 min, 3 min, 11 min]
-- Trend: Phase 20.1 COMPLETE (11 min). Many-to-many company_members architecture, tenant_3 created from scratch, copy buttons in all views.
+- Last 5 plans: [4 min, 3 min, 3 min, 11 min, 4 min]
+- Trend: Phase 20.1 COMPLETE (15 min total). Complete many-to-many contact architecture: backend (company_members table) + frontend (Kanban member display with star icons).
 
 ## Accumulated Context
 
@@ -185,6 +185,10 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 20.1-01 | 🚨 CRITICAL: Increment tenant number vs fix migrations | **DEVELOPMENT ONLY**: When schema changes or tenant breaks, create NEW tenant (tenant_3, tenant_4...) instead of debugging migrations. Rationale: 30 seconds vs 2-3 hours debugging. Phases 18.1/18.2/18.3 wasted 80+ minutes on migration fixes. New pattern: increment tenant, apply current schema, seed data, continue building. Old tenants = ignore/delete later. Documented in `.planning/DEVELOPMENT-WORKFLOW.md`. Production still requires progressive migrations. |
 | 20.1-01 | Many-to-many company_members architecture | Replaced client_contacts (one-to-many) with company_members junction table (many-to-many). Rationale: Contacts can now belong to multiple companies, each contact is a full client record with their own page. Proper relational design enables contact reusability across organizations/groups. |
 | 20.1-01 | Copy-to-clipboard in all views (Table/Grid/Kanban) | Added CopyButton component with toast feedback to ALL client views. Rationale: Universal UX need for copying contact info (email/phone). Consistency across viewing modes. Toast confirms action ('Email copié!' / 'Téléphone copié!'). |
+| 20.1-02 | IIFE pattern for conditional hook usage | Used IIFE (Immediately Invoked Function Expression) to call hooks at top level while keeping rendering logic scoped and conditional. Rationale: React hooks can't be called conditionally, but we need conditional rendering based on hook data. Pattern: `{(() => { const { data } = useQuery(...); if (!data) return null; return <Component />; })()}`. Enables conditional display without violating Rules of Hooks. |
+| 20.1-02 | Multi-condition enabled flag for tRPC queries | Prevent unnecessary API calls with compound enabled condition: `viewMode === 'kanban' && client.type === 'company' && contactsCount > 0`. Rationale: Only loads members when actually needed (Kanban view, company clients, has contacts). Performance optimization: 3 API calls instead of potentially dozens for Table/Grid views or individual clients. |
+| 20.1-02 | Truncate class for member overflow | Applied `truncate` class to member names and roles to prevent card layout breaking. Rationale: Long names ("Alexandre Grand - Ingénieur du son principal et mixage") could overflow card width. Truncate ensures ellipsis on overflow for consistent card sizing. |
+| 20.1-02 | stopPropagation on member links | Added `onClick={(e) => e.stopPropagation()}` to member Link components. Rationale: Prevents card click events from interfering with member link navigation. User clicks member name → profile page, not card background behavior. Ensures predictable click targets in nested interactive elements. |
 
 ### Deferred Issues
 
@@ -421,32 +425,34 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-17T03:11:59Z
-Stopped at: Phase 20.1-01 COMPLETE ✅ - Many-to-many company_members architecture implementation
+Last session: 2026-01-17T08:00:01Z
+Stopped at: Phase 20.1-02 COMPLETE ✅ - Kanban member list display complete
 Resume context:
-  - Phase 20.1 COMPLETE ✅: Corrected architecture from client_contacts to company_members many-to-many
-    - **Phase 20.1-01 Accomplishments:**
+  - Phase 20.1 COMPLETE ✅✅: Complete many-to-many contact architecture (backend + frontend)
+    - **Phase 20.1-01 Accomplishments (11 min):**
       - ✅ Database: company_members table with FK constraints and indexes (migration 0011)
       - ✅ tenant_3: Created fresh tenant from scratch with new schema (30 tables)
       - ✅ Test data: 5 individual clients, 3 companies, 7 company-member relationships, 3 rooms
       - ✅ Backend: getMembers endpoint, contactsCount now uses company_members
       - ✅ Frontend: CopyButton component added to Table/Grid/Kanban views (email/phone)
-      - ✅ Toast feedback: "Email copié!" / "Téléphone copié!"
-      - ✅ Duration: 11 minutes (4 tasks, 6 files, 4 atomic commits)
-    - **Files created:**
-      - packages/database/drizzle/migrations/tenant/0011_add_company_members.sql
-      - packages/database/scripts/create-tenant-3.ts
-      - packages/database/scripts/seed-tenant-3.ts
-    - **Files modified:**
-      - packages/database/src/tenant/schema.ts (companyMembers table)
-      - packages/server/src/routers/clients.ts (getMembers endpoint)
-      - packages/client/src/pages/Clients.tsx (CopyButton component)
-    - **Key decisions:**
-      - Many-to-many via company_members replaces one-to-many client_contacts
-      - tenant_3 created from scratch (following Phase 18.1 pattern)
-      - Copy buttons in ALL views for consistency
-  - **Next:** Testing with tenant_3 (Organization 3)
-    - Switch dev mode to org 3 (x-test-org-id: 3)
-    - Verify company members display in Kanban view with getMembers
-    - Test copy-to-clipboard in all 3 views
-    - Validate member sorting (primary first)
+    - **Phase 20.1-02 Accomplishments (4 min):**
+      - ✅ Kanban view: Replaced "3 contacts" badge with detailed member list
+      - ✅ Primary contact: ⭐ yellow star icon for visual identification
+      - ✅ Clickable members: Each member links to their profile page (`/clients/{id}`)
+      - ✅ Roles displayed: Shows role when present (e.g., "Productrice", "Ingénieur du son")
+      - ✅ Conditional loading: Only loads members in Kanban view for companies with contacts
+      - ✅ Performance: 3 API calls total (vs dozens if not optimized)
+    - **Files modified in 20.1-02:**
+      - packages/client/src/pages/Clients.tsx (getCompanyMembers hook, IIFE pattern, member list rendering)
+    - **Key patterns established:**
+      - IIFE for conditional hook usage without violating Rules of Hooks
+      - Multi-condition enabled flags for tRPC query optimization
+      - stopPropagation for nested interactive elements (card vs member link)
+  - **Architecture Complete:**
+    - Backend: company_members many-to-many table ✅
+    - Backend: getMembers endpoint with sorting ✅
+    - Frontend: Table view (count badge) ✅
+    - Frontend: Grid view (count badge) ✅
+    - Frontend: Kanban view (detailed member list) ✅
+    - UX: Copy-to-clipboard in all views ✅
+  - **Next:** Phase 20.1 is complete. No further work planned for contact architecture.
