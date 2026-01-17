@@ -46,6 +46,17 @@ export default function ClientDetail() {
   const [isEditing, setIsEditing] = useState(searchParams.get('edit') === 'true');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  // Helper to toggle edit mode and update URL
+  const toggleEditMode = (editing: boolean) => {
+    setIsEditing(editing);
+    if (editing) {
+      searchParams.set('edit', 'true');
+    } else {
+      searchParams.delete('edit');
+    }
+    setSearchParams(searchParams);
+  };
+
   // Fetch client data
   const { data: client, isLoading, refetch } = trpc.clients.get.useQuery(
     { id: Number(id) },
@@ -101,7 +112,7 @@ export default function ClientDetail() {
   const updateMutation = trpc.clients.update.useMutation({
     onSuccess: () => {
       toast.success("Client mis à jour");
-      setIsEditing(false);
+      toggleEditMode(false);
       refetch();
     },
     onError: (error) => {
@@ -390,7 +401,7 @@ export default function ClientDetail() {
                     <div className="flex gap-2">
                       {!isEditing ? (
                         <>
-                          <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} title="Modifier les informations du client">
+                          <Button variant="outline" size="sm" onClick={() => toggleEditMode(true)} title="Modifier les informations du client">
                             <Edit className="mr-2 h-4 w-4" />
                             Modifier
                           </Button>
@@ -401,7 +412,7 @@ export default function ClientDetail() {
                         </>
                       ) : (
                         <>
-                          <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                          <Button variant="outline" size="sm" onClick={() => toggleEditMode(false)}>
                             <X className="mr-2 h-4 w-4" />
                             Annuler
                           </Button>

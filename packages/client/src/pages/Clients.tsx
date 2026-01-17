@@ -639,7 +639,7 @@ export function Clients() {
                           <TableCell>
                             <div className="flex items-center gap-1">
                               <Button variant="ghost" size="icon" asChild>
-                                <Link to={`/clients/${client.id}/edit`}>
+                                <Link to={`/clients/${client.id}?edit=true`}>
                                   <Pencil className="h-3 w-3" />
                                 </Link>
                               </Button>
