@@ -13,6 +13,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -583,26 +588,34 @@ export function Clients() {
                               />
                             ) : (
                               client.contactsCount > 0 && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Badge variant="outline" className="cursor-help">
-                                        {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
-                                      </Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <div className="space-y-1">
-                                        {contactsByCompany.get(client.id)?.map((contact, idx) => (
-                                          <div key={idx} className="flex items-center gap-1 text-sm">
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Badge variant="outline" className="cursor-pointer">
+                                      {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                    </Badge>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto">
+                                    <div className="space-y-1">
+                                      {contactsByCompany.get(client.id)?.map((contact, idx) => {
+                                        // Find the contact's memberId from allMembersQuery
+                                        const memberData = allMembersQuery.data?.find(
+                                          m => m.companyId === client.id && m.memberName === contact.memberName
+                                        );
+                                        return (
+                                          <Link
+                                            key={idx}
+                                            to={`/clients/${memberData?.memberId}`}
+                                            className="flex items-center gap-1 text-sm hover:bg-accent p-1 rounded transition-colors"
+                                          >
                                             {contact.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
-                                            <span>{contact.memberName}</span>
+                                            <span className="font-medium">{contact.memberName}</span>
                                             {contact.role && <span className="text-muted-foreground">- {contact.role}</span>}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                          </Link>
+                                        );
+                                      })}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               )
                             )}
                           </TableCell>
