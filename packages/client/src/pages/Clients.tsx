@@ -7,6 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -50,6 +56,58 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   );
 }
 
+/**
+ * Company badge with tooltip showing company names
+ * For individuals: Shows "X entreprise(s)" with tooltip
+ * For companies: Shows "Entreprise"
+ */
+function CompanyBadge({
+  clientType,
+  companies
+}: {
+  clientType: 'individual' | 'company';
+  companies: { companyName: string; isPrimary: boolean }[];
+}) {
+  if (clientType === 'company') {
+    return (
+      <Badge variant="outline" className="capitalize">
+        Entreprise
+      </Badge>
+    );
+  }
+
+  // Individual with companies
+  if (companies.length === 0) {
+    return (
+      <Badge variant="outline" className="capitalize">
+        Particulier
+      </Badge>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge variant="secondary" className="cursor-help">
+            {companies.length} entreprise{companies.length > 1 ? 's' : ''}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="space-y-1">
+            {companies.map((company, idx) => (
+              <div key={idx} className="flex items-center gap-1 text-sm">
+                {company.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                <span>{company.companyName}</span>
+              </div>
+            ))}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -69,6 +127,26 @@ export function Clients() {
     undefined,
     { enabled: viewMode === 'kanban' }
   );
+
+  // Load companies for contacts (for Type column badge)
+  const { data: companiesForContacts } = trpc.clients.getAllCompaniesForContacts.useQuery();
+
+  // Map memberId → companies[] for Type column display
+  const companiesByMember = useMemo(() => {
+    const map = new Map<number, { companyName: string; isPrimary: boolean }[]>();
+
+    companiesForContacts?.forEach(c => {
+      if (!map.has(c.memberId)) {
+        map.set(c.memberId, []);
+      }
+      map.get(c.memberId)!.push({
+        companyName: c.companyName,
+        isPrimary: c.isPrimary
+      });
+    });
+
+    return map;
+  }, [companiesForContacts]);
 
   // Export mutations
   const exportVCard = trpc.clients.exportVCard.useMutation();
@@ -484,9 +562,10 @@ export function Clients() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="capitalize">
-                              {client.type === "company" ? "Entreprise" : "Particulier"}
-                            </Badge>
+                            <CompanyBadge
+                              clientType={client.type}
+                              companies={companiesByMember.get(client.id) || []}
+                            />
                           </TableCell>
                           <TableCell>
                             {client.type === 'company' && client.contactsCount > 0 && (
@@ -581,12 +660,10 @@ export function Clients() {
 
                             {/* Type badge - visual category indicator */}
                             <div className="flex flex-col gap-1">
-                              <Badge
-                                variant={client.type === 'company' ? 'default' : 'secondary'}
-                                className="w-fit"
-                              >
-                                {client.type === 'company' ? 'Entreprise' : 'Particulier'}
-                              </Badge>
+                              <CompanyBadge
+                                clientType={client.type}
+                                companies={companiesByMember.get(client.id) || []}
+                              />
                               {client.type === 'company' && client.contactsCount > 0 && (
                                 <Badge variant="outline" className="text-xs w-fit">
                                   {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}

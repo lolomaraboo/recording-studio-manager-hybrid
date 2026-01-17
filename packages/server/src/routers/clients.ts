@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq, desc, sql, inArray, asc } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { router, protectedProcedure } from '../_core/trpc';
 import { clients, clientNotes, clientContacts, companyMembers } from '@rsm/database/tenant';
 import { clientToVCard, parseVCardFile } from '../utils/vcard-service';
@@ -165,6 +166,33 @@ export const clientsRouter = router({
         desc(companyMembers.isPrimary),
         asc(clients.lastName),
         asc(clients.name)
+      );
+
+    return memberships;
+  }),
+
+  /**
+   * Get ALL companies that individuals belong to (for Type column display)
+   * Returns: { memberId, companyId, companyName, isPrimary }[]
+   * Used by Table/Grid/Kanban views to show "X entreprise(s)" badge for contacts
+   */
+  getAllCompaniesForContacts: protectedProcedure.query(async ({ ctx }) => {
+    const tenantDb = await ctx.getTenantDb();
+
+    const companyClients = alias(clients, 'companyClients');
+
+    const memberships = await tenantDb
+      .select({
+        memberId: companyMembers.memberClientId,
+        companyId: companyMembers.companyClientId,
+        companyName: companyClients.name,
+        isPrimary: companyMembers.isPrimary,
+      })
+      .from(companyMembers)
+      .innerJoin(companyClients, eq(companyMembers.companyClientId, companyClients.id))
+      .orderBy(
+        asc(companyMembers.memberClientId),
+        desc(companyMembers.isPrimary)
       );
 
     return memberships;
