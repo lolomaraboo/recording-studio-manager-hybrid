@@ -12,6 +12,7 @@ import { FileText, Plus, Search, ArrowLeft, Download, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { ClientPopover } from "@/components/ClientPopover";
 
 export function Invoices() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -249,7 +250,12 @@ export function Invoices() {
                       {filteredInvoices.map((invoice) => (
                         <TableRow key={invoice.id} className="cursor-pointer hover:bg-muted/50">
                           <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-                          <TableCell>{clientMap[invoice.clientId] || "Client inconnu"}</TableCell>
+                          <TableCell>
+                            <ClientPopover
+                              clientId={invoice.clientId}
+                              clientName={clientMap[invoice.clientId]}
+                            />
+                          </TableCell>
                           <TableCell className="font-semibold">
                             <div className="flex items-center gap-1">
                               {parseFloat(invoice.total || "0").toLocaleString("fr-FR", {

@@ -71,7 +71,7 @@ function CompanyBadge({
   companies
 }: {
   clientType: 'individual' | 'company';
-  companies: { companyName: string; isPrimary: boolean }[];
+  companies: { companyId: number; companyName: string; isPrimary: boolean }[];
 }) {
   if (clientType === 'company') {
     return (
@@ -147,13 +147,14 @@ export function Clients() {
 
   // Map memberId → companies[] for Type column display
   const companiesByMember = useMemo(() => {
-    const map = new Map<number, { companyName: string; isPrimary: boolean }[]>();
+    const map = new Map<number, { companyId: number; companyName: string; isPrimary: boolean }[]>();
 
     companiesForContacts?.forEach(c => {
       if (!map.has(c.memberId)) {
         map.set(c.memberId, []);
       }
       map.get(c.memberId)!.push({
+        companyId: c.companyId,
         companyName: c.companyName,
         isPrimary: c.isPrimary
       });
@@ -596,10 +597,31 @@ export function Clients() {
                           </TableCell>
                           <TableCell>
                             {client.type === 'individual' ? (
-                              <CompanyBadge
-                                clientType={client.type}
-                                companies={companiesByMember.get(client.id) || []}
-                              />
+                              companiesByMember.get(client.id) && companiesByMember.get(client.id)!.length > 0 ? (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Badge variant="secondary" className="cursor-pointer">
+                                      {companiesByMember.get(client.id)!.length} entreprise{companiesByMember.get(client.id)!.length > 1 ? 's' : ''}
+                                    </Badge>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto">
+                                    <div className="space-y-1">
+                                      {companiesByMember.get(client.id)!.map((company, idx) => (
+                                        <Link
+                                          key={idx}
+                                          to={`/clients/${company.companyId}`}
+                                          className="flex items-center gap-1 text-sm hover:bg-accent p-1 rounded transition-colors"
+                                        >
+                                          {company.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                                          <span className="font-medium">{company.companyName}</span>
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              ) : (
+                                <Badge variant="outline">Particulier</Badge>
+                              )
                             ) : (
                               client.contactsCount > 0 && (
                                 <Popover>
@@ -726,39 +748,63 @@ export function Clients() {
 
                             {/* Type badge - visual category indicator */}
                             <div className="flex flex-col gap-1">
-                              <CompanyBadge
-                                clientType={client.type}
-                                companies={companiesByMember.get(client.id) || []}
-                              />
-                              {client.type === 'company' && client.contactsCount > 0 && (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Badge variant="outline" className="text-xs w-fit cursor-pointer">
-                                      {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
-                                    </Badge>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto">
-                                    <div className="space-y-1">
-                                      {contactsByCompany.get(client.id)?.map((contact, idx) => {
-                                        // Find the contact's memberId from allMembersQuery
-                                        const memberData = allMembersQuery.data?.find(
-                                          m => m.companyId === client.id && m.memberName === contact.memberName
-                                        );
-                                        return (
+                              {client.type === 'individual' ? (
+                                companiesByMember.get(client.id) && companiesByMember.get(client.id)!.length > 0 ? (
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Badge variant="secondary" className="text-xs w-fit cursor-pointer">
+                                        {companiesByMember.get(client.id)!.length} entreprise{companiesByMember.get(client.id)!.length > 1 ? 's' : ''}
+                                      </Badge>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto">
+                                      <div className="space-y-1">
+                                        {companiesByMember.get(client.id)!.map((company, idx) => (
                                           <Link
                                             key={idx}
-                                            to={`/clients/${memberData?.memberId}`}
+                                            to={`/clients/${company.companyId}`}
                                             className="flex items-center gap-1 text-sm hover:bg-accent p-1 rounded transition-colors"
                                           >
-                                            {contact.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
-                                            <span className="font-medium">{contact.memberName}</span>
-                                            {contact.role && <span className="text-muted-foreground">- {contact.role}</span>}
+                                            {company.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                                            <span className="font-medium">{company.companyName}</span>
                                           </Link>
-                                        );
-                                      })}
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
+                                        ))}
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                ) : (
+                                  <Badge variant="outline" className="text-xs w-fit">Particulier</Badge>
+                                )
+                              ) : (
+                                client.contactsCount > 0 && (
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Badge variant="outline" className="text-xs w-fit cursor-pointer">
+                                        {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                      </Badge>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto">
+                                      <div className="space-y-1">
+                                        {contactsByCompany.get(client.id)?.map((contact, idx) => {
+                                          // Find the contact's memberId from allMembersQuery
+                                          const memberData = allMembersQuery.data?.find(
+                                            m => m.companyId === client.id && m.memberName === contact.memberName
+                                          );
+                                          return (
+                                            <Link
+                                              key={idx}
+                                              to={`/clients/${memberData?.memberId}`}
+                                              className="flex items-center gap-1 text-sm hover:bg-accent p-1 rounded transition-colors"
+                                            >
+                                              {contact.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                                              <span className="font-medium">{contact.memberName}</span>
+                                              {contact.role && <span className="text-muted-foreground">- {contact.role}</span>}
+                                            </Link>
+                                          );
+                                        })}
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                )
                               )}
                             </div>
                           </div>

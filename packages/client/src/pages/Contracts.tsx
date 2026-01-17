@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { FileText, Plus, Search, ArrowLeft, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { ClientPopover } from "@/components/ClientPopover";
 
 export function Contracts() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -257,7 +258,12 @@ export function Contracts() {
                         <TableRow key={contract.id} className="cursor-pointer hover:bg-muted/50">
                           <TableCell className="font-medium">{contract.contractNumber}</TableCell>
                           <TableCell>{contract.title}</TableCell>
-                          <TableCell>{clientMap[contract.clientId] || "Client inconnu"}</TableCell>
+                          <TableCell>
+                            <ClientPopover
+                              clientId={contract.clientId}
+                              clientName={clientMap[contract.clientId]}
+                            />
+                          </TableCell>
                           <TableCell>{getTypeBadge(contract.type)}</TableCell>
                           <TableCell>
                             {format(new Date(contract.createdAt), "dd MMM yyyy", { locale: fr })}

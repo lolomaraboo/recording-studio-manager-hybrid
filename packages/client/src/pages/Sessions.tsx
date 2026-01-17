@@ -12,6 +12,7 @@ import { Calendar, Plus, Search, ArrowLeft, Clock, MapPin, Download, Mic } from 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { ClientPopover } from "@/components/ClientPopover";
 
 export function Sessions() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -221,9 +222,10 @@ export function Sessions() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="font-medium">
-                                {clientMap[session.clientId] || "N/A"}
-                              </div>
+                              <ClientPopover
+                                clientId={session.clientId}
+                                clientName={clientMap[session.clientId]}
+                              />
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1 text-sm">

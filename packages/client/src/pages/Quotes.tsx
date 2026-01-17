@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { FileText, Plus, Search, ArrowLeft, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { ClientPopover } from "@/components/ClientPopover";
 
 export function Quotes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -241,7 +242,12 @@ export function Quotes() {
                         <TableRow key={quote.id} className="cursor-pointer hover:bg-muted/50">
                           <TableCell className="font-medium">{quote.quoteNumber}</TableCell>
                           <TableCell>{quote.notes?.substring(0, 50) || "-"}</TableCell>
-                          <TableCell>{clientMap[quote.clientId] || "Client inconnu"}</TableCell>
+                          <TableCell>
+                            <ClientPopover
+                              clientId={quote.clientId}
+                              clientName={clientMap[quote.clientId]}
+                            />
+                          </TableCell>
                           <TableCell className="font-semibold">
                             <div className="flex items-center gap-1">
                               {parseFloat(quote.total || "0").toLocaleString("fr-FR", {
