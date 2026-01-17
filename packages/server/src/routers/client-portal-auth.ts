@@ -268,21 +268,6 @@ export const clientPortalAuthRouter = router({
         throw new Error("Please verify your email before logging in");
       }
 
-      // Create session
-      const sessionToken = generateSecureToken();
-      const deviceInfo = parseUserAgent(ctx.req.headers["user-agent"]);
-
-      await tenantDb.insert(clientPortalSessions).values({
-        clientId: account.clientId,
-        token: sessionToken,
-        expiresAt: getSessionExpiration(),
-        ipAddress: ctx.req.ip,
-        userAgent: ctx.req.headers["user-agent"],
-        deviceType: deviceInfo.deviceType,
-        browser: deviceInfo.browser,
-        os: deviceInfo.os,
-      });
-
       // Update last login
       await tenantDb
         .update(clientPortalAccounts)
@@ -310,9 +295,33 @@ export const clientPortalAuthRouter = router({
         .where(eq(clients.id, account.clientId))
         .limit(1);
 
+      // Set session (same pattern as Admin Portal auth.ts)
+      (ctx.req.session as any).clientPortalClientId = account.clientId;
+      (ctx.req.session as any).clientPortalOrganizationId = organizationId;
+
+      // Save session with error handling
+      try {
+        await new Promise<void>((resolve, reject) => {
+          ctx.req.session.save((err) => {
+            if (err) {
+              console.error('[Client Portal Auth] Session save failed:', err);
+              reject(new Error('Failed to persist session. Please try again.'));
+            } else {
+              resolve();
+            }
+          });
+        });
+      } catch (error) {
+        console.error('[Client Portal Auth] Login session error:', error);
+        throw new Error('Failed to save login session');
+      }
+
+      console.log('[Client Portal Login] Session saved to Redis:', {
+        clientId: account.clientId,
+        organizationId
+      });
+
       return {
-        sessionToken,
-        expiresAt: getSessionExpiration(),
         client: client[0],
       };
     }),
@@ -497,22 +506,7 @@ export const clientPortalAuthRouter = router({
         };
       }
 
-      // For login magic links, create session
-      const sessionToken = generateSecureToken();
-      const deviceInfo = parseUserAgent(ctx.req.headers["user-agent"]);
-
-      await tenantDb.insert(clientPortalSessions).values({
-        clientId: magicLink.clientId,
-        token: sessionToken,
-        expiresAt: getSessionExpiration(),
-        ipAddress: ctx.req.ip,
-        userAgent: ctx.req.headers["user-agent"],
-        deviceType: deviceInfo.deviceType,
-        browser: deviceInfo.browser,
-        os: deviceInfo.os,
-      });
-
-      // Update last login
+      // For login magic links, update last login
       const account = await tenantDb
         .select()
         .from(clientPortalAccounts)
@@ -547,10 +541,34 @@ export const clientPortalAuthRouter = router({
         .where(eq(clients.id, magicLink.clientId))
         .limit(1);
 
+      // Set session (same pattern as password login)
+      (ctx.req.session as any).clientPortalClientId = magicLink.clientId;
+      (ctx.req.session as any).clientPortalOrganizationId = organizationId;
+
+      // Save session with error handling
+      try {
+        await new Promise<void>((resolve, reject) => {
+          ctx.req.session.save((err) => {
+            if (err) {
+              console.error('[Client Portal Auth] Magic link session save failed:', err);
+              reject(new Error('Failed to persist session. Please try again.'));
+            } else {
+              resolve();
+            }
+          });
+        });
+      } catch (error) {
+        console.error('[Client Portal Auth] Magic link session error:', error);
+        throw new Error('Failed to save magic link session');
+      }
+
+      console.log('[Client Portal Magic Link] Session saved to Redis:', {
+        clientId: magicLink.clientId,
+        organizationId
+      });
+
       return {
         purpose: "login",
-        sessionToken,
-        expiresAt: getSessionExpiration(),
         client: client[0],
       };
     }),
@@ -730,51 +748,82 @@ export const clientPortalAuthRouter = router({
     }),
 
   /**
+   * Get current authenticated client
+   * Validates session from express-session cookie
+   */
+  me: publicProcedure.query(async ({ ctx }) => {
+    const clientPortalClientId = (ctx.req.session as any).clientPortalClientId;
+    const clientPortalOrganizationId = (ctx.req.session as any).clientPortalOrganizationId;
+
+    if (!clientPortalClientId || !clientPortalOrganizationId) {
+      return { client: null };
+    }
+
+    const tenantDb = await getTenantDb(clientPortalOrganizationId);
+    const client = await tenantDb
+      .select()
+      .from(clients)
+      .where(eq(clients.id, clientPortalClientId))
+      .limit(1);
+
+    if (client.length === 0) {
+      return { client: null };
+    }
+
+    return { client: client[0] };
+  }),
+
+  /**
    * Logout
    * Destroys the current session
    */
-  logout: publicProcedure
-    .input(
-      z.object({
-        sessionToken: z.string().length(64),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const organizationId = (ctx.req.session as any).organizationId;
-      if (!organizationId) {
-        throw new Error("Not authenticated");
-      }
+  logout: publicProcedure.mutation(async ({ ctx }) => {
+    const clientPortalClientId = (ctx.req.session as any).clientPortalClientId;
+    const clientPortalOrganizationId = (ctx.req.session as any).clientPortalOrganizationId;
 
-      const tenantDb = await getTenantDb(organizationId);
-
-      // Find and delete session
-      const sessionList = await tenantDb
-        .select()
-        .from(clientPortalSessions)
-        .where(eq(clientPortalSessions.token, input.sessionToken))
-        .limit(1);
-
-      if (sessionList.length > 0) {
-        const session = sessionList[0];
-
-        // Delete session
-        await tenantDb
-          .delete(clientPortalSessions)
-          .where(eq(clientPortalSessions.id, session.id));
-
-        // Log activity
+    // Log activity if authenticated
+    if (clientPortalClientId && clientPortalOrganizationId) {
+      try {
+        const tenantDb = await getTenantDb(clientPortalOrganizationId);
         await tenantDb.insert(clientPortalActivityLogs).values({
-          clientId: session.clientId,
+          clientId: clientPortalClientId,
           action: "logout",
           description: "Logged out successfully",
           status: "success",
           ipAddress: ctx.req.ip,
           userAgent: ctx.req.headers["user-agent"],
         });
+      } catch (error) {
+        console.error('[Client Portal Logout] Failed to log activity:', error);
+        // Don't throw - allow logout to proceed
       }
+    }
 
-      return { message: "Logged out successfully" };
-    }),
+    // Clear session
+    delete (ctx.req.session as any).clientPortalClientId;
+    delete (ctx.req.session as any).clientPortalOrganizationId;
+
+    // Save session with error handling
+    try {
+      await new Promise<void>((resolve, reject) => {
+        ctx.req.session.save((err) => {
+          if (err) {
+            console.error('[Client Portal Auth] Logout session save failed:', err);
+            reject(new Error('Failed to clear session. Please try again.'));
+          } else {
+            resolve();
+          }
+        });
+      });
+    } catch (error) {
+      console.error('[Client Portal Auth] Logout session error:', error);
+      throw new Error('Failed to clear logout session');
+    }
+
+    console.log('[Client Portal Logout] Session cleared from Redis');
+
+    return { message: "Logged out successfully" };
+  }),
 
   /**
    * Get current session

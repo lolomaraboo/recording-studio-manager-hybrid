@@ -32,6 +32,8 @@ export type TrpcContext = {
   res: CreateExpressContextOptions['res'];
   user: User | null;
   organizationId: number | null;
+  clientPortalClientId: number | null;
+  clientPortalOrganizationId: number | null;
   tenantDb: TenantDb | null;
   getTenantDb: () => Promise<TenantDb>;
 };
@@ -51,6 +53,8 @@ export async function createContext(
 ): Promise<TrpcContext> {
   let user: User | null = null;
   let organizationId: number | null = null;
+  let clientPortalClientId: number | null = null;
+  let clientPortalOrganizationId: number | null = null;
   let tenantDb: TenantDb | null = null;
 
   try {
@@ -75,9 +79,15 @@ export async function createContext(
 
       // Debug session
       console.log('[Auth Debug] Session ID:', opts.req.sessionID);
-      console.log('[Auth Debug] Session data:', { userId: session.userId, organizationId: session.organizationId });
+      console.log('[Auth Debug] Session data:', {
+        userId: session.userId,
+        organizationId: session.organizationId,
+        clientPortalClientId: session.clientPortalClientId,
+        clientPortalOrganizationId: session.clientPortalOrganizationId
+      });
       console.log('[Auth Debug] Cookie header:', opts.req.headers.cookie);
 
+      // Admin Portal session
       if (session.userId && session.organizationId) {
         // User is authenticated via session
         user = {
@@ -90,9 +100,18 @@ export async function createContext(
 
         // Load tenant DB
         tenantDb = await getTenantDb(organizationId);
-        console.log('[Auth Debug] User authenticated:', { userId: user.id, organizationId });
-      } else {
-        console.log('[Auth Debug] No valid session - user not authenticated');
+        console.log('[Auth Debug] Admin user authenticated:', { userId: user.id, organizationId });
+      }
+
+      // Client Portal session
+      if (session.clientPortalClientId && session.clientPortalOrganizationId) {
+        clientPortalClientId = session.clientPortalClientId;
+        clientPortalOrganizationId = session.clientPortalOrganizationId;
+        console.log('[Auth Debug] Client Portal authenticated:', { clientPortalClientId, clientPortalOrganizationId });
+      }
+
+      if (!user && !clientPortalClientId) {
+        console.log('[Auth Debug] No valid session - neither admin nor client portal authenticated');
       }
     }
   } catch (error) {
@@ -100,21 +119,28 @@ export async function createContext(
     console.error('[Auth Error]:', error);
     user = null;
     organizationId = null;
+    clientPortalClientId = null;
+    clientPortalOrganizationId = null;
     tenantDb = null;
   }
+
+  // Determine effective organizationId for getTenantDb
+  const effectiveOrgId = organizationId || clientPortalOrganizationId;
 
   return {
     req: opts.req,
     res: opts.res,
     user,
     organizationId,
+    clientPortalClientId,
+    clientPortalOrganizationId,
     tenantDb,
     getTenantDb: () => {
-      if (!organizationId) {
+      if (!effectiveOrgId) {
         throw new Error('No organization context');
       }
       if (tenantDb) return Promise.resolve(tenantDb);
-      return getTenantDb(organizationId);
+      return getTenantDb(effectiveOrgId);
     },
   };
 }
