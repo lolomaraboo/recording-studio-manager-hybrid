@@ -45,8 +45,8 @@ export default function ClientLogin() {
       const result = await loginMutation.mutateAsync({ email, password });
       console.log('Login successful:', result);
 
-      // Store session in context (localStorage)
-      authLogin(result.sessionToken, result.client as any);
+      // Store client data in context (session cookie sent automatically)
+      authLogin(result.client as any);
 
       toast.success('Login successful!');
       // Navigate to client portal index (dashboard)

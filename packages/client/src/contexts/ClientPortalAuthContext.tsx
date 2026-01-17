@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
+import { trpc } from '@/lib/trpc';
 
 /**
  * Client Portal Authentication Context
  *
  * Manages client authentication state for the client portal:
- * - Session token storage (localStorage)
- * - Auto-login from stored token
+ * - Session validation via tRPC me query (express-session cookies)
+ * - Auto-login from server session
  * - Login/logout methods
  * - Current client data
  */
@@ -18,11 +20,10 @@ interface Client {
 }
 
 interface ClientPortalAuthContextType {
-  sessionToken: string | null;
   client: Client | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string, client: Client) => void;
+  login: (client: Client) => void;
   logout: () => void;
   updateClient: (client: Client) => void;
 }
@@ -31,62 +32,46 @@ const ClientPortalAuthContext = createContext<ClientPortalAuthContextType | unde
   undefined
 );
 
-const SESSION_TOKEN_KEY = 'client_portal_session_token';
-const CLIENT_DATA_KEY = 'client_portal_client_data';
-
 interface ClientPortalAuthProviderProps {
   children: ReactNode;
 }
 
 export function ClientPortalAuthProvider({ children }: ClientPortalAuthProviderProps) {
-  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from localStorage on mount
+  // Query session from server (like Admin Portal auth.me)
+  const meQuery = trpc.clientPortalAuth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   useEffect(() => {
-    const storedToken = localStorage.getItem(SESSION_TOKEN_KEY);
-    const storedClient = localStorage.getItem(CLIENT_DATA_KEY);
-
-    if (storedToken && storedClient) {
-      try {
-        const parsedClient = JSON.parse(storedClient) as Client;
-        setSessionToken(storedToken);
-        setClient(parsedClient);
-      } catch (error) {
-        console.error('Failed to parse stored client data:', error);
-        // Clear invalid data
-        localStorage.removeItem(SESSION_TOKEN_KEY);
-        localStorage.removeItem(CLIENT_DATA_KEY);
-      }
+    if (meQuery.data?.client) {
+      setClient(meQuery.data.client);
+    } else if (meQuery.error || meQuery.isError) {
+      setClient(null);
     }
+    setIsLoading(meQuery.isLoading);
+  }, [meQuery.data, meQuery.error, meQuery.isError, meQuery.isLoading]);
 
-    setIsLoading(false);
-  }, []);
-
-  const login = (token: string, clientData: Client) => {
-    setSessionToken(token);
+  const login = (clientData: Client) => {
     setClient(clientData);
-    localStorage.setItem(SESSION_TOKEN_KEY, token);
-    localStorage.setItem(CLIENT_DATA_KEY, JSON.stringify(clientData));
+    // No localStorage - session cookie sent automatically by browser
   };
 
   const logout = () => {
-    setSessionToken(null);
     setClient(null);
-    localStorage.removeItem(SESSION_TOKEN_KEY);
-    localStorage.removeItem(CLIENT_DATA_KEY);
+    // Server destroys session via logout mutation
   };
 
   const updateClient = (clientData: Client) => {
     setClient(clientData);
-    localStorage.setItem(CLIENT_DATA_KEY, JSON.stringify(clientData));
   };
 
   const value: ClientPortalAuthContextType = {
-    sessionToken,
     client,
-    isAuthenticated: !!sessionToken && !!client,
+    isAuthenticated: !!client,
     isLoading,
     login,
     logout,
@@ -144,9 +129,8 @@ export function ProtectedClientRoute({ children }: ProtectedClientRouteProps) {
   }
 
   if (!isAuthenticated) {
-    // Redirect to login
-    window.location.href = '/client-portal/login';
-    return null;
+    // Declarative React Router redirect
+    return <Navigate to="/client-portal/login" replace />;
   }
 
   return <>{children}</>;
