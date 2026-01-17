@@ -71,30 +71,8 @@ export function Clients() {
     );
   }, [clients, sessions, invoices]);
 
-  // Batch load contacts for companies (for Kanban view)
-  const companyClientIds = useMemo(() => {
-    return clientsWithStats
-      .filter(c => c.type === 'company' && c.contactsCount > 0)
-      .map(c => c.id);
-  }, [clientsWithStats]);
-
-  // Batch query contacts for all companies with contacts
-  const contactQueries = companyClientIds.map(clientId =>
-    trpc.clients.getWithContacts.useQuery({ id: clientId }, {
-      enabled: viewMode === 'kanban', // Only load when Kanban view is active
-    })
-  );
-
-  // Build clientId -> contacts map
-  const contactsMap = useMemo(() => {
-    const map = new Map();
-    contactQueries.forEach((query, index) => {
-      if (query.data?.contacts) {
-        map.set(companyClientIds[index], query.data.contacts);
-      }
-    });
-    return map;
-  }, [contactQueries, companyClientIds]);
+  // Note: Removed batch loading to avoid React Hooks violation
+  // Contacts are now loaded per-card in Kanban view
 
   // Filter and sort clients
   const filteredClients = useMemo(() => {
@@ -900,76 +878,12 @@ export function Clients() {
                                     </div>
                                   )}
 
-                                  {/* Contact list for companies */}
-                                  {client.type === 'company' && contactsMap.has(client.id) && (
-                                    <div className="space-y-2 border-t pt-2">
-                                      <h4 className="text-xs font-semibold">Contacts de l'entreprise</h4>
-                                      {contactsMap.get(client.id)
-                                        .sort((a: any, b: any) => {
-                                          // Primary contact first
-                                          if (a.isPrimary && !b.isPrimary) return -1;
-                                          if (!a.isPrimary && b.isPrimary) return 1;
-                                          // Then alphabetically by lastName
-                                          return a.lastName.localeCompare(b.lastName);
-                                        })
-                                        .map((contact: any) => (
-                                          <div key={contact.id} className="text-xs space-y-1 bg-muted/50 p-2 rounded">
-                                            {/* Name with primary star */}
-                                            <div className="font-medium flex items-center gap-1">
-                                              {contact.isPrimary && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
-                                              {contact.firstName} {contact.lastName}
-                                            </div>
-
-                                            {/* Title/role */}
-                                            {contact.title && (
-                                              <div className="text-muted-foreground">{contact.title}</div>
-                                            )}
-
-                                            {/* Email with mailto link and copy button */}
-                                            {contact.email && (
-                                              <div className="flex items-center gap-2">
-                                                <Mail className="h-3 w-3 flex-shrink-0" />
-                                                <a href={`mailto:${contact.email}`} className="hover:underline truncate">
-                                                  {contact.email}
-                                                </a>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="icon"
-                                                  className="h-4 w-4 flex-shrink-0"
-                                                  onClick={(e) => {
-                                                    e.preventDefault();
-                                                    navigator.clipboard.writeText(contact.email);
-                                                    toast.success("Email copié!");
-                                                  }}
-                                                >
-                                                  <Copy className="h-3 w-3" />
-                                                </Button>
-                                              </div>
-                                            )}
-
-                                            {/* Phone with tel link and copy button */}
-                                            {contact.phone && (
-                                              <div className="flex items-center gap-2">
-                                                <Phone className="h-3 w-3 flex-shrink-0" />
-                                                <a href={`tel:${contact.phone}`} className="hover:underline">
-                                                  {contact.phone}
-                                                </a>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="icon"
-                                                  className="h-4 w-4 flex-shrink-0"
-                                                  onClick={(e) => {
-                                                    e.preventDefault();
-                                                    navigator.clipboard.writeText(contact.phone);
-                                                    toast.success("Téléphone copié!");
-                                                  }}
-                                                >
-                                                  <Copy className="h-3 w-3" />
-                                                </Button>
-                                              </div>
-                                            )}
-                                          </div>
-                                        ))}
+                                  {/* Contact count badge for companies (Kanban view) */}
+                                  {client.type === 'company' && client.contactsCount > 0 && (
+                                    <div className="border-t pt-2">
+                                      <Badge variant="outline" className="text-xs">
+                                        {client.contactsCount} contact{client.contactsCount > 1 ? 's' : ''}
+                                      </Badge>
                                     </div>
                                   )}
 
