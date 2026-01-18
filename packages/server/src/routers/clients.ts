@@ -751,4 +751,39 @@ export const clientsRouter = router({
         preview,
       };
     }),
+
+  /**
+   * Get client statistics including genre distribution
+   */
+  stats: protectedProcedure
+    .query(async ({ ctx }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get all clients with genres
+      const clientsWithGenres = await tenantDb
+        .select({
+          genres: clients.genres,
+        })
+        .from(clients)
+        .where(sql`${clients.genres} IS NOT NULL AND jsonb_array_length(${clients.genres}) > 0`);
+
+      // Aggregate genre counts
+      const genreCounts: Record<string, number> = {};
+      clientsWithGenres.forEach(client => {
+        (client.genres as string[] || []).forEach(genre => {
+          genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+        });
+      });
+
+      // Sort by count descending, take top 5
+      const topGenres = Object.entries(genreCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5)
+        .map(([genre, count]) => ({ genre, count }));
+
+      return {
+        genreDistribution: topGenres,
+        totalClients: clientsWithGenres.length,
+      };
+    }),
 });

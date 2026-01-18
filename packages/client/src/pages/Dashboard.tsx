@@ -47,7 +47,8 @@ type WidgetId =
   | 'weekly-revenue'
   | 'top-clients'
   | 'equipment-maintenance'
-  | 'unread-messages';
+  | 'unread-messages'
+  | 'genre-distribution';
 
 interface WidgetConfig {
   id: WidgetId;
@@ -116,6 +117,7 @@ export function Dashboard() {
     { id: 'top-clients', title: 'Top Clients', visible: true },
     { id: 'equipment-maintenance', title: 'Équipement en maintenance', visible: true },
     { id: 'unread-messages', title: 'Messages non lus', visible: true },
+    { id: 'genre-distribution', title: 'Genres musicaux populaires', visible: true },
   ];
 
   const [widgets, setWidgets] = useState<WidgetConfig[]>(() => {
@@ -161,6 +163,7 @@ export function Dashboard() {
   const { data: projectsData } = trpc.projects.list.useQuery(undefined, { enabled: selectedOrgId !== null });
   const { data: allSessions } = trpc.sessions.list.useQuery(undefined, { enabled: selectedOrgId !== null });
   const { data: invoicesData } = trpc.invoices.list.useQuery(undefined, { enabled: selectedOrgId !== null });
+  const { data: clientStats } = trpc.clients.stats.useQuery(undefined, { enabled: selectedOrgId !== null });
 
   // Filtrer les sessions côté client
   const today = new Date().toISOString().split("T")[0];
@@ -329,6 +332,7 @@ export function Dashboard() {
                         upcomingSessions,
                         revenueTrend,
                         navigate,
+                        clientStats,
                       })}
                     </DraggableWidget>
                   ))}
@@ -353,6 +357,7 @@ function renderWidget(
     upcomingSessions: any;
     revenueTrend: number;
     navigate: (path: string) => void;
+    clientStats: any;
   }
 ) {
   const {
@@ -365,6 +370,7 @@ function renderWidget(
     upcomingSessions,
     revenueTrend,
     navigate,
+    clientStats,
   } = data;
 
   switch (id) {
@@ -602,6 +608,36 @@ function renderWidget(
             <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Aucun message non lu</p>
           </div>
+        </div>
+      );
+
+    case 'genre-distribution':
+      return (
+        <div>
+          <CardTitle className="text-lg mb-4 flex items-center gap-2">
+            <Music className="h-8 w-8 text-primary" />
+            Genres musicaux populaires
+          </CardTitle>
+          <CardDescription className="text-sm mb-4">Top 5 genres d'artistes</CardDescription>
+          {data.clientStats?.genreDistribution && data.clientStats.genreDistribution.length > 0 ? (
+            <div className="space-y-2">
+              {data.clientStats.genreDistribution.map(({ genre, count }, idx) => (
+                <div key={genre} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="w-6 h-6 rounded-full flex items-center justify-center text-xs">
+                      {idx + 1}
+                    </Badge>
+                    <span className="text-sm font-medium">{genre}</span>
+                  </div>
+                  <Badge variant="outline">{count} client{count > 1 ? 's' : ''}</Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              Aucune donnée de genre disponible
+            </p>
+          )}
         </div>
       );
 
