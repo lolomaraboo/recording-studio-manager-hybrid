@@ -30,15 +30,18 @@ export const clientsRouter = router({
         .object({
           limit: z.number().min(1).max(100).default(50),
           offset: z.number().min(0).default(0),
+          search: z.string().optional(),
+          genre: z.string().optional(), // NEW: Filter by genre
+          instrument: z.string().optional(), // NEW: Filter by instrument
         })
         .optional()
     )
     .query(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
-      const { limit = 50, offset = 0 } = input || {};
+      const { limit = 50, offset = 0, search, genre, instrument } = input || {};
 
-      // Get clients with notes metadata and members count
-      const clientsList = await tenantDb
+      // Build base query
+      let query = tenantDb
         .select({
           id: clients.id,
           userId: clients.userId,
@@ -66,8 +69,39 @@ export const clientsRouter = router({
         .leftJoin(clientNotes, eq(clients.id, clientNotes.clientId))
         .leftJoin(companyMembers, eq(clients.id, companyMembers.companyClientId))
         .groupBy(clients.id)
-        .limit(limit)
-        .offset(offset);
+        .$dynamic();
+
+      // Apply filters conditionally
+      const conditions: any[] = [];
+
+      // Search filter (name/email)
+      if (search) {
+        conditions.push(
+          sql`${clients.name} ILIKE ${`%${search}%`} OR ${clients.email} ILIKE ${`%${search}%`}`
+        );
+      }
+
+      // Genre filter using JSONB containment (@>)
+      if (genre) {
+        conditions.push(
+          sql`${clients.genres} @> ${JSON.stringify([genre])}`
+        );
+      }
+
+      // Instrument filter using JSONB containment (@>)
+      if (instrument) {
+        conditions.push(
+          sql`${clients.instruments} @> ${JSON.stringify([instrument])}`
+        );
+      }
+
+      // Apply all conditions with AND logic
+      if (conditions.length > 0) {
+        query = query.where(sql.join(conditions, sql` AND `)) as typeof query;
+      }
+
+      // Apply pagination
+      const clientsList = await query.limit(limit).offset(offset);
 
       return clientsList;
     }),
