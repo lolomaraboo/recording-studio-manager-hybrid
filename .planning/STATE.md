@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 21.1 of 21 (Fix Client Portal Authentication Persistence)
-Plan: 21.1-01 of 1 - Phase 21.1 COMPLETE ✅
-Status: Phase 21.1 complete - Client Portal auth migrated to express-session, E2E tests 9/9 passing
-Last activity: 2026-01-17 - Phase 21.1-01 complete (5 min), migrated from localStorage to express-session cookies, unified Admin + Client Portal authentication, removed E2E test workarounds
+Phase: 18.4 of 21 (Music Profile for Artists)
+Plan: 18.4-01 of 1 - Phase 18.4 IN PROGRESS
+Status: Plan 18.4-01 complete - Music profile schema extension (22 fields) with JSONB arrays and GIN indexes
+Last activity: 2026-01-17 - Phase 18.4-01 complete (8 min), added 22 music profile fields to clients table, created migration 0012, validated with tenant_24
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 1/1 plans (18.4-01 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 87
-- Average duration: 35.2 min
-- Total execution time: 51.1 hours
+- Total plans completed: 88
+- Average duration: 34.9 min
+- Total execution time: 51.2 hours
 
 **By Phase:**
 
@@ -81,10 +81,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 20.1 | 2/2 | 15 min | 7.5 min |
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
+| 18.4 | 1/1 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 6 min, 10 min, 6 min, 5 min]
-- Trend: Phase 21.1 COMPLETE (5 min). Client Portal authentication persistence bug FIXED. Migrated from localStorage sessionToken to express-session cookies (unified Admin + Client Portal authentication). E2E tests 9/9 passing (was 2/8 with workarounds). Production Client Portal now functional for invoice payments.
+- Last 5 plans: [6 min, 10 min, 6 min, 5 min, 8 min]
+- Trend: Phase 18.4-01 COMPLETE (8 min). Music profile schema extension - added 22 fields to clients table (JSONB arrays for genres/instruments, streaming platform URLs, industry contacts, career info). Created migration 0012 with GIN indexes for JSONB search performance. Validated with tenant_24 database. Ready for UI implementation.
 
 ## Accumulated Context
 
@@ -194,6 +195,10 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21.1-01 | Express-session for Client Portal auth | Migrated Client Portal from localStorage sessionToken to express-session cookies (same pattern as Admin Portal). Rationale: localStorage tokens have no server-side validation, can be manipulated, no automatic expiration enforcement. Express-session provides battle-tested session management with Redis persistence, automatic expiration, CSRF protection via sameSite cookies, httpOnly security. Unified authentication system for both Admin and Client Portal. |
 | 21.1-01 | Session save error handling pattern | All req.session.save() calls wrapped in try-catch with console.error logging. Rationale: If Redis connection fails during session save, mutation would throw unhandled exception causing generic 500 error. With try-catch wrapper, we get console.error logging for debugging production session issues and user-friendly error messages. Prevents partial state where session data is set in memory but save failed. |
 | 21.1-01 | Navigate component over window.location.href | Replaced window.location.href with Navigate component in ProtectedClientRoute. Rationale: Full page reload breaks SPA navigation, loses React Router state, causes flash of loading. Navigate component preserves SPA behavior, maintains React state, is React Router v6 standard pattern. |
+| 18.4-01 | Manual migration creation for music profile | Created migration 0012 manually instead of drizzle-kit generate (interactive prompt blocking automation). Rationale: Faster and more reliable for known schema changes. Interactive prompt asked about unrelated quote_items.service_template_id column, would require debugging Drizzle internals. |
+| 18.4-01 | Increment tenant number for testing | Created tenant_24 for schema validation instead of fixing broken tenants. Rationale: Development workflow pattern from DEVELOPMENT-WORKFLOW.md - 30 seconds vs 2-3 hours debugging migrations. Migration 0012 applied successfully to fresh tenant with all 22 music profile fields. |
+| 18.4-01 | GIN indexes for JSONB arrays | Added GIN indexes on genres and instruments columns for fast containment queries. Rationale: PostgreSQL recommended pattern for JSONB array filtering using @> operator. Enables "find all clients with genre 'Rock'" queries at scale without table scans. |
+| 18.4-01 | Flat streaming URL fields | Used 11 separate varchar columns for streaming platforms instead of nested JSONB object. Rationale: Simpler querying, allows individual field validation in future, clear column names in schema. Trade-off: More columns but better developer ergonomics and type safety. |
 | 21-01 | Evidence-based script audit (test results required) | Document actual test execution results (ERROR messages, missing columns) not just status markers. Rationale: Proves obsolescence with concrete evidence, enables informed decisions. Impact: Audit credibility increased, developers understand WHY scripts obsolete (e.g., "ERROR: column project_id does not exist", "missing 16 tables"). Alternative rejected: Simple WORKING/BROKEN classification without evidence. |
 | 21-01 | Keep production deploy scripts unchanged despite migration-based approach | deploy-master.sh and deploy-tenants.sh marked WORKING despite using migrations. Rationale: Production tenants have migration history (can't skip migrations), sequential application correct for incremental updates, different from dev tenant creation. Impact: 2/2 DEPLOY scripts remain production-ready, production workflow unchanged. Alternative rejected: Deprecate ALL migration-based scripts uniformly. |
 | 21-01 | Categorize scripts by use case (5 categories) | Group scripts into INIT/SEED/FIX/DEPLOY/MONITOR categories. Rationale: Clear purpose identification, reveals patterns (FIX 100% obsolete validates increment tenant), enables targeted recommendations. Impact: Category summaries show working/obsolete counts, critical gaps surface. Alternative rejected: Flat alphabetical list (no pattern insight). |
@@ -451,32 +456,39 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-17T10:20:50Z
-Stopped at: Phase 21.1 COMPLETE ✅ - Client Portal authentication persistence bug fixed
+Last session: 2026-01-18T00:17:30Z
+Stopped at: Phase 18.4-01 COMPLETE ✅ - Music profile schema extension
 Resume context:
-  - Phase 21.1 COMPLETE ✅: Fix Client Portal Authentication Persistence (5 min total)
-    - **Plan 21.1-01:** Authentication migration complete (5 min)
-      - **Task 1 (Backend):** Migrated login/verifyMagicLink/logout mutations to express-session
-        - Removed sessionToken generation and return
-        - Added req.session.clientPortalClientId + clientPortalOrganizationId storage
-        - Added session.save() with try-catch error handling and logging
-        - Created new me query for session validation
-        - Updated logout to destroy session instead of deleting token
-      - **Task 2 (Frontend):** Updated ClientPortalAuthContext and ClientLogin
-        - Removed localStorage logic (SESSION_TOKEN_KEY, CLIENT_DATA_KEY)
-        - Added tRPC me query for session validation
-        - Replaced window.location.href with Navigate component
-        - Updated login handler to not expect sessionToken
-      - **Task 3 (E2E Tests):** Fixed test-phase17-invoice-payment.spec.ts
-        - Replaced injectSessionToken workaround with real loginToClientPortal function
-        - Removed manual session DB insertion from beforeAll
-        - Added session persistence test with page refresh validation
-        - Added session cookie verification (connect.sid, httpOnly)
-        - Verified NO localStorage usage
+  - Phase 18.4 Plan 01 COMPLETE ✅: Music Profile Schema Extension (8 min total)
+    - **Plan 18.4-01:** Database schema extension complete (8 min)
+      - **Task 1 (Schema):** Extended clients table with 22 music profile fields
+        - Added 2 JSONB array fields (genres, instruments) with .$type<string[]>() type safety
+        - Added 11 streaming platform URL fields (Spotify, Apple Music, YouTube, etc.)
+        - Added 5 industry information fields (label, distributor, manager, publisher, PRO)
+        - Added 4 career information fields (years active, notable works, awards, bio)
+        - All fields nullable for backward compatibility
+        - TypeScript type checking passes with 0 errors
+      - **Task 2 (Migration):** Created migration 0012_add_music_profile_fields.sql
+        - 22 ALTER TABLE ADD COLUMN statements
+        - 2 CREATE INDEX USING GIN for genres and instruments
+        - JSONB fields have DEFAULT '[]' (empty array)
+        - Manual creation (avoided Drizzle interactive prompt)
+      - **Task 3 (Validation):** Tested schema with tenant_24 database
+        - Created tenant_24 database
+        - Applied all 13 tenant migrations (0000-0012)
+        - Verified all 22 music profile columns exist
+        - Verified GIN indexes on genres and instruments
+        - Tested INSERT with JSONB arrays
+        - Tested JSONB containment queries (@> operator)
+        - Registered tenant_24 in master DB (org_id 24)
     - **Final State:**
-      - E2E tests: 9/9 passing (was 2/8 with localStorage workarounds)
-      - Session cookie: connect.sid, httpOnly: true
-      - localStorage: NO usage (verified in E2E test 2)
-      - Dual authentication: Admin Portal + Client Portal unified in tRPC context
-      - Phase 17 UAT: Unblocked - invoice payment flow now functional
-  - **Next:** Phase 17 UAT can proceed. Client Portal production-ready for invoice payments.
+      - Schema: 22 new music profile fields in clients table
+      - Migration: 0012 ready for new tenants
+      - Validation: tenant_24 with test data (5 artists)
+      - Performance: GIN indexes enable fast genre/instrument filtering
+      - Type safety: TypeScript infers all fields correctly
+    - **Commits:**
+      - 31330b8: feat(18.4-01): add music profile fields to clients table schema
+      - a58257b: feat(18.4-01): create migration for music profile fields
+      - e1cd2b7: test(18.4-01): validate music profile schema with tenant_24
+  - **Next:** Phase 18.4-02 UI implementation. Database schema ready for music profile components.
