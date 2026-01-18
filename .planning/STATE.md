@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 18.4 of 21 (Music Profile for Artists)
-Plan: 18.4-02 of 2 - Phase 18.4 COMPLETE ✅
-Status: Plan 18.4-02 complete - Music profile UI component with multi-select, presets, and collapsible panel
-Last activity: 2026-01-18 - Phase 18.4-02 complete (10 min), created MusicProfileSection component (339 lines), music presets (17 genres, 13 instruments), ready for ClientDetail integration
+Plan: 18.4-03 of 3 - Phase 18.4 COMPLETE ✅
+Status: Plan 18.4-03 complete - Music profile UI integration with tabbed interface, JSONB filters, and Dashboard widget
+Last activity: 2026-01-18 - Phase 18.4-03 complete (28 min), tabbed ClientDetail interface, genre/instrument filters on Clients list with backend JSONB @> queries, genre distribution Dashboard widget, 4 atomic commits
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 2/2 plans (18.4-01 ✅, 18.4-02 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 89
-- Average duration: 34.6 min
-- Total execution time: 51.4 hours
+- Total plans completed: 90
+- Average duration: 34.7 min
+- Total execution time: 52.1 hours
 
 **By Phase:**
 
@@ -81,11 +81,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 20.1 | 2/2 | 15 min | 7.5 min |
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
-| 18.4 | 2/2 | 18 min | 9 min |
+| 18.4 | 3/3 | 46 min | 15.3 min |
 
 **Recent Trend:**
-- Last 5 plans: [10 min, 6 min, 5 min, 8 min, 10 min]
-- Trend: Phase 18.4 COMPLETE ✅ (18 min total). Music profile feature complete - database schema (22 fields) + UI component (339 lines). Plan 18.4-02: Created MusicProfileSection with multi-select genres/instruments, 17 genre categories, 13 instrument families, 11 streaming platforms, collapsible panel with localStorage. Ready for ClientDetail integration.
+- Last 5 plans: [6 min, 5 min, 8 min, 10 min, 28 min]
+- Trend: Phase 18.4 COMPLETE ✅ (46 min total). Music profile feature fully integrated - database + UI component + filters + analytics. Plan 18.4-03: Tabbed ClientDetail interface, genre/instrument filters with JSONB @> backend queries, Dashboard genre distribution widget. All 22 music profile fields operational end-to-end.
 
 ## Accumulated Context
 
@@ -202,6 +202,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21-01 | Evidence-based script audit (test results required) | Document actual test execution results (ERROR messages, missing columns) not just status markers. Rationale: Proves obsolescence with concrete evidence, enables informed decisions. Impact: Audit credibility increased, developers understand WHY scripts obsolete (e.g., "ERROR: column project_id does not exist", "missing 16 tables"). Alternative rejected: Simple WORKING/BROKEN classification without evidence. |
 | 21-01 | Keep production deploy scripts unchanged despite migration-based approach | deploy-master.sh and deploy-tenants.sh marked WORKING despite using migrations. Rationale: Production tenants have migration history (can't skip migrations), sequential application correct for incremental updates, different from dev tenant creation. Impact: 2/2 DEPLOY scripts remain production-ready, production workflow unchanged. Alternative rejected: Deprecate ALL migration-based scripts uniformly. |
 | 21-01 | Categorize scripts by use case (5 categories) | Group scripts into INIT/SEED/FIX/DEPLOY/MONITOR categories. Rationale: Clear purpose identification, reveals patterns (FIX 100% obsolete validates increment tenant), enables targeted recommendations. Impact: Category summaries show working/obsolete counts, critical gaps surface. Alternative rejected: Flat alphabetical list (no pattern insight). |
+| 18.4-03 | Use tabbed interface for client detail | Rationale: Reduces vertical scrolling, organizes 3 major sections (basic info, enriched fields, music profile) into logical tabs. Impact: Improved UX for navigating large client profiles with many fields. |
+| 18.4-03 | Backend JSONB filtering instead of client-side | Rationale: Better performance for large datasets, leverages GIN indexes created in 18.4-01, reduces data transfer. Impact: Fast filtering even with hundreds of clients, server-side filtering ensures accuracy. |
+| 18.4-03 | Dynamic query builder pattern | Rationale: Avoids query duplication, conditionally adds WHERE clauses only when filters are provided. Impact: Clean, maintainable code for optional filters, easy to add more filters in future. |
+| 18.4-03 | Server-side genre aggregation in stats endpoint | Rationale: Accurate counts across all clients, not just currently loaded page, reusable for future analytics. Impact: Enables reliable dashboard widget, foundation for future reporting features. |
+| 18.4-03 | Conditional clear filters button | Rationale: Reduces UI clutter when no filters are active, discoverable when needed. Impact: Clean interface design, intuitive filter management. |
 
 ### Deferred Issues
 
@@ -456,34 +461,32 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-18T00:39:21Z
-Stopped at: Phase 18.4 COMPLETE ✅ - Music profile feature complete (database + UI)
+Last session: 2026-01-18T00:48:11Z
+Stopped at: Phase 18.4 COMPLETE ✅ - Music profile feature 100% operational end-to-end
 Resume context:
-  - Phase 18.4 COMPLETE ✅: Music Profile for Artists (18 min total)
+  - Phase 18.4 COMPLETE ✅: Music Profile for Artists (46 min total, 3 plans)
     - **Plan 18.4-01:** Database schema extension (8 min)
-      - Extended clients table with 22 music profile fields
+      - Extended clients table with 22 music profile fields (genres, instruments, streaming, industry, career)
       - Created migration 0012 with GIN indexes for JSONB arrays
       - Validated with tenant_24 database
     - **Plan 18.4-02:** UI component implementation (10 min)
-      - **Task 1:** Multi-select component (already existed in project)
-      - **Task 2:** Created music-presets.ts with 17 genre categories, 13 instrument families
-      - **Task 3:** Created MusicProfileSection.tsx component (339 lines)
-        - Main view: Genre and instrument badges with icons
-        - Collapsible panel: 11 streaming platforms + 5 industry contacts + 4 career fields
-        - localStorage state persistence for panel (collapsed by default)
-        - Empty state with quick-add buttons
-        - Follows EnrichedClientInfo pattern (controlled inputs, onUpdate callback)
-        - TypeScript compilation successful, client build passes
+      - Created music-presets.ts with 17 genre categories, 13 instrument families (130+ genres, 80+ instruments)
+      - Created MusicProfileSection.tsx component (339 lines) - main view + collapsible panel + localStorage state
+    - **Plan 18.4-03:** UI integration and filters (28 min)
+      - **Task 1:** Tabbed ClientDetail interface (Informations, Informations Enrichies, Profil Musical)
+      - **Task 2:** Genre/instrument filters on Clients list page with real-time filtering
+      - **Task 3:** Backend JSONB containment filters using PostgreSQL @> operator with dynamic query builder
+      - **Task 4:** Genre distribution Dashboard widget showing top 5 genres with ranking badges
     - **Final State:**
-      - Database: 22 music profile fields in clients table (migration 0012)
-      - UI: MusicProfileSection component ready for integration
-      - Presets: FLAT_GENRES (130+ genres), FLAT_INSTRUMENTS (80+ instruments)
-      - Build: Client package builds successfully (dist generated)
+      - Database: 22 music profile fields in clients table (migration 0012, GIN indexes)
+      - UI: Fully integrated MusicProfileSection in ClientDetail with 3-tab interface
+      - Filtering: Genre/instrument filters on Clients list with backend JSONB @> queries
+      - Analytics: Dashboard widget displaying top 5 genres across all clients
+      - Backend: clients.stats endpoint for aggregated genre data, dynamic query builder for conditional filters
+      - Build: Client package builds successfully, TypeScript compilation passes
     - **Commits:**
-      - 31330b8: feat(18.4-01): add music profile fields to clients table schema
-      - a58257b: feat(18.4-01): create migration for music profile fields
-      - e1cd2b7: test(18.4-01): validate music profile schema with tenant_24
-      - 2f7c0d6: chore(18.4-02): verify multi-select component exists
-      - aba8d9a: feat(18.4-02): create music preset data for genres and instruments
-      - b3ac8ae: feat(18.4-02): create MusicProfileSection component
-  - **Next:** Integrate MusicProfileSection into ClientDetail.tsx. Component ready to import and use immediately.
+      - a7ee1ba: feat(18.4-03): add Music Profile tab to ClientDetail page
+      - 13515d1: feat(18.4-03): add genre/instrument filters to Clients list
+      - 073fe45: feat(18.4-03): implement backend JSONB containment filters
+      - c621951: feat(18.4-03): add genre distribution widget to Dashboard
+  - **Next:** Phase 18.4 complete. Ready for Phase 18.4-04 (Testing & E2E) or proceed to next phase in roadmap.
