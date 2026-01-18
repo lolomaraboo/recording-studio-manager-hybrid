@@ -124,13 +124,19 @@ export function Clients() {
   });
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [genreFilter, setGenreFilter] = useState<string>("");
+  const [instrumentFilter, setInstrumentFilter] = useState<string>("");
 
   // Save view mode to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('clientsViewMode', viewMode);
   }, [viewMode]);
 
-  const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({ limit: 100 });
+  const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({
+    limit: 100,
+    genre: genreFilter || undefined,
+    instrument: instrumentFilter || undefined,
+  });
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
 
@@ -453,20 +459,59 @@ export function Clients() {
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search & Filters */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Recherche</CardTitle>
+            <CardTitle className="text-base">Recherche et filtres</CardTitle>
           </CardHeader>
             <CardContent>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher par nom, email ou entreprise..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Search */}
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher par nom, email ou entreprise..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+
+                {/* Genre Filter */}
+                <div className="w-full sm:w-48">
+                  <Input
+                    placeholder="Filtrer par genre..."
+                    value={genreFilter}
+                    onChange={(e) => setGenreFilter(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Instrument Filter */}
+                <div className="w-full sm:w-48">
+                  <Input
+                    placeholder="Filtrer par instrument..."
+                    value={instrumentFilter}
+                    onChange={(e) => setInstrumentFilter(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Clear Filters Button */}
+                {(genreFilter || instrumentFilter) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setGenreFilter("");
+                      setInstrumentFilter("");
+                    }}
+                    className="gap-2 shrink-0"
+                  >
+                    <X className="h-4 w-4" />
+                    Effacer filtres
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
