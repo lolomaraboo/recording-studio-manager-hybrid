@@ -49,6 +49,36 @@ export const clients = pgTable("clients", {
   gender: varchar("gender", { length: 20 }),
   customFields: jsonb("custom_fields").$type<Array<{label: string; type: string; value: any}>>().default([]),
 
+  // Music Profile - Multi-value fields
+  genres: jsonb("genres").$type<string[]>().default([]),
+  instruments: jsonb("instruments").$type<string[]>().default([]),
+
+  // Streaming Platforms
+  spotifyUrl: varchar("spotify_url", { length: 500 }),
+  appleMusicUrl: varchar("apple_music_url", { length: 500 }),
+  youtubeUrl: varchar("youtube_url", { length: 500 }),
+  soundcloudUrl: varchar("soundcloud_url", { length: 500 }),
+  bandcampUrl: varchar("bandcamp_url", { length: 500 }),
+  deezerUrl: varchar("deezer_url", { length: 500 }),
+  tidalUrl: varchar("tidal_url", { length: 500 }),
+  amazonMusicUrl: varchar("amazon_music_url", { length: 500 }),
+  audiomackUrl: varchar("audiomack_url", { length: 500 }),
+  beatportUrl: varchar("beatport_url", { length: 500 }),
+  otherPlatformsUrl: text("other_platforms_url"), // For custom/additional platforms
+
+  // Industry Information
+  recordLabel: varchar("record_label", { length: 255 }),
+  distributor: varchar("distributor", { length: 255 }),
+  managerContact: varchar("manager_contact", { length: 255 }),
+  publisher: varchar("publisher", { length: 255 }),
+  performanceRightsSociety: varchar("performance_rights_society", { length: 100 }), // SACEM, SOCAN, BMI, ASCAP, PRS
+
+  // Career Information
+  yearsActive: varchar("years_active", { length: 100 }), // e.g., "2015-present" or "2010-2018"
+  notableWorks: text("notable_works"),
+  awardsRecognition: text("awards_recognition"),
+  biography: text("biography"),
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
