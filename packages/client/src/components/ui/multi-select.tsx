@@ -30,6 +30,7 @@ export function MultiSelect({
 }: MultiSelectProps) {
   const [inputValue, setInputValue] = React.useState("");
   const [selectedValues, setSelectedValues] = React.useState<string[]>(value);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   // Sync with external value prop
   React.useEffect(() => {
@@ -125,13 +126,15 @@ export function MultiSelect({
               value={inputValue}
               onValueChange={setInputValue}
               onKeyDown={handleKeyDown}
+              onFocus={() => setIsOpen(true)}
+              onBlur={() => setTimeout(() => setIsOpen(false), 200)}
               placeholder={selectedValues.length === 0 ? placeholder : ""}
               className="ml-2 bg-transparent outline-none placeholder:text-muted-foreground flex-1"
               disabled={disabled}
             />
           </div>
         </div>
-        {!disabled && (inputValue || availableOptions.length > 0) && (
+        {!disabled && isOpen && (inputValue || availableOptions.length > 0) && (
           <div className="relative mt-2">
             <div className="absolute w-full z-10 top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
               <CommandGroup className="h-full overflow-auto max-h-60">
