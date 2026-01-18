@@ -20,6 +20,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { NotesHistory } from "@/components/NotesHistory";
 import { EnrichedClientInfo } from "@/components/EnrichedClientInfo";
+import { MusicProfileSection } from "@/components/MusicProfileSection";
 import {
   ArrowLeft,
   Edit,
@@ -34,6 +35,7 @@ import {
   FileText,
   Star,
   Users,
+  Music,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -178,6 +180,30 @@ export default function ClientDetail() {
     birthday: "",
     gender: "",
     customFields: [] as Array<{label: string; type: string; value: any}>,
+
+    // Music profile fields
+    genres: [] as string[],
+    instruments: [] as string[],
+    spotifyUrl: "",
+    appleMusicUrl: "",
+    youtubeUrl: "",
+    soundcloudUrl: "",
+    bandcampUrl: "",
+    deezerUrl: "",
+    tidalUrl: "",
+    amazonMusicUrl: "",
+    audiomackUrl: "",
+    beatportUrl: "",
+    otherPlatformsUrl: "",
+    recordLabel: "",
+    distributor: "",
+    managerContact: "",
+    publisher: "",
+    performanceRightsSociety: "",
+    yearsActive: "",
+    notableWorks: "",
+    awardsRecognition: "",
+    biography: "",
   });
 
   // Update form when client loads
@@ -206,6 +232,29 @@ export default function ClientDetail() {
         birthday: client.birthday || "",
         gender: client.gender || "",
         customFields: client.customFields || [],
+        // Music profile fields
+        genres: (client as any).genres || [],
+        instruments: (client as any).instruments || [],
+        spotifyUrl: (client as any).spotifyUrl || "",
+        appleMusicUrl: (client as any).appleMusicUrl || "",
+        youtubeUrl: (client as any).youtubeUrl || "",
+        soundcloudUrl: (client as any).soundcloudUrl || "",
+        bandcampUrl: (client as any).bandcampUrl || "",
+        deezerUrl: (client as any).deezerUrl || "",
+        tidalUrl: (client as any).tidalUrl || "",
+        amazonMusicUrl: (client as any).amazonMusicUrl || "",
+        audiomackUrl: (client as any).audiomackUrl || "",
+        beatportUrl: (client as any).beatportUrl || "",
+        otherPlatformsUrl: (client as any).otherPlatformsUrl || "",
+        recordLabel: (client as any).recordLabel || "",
+        distributor: (client as any).distributor || "",
+        managerContact: (client as any).managerContact || "",
+        publisher: (client as any).publisher || "",
+        performanceRightsSociety: (client as any).performanceRightsSociety || "",
+        yearsActive: (client as any).yearsActive || "",
+        notableWorks: (client as any).notableWorks || "",
+        awardsRecognition: (client as any).awardsRecognition || "",
+        biography: (client as any).biography || "",
       });
     }
   }, [client]);
@@ -389,7 +438,7 @@ export default function ClientDetail() {
           <div className="grid gap-6 md:grid-cols-3">
             {/* Left Column - Client Info */}
             <div className="md:col-span-2 space-y-6">
-              {/* Profile Card */}
+              {/* Profile Card with Tabs */}
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -425,117 +474,142 @@ export default function ClientDetail() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {isEditing ? (
-                    <>
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Nom</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                      </div>
+                <CardContent>
+                  <Tabs defaultValue="informations">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="informations" className="gap-2">
+                        <Users className="h-4 w-4" />
+                        Informations
+                      </TabsTrigger>
+                      <TabsTrigger value="enriched" className="gap-2">
+                        <FileText className="h-4 w-4" />
+                        Informations Enrichies
+                      </TabsTrigger>
+                      <TabsTrigger value="music-profile" className="gap-2">
+                        <Music className="h-4 w-4" />
+                        Profil Musical
+                      </TabsTrigger>
+                    </TabsList>
 
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          />
-                        </div>
+                    <TabsContent value="informations" className="space-y-4">
+                      {isEditing ? (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="name">Nom</Label>
+                            <Input
+                              id="name"
+                              value={formData.name}
+                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            />
+                          </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Téléphone</Label>
-                          <Input
-                            id="phone"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          />
-                        </div>
-                      </div>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label htmlFor="email">Email</Label>
+                              <Input
+                                id="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                              />
+                            </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="artistName">Nom d'artiste</Label>
-                        <Input
-                          id="artistName"
-                          value={formData.artistName}
-                          onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                        />
-                      </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="phone">Téléphone</Label>
+                              <Input
+                                id="phone"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                              />
+                            </div>
+                          </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="address">Adresse</Label>
-                        <Textarea
-                          id="address"
-                          value={formData.address}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                          rows={2}
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {client.artistName && (
-                        <div className="flex items-center gap-2">
-                          <Building className="h-4 w-4 text-muted-foreground" />
-                          <p className="text-sm">{client.artistName}</p>
-                        </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="artistName">Nom d'artiste</Label>
+                            <Input
+                              id="artistName"
+                              value={formData.artistName}
+                              onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="address">Adresse</Label>
+                            <Textarea
+                              id="address"
+                              value={formData.address}
+                              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                              rows={2}
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {client.artistName && (
+                            <div className="flex items-center gap-2">
+                              <Building className="h-4 w-4 text-muted-foreground" />
+                              <p className="text-sm">{client.artistName}</p>
+                            </div>
+                          )}
+
+                          {client.email && (
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              <a href={`mailto:${client.email}`} className="text-sm hover:underline">
+                                {client.email}
+                              </a>
+                            </div>
+                          )}
+
+                          {client.phone && (
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              <a href={`tel:${client.phone}`} className="text-sm hover:underline">
+                                {client.phone}
+                              </a>
+                            </div>
+                          )}
+
+                          {client.address && (
+                            <div className="flex items-start gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <p className="text-sm whitespace-pre-wrap">{client.address}</p>
+                            </div>
+                          )}
+
+                          {!client.artistName && !client.email && !client.phone && !client.address && (
+                            <p className="text-sm text-muted-foreground">Aucune information de contact</p>
+                          )}
+                        </>
                       )}
+                    </TabsContent>
 
-                      {client.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <a href={`mailto:${client.email}`} className="text-sm hover:underline">
-                            {client.email}
-                          </a>
-                        </div>
-                      )}
+                    <TabsContent value="enriched">
+                      <EnrichedClientInfo
+                        client={formData as any}
+                        isEditing={isEditing}
+                        onUpdate={handleUpdateField as any}
+                        contacts={clientWithContacts?.contacts as any || []}
+                        onAddContact={(contact) => {
+                          addContactMutation.mutate({
+                            clientId: Number(id),
+                            ...contact,
+                          });
+                        }}
+                        onDeleteContact={(contactId) => {
+                          deleteContactMutation.mutate({ id: contactId });
+                        }}
+                      />
+                    </TabsContent>
 
-                      {client.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
-                          <a href={`tel:${client.phone}`} className="text-sm hover:underline">
-                            {client.phone}
-                          </a>
-                        </div>
-                      )}
-
-                      {client.address && (
-                        <div className="flex items-start gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                          <p className="text-sm whitespace-pre-wrap">{client.address}</p>
-                        </div>
-                      )}
-
-                      {!client.artistName && !client.email && !client.phone && !client.address && (
-                        <p className="text-sm text-muted-foreground">Aucune information de contact</p>
-                      )}
-                    </>
-                  )}
-
-                  {/* Informations enrichies - déplacé depuis l'onglet Historique */}
-                  <div className="mt-6 pt-6 border-t">
-                    <h3 className="text-sm font-semibold mb-4">Informations enrichies</h3>
-                    <EnrichedClientInfo
-                      client={formData as any}
-                      isEditing={isEditing}
-                      onUpdate={handleUpdateField as any}
-                      contacts={clientWithContacts?.contacts as any || []}
-                      onAddContact={(contact) => {
-                        addContactMutation.mutate({
-                          clientId: Number(id),
-                          ...contact,
-                        });
-                      }}
-                      onDeleteContact={(contactId) => {
-                        deleteContactMutation.mutate({ id: contactId });
-                      }}
-                    />
-                  </div>
+                    <TabsContent value="music-profile">
+                      <MusicProfileSection
+                        client={client}
+                        isEditing={isEditing}
+                        onUpdate={handleUpdateField}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </CardContent>
               </Card>
 
