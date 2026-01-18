@@ -368,6 +368,36 @@ export const clientsRouter = router({
           birthday: z.string().optional(),
           gender: z.string().optional(),
           customFields: z.array(z.object({ label: z.string(), type: z.string(), value: z.any() })).optional(),
+
+          // Music Profile - Multi-value fields
+          genres: z.array(z.string()).optional(),
+          instruments: z.array(z.string()).optional(),
+
+          // Streaming Platforms
+          spotifyUrl: z.string().optional(),
+          appleMusicUrl: z.string().optional(),
+          youtubeUrl: z.string().optional(),
+          soundcloudUrl: z.string().optional(),
+          bandcampUrl: z.string().optional(),
+          deezerUrl: z.string().optional(),
+          tidalUrl: z.string().optional(),
+          amazonMusicUrl: z.string().optional(),
+          audiomackUrl: z.string().optional(),
+          beatportUrl: z.string().optional(),
+          otherPlatformsUrl: z.string().optional(),
+
+          // Industry Information
+          recordLabel: z.string().optional(),
+          distributor: z.string().optional(),
+          managerContact: z.string().optional(),
+          publisher: z.string().optional(),
+          performanceRightsSociety: z.string().optional(),
+
+          // Career Information
+          yearsActive: z.string().optional(),
+          notableWorks: z.string().optional(),
+          awardsRecognition: z.string().optional(),
+          biography: z.string().optional(),
         }),
       })
     )
