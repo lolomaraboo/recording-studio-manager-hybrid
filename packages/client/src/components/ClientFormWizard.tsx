@@ -133,11 +133,19 @@ export function ClientFormWizard({
     biography: initialData.biography || "",
   });
 
-  // Arrays state
-  const [phones, setPhones] = useState<Array<{ type: string; number: string }>>([]);
-  const [emails, setEmails] = useState<Array<{ type: string; email: string }>>([]);
-  const [websites, setWebsites] = useState<Array<{ type: string; url: string }>>([]);
-  const [customFields, setCustomFields] = useState<Array<{ label: string; type: string; value: any }>>([]);
+  // Arrays state - hydrate from initialData in edit mode
+  const [phones, setPhones] = useState<Array<{ type: string; number: string }>>(
+    initialData.phones || []
+  );
+  const [emails, setEmails] = useState<Array<{ type: string; email: string }>>(
+    initialData.emails || []
+  );
+  const [websites, setWebsites] = useState<Array<{ type: string; url: string }>>(
+    initialData.websites || []
+  );
+  const [customFields, setCustomFields] = useState<Array<{ label: string; type: string; value: any }>>(
+    initialData.customFields || []
+  );
 
   // Avatar/Logo upload handlers
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
