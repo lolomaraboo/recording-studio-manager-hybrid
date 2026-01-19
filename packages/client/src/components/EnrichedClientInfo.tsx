@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Upload, Plus, Trash2, User, Building2 } from "lucide-react";
-import { toast } from "sonner";
+import { Plus, Trash2 } from "lucide-react";
 
 interface Phone {
   type: string;
@@ -76,59 +73,6 @@ export function EnrichedClientInfo({
   onAddContact,
   onDeleteContact,
 }: EnrichedClientInfoProps) {
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-
-  const handleUploadAvatar = async (file: File) => {
-    setUploadingAvatar(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/upload/avatar", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      if (!response.ok) throw new Error("Upload failed");
-
-      const result = await response.json();
-      onUpdate({ avatarUrl: result.data.url });
-      toast.success("Avatar upload successful");
-    } catch (error) {
-      toast.error("Avatar upload failed");
-      console.error(error);
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
-
-  const handleUploadLogo = async (file: File) => {
-    setUploadingLogo(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/upload/client-logo", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      if (!response.ok) throw new Error("Upload failed");
-
-      const result = await response.json();
-      onUpdate({ logoUrl: result.data.url });
-      toast.success("Logo upload successful");
-    } catch (error) {
-      toast.error("Logo upload failed");
-      console.error(error);
-    } finally {
-      setUploadingLogo(false);
-    }
-  };
-
   const addPhone = () => {
     const phones = [...(client.phones || []), { type: "mobile", number: "" }];
     onUpdate({ phones });
@@ -179,126 +123,6 @@ export function EnrichedClientInfo({
 
   return (
     <div className="space-y-6">
-      {/* Avatar/Logo Upload Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{client.type === "individual" ? "Photo" : "Logo"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            {/* Preview */}
-            <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-              {client.avatarUrl || client.logoUrl ? (
-                <img
-                  src={client.type === "individual" ? client.avatarUrl : client.logoUrl}
-                  alt={client.firstName || "Client"}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-4xl text-muted-foreground">
-                  {client.type === "individual" ? (
-                    <User className="w-12 h-12" />
-                  ) : (
-                    <Building2 className="w-12 h-12" />
-                  )}
-                </span>
-              )}
-            </div>
-
-            {/* Upload Button */}
-            {isEditing && (
-              <div>
-                <input
-                  type="file"
-                  id="avatar-upload"
-                  accept="image/png,image/jpeg,image/jpg,image/webp"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-
-                    if (client.type === "individual") {
-                      handleUploadAvatar(file);
-                    } else {
-                      handleUploadLogo(file);
-                    }
-                  }}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById("avatar-upload")?.click()}
-                  disabled={uploadingAvatar || uploadingLogo}
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  {uploadingAvatar || uploadingLogo ? "Uploading..." : "Modifier"}
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Structured Name Section (for individuals) */}
-      {client.type === "individual" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Nom structuré</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Civilité</Label>
-                <select
-                  value={client.prefix || ""}
-                  onChange={(e) => onUpdate({ prefix: e.target.value })}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="">-</option>
-                  <option value="M.">M.</option>
-                  <option value="Mme">Mme</option>
-                  <option value="Dr.">Dr.</option>
-                </select>
-              </div>
-              <div>
-                <Label>Prénom</Label>
-                <Input
-                  value={client.firstName || ""}
-                  onChange={(e) => onUpdate({ firstName: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
-              <div>
-                <Label>Nom du milieu</Label>
-                <Input
-                  value={client.middleName || ""}
-                  onChange={(e) => onUpdate({ middleName: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
-              <div>
-                <Label>Nom</Label>
-                <Input
-                  value={client.lastName || ""}
-                  onChange={(e) => onUpdate({ lastName: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
-              <div>
-                <Label>Suffixe</Label>
-                <Input
-                  value={client.suffix || ""}
-                  onChange={(e) => onUpdate({ suffix: e.target.value })}
-                  placeholder="Jr., III, etc."
-                  disabled={!isEditing}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Multiple Phones Section */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

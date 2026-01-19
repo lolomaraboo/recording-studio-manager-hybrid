@@ -21,6 +21,7 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
+  ExternalLink,
 } from "lucide-react";
 import {
   Collapsible,
@@ -74,45 +75,8 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
 
   return (
     <div className="space-y-6">
-      {/* Main View - Genres and Instruments with Icons (Always Visible) */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-8 w-8 text-primary" />
-            Profil Musical
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Genres Row */}
-          <div>
-            <Label className="flex items-center gap-2 mb-2">
-              <Music className="h-4 w-4" />
-              Genres musicaux
-            </Label>
-            {isEditing ? (
-              <MultiSelect
-                value={client.genres || []}
-                onChange={(values) => onUpdate({ genres: values })}
-                options={FLAT_GENRES.map(g => ({ label: g, value: g }))}
-                placeholder="Sélectionner des genres ou ajouter des personnalisés..."
-                creatable
-              />
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {(client.genres || []).length > 0 ? (
-                  (client.genres || []).map((genre: string, idx: number) => (
-                    <Badge key={idx} variant="secondary" className="flex items-center gap-1">
-                      <Music className="h-3 w-3" />
-                      {genre}
-                    </Badge>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Aucun genre renseigné</p>
-                )}
-              </div>
-            )}
-          </div>
-
+      {/* Main View - Instruments and Genres (Always Visible) */}
+      <div className="space-y-4">
           {/* Instruments Row */}
           <div>
             <Label className="flex items-center gap-2 mb-2">
@@ -142,8 +106,37 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Genres Row */}
+          <div>
+            <Label className="flex items-center gap-2 mb-2">
+              <Music className="h-4 w-4" />
+              Genres musicaux
+            </Label>
+            {isEditing ? (
+              <MultiSelect
+                value={client.genres || []}
+                onChange={(values) => onUpdate({ genres: values })}
+                options={FLAT_GENRES.map(g => ({ label: g, value: g }))}
+                placeholder="Sélectionner des genres ou ajouter des personnalisés..."
+                creatable
+              />
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {(client.genres || []).length > 0 ? (
+                  (client.genres || []).map((genre: string, idx: number) => (
+                    <Badge key={idx} variant="outline" className="flex items-center gap-1">
+                      <Music className="h-3 w-3" />
+                      {genre}
+                    </Badge>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">Aucun genre renseigné</p>
+                )}
+              </div>
+            )}
+          </div>
+      </div>
 
       {/* Expandable Panel - Informations Musicales (Streaming, Industry, Career) */}
       <Collapsible open={isPanelOpen} onOpenChange={setIsPanelOpen}>
@@ -170,161 +163,274 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
           <CollapsibleContent>
             <CardContent className="space-y-6 pt-4">
               {/* Streaming Platforms Section */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <Radio className="h-4 w-4" />
-                  Plateformes de streaming
-                </h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { key: 'spotifyUrl', label: 'Spotify', placeholder: 'https://open.spotify.com/artist/...' },
-                    { key: 'appleMusicUrl', label: 'Apple Music', placeholder: 'https://music.apple.com/artist/...' },
-                    { key: 'youtubeUrl', label: 'YouTube', placeholder: 'https://youtube.com/...' },
-                    { key: 'soundcloudUrl', label: 'SoundCloud', placeholder: 'https://soundcloud.com/...' },
-                    { key: 'bandcampUrl', label: 'Bandcamp', placeholder: 'https://artistname.bandcamp.com' },
-                    { key: 'deezerUrl', label: 'Deezer', placeholder: 'https://deezer.com/artist/...' },
-                    { key: 'tidalUrl', label: 'Tidal', placeholder: 'https://tidal.com/artist/...' },
-                    { key: 'amazonMusicUrl', label: 'Amazon Music', placeholder: 'https://music.amazon.com/...' },
-                    { key: 'audiomackUrl', label: 'Audiomack', placeholder: 'https://audiomack.com/...' },
-                    { key: 'beatportUrl', label: 'Beatport', placeholder: 'https://beatport.com/artist/...' },
-                  ].map(({ key, label, placeholder }) => (
-                    <div key={key}>
-                      <Label className="text-xs">{label}</Label>
-                      <Input
-                        value={(client[key as keyof Client] as string) || ""}
-                        onChange={(e) => onUpdate({ [key]: e.target.value })}
-                        placeholder={placeholder}
-                        disabled={!isEditing}
-                        className="text-sm"
-                      />
+              {(() => {
+                const streamingFields = [
+                  { key: 'spotifyUrl', label: 'Spotify', placeholder: 'https://open.spotify.com/artist/...' },
+                  { key: 'appleMusicUrl', label: 'Apple Music', placeholder: 'https://music.apple.com/artist/...' },
+                  { key: 'youtubeUrl', label: 'YouTube', placeholder: 'https://youtube.com/...' },
+                  { key: 'soundcloudUrl', label: 'SoundCloud', placeholder: 'https://soundcloud.com/...' },
+                  { key: 'bandcampUrl', label: 'Bandcamp', placeholder: 'https://artistname.bandcamp.com' },
+                  { key: 'deezerUrl', label: 'Deezer', placeholder: 'https://deezer.com/artist/...' },
+                  { key: 'tidalUrl', label: 'Tidal', placeholder: 'https://tidal.com/artist/...' },
+                  { key: 'amazonMusicUrl', label: 'Amazon Music', placeholder: 'https://music.amazon.com/...' },
+                  { key: 'audiomackUrl', label: 'Audiomack', placeholder: 'https://audiomack.com/...' },
+                  { key: 'beatportUrl', label: 'Beatport', placeholder: 'https://beatport.com/artist/...' },
+                ];
+                const hasStreamingData = isEditing || streamingFields.some(f => client[f.key as keyof Client]) || client.otherPlatformsUrl;
+
+                if (!hasStreamingData) return null;
+
+                return (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Radio className="h-4 w-4" />
+                      Plateformes de streaming
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {streamingFields
+                        .filter(({ key }) => isEditing || client[key as keyof Client])
+                        .map(({ key, label, placeholder }) => {
+                          const value = (client[key as keyof Client] as string) || "";
+                          return (
+                            <div key={key}>
+                              <Label className="text-xs">{label}</Label>
+                              {isEditing ? (
+                                <Input
+                                  value={value}
+                                  onChange={(e) => onUpdate({ [key]: e.target.value })}
+                                  placeholder={placeholder}
+                                  className="text-sm"
+                                />
+                              ) : value ? (
+                                <a
+                                  href={value}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-foreground hover:text-primary underline underline-offset-4 transition-colors"
+                                >
+                                  <span className="truncate">{value}</span>
+                                  <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                                </a>
+                              ) : null}
+                            </div>
+                          );
+                        })}
+                      {(isEditing || client.otherPlatformsUrl) && (
+                        <div className="col-span-2">
+                          <Label className="text-xs">Autres plateformes</Label>
+                          {isEditing ? (
+                            <Textarea
+                              value={client.otherPlatformsUrl || ""}
+                              onChange={(e) => onUpdate({ otherPlatformsUrl: e.target.value })}
+                              placeholder="URLs supplémentaires (une par ligne)"
+                              rows={2}
+                              className="text-sm"
+                            />
+                          ) : client.otherPlatformsUrl ? (
+                            <div className="space-y-1">
+                              {client.otherPlatformsUrl.split('\n').filter(url => url.trim()).map((url, idx) => (
+                                <a
+                                  key={idx}
+                                  href={url.trim()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-foreground hover:text-primary underline underline-offset-4 transition-colors"
+                                >
+                                  <span className="truncate">{url.trim()}</span>
+                                  <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                                </a>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
-                  ))}
-                  <div className="col-span-2">
-                    <Label className="text-xs">Autres plateformes</Label>
-                    <Textarea
-                      value={client.otherPlatformsUrl || ""}
-                      onChange={(e) => onUpdate({ otherPlatformsUrl: e.target.value })}
-                      placeholder="URLs supplémentaires (une par ligne)"
-                      disabled={!isEditing}
-                      rows={2}
-                      className="text-sm"
-                    />
                   </div>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Industry Contacts Section */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Contacts industrie
-                </h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs">Label</Label>
-                    <Input
-                      value={client.recordLabel || ""}
-                      onChange={(e) => onUpdate({ recordLabel: e.target.value })}
-                      placeholder="Nom du label"
-                      disabled={!isEditing}
-                      className="text-sm"
-                    />
+              {(() => {
+                const hasIndustryData = isEditing ||
+                  client.recordLabel ||
+                  client.distributor ||
+                  client.managerContact ||
+                  client.publisher ||
+                  client.performanceRightsSociety;
+
+                if (!hasIndustryData) return null;
+
+                return (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      Contacts industrie
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {(isEditing || client.recordLabel) && (
+                        <div>
+                          <Label className="text-xs">Label</Label>
+                          {isEditing ? (
+                            <Input
+                              value={client.recordLabel || ""}
+                              onChange={(e) => onUpdate({ recordLabel: e.target.value })}
+                              placeholder="Nom du label"
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground py-2">{client.recordLabel}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.distributor) && (
+                        <div>
+                          <Label className="text-xs">Distributeur</Label>
+                          {isEditing ? (
+                            <Input
+                              value={client.distributor || ""}
+                              onChange={(e) => onUpdate({ distributor: e.target.value })}
+                              placeholder="Nom du distributeur"
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground py-2">{client.distributor}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.managerContact) && (
+                        <div>
+                          <Label className="text-xs">Manager</Label>
+                          {isEditing ? (
+                            <Input
+                              value={client.managerContact || ""}
+                              onChange={(e) => onUpdate({ managerContact: e.target.value })}
+                              placeholder="Nom et contact du manager"
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground py-2">{client.managerContact}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.publisher) && (
+                        <div>
+                          <Label className="text-xs">Éditeur</Label>
+                          {isEditing ? (
+                            <Input
+                              value={client.publisher || ""}
+                              onChange={(e) => onUpdate({ publisher: e.target.value })}
+                              placeholder="Nom de l'éditeur"
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground py-2">{client.publisher}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.performanceRightsSociety) && (
+                        <div className="col-span-2">
+                          <Label className="text-xs">Société de gestion collective (SACEM, SOCAN, BMI, etc.)</Label>
+                          {isEditing ? (
+                            <Input
+                              value={client.performanceRightsSociety || ""}
+                              onChange={(e) => onUpdate({ performanceRightsSociety: e.target.value })}
+                              placeholder="Nom de la société"
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground py-2">{client.performanceRightsSociety}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-xs">Distributeur</Label>
-                    <Input
-                      value={client.distributor || ""}
-                      onChange={(e) => onUpdate({ distributor: e.target.value })}
-                      placeholder="Nom du distributeur"
-                      disabled={!isEditing}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Manager</Label>
-                    <Input
-                      value={client.managerContact || ""}
-                      onChange={(e) => onUpdate({ managerContact: e.target.value })}
-                      placeholder="Nom et contact du manager"
-                      disabled={!isEditing}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Éditeur</Label>
-                    <Input
-                      value={client.publisher || ""}
-                      onChange={(e) => onUpdate({ publisher: e.target.value })}
-                      placeholder="Nom de l'éditeur"
-                      disabled={!isEditing}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label className="text-xs">Société de gestion collective (SACEM, SOCAN, BMI, etc.)</Label>
-                    <Input
-                      value={client.performanceRightsSociety || ""}
-                      onChange={(e) => onUpdate({ performanceRightsSociety: e.target.value })}
-                      placeholder="Nom de la société"
-                      disabled={!isEditing}
-                      className="text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Career Information Section */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <Award className="h-4 w-4" />
-                  Informations de carrière
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs">Années d'activité</Label>
-                    <Input
-                      value={client.yearsActive || ""}
-                      onChange={(e) => onUpdate({ yearsActive: e.target.value })}
-                      placeholder="ex: 2015-présent ou 2010-2018"
-                      disabled={!isEditing}
-                      className="text-sm"
-                    />
+              {(() => {
+                const hasCareerData = isEditing ||
+                  client.yearsActive ||
+                  client.notableWorks ||
+                  client.awardsRecognition ||
+                  client.biography;
+
+                if (!hasCareerData) return null;
+
+                return (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Award className="h-4 w-4" />
+                      Informations de carrière
+                    </h4>
+                    <div className="space-y-3">
+                      {(isEditing || client.yearsActive) && (
+                        <div>
+                          <Label className="text-xs">Années d'activité</Label>
+                          {isEditing ? (
+                            <Input
+                              value={client.yearsActive || ""}
+                              onChange={(e) => onUpdate({ yearsActive: e.target.value })}
+                              placeholder="ex: 2015-présent ou 2010-2018"
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground py-2">{client.yearsActive}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.notableWorks) && (
+                        <div>
+                          <Label className="text-xs">Œuvres notables</Label>
+                          {isEditing ? (
+                            <Textarea
+                              value={client.notableWorks || ""}
+                              onChange={(e) => onUpdate({ notableWorks: e.target.value })}
+                              placeholder="Albums, singles, collaborations marquantes..."
+                              rows={2}
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground whitespace-pre-wrap py-2">{client.notableWorks}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.awardsRecognition) && (
+                        <div>
+                          <Label className="text-xs">Prix et reconnaissances</Label>
+                          {isEditing ? (
+                            <Textarea
+                              value={client.awardsRecognition || ""}
+                              onChange={(e) => onUpdate({ awardsRecognition: e.target.value })}
+                              placeholder="Prix, nominations, distinctions..."
+                              rows={2}
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground whitespace-pre-wrap py-2">{client.awardsRecognition}</p>
+                          )}
+                        </div>
+                      )}
+                      {(isEditing || client.biography) && (
+                        <div>
+                          <Label className="text-xs">Biographie</Label>
+                          {isEditing ? (
+                            <Textarea
+                              value={client.biography || ""}
+                              onChange={(e) => onUpdate({ biography: e.target.value })}
+                              placeholder="Histoire de l'artiste, parcours musical..."
+                              rows={4}
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground whitespace-pre-wrap py-2">{client.biography}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-xs">Œuvres notables</Label>
-                    <Textarea
-                      value={client.notableWorks || ""}
-                      onChange={(e) => onUpdate({ notableWorks: e.target.value })}
-                      placeholder="Albums, singles, collaborations marquantes..."
-                      disabled={!isEditing}
-                      rows={2}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Prix et reconnaissances</Label>
-                    <Textarea
-                      value={client.awardsRecognition || ""}
-                      onChange={(e) => onUpdate({ awardsRecognition: e.target.value })}
-                      placeholder="Prix, nominations, distinctions..."
-                      disabled={!isEditing}
-                      rows={2}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Biographie</Label>
-                    <Textarea
-                      value={client.biography || ""}
-                      onChange={(e) => onUpdate({ biography: e.target.value })}
-                      placeholder="Histoire de l'artiste, parcours musical..."
-                      disabled={!isEditing}
-                      rows={4}
-                      className="text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
             </CardContent>
           </CollapsibleContent>
         </Card>

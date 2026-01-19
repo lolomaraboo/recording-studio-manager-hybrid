@@ -225,12 +225,8 @@ export default function ClientDetail() {
         )}
 
         {/* Notes Section - ALWAYS VISIBLE */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Notes</CardTitle>
-            <CardDescription>Historique daté des notes sur le client</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <Card className="mt-2">
+          <CardContent className="p-2">
             <NotesHistory clientId={client.id} />
           </CardContent>
         </Card>

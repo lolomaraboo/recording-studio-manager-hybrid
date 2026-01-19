@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { EnrichedClientInfo } from "@/components/EnrichedClientInfo";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { MusicProfileSection } from "@/components/MusicProfileSection";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
@@ -18,6 +19,11 @@ import {
   Phone,
   Building,
   MapPin,
+  Upload,
+  User,
+  Building2,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
@@ -48,11 +54,64 @@ export function ClientDetailTabs({
   addContactMutation,
   deleteContactMutation,
 }: ClientDetailTabsProps) {
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
   // Fetch related data
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
   const { data: quotes } = trpc.quotes.list.useQuery({ limit: 100 });
   const { data: rooms } = trpc.rooms.list.useQuery();
+
+  const handleUploadAvatar = async (file: File) => {
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload/avatar", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+
+      const result = await response.json();
+      handleUpdateField({ avatarUrl: result.data.url });
+      toast.success("Avatar modifié avec succès");
+    } catch (error) {
+      toast.error("Erreur lors de la modification de l'avatar");
+      console.error(error);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleUploadLogo = async (file: File) => {
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload/client-logo", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+
+      const result = await response.json();
+      handleUpdateField({ logoUrl: result.data.url });
+      toast.success("Logo modifié avec succès");
+    } catch (error) {
+      toast.error("Erreur lors de la modification du logo");
+      console.error(error);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
   // Filter data by client
   const clientSessions = useMemo(() => {
@@ -92,145 +151,395 @@ export function ClientDetailTabs({
         </TabsTrigger>
       </TabsList>
 
-      {/* Informations Tab - Single view with 3 visual sections */}
-      <TabsContent value="informations" className="mt-4">
+      {/* Informations Tab - Single view with 2 visual sections */}
+      <TabsContent value="informations" className="mt-2 space-y-4">
+        {/* Section 1: Informations de Base */}
         <Card>
-          <CardContent className="pt-6 space-y-6">
-            {/* Section 1: Informations de Base */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Informations de Base</h3>
-              <div className="space-y-4">
-                {isEditing ? (
-                  <>
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">Nom</label>
-                      <input
-                        id="name"
-                        className="w-full px-3 py-2 border rounded-md"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      />
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Informations de Base</h3>
+
+              <div className="flex gap-6">
+                {/* Photo/Logo à gauche */}
+                <div className="flex-shrink-0">
+                  <div className="flex flex-col items-center gap-4">
+                    {/* Preview */}
+                    <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                      {client.avatarUrl || client.logoUrl ? (
+                        <img
+                          src={client.type === "individual" ? client.avatarUrl : client.logoUrl}
+                          alt={client.firstName || "Client"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-4xl text-muted-foreground">
+                          {client.type === "individual" ? (
+                            <User className="w-12 h-12" />
+                          ) : (
+                            <Building2 className="w-12 h-12" />
+                          )}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <label htmlFor="email" className="text-sm font-medium">Email</label>
+                    {/* Upload Button */}
+                    {isEditing && (
+                      <div>
                         <input
-                          id="email"
-                          type="email"
+                          type="file"
+                          id="avatar-upload"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+
+                            if (client.type === "individual") {
+                              handleUploadAvatar(file);
+                            } else {
+                              handleUploadLogo(file);
+                            }
+                          }}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById("avatar-upload")?.click()}
+                          disabled={uploadingAvatar || uploadingLogo}
+                        >
+                          <Upload className="mr-2 h-4 w-4" />
+                          {uploadingAvatar || uploadingLogo ? "Uploading..." : "Modifier"}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Informations de contact à droite */}
+                <div className="flex-1 space-y-2">
+                  {isEditing ? (
+                    <>
+                      {/* Nom complet */}
+                      <div className="space-y-2">
+                        <label htmlFor="name" className="text-sm font-medium">Nom complet</label>
+                        <input
+                          id="name"
                           className="w-full px-3 py-2 border rounded-md"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         />
                       </div>
 
+                      {/* Champs de nom structuré (pour individus) */}
+                      {client.type === "individual" && (
+                        <>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
+                              <select
+                                id="prefix"
+                                value={formData.prefix || ""}
+                                onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
+                                className="w-full px-3 py-2 border rounded"
+                              >
+                                <option value="">-</option>
+                                <option value="M.">M.</option>
+                                <option value="Mme">Mme</option>
+                                <option value="Dr.">Dr.</option>
+                              </select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label htmlFor="firstName" className="text-sm font-medium">Prénom</label>
+                              <input
+                                id="firstName"
+                                className="w-full px-3 py-2 border rounded-md"
+                                value={formData.firstName || ""}
+                                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
+                              <input
+                                id="middleName"
+                                className="w-full px-3 py-2 border rounded-md"
+                                value={formData.middleName || ""}
+                                onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <label htmlFor="lastName" className="text-sm font-medium">Nom</label>
+                              <input
+                                id="lastName"
+                                className="w-full px-3 py-2 border rounded-md"
+                                value={formData.lastName || ""}
+                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label htmlFor="suffix" className="text-sm font-medium">Suffixe</label>
+                            <input
+                              id="suffix"
+                              className="w-full px-3 py-2 border rounded-md"
+                              value={formData.suffix || ""}
+                              onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
+                              placeholder="Jr., III, etc."
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {/* Nom d'artiste */}
                       <div className="space-y-2">
-                        <label htmlFor="phone" className="text-sm font-medium">Téléphone</label>
+                        <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste</label>
                         <input
-                          id="phone"
+                          id="artistName"
                           className="w-full px-3 py-2 border rounded-md"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          value={formData.artistName || ""}
+                          onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                         />
                       </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste</label>
-                      <input
-                        id="artistName"
-                        className="w-full px-3 py-2 border rounded-md"
-                        value={formData.artistName}
-                        onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
+                      {/* Emails multiples */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium">Emails</label>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const emails = [...(formData.emails || []), { type: "work", email: "" }];
+                              setFormData({ ...formData, emails });
+                            }}
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Ajouter
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          {(formData.emails || []).map((email: any, index: number) => (
+                            <div key={index} className="flex gap-2">
+                              <select
+                                value={email.type}
+                                onChange={(e) => {
+                                  const emails = [...(formData.emails || [])];
+                                  emails[index] = { ...emails[index], type: e.target.value };
+                                  setFormData({ ...formData, emails });
+                                }}
+                                className="w-32 px-3 py-2 border rounded"
+                              >
+                                <option value="work">Travail</option>
+                                <option value="personal">Personnel</option>
+                                <option value="other">Autre</option>
+                              </select>
+                              <input
+                                type="email"
+                                value={email.email}
+                                onChange={(e) => {
+                                  const emails = [...(formData.emails || [])];
+                                  emails[index] = { ...emails[index], email: e.target.value };
+                                  setFormData({ ...formData, emails });
+                                }}
+                                placeholder="Email"
+                                className="flex-1 px-3 py-2 border rounded-md"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const emails = (formData.emails || []).filter((_: any, i: number) => i !== index);
+                                  setFormData({ ...formData, emails });
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Téléphones multiples */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium">Téléphones</label>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const phones = [...(formData.phones || []), { type: "mobile", number: "" }];
+                              setFormData({ ...formData, phones });
+                            }}
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Ajouter
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          {(formData.phones || []).map((phone: any, index: number) => (
+                            <div key={index} className="flex gap-2">
+                              <select
+                                value={phone.type}
+                                onChange={(e) => {
+                                  const phones = [...(formData.phones || [])];
+                                  phones[index] = { ...phones[index], type: e.target.value };
+                                  setFormData({ ...formData, phones });
+                                }}
+                                className="w-32 px-3 py-2 border rounded"
+                              >
+                                <option value="mobile">Mobile</option>
+                                <option value="work">Travail</option>
+                                <option value="home">Domicile</option>
+                              </select>
+                              <input
+                                value={phone.number}
+                                onChange={(e) => {
+                                  const phones = [...(formData.phones || [])];
+                                  phones[index] = { ...phones[index], number: e.target.value };
+                                  setFormData({ ...formData, phones });
+                                }}
+                                placeholder="Numéro"
+                                className="flex-1 px-3 py-2 border rounded-md"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const phones = (formData.phones || []).filter((_: any, i: number) => i !== index);
+                                  setFormData({ ...formData, phones });
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Adresse */}
+                      <div className="space-y-2">
+                        <label htmlFor="address" className="text-sm font-medium">Adresse</label>
+                        <textarea
+                          id="address"
+                          className="w-full px-3 py-2 border rounded-md"
+                          value={formData.address || ""}
+                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                          rows={2}
+                        />
+                      </div>
+
+                      {/* Separator */}
+                      <Separator className="my-4" />
+
+                      {/* Profil Musical en mode édition */}
+                      <MusicProfileSection
+                        client={client}
+                        isEditing={isEditing}
+                        onUpdate={handleUpdateField}
                       />
-                    </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Affichage des informations de nom */}
+                      {(client.prefix || client.firstName || client.middleName || client.lastName || client.suffix) && (
+                        <div className="text-sm">
+                          <span className="font-medium">
+                            {[client.prefix, client.firstName, client.middleName, client.lastName, client.suffix]
+                              .filter(Boolean)
+                              .join(" ")}
+                          </span>
+                        </div>
+                      )}
 
-                    <div className="space-y-2">
-                      <label htmlFor="address" className="text-sm font-medium">Adresse</label>
-                      <textarea
-                        id="address"
-                        className="w-full px-3 py-2 border rounded-md"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        rows={2}
+                      {client.artistName && (
+                        <div className="flex items-center gap-2">
+                          <Building className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-sm">{client.artistName}</p>
+                        </div>
+                      )}
+
+                      {/* Affichage de l'email simple (legacy) */}
+                      {client.email && (!client.emails || client.emails.length === 0) && (
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <a href={`mailto:${client.email}`} className="text-sm hover:underline">
+                            {client.email}
+                          </a>
+                        </div>
+                      )}
+
+                      {/* Affichage des emails multiples */}
+                      {(client.emails && client.emails.length > 0) && (
+                        <div className="space-y-1">
+                          {client.emails.map((email: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              <a href={`mailto:${email.email}`} className="text-sm hover:underline">
+                                {email.email}
+                              </a>
+                              <span className="text-xs text-muted-foreground">
+                                ({email.type === 'work' ? 'Travail' : email.type === 'personal' ? 'Personnel' : 'Autre'})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Affichage du téléphone simple (legacy) */}
+                      {client.phone && (!client.phones || client.phones.length === 0) && (
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          <a href={`tel:${client.phone}`} className="text-sm hover:underline">
+                            {client.phone}
+                          </a>
+                        </div>
+                      )}
+
+                      {/* Affichage des téléphones multiples */}
+                      {(client.phones && client.phones.length > 0) && (
+                        <div className="space-y-1">
+                          {client.phones.map((phone: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              <a href={`tel:${phone.number}`} className="text-sm hover:underline">
+                                {phone.number}
+                              </a>
+                              <span className="text-xs text-muted-foreground">
+                                ({phone.type === 'mobile' ? 'Mobile' : phone.type === 'work' ? 'Travail' : 'Domicile'})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {client.address && (
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <p className="text-sm whitespace-pre-wrap">{client.address}</p>
+                        </div>
+                      )}
+
+                      {!client.prefix && !client.firstName && !client.lastName && !client.artistName && !client.email && !client.phone && !client.address && (
+                        <p className="text-sm text-muted-foreground">Aucune information de contact</p>
+                      )}
+
+                      {/* Separator */}
+                      <Separator className="my-4" />
+
+                      {/* Profil Musical en mode lecture */}
+                      <MusicProfileSection
+                        client={client}
+                        isEditing={isEditing}
+                        onUpdate={handleUpdateField}
                       />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {client.artistName && (
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-sm">{client.artistName}</p>
-                      </div>
-                    )}
-
-                    {client.email && (
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <a href={`mailto:${client.email}`} className="text-sm hover:underline">
-                          {client.email}
-                        </a>
-                      </div>
-                    )}
-
-                    {client.phone && (
-                      <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
-                        <a href={`tel:${client.phone}`} className="text-sm hover:underline">
-                          {client.phone}
-                        </a>
-                      </div>
-                    )}
-
-                    {client.address && (
-                      <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <p className="text-sm whitespace-pre-wrap">{client.address}</p>
-                      </div>
-                    )}
-
-                    {!client.artistName && !client.email && !client.phone && !client.address && (
-                      <p className="text-sm text-muted-foreground">Aucune information de contact</p>
-                    )}
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-
-            <Separator className="my-6" />
-
-            {/* Section 2: Informations Enrichies */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Informations Enrichies</h3>
-              <EnrichedClientInfo
-                client={formData as any}
-                isEditing={isEditing}
-                onUpdate={handleUpdateField as any}
-                contacts={clientWithContacts?.contacts as any || []}
-                onAddContact={(contact) => {
-                  addContactMutation.mutate({
-                    clientId: clientId,
-                    ...contact,
-                  });
-                }}
-                onDeleteContact={(contactId) => {
-                  deleteContactMutation.mutate({ id: contactId });
-                }}
-              />
-            </div>
-
-            <Separator className="my-6" />
-
-            {/* Section 3: Profil Musical */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Profil Musical</h3>
-              <MusicProfileSection
-                client={client}
-                isEditing={isEditing}
-                onUpdate={handleUpdateField}
-              />
-            </div>
           </CardContent>
         </Card>
       </TabsContent>

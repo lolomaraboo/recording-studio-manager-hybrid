@@ -112,31 +112,30 @@ export function NotesHistory({ clientId, className }: NotesHistoryProps) {
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('space-y-2', className)}>
       {/* Add Note Form */}
-      <Card>
-        <CardContent className="pt-6 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <MessageSquare className="h-4 w-4" />
-            <span>Nouvelle note</span>
-          </div>
-          <Textarea
-            placeholder="Écrivez une note sur ce client..."
-            value={newNote}
-            onChange={(e) => setNewNote(e.target.value)}
-            rows={3}
-          />
-          <div className="flex justify-end">
-            <Button
-              size="sm"
-              onClick={handleCreateNote}
-              disabled={createNote.isPending || !newNote.trim()}
-            >
-              {createNote.isPending ? 'Ajout...' : 'Ajouter une note'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div>
+        <div className="flex items-center gap-2 text-sm font-medium mb-1">
+          <MessageSquare className="h-4 w-4" />
+          <span>Nouvelle note</span>
+        </div>
+        <Textarea
+          placeholder="Écrivez une note sur ce client..."
+          value={newNote}
+          onChange={(e) => setNewNote(e.target.value)}
+          rows={3}
+          className="mb-1"
+        />
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            onClick={handleCreateNote}
+            disabled={createNote.isPending || !newNote.trim()}
+          >
+            {createNote.isPending ? 'Ajout...' : 'Ajouter une note'}
+          </Button>
+        </div>
+      </div>
 
       {/* Notes Timeline */}
       <div className="space-y-3">
@@ -164,7 +163,7 @@ export function NotesHistory({ clientId, className }: NotesHistoryProps) {
 
             {notes.map((note) => (
               <Card key={note.id} className="relative">
-                <CardContent className="p-4 space-y-2">
+                <CardContent className="p-4 space-y-0">
                   {/* Timeline dot */}
                   <div className="absolute left-[11px] top-6 h-3 w-3 rounded-full bg-primary border-2 border-background hidden sm:block" />
 

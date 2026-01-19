@@ -52,8 +52,8 @@ const trpcClient = trpc.createClient({
             ...options?.headers,
             // Dev mode: bypass auth with test headers
             ...(import.meta.env.DEV && {
-              'x-test-user-id': '1',  // alice@studiopro.com
-              'x-test-org-id': '3',  // Organization 3 (tenant_3)
+              'x-test-user-id': '18',  // test@org24.com
+              'x-test-org-id': '24',  // Test Org Phase 18.4 (tenant_24 - Phase 24 data)
             }),
           },
         })
