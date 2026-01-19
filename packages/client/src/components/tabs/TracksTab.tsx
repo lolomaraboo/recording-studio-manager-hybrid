@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { trpc } from '@/lib/trpc';
 import { AudioPlayer } from '@/components/AudioPlayer';
@@ -13,7 +12,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ListMusic, LayoutGrid, Table2, Music } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
+import { ListMusic, LayoutGrid, Table2, Music, Settings } from 'lucide-react';
+import { useTabPreferences } from '@/hooks/useTabPreferences';
 
 interface TracksTabProps {
   clientId: number;
@@ -37,17 +46,18 @@ const STATUS_COLORS: Record<string, string> = {
   completed: 'bg-green-500',
 };
 
-export function TracksTab({ clientId }: TracksTabProps) {
-  // State for view mode with localStorage persistence
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('tracks-view-mode');
-    return (saved as ViewMode) || 'liste';
-  });
+const ALL_COLUMNS = ["titre", "projet", "artistes", "durée", "statut", "version"];
 
-  // Persist view mode to localStorage
-  useEffect(() => {
-    localStorage.setItem('tracks-view-mode', viewMode);
-  }, [viewMode]);
+export function TracksTab({ clientId }: TracksTabProps) {
+  // Use preferences hook for database-backed state
+  const { preferences, updatePreferences, resetPreferences } = useTabPreferences(
+    "client-detail-tracks",
+    {
+      viewMode: "liste",
+      visibleColumns: ["titre", "projet", "artistes", "durée", "statut", "version"],
+      columnOrder: ["titre", "projet", "artistes", "durée", "statut", "version"],
+    }
+  );
 
   // Query tracks
   const { data: tracks = [], isLoading } = trpc.clients.getTracks.useQuery({
@@ -86,36 +96,70 @@ export function TracksTab({ clientId }: TracksTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* View mode toggle */}
+      {/* View mode toggle & Customization */}
       <div className="flex items-center gap-2">
         <Button
           size="sm"
-          variant={viewMode === 'liste' ? 'default' : 'outline'}
-          onClick={() => setViewMode('liste')}
+          variant={preferences.viewMode === 'liste' ? 'default' : 'outline'}
+          onClick={() => updatePreferences({ viewMode: 'liste' })}
         >
           <ListMusic className="h-4 w-4 mr-2" />
           Liste
         </Button>
         <Button
           size="sm"
-          variant={viewMode === 'cards' ? 'default' : 'outline'}
-          onClick={() => setViewMode('cards')}
+          variant={preferences.viewMode === 'cards' ? 'default' : 'outline'}
+          onClick={() => updatePreferences({ viewMode: 'cards' })}
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
           Cards
         </Button>
         <Button
           size="sm"
-          variant={viewMode === 'table' ? 'default' : 'outline'}
-          onClick={() => setViewMode('table')}
+          variant={preferences.viewMode === 'table' ? 'default' : 'outline'}
+          onClick={() => updatePreferences({ viewMode: 'table' })}
         >
           <Table2 className="h-4 w-4 mr-2" />
           Table
         </Button>
+
+        {/* Customization Dropdown (for Table mode) */}
+        {preferences.viewMode === "table" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Personnaliser
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {ALL_COLUMNS.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col}
+                  checked={preferences.visibleColumns.includes(col)}
+                  onCheckedChange={(checked) => {
+                    const updated = checked
+                      ? [...preferences.visibleColumns, col]
+                      : preferences.visibleColumns.filter((c) => c !== col);
+                    updatePreferences({ visibleColumns: updated });
+                  }}
+                >
+                  {col.charAt(0).toUpperCase() + col.slice(1)}
+                </DropdownMenuCheckboxItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={resetPreferences}>
+                Réinitialiser
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Mode 1: Liste avec audio player (default) */}
-      {viewMode === 'liste' && (
+      {preferences.viewMode === 'liste' && (
         <div className="space-y-2">
           {tracks.map((track) => (
             <div
@@ -160,7 +204,7 @@ export function TracksTab({ clientId }: TracksTabProps) {
       )}
 
       {/* Mode 2: Cards visuelles */}
-      {viewMode === 'cards' && (
+      {preferences.viewMode === 'cards' && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {tracks.map((track) => (
             <Card key={track.id} className="p-4 space-y-3">
@@ -211,62 +255,68 @@ export function TracksTab({ clientId }: TracksTabProps) {
       )}
 
       {/* Mode 3: Table simple (metadata) */}
-      {viewMode === 'table' && (
+      {preferences.viewMode === 'table' && (
         <div className="border rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Titre</TableHead>
-                <TableHead>Projet</TableHead>
-                <TableHead>Artistes</TableHead>
-                <TableHead>Durée</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Version</TableHead>
+                {preferences.visibleColumns.includes("titre") && <TableHead>Titre</TableHead>}
+                {preferences.visibleColumns.includes("projet") && <TableHead>Projet</TableHead>}
+                {preferences.visibleColumns.includes("artistes") && <TableHead>Artistes</TableHead>}
+                {preferences.visibleColumns.includes("durée") && <TableHead>Durée</TableHead>}
+                {preferences.visibleColumns.includes("statut") && <TableHead>Statut</TableHead>}
+                {preferences.visibleColumns.includes("version") && <TableHead>Version</TableHead>}
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tracks.map((track) => (
                 <TableRow key={track.id}>
-                  <TableCell className="font-medium">
-                    <Link to={`/tracks/${track.id}`}>
-                      <span className="hover:underline cursor-pointer">
-                        {track.title}
-                      </span>
-                    </Link>
-                  </TableCell>
-                  <TableCell>{track.projectTitle}</TableCell>
-                  <TableCell>{track.composer || 'Inconnu'}</TableCell>
-                  <TableCell>{formatDuration(track.duration)}</TableCell>
-                  <TableCell>
-                    <Badge className={STATUS_COLORS[track.status] || 'bg-gray-500'}>
-                      {STATUS_LABELS[track.status] || track.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1 text-xs">
-                      {track.demoUrl && (
-                        <Badge variant="outline" className="text-xs">
-                          Demo
-                        </Badge>
-                      )}
-                      {track.roughMixUrl && (
-                        <Badge variant="outline" className="text-xs">
-                          Rough
-                        </Badge>
-                      )}
-                      {track.finalMixUrl && (
-                        <Badge variant="outline" className="text-xs">
-                          Final
-                        </Badge>
-                      )}
-                      {track.masterUrl && (
-                        <Badge variant="outline" className="text-xs">
-                          Master
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
+                  {preferences.visibleColumns.includes("titre") && (
+                    <TableCell className="font-medium">
+                      <Link to={`/tracks/${track.id}`}>
+                        <span className="hover:underline cursor-pointer">
+                          {track.title}
+                        </span>
+                      </Link>
+                    </TableCell>
+                  )}
+                  {preferences.visibleColumns.includes("projet") && <TableCell>{track.projectTitle}</TableCell>}
+                  {preferences.visibleColumns.includes("artistes") && <TableCell>{track.composer || 'Inconnu'}</TableCell>}
+                  {preferences.visibleColumns.includes("durée") && <TableCell>{formatDuration(track.duration)}</TableCell>}
+                  {preferences.visibleColumns.includes("statut") && (
+                    <TableCell>
+                      <Badge className={STATUS_COLORS[track.status] || 'bg-gray-500'}>
+                        {STATUS_LABELS[track.status] || track.status}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  {preferences.visibleColumns.includes("version") && (
+                    <TableCell>
+                      <div className="flex gap-1 text-xs">
+                        {track.demoUrl && (
+                          <Badge variant="outline" className="text-xs">
+                            Demo
+                          </Badge>
+                        )}
+                        {track.roughMixUrl && (
+                          <Badge variant="outline" className="text-xs">
+                            Rough
+                          </Badge>
+                        )}
+                        {track.finalMixUrl && (
+                          <Badge variant="outline" className="text-xs">
+                            Final
+                          </Badge>
+                        )}
+                        {track.masterUrl && (
+                          <Badge variant="outline" className="text-xs">
+                            Master
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Link to={`/tracks/${track.id}`}>
                       <Button size="sm" variant="ghost">

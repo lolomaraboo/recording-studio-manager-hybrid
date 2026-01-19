@@ -1,10 +1,18 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import {
   LayoutGrid,
   List,
@@ -14,7 +22,9 @@ import {
   Music,
   Clock,
   Euro,
+  Settings,
 } from "lucide-react";
+import { useTabPreferences } from "@/hooks/useTabPreferences";
 
 interface ProjectsTabProps {
   clientId: number;
@@ -44,19 +54,20 @@ const STATUS_COLORS = {
   archived: "bg-gray-400",
 } as const;
 
+const ALL_COLUMNS = ["titre", "statut", "tracks", "sessions", "budget", "genre", "date"];
+
 export function ProjectsTab({ clientId }: ProjectsTabProps) {
   const navigate = useNavigate();
 
-  // Load view mode from localStorage
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const stored = localStorage.getItem("projects-view-mode");
-    return (stored as ViewMode) || "cards";
-  });
-
-  // Persist view mode to localStorage
-  useEffect(() => {
-    localStorage.setItem("projects-view-mode", viewMode);
-  }, [viewMode]);
+  // Use preferences hook for database-backed state
+  const { preferences, updatePreferences, resetPreferences, isLoading: prefsLoading } = useTabPreferences(
+    "client-detail-projects",
+    {
+      viewMode: "cards",
+      visibleColumns: ["titre", "statut", "tracks", "sessions", "budget", "genre", "date"],
+      columnOrder: ["titre", "statut", "tracks", "sessions", "budget", "genre", "date"],
+    }
+  );
 
   // Fetch projects with stats
   const { data: projects, isLoading } = trpc.clients.getProjects.useQuery({ clientId });
@@ -105,44 +116,78 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* View Mode Toggle */}
-      <div className="flex gap-2">
+      {/* View Mode Toggle & Customization */}
+      <div className="flex gap-2 items-center">
         <Button
-          variant={viewMode === "cards" ? "default" : "outline"}
+          variant={preferences.viewMode === "cards" ? "default" : "outline"}
           size="sm"
-          onClick={() => setViewMode("cards")}
+          onClick={() => updatePreferences({ viewMode: "cards" })}
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
           Cards
         </Button>
         <Button
-          variant={viewMode === "liste" ? "default" : "outline"}
+          variant={preferences.viewMode === "liste" ? "default" : "outline"}
           size="sm"
-          onClick={() => setViewMode("liste")}
+          onClick={() => updatePreferences({ viewMode: "liste" })}
         >
           <List className="h-4 w-4 mr-2" />
           Liste
         </Button>
         <Button
-          variant={viewMode === "table" ? "default" : "outline"}
+          variant={preferences.viewMode === "table" ? "default" : "outline"}
           size="sm"
-          onClick={() => setViewMode("table")}
+          onClick={() => updatePreferences({ viewMode: "table" })}
         >
           <Table2 className="h-4 w-4 mr-2" />
           Table
         </Button>
         <Button
-          variant={viewMode === "kanban" ? "default" : "outline"}
+          variant={preferences.viewMode === "kanban" ? "default" : "outline"}
           size="sm"
-          onClick={() => setViewMode("kanban")}
+          onClick={() => updatePreferences({ viewMode: "kanban" })}
         >
           <Trello className="h-4 w-4 mr-2" />
           Kanban
         </Button>
+
+        {/* Customization Dropdown (for Table mode) */}
+        {preferences.viewMode === "table" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Personnaliser
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {ALL_COLUMNS.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col}
+                  checked={preferences.visibleColumns.includes(col)}
+                  onCheckedChange={(checked) => {
+                    const updated = checked
+                      ? [...preferences.visibleColumns, col]
+                      : preferences.visibleColumns.filter((c) => c !== col);
+                    updatePreferences({ visibleColumns: updated });
+                  }}
+                >
+                  {col.charAt(0).toUpperCase() + col.slice(1)}
+                </DropdownMenuCheckboxItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={resetPreferences}>
+                Réinitialiser
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Cards Mode (Default) */}
-      {viewMode === "cards" && (
+      {preferences.viewMode === "cards" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects?.map((project) => (
             <Card
@@ -182,7 +227,7 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
       )}
 
       {/* Liste Mode */}
-      {viewMode === "liste" && (
+      {preferences.viewMode === "liste" && (
         <div className="space-y-2">
           {projects?.map((project) => (
             <div
@@ -212,18 +257,18 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
       )}
 
       {/* Table Mode */}
-      {viewMode === "table" && (
+      {preferences.viewMode === "table" && (
         <div className="border rounded-lg">
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left p-3 font-medium">Titre</th>
-                <th className="text-left p-3 font-medium">Statut</th>
-                <th className="text-left p-3 font-medium">Tracks</th>
-                <th className="text-left p-3 font-medium">Sessions</th>
-                <th className="text-left p-3 font-medium">Budget</th>
-                <th className="text-left p-3 font-medium">Genre</th>
-                <th className="text-left p-3 font-medium">Date</th>
+                {preferences.visibleColumns.includes("titre") && <th className="text-left p-3 font-medium">Titre</th>}
+                {preferences.visibleColumns.includes("statut") && <th className="text-left p-3 font-medium">Statut</th>}
+                {preferences.visibleColumns.includes("tracks") && <th className="text-left p-3 font-medium">Tracks</th>}
+                {preferences.visibleColumns.includes("sessions") && <th className="text-left p-3 font-medium">Sessions</th>}
+                {preferences.visibleColumns.includes("budget") && <th className="text-left p-3 font-medium">Budget</th>}
+                {preferences.visibleColumns.includes("genre") && <th className="text-left p-3 font-medium">Genre</th>}
+                {preferences.visibleColumns.includes("date") && <th className="text-left p-3 font-medium">Date</th>}
                 <th className="text-left p-3 font-medium">Actions</th>
               </tr>
             </thead>
@@ -234,21 +279,25 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
                   className="border-t hover:bg-accent cursor-pointer"
                   onClick={() => navigate(`/projects/${project.id}`)}
                 >
-                  <td className="p-3 font-medium">{project.name}</td>
-                  <td className="p-3">
-                    <Badge className={STATUS_COLORS[project.status as keyof typeof STATUS_COLORS]}>
-                      {STATUS_LABELS[project.status as keyof typeof STATUS_LABELS]}
-                    </Badge>
-                  </td>
-                  <td className="p-3">{project.tracksCount}</td>
-                  <td className="p-3">{project.hoursRecorded}h</td>
-                  <td className="p-3">{formatBudget(project.budget, project.totalCost) || "-"}</td>
-                  <td className="p-3">{project.genre || "-"}</td>
-                  <td className="p-3">
-                    {project.createdAt
-                      ? new Date(project.createdAt).toLocaleDateString("fr-FR")
-                      : "-"}
-                  </td>
+                  {preferences.visibleColumns.includes("titre") && <td className="p-3 font-medium">{project.name}</td>}
+                  {preferences.visibleColumns.includes("statut") && (
+                    <td className="p-3">
+                      <Badge className={STATUS_COLORS[project.status as keyof typeof STATUS_COLORS]}>
+                        {STATUS_LABELS[project.status as keyof typeof STATUS_LABELS]}
+                      </Badge>
+                    </td>
+                  )}
+                  {preferences.visibleColumns.includes("tracks") && <td className="p-3">{project.tracksCount}</td>}
+                  {preferences.visibleColumns.includes("sessions") && <td className="p-3">{project.hoursRecorded}h</td>}
+                  {preferences.visibleColumns.includes("budget") && <td className="p-3">{formatBudget(project.budget, project.totalCost) || "-"}</td>}
+                  {preferences.visibleColumns.includes("genre") && <td className="p-3">{project.genre || "-"}</td>}
+                  {preferences.visibleColumns.includes("date") && (
+                    <td className="p-3">
+                      {project.createdAt
+                        ? new Date(project.createdAt).toLocaleDateString("fr-FR")
+                        : "-"}
+                    </td>
+                  )}
                   <td className="p-3">
                     <Button variant="ghost" size="sm">
                       Voir
@@ -262,7 +311,7 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
       )}
 
       {/* Kanban Mode */}
-      {viewMode === "kanban" && (
+      {preferences.viewMode === "kanban" && (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {/* Planifié Column */}
           <div className="space-y-3">

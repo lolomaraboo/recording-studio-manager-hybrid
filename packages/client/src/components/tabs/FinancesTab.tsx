@@ -1,9 +1,18 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import {
   Table2,
   LayoutGrid,
@@ -14,10 +23,12 @@ import {
   AlertCircle,
   FileText,
   Plus,
+  Settings,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { trpc } from "@/lib/trpc";
+import { useTabPreferences } from "@/hooks/useTabPreferences";
 
 interface Invoice {
   id: number;
@@ -45,31 +56,40 @@ interface FinancesTabProps {
 
 type ViewMode = "table" | "cards" | "timeline" | "kanban";
 
-export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
-  // Load view modes from localStorage
-  const [invoicesViewMode, setInvoicesViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem("invoices-view-mode");
-    return (saved as ViewMode) || "table";
-  });
+const INVOICE_COLUMNS = ["numéro", "date", "montant", "statut"];
+const QUOTE_COLUMNS = ["numéro", "date", "montant", "statut"];
 
-  const [quotesViewMode, setQuotesViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem("quotes-view-mode");
-    return (saved as ViewMode) || "table";
-  });
+export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
+  // Use preferences hook for invoices (separate scope)
+  const {
+    preferences: invoicesPreferences,
+    updatePreferences: updateInvoicesPreferences,
+    resetPreferences: resetInvoicesPreferences
+  } = useTabPreferences(
+    "client-detail-finances-invoices",
+    {
+      viewMode: "table",
+      visibleColumns: ["numéro", "date", "montant", "statut"],
+      columnOrder: ["numéro", "date", "montant", "statut"],
+    }
+  );
+
+  // Use preferences hook for quotes (separate scope)
+  const {
+    preferences: quotesPreferences,
+    updatePreferences: updateQuotesPreferences,
+    resetPreferences: resetQuotesPreferences
+  } = useTabPreferences(
+    "client-detail-finances-quotes",
+    {
+      viewMode: "table",
+      visibleColumns: ["numéro", "date", "montant", "statut"],
+      columnOrder: ["numéro", "date", "montant", "statut"],
+    }
+  );
 
   // Query financial stats
   const { data: stats } = trpc.clients.getFinancialStats.useQuery({ clientId });
-
-  // Update localStorage when view modes change
-  const handleInvoicesViewModeChange = (mode: ViewMode) => {
-    setInvoicesViewMode(mode);
-    localStorage.setItem("invoices-view-mode", mode);
-  };
-
-  const handleQuotesViewModeChange = (mode: ViewMode) => {
-    setQuotesViewMode(mode);
-    localStorage.setItem("quotes-view-mode", mode);
-  };
 
   // Invoice status badge
   const getInvoiceStatusBadge = (status: string) => {
@@ -180,7 +200,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (invoicesViewMode === "table") {
+    if (invoicesPreferences.viewMode === "table") {
       return (
         <Table>
           <TableHeader>
@@ -211,7 +231,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (invoicesViewMode === "cards") {
+    if (invoicesPreferences.viewMode === "cards") {
       return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {invoices.map((inv) => (
@@ -236,7 +256,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (invoicesViewMode === "timeline") {
+    if (invoicesPreferences.viewMode === "timeline") {
       return (
         <div className="space-y-4">
           {timelineInvoices.map((inv) => (
@@ -265,7 +285,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (invoicesViewMode === "kanban") {
+    if (invoicesPreferences.viewMode === "kanban") {
       return (
         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
           {Object.entries(invoiceKanbanColumns).map(([status, items]) => (
@@ -321,7 +341,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (quotesViewMode === "table") {
+    if (quotesPreferences.viewMode === "table") {
       return (
         <Table>
           <TableHeader>
@@ -352,7 +372,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (quotesViewMode === "cards") {
+    if (quotesPreferences.viewMode === "cards") {
       return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {quotes.map((q) => (
@@ -377,7 +397,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (quotesViewMode === "timeline") {
+    if (quotesPreferences.viewMode === "timeline") {
       return (
         <div className="space-y-4">
           {timelineQuotes.map((q) => (
@@ -406,7 +426,7 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
       );
     }
 
-    if (quotesViewMode === "kanban") {
+    if (quotesPreferences.viewMode === "kanban") {
       return (
         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-7">
           {Object.entries(quoteKanbanColumns).map(([status, items]) => (
@@ -508,33 +528,65 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
           <h3 className="text-lg font-semibold">Factures</h3>
           <div className="flex gap-2">
             <Button
-              variant={invoicesViewMode === "table" ? "default" : "outline"}
+              variant={invoicesPreferences.viewMode === "table" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleInvoicesViewModeChange("table")}
+              onClick={() => updateInvoicesPreferences({ viewMode: "table" })}
             >
               <Table2 className="h-4 w-4" />
             </Button>
             <Button
-              variant={invoicesViewMode === "cards" ? "default" : "outline"}
+              variant={invoicesPreferences.viewMode === "cards" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleInvoicesViewModeChange("cards")}
+              onClick={() => updateInvoicesPreferences({ viewMode: "cards" })}
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
             <Button
-              variant={invoicesViewMode === "timeline" ? "default" : "outline"}
+              variant={invoicesPreferences.viewMode === "timeline" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleInvoicesViewModeChange("timeline")}
+              onClick={() => updateInvoicesPreferences({ viewMode: "timeline" })}
             >
               <CalendarDays className="h-4 w-4" />
             </Button>
             <Button
-              variant={invoicesViewMode === "kanban" ? "default" : "outline"}
+              variant={invoicesPreferences.viewMode === "kanban" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleInvoicesViewModeChange("kanban")}
+              onClick={() => updateInvoicesPreferences({ viewMode: "kanban" })}
             >
               <Trello className="h-4 w-4" />
             </Button>
+            {/* Customization Dropdown (for Table mode) */}
+            {invoicesPreferences.viewMode === "table" && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {INVOICE_COLUMNS.map((col) => (
+                    <DropdownMenuCheckboxItem
+                      key={col}
+                      checked={invoicesPreferences.visibleColumns.includes(col)}
+                      onCheckedChange={(checked) => {
+                        const updated = checked
+                          ? [...invoicesPreferences.visibleColumns, col]
+                          : invoicesPreferences.visibleColumns.filter((c) => c !== col);
+                        updateInvoicesPreferences({ visibleColumns: updated });
+                      }}
+                    >
+                      {col.charAt(0).toUpperCase() + col.slice(1)}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={resetInvoicesPreferences}>
+                    Réinitialiser
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
         {renderInvoices()}
@@ -546,33 +598,65 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
           <h3 className="text-lg font-semibold">Devis</h3>
           <div className="flex gap-2">
             <Button
-              variant={quotesViewMode === "table" ? "default" : "outline"}
+              variant={quotesPreferences.viewMode === "table" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleQuotesViewModeChange("table")}
+              onClick={() => updateQuotesPreferences({ viewMode: "table" })}
             >
               <Table2 className="h-4 w-4" />
             </Button>
             <Button
-              variant={quotesViewMode === "cards" ? "default" : "outline"}
+              variant={quotesPreferences.viewMode === "cards" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleQuotesViewModeChange("cards")}
+              onClick={() => updateQuotesPreferences({ viewMode: "cards" })}
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
             <Button
-              variant={quotesViewMode === "timeline" ? "default" : "outline"}
+              variant={quotesPreferences.viewMode === "timeline" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleQuotesViewModeChange("timeline")}
+              onClick={() => updateQuotesPreferences({ viewMode: "timeline" })}
             >
               <CalendarDays className="h-4 w-4" />
             </Button>
             <Button
-              variant={quotesViewMode === "kanban" ? "default" : "outline"}
+              variant={quotesPreferences.viewMode === "kanban" ? "default" : "outline"}
               size="sm"
-              onClick={() => handleQuotesViewModeChange("kanban")}
+              onClick={() => updateQuotesPreferences({ viewMode: "kanban" })}
             >
               <Trello className="h-4 w-4" />
             </Button>
+            {/* Customization Dropdown (for Table mode) */}
+            {quotesPreferences.viewMode === "table" && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {QUOTE_COLUMNS.map((col) => (
+                    <DropdownMenuCheckboxItem
+                      key={col}
+                      checked={quotesPreferences.visibleColumns.includes(col)}
+                      onCheckedChange={(checked) => {
+                        const updated = checked
+                          ? [...quotesPreferences.visibleColumns, col]
+                          : quotesPreferences.visibleColumns.filter((c) => c !== col);
+                        updateQuotesPreferences({ visibleColumns: updated });
+                      }}
+                    >
+                      {col.charAt(0).toUpperCase() + col.slice(1)}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={resetQuotesPreferences}>
+                    Réinitialiser
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
         {renderQuotes()}

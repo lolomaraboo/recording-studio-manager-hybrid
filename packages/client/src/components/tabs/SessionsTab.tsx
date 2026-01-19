@@ -1,9 +1,18 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import {
   Calendar,
   Table2,
@@ -12,9 +21,11 @@ import {
   Trello,
   Clock,
   MapPin,
+  Settings,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useTabPreferences } from "@/hooks/useTabPreferences";
 
 interface Session {
   id: number;
@@ -39,14 +50,20 @@ interface SessionsTabProps {
 
 type ViewMode = "table" | "cards" | "timeline" | "kanban";
 
-export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
-  // Load view mode from localStorage or default to "table"
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem("sessions-view-mode");
-    return (saved as ViewMode) || "table";
-  });
+const ALL_COLUMNS = ["session", "salle", "date", "statut"];
 
+export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
   const navigate = useNavigate();
+
+  // Use preferences hook for database-backed state
+  const { preferences, updatePreferences, resetPreferences } = useTabPreferences(
+    "client-detail-sessions",
+    {
+      viewMode: "table",
+      visibleColumns: ["session", "salle", "date", "statut"],
+      columnOrder: ["session", "salle", "date", "statut"],
+    }
+  );
 
   // Room mapping
   const roomMap = useMemo(() => {
@@ -55,12 +72,6 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
       return acc;
     }, {} as Record<number, string>);
   }, [rooms]);
-
-  // Update localStorage when view mode changes
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-    localStorage.setItem("sessions-view-mode", mode);
-  };
 
   // Status badge helper
   const getSessionStatusBadge = (status: string) => {
@@ -139,52 +150,86 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* View Mode Toggle */}
+      {/* View Mode Toggle & Customization */}
       <div className="flex gap-2">
         <Button
-          variant={viewMode === "table" ? "default" : "outline"}
+          variant={preferences.viewMode === "table" ? "default" : "outline"}
           size="sm"
-          onClick={() => handleViewModeChange("table")}
+          onClick={() => updatePreferences({ viewMode: "table" })}
         >
           <Table2 className="h-4 w-4 mr-2" />
           Table
         </Button>
         <Button
-          variant={viewMode === "cards" ? "default" : "outline"}
+          variant={preferences.viewMode === "cards" ? "default" : "outline"}
           size="sm"
-          onClick={() => handleViewModeChange("cards")}
+          onClick={() => updatePreferences({ viewMode: "cards" })}
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
           Cards
         </Button>
         <Button
-          variant={viewMode === "timeline" ? "default" : "outline"}
+          variant={preferences.viewMode === "timeline" ? "default" : "outline"}
           size="sm"
-          onClick={() => handleViewModeChange("timeline")}
+          onClick={() => updatePreferences({ viewMode: "timeline" })}
         >
           <CalendarDays className="h-4 w-4 mr-2" />
           Timeline
         </Button>
         <Button
-          variant={viewMode === "kanban" ? "default" : "outline"}
+          variant={preferences.viewMode === "kanban" ? "default" : "outline"}
           size="sm"
-          onClick={() => handleViewModeChange("kanban")}
+          onClick={() => updatePreferences({ viewMode: "kanban" })}
         >
           <Trello className="h-4 w-4 mr-2" />
           Kanban
         </Button>
+
+        {/* Customization Dropdown (for Table mode) */}
+        {preferences.viewMode === "table" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Personnaliser
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Colonnes visibles</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {ALL_COLUMNS.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col}
+                  checked={preferences.visibleColumns.includes(col)}
+                  onCheckedChange={(checked) => {
+                    const updated = checked
+                      ? [...preferences.visibleColumns, col]
+                      : preferences.visibleColumns.filter((c) => c !== col);
+                    updatePreferences({ visibleColumns: updated });
+                  }}
+                >
+                  {col.charAt(0).toUpperCase() + col.slice(1)}
+                </DropdownMenuCheckboxItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={resetPreferences}>
+                Réinitialiser
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Table Mode */}
-      {viewMode === "table" && (
+      {preferences.viewMode === "table" && (
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Session</TableHead>
-                <TableHead>Salle</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Statut</TableHead>
+                {preferences.visibleColumns.includes("session") && <TableHead>Session</TableHead>}
+                {preferences.visibleColumns.includes("salle") && <TableHead>Salle</TableHead>}
+                {preferences.visibleColumns.includes("date") && <TableHead>Date</TableHead>}
+                {preferences.visibleColumns.includes("statut") && <TableHead>Statut</TableHead>}
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -196,25 +241,33 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
                 )
                 .map((session) => (
                   <TableRow key={session.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{session.title}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {calculateDuration(session.startTime, session.endTime)}
+                    {preferences.visibleColumns.includes("session") && (
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{session.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {calculateDuration(session.startTime, session.endTime)}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{roomMap[session.roomId] || "N/A"}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {format(new Date(session.startTime), "dd MMM yyyy", {
-                          locale: fr,
-                        })}
-                      </div>
-                    </TableCell>
-                    <TableCell>{getSessionStatusBadge(session.status)}</TableCell>
+                      </TableCell>
+                    )}
+                    {preferences.visibleColumns.includes("salle") && (
+                      <TableCell>
+                        <div className="text-sm">{roomMap[session.roomId] || "N/A"}</div>
+                      </TableCell>
+                    )}
+                    {preferences.visibleColumns.includes("date") && (
+                      <TableCell>
+                        <div className="text-sm">
+                          {format(new Date(session.startTime), "dd MMM yyyy", {
+                            locale: fr,
+                          })}
+                        </div>
+                      </TableCell>
+                    )}
+                    {preferences.visibleColumns.includes("statut") && (
+                      <TableCell>{getSessionStatusBadge(session.status)}</TableCell>
+                    )}
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" asChild>
                         <Link to={`/sessions/${session.id}`}>Voir</Link>
@@ -228,7 +281,7 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
       )}
 
       {/* Cards Mode */}
-      {viewMode === "cards" && (
+      {preferences.viewMode === "cards" && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {sessions
             .sort(
@@ -271,7 +324,7 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
       )}
 
       {/* Timeline Mode */}
-      {viewMode === "timeline" && (
+      {preferences.viewMode === "timeline" && (
         <div className="space-y-6">
           {timelineSessions.upcoming.length > 0 && (
             <div>
@@ -364,7 +417,7 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
       )}
 
       {/* Kanban Mode */}
-      {viewMode === "kanban" && (
+      {preferences.viewMode === "kanban" && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {/* Programmée Column */}
           <div>
