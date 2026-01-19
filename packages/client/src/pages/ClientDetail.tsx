@@ -30,6 +30,7 @@ export default function ClientDetail() {
   const [isEditing, setIsEditing] = useState(searchParams.get('edit') === 'true');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("informations");
+  const [formData, setFormData] = useState<any>(null);
 
   // Helper to toggle edit mode and update URL
   const toggleEditMode = (editing: boolean) => {
@@ -48,8 +49,39 @@ export default function ClientDetail() {
     { enabled: !!id }
   );
 
+  // Fetch client with contacts for enriched info
+  const { data: clientWithContacts } = trpc.clients.getWithContacts.useQuery(
+    { id: Number(id) },
+    { enabled: !!id }
+  );
+
+  // Initialize formData when client loads
+  if (client && !formData) {
+    setFormData(client);
+  }
+
   // Mutations
   const updateMutation = trpc.clients.update.useMutation();
+
+  const addContactMutation = trpc.clients.addContact.useMutation({
+    onSuccess: () => {
+      toast.success("Contact ajouté");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
+  const deleteContactMutation = trpc.clients.deleteContact.useMutation({
+    onSuccess: () => {
+      toast.success("Contact supprimé");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
 
   // Handle update from wizard
   const handleUpdate = (data: any) => {
@@ -59,6 +91,24 @@ export default function ClientDetail() {
         onSuccess: () => {
           toast.success("Client mis à jour");
           toggleEditMode(false);
+          refetch();
+        },
+        onError: (error) => {
+          toast.error(`Erreur: ${error.message}`);
+        },
+      }
+    );
+  };
+
+  // Handle field updates in tabs
+  const handleUpdateField = (updates: any) => {
+    const updatedData = { ...formData, ...updates };
+    setFormData(updatedData);
+    updateMutation.mutate(
+      { id: Number(id), data: updates },
+      {
+        onSuccess: () => {
+          toast.success("Modification enregistrée");
           refetch();
         },
         onError: (error) => {
@@ -154,7 +204,7 @@ export default function ClientDetail() {
         {isEditing ? (
           <ClientFormWizard
             mode="edit"
-            initialData={client}
+            initialData={client as any}
             onSubmit={handleUpdate}
             onCancel={() => toggleEditMode(false)}
           />
@@ -163,6 +213,14 @@ export default function ClientDetail() {
             clientId={client.id}
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            client={client}
+            isEditing={false}
+            formData={formData || client}
+            setFormData={setFormData}
+            handleUpdateField={handleUpdateField}
+            clientWithContacts={clientWithContacts}
+            addContactMutation={addContactMutation}
+            deleteContactMutation={deleteContactMutation}
           />
         )}
 
