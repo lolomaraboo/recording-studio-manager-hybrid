@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 22 of 22 (Refonte UI Client - Hub Relationnel Complet)
-Plan: 2 of 9 (22-02 COMPLETE ✅)
-Status: In progress - tab-based navigation structure created for client detail
-Last activity: 2026-01-19 - Completed 22-02-PLAN.md (5 min), ClientDetailTabs component with 5 horizontal tabs (Informations, Projets, Tracks, Sessions, Finances), Notes section persistent at bottom, placeholder tabs for future plans
+Plan: 6 of 9 (22-06 COMPLETE ✅)
+Status: In progress - Finances tab with stats + dual tables complete
+Last activity: 2026-01-19 - Completed 22-06-PLAN.md (6 min), FinancesTab component with financial stats (totalPaid, pending, quotesOpen, projection) + Factures/Quotes tables (each with 4 view modes: Table, Cards, Timeline, Kanban), independent toggles, localStorage persistence, empty states
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 2/9 plans (22-01 ✅, 22-02 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 6/9 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 92
-- Average duration: 33.9 min
-- Total execution time: 52.3 hours
+- Total plans completed: 96
+- Average duration: 33.2 min
+- Total execution time: 53.1 hours
 
 **By Phase:**
 
@@ -82,11 +82,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
-| 22 | 2/9 | 9 min | 4.5 min |
+| 22 | 6/9 | 33 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [28 min, verification, 4 min, 5 min, current]
-- Trend: Phase 22 Plan 2 COMPLETE ✅ (5 min execution). Tab-based navigation for ClientDetail page. ClientDetailTabs component (466 lines) with 5 horizontal tabs (Informations, Projets, Tracks, Sessions, Finances). Notes section persistent at bottom. Informations tab contains 3 sub-tabs (basic, enriched, music). Placeholder tabs ready for Plans 22-03 and 22-04. Edit/Delete buttons moved to header for better accessibility.
+- Last 5 plans: [4 min, 5 min, 4 min, 4 min, 6 min]
+- Trend: Phase 22 Plan 6 COMPLETE ✅ (6 min execution). FinancesTab component with financial dashboard complete. getFinancialStats endpoint added to clients router (totalPaid, pending, quotesOpen, projection). FinancesTab component (582 lines) with 3 sections: stats cards (4 metrics), Factures table (4 view modes), Quotes table (4 view modes). Independent view mode toggles with localStorage persistence. Empty states with CTA buttons. Status badges for 5 invoice + 7 quote statuses. Clickable navigation to detail pages.
 
 ## Accumulated Context
 
@@ -469,33 +469,42 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-19T02:15:07Z
-Stopped at: Phase 22 Plan 02 COMPLETE ✅ - Tab navigation ready for relational data
+Last session: 2026-01-19T02:18:28Z
+Stopped at: Phase 22 Plan 06 COMPLETE ✅ - Finances tab with stats + dual tables complete
 Resume context:
-  - Phase 22 Plan 02 COMPLETE ✅: Client Detail Tabs Navigation (5 min execution, 3/3 tasks)
-    - **Task 1:** Created ClientDetailTabs component (7d01a86)
-      - 466-line component with 5 main tabs: Informations, Projets, Tracks, Sessions, Finances
-      - Informations tab contains 3 sub-tabs (basic, enriched, music)
-      - Sessions tab shows existing sessions table
-      - Finances tab shows invoices with placeholders for quotes/stats
-      - Projets and Tracks tabs have placeholder content
-    - **Task 2:** Refactored ClientDetail page (3bf25a3)
-      - Restructured to use ClientDetailTabs component
-      - Edit/Delete buttons moved to header for better accessibility
-      - Removed duplicate queries (now in ClientDetailTabs)
-      - Notes section persistent at bottom
-    - **Task 3:** Build validation (e7b3915)
-      - Client package builds successfully
-      - TypeScript compilation passes
-      - Tab navigation works correctly
+  - Phase 22 Plan 06 COMPLETE ✅: Finances Tab Implementation (6 min execution, 3/3 tasks)
+    - **Task 1:** Added getFinancialStats endpoint (6a88a52)
+      - Import invoices and quotes tables in clients router
+      - Calculate totalPaid from paid invoices
+      - Calculate pending from sent/overdue invoices
+      - Calculate quotesOpen from sent quotes
+      - Calculate projection (quotesOpen + pending)
+      - Returns financial metrics for stats cards
+    - **Task 2:** Created FinancesTab component (2f898be)
+      - 582-line component with 3 sections
+      - Section 1: Stats cards (4 metrics with icons and colors)
+      - Section 2: Factures table with 4 view modes (Table, Cards, Timeline, Kanban)
+      - Section 3: Quotes table with 4 view modes (independent toggle)
+      - localStorage persistence for both view modes separately
+      - Empty states with illustrations + CTA buttons
+      - Status badges for 5 invoice + 7 quote statuses
+    - **Task 3:** Integrated FinancesTab into ClientDetailTabs (3d57942)
+      - Import FinancesTab component
+      - Add quotes query: trpc.quotes.list.useQuery({ limit: 100 })
+      - Filter quotes by clientId in useMemo hook
+      - Replace finances TabsContent with FinancesTab component
+      - Remove unused getInvoiceStatusBadge function
+      - Clean up unused imports
+      - Code reduction: -176 lines (88%)
     - **Final State:**
-      - UI: 5 horizontal tabs with clear navigation
-      - Component: ClientDetailTabs reusable for tab management
-      - Structure: Notes always visible regardless of active tab
-      - Placeholders: Projets and Tracks tabs ready for Plans 22-03, 22-04
+      - Backend: Financial stats endpoint ready
+      - Frontend: Comprehensive financial dashboard
+      - View modes: 4 toggles for Factures + 4 toggles for Quotes
+      - Navigation: Clickable cards/rows to detail pages
+      - Empty states: CTA buttons for new invoices/quotes
     - **Commits:**
-      - 7d01a86: feat(22-02): create ClientDetailTabs component with 5 tabs
-      - 3bf25a3: feat(22-02): refactor ClientDetail page with 5 tabs + persistent Notes
-      - e7b3915: test(22-02): validate tab structure builds successfully
+      - 6a88a52: feat(22-06): add getFinancialStats endpoint to clients router
+      - 2f898be: feat(22-06): create FinancesTab component with stats + dual tables
+      - 3d57942: feat(22-06): integrate FinancesTab into ClientDetailTabs
     - **Deviations:** None - plan executed exactly as written
-  - **Next:** Phase 22 Plan 03 - Implement Projets tab with client projects table and relational data display.
+  - **Next:** Phase 22 Plan 07 - Next plan in sequence (check ROADMAP for details).
