@@ -928,19 +928,52 @@ export const clientsRouter = router({
 
       const projectIds = clientProjects.map(p => p.id);
 
-      // Get all tracks from these projects
-      const clientTracks = await tenantDb.query.tracks.findMany({
-        where: inArray(tracks.projectId, projectIds),
-        with: {
-          project: {
-            columns: { title: true },
-          },
-        },
-      });
+      // Get all tracks from these projects with project title via JOIN
+      const clientTracks = await tenantDb
+        .select({
+          id: tracks.id,
+          projectId: tracks.projectId,
+          title: tracks.title,
+          trackNumber: tracks.trackNumber,
+          duration: tracks.duration,
+          isrc: tracks.isrc,
+          status: tracks.status,
+          bpm: tracks.bpm,
+          key: tracks.key,
+          lyrics: tracks.lyrics,
+          fileUrl: tracks.fileUrl,
+          waveformUrl: tracks.waveformUrl,
+          demoUrl: tracks.demoUrl,
+          roughMixUrl: tracks.roughMixUrl,
+          finalMixUrl: tracks.finalMixUrl,
+          masterUrl: tracks.masterUrl,
+          composer: tracks.composer,
+          lyricist: tracks.lyricist,
+          copyrightHolder: tracks.copyrightHolder,
+          copyrightYear: tracks.copyrightYear,
+          genreTags: tracks.genreTags,
+          mood: tracks.mood,
+          language: tracks.language,
+          explicitContent: tracks.explicitContent,
+          patchPreset: tracks.patchPreset,
+          instrumentsUsed: tracks.instrumentsUsed,
+          microphonesUsed: tracks.microphonesUsed,
+          effectsChain: tracks.effectsChain,
+          dawSessionPath: tracks.dawSessionPath,
+          recordedInRoomId: tracks.recordedInRoomId,
+          notes: tracks.notes,
+          technicalNotes: tracks.technicalNotes,
+          createdAt: tracks.createdAt,
+          updatedAt: tracks.updatedAt,
+          projectTitle: projects.title,
+        })
+        .from(tracks)
+        .leftJoin(projects, eq(tracks.projectId, projects.id))
+        .where(inArray(tracks.projectId, projectIds));
 
       return clientTracks.map(track => ({
         ...track,
-        projectTitle: track.project?.title || "Sans projet",
+        projectTitle: track.projectTitle || "Sans projet",
       }));
     }),
 });
