@@ -1,8 +1,8 @@
 ---
-status: verifying
+status: resolved
 trigger: "client-detail-tabs-missing-props"
 created: 2026-01-18T17:55:00Z
-updated: 2026-01-18T18:00:00Z
+updated: 2026-01-18T18:03:00Z
 ---
 
 ## Current Focus
