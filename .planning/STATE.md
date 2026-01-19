@@ -469,34 +469,33 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-19T02:13:51Z
-Stopped at: Phase 22 Plan 1 COMPLETE ✅ - Wizard component ready for next plan
+Last session: 2026-01-19T02:15:07Z
+Stopped at: Phase 22 Plan 02 COMPLETE ✅ - Tab navigation ready for relational data
 Resume context:
-  - Phase 22 Plan 1 COMPLETE ✅: ClientFormWizard Component (4 min execution, 3/3 tasks)
-    - **Task 1:** Create ClientFormWizard component (299dfaa)
-      - 782-line reusable component with 3-step wizard navigation
-      - Step 1: Base fields (name, type, structured name, simple contact, address, birthday, gender, avatar/logo)
-      - Step 2: Enriched vCard arrays (phones, emails, websites, custom fields)
-      - Step 3: Music profile (22 fields via MusicProfileSection from Phase 18.4)
-      - Free navigation pattern: all tabs always clickable (no blocking validation)
-      - Submit button visible on all steps (not just last step)
-    - **Task 2:** Refactor ClientCreate to use wizard (9406210)
-      - Simplified from 726 lines to 54 lines (92.5% reduction)
-      - Preserved breadcrumb navigation, error handling, success redirect
-      - All form state delegated to wizard component
-    - **Task 3:** Build and validate (a0e8d64)
-      - Vite build succeeds: "✓ built in 5.74s"
-      - Zero blocking errors in new files
-      - MusicProfileSection integration verified
+  - Phase 22 Plan 02 COMPLETE ✅: Client Detail Tabs Navigation (5 min execution, 3/3 tasks)
+    - **Task 1:** Created ClientDetailTabs component (7d01a86)
+      - 466-line component with 5 main tabs: Informations, Projets, Tracks, Sessions, Finances
+      - Informations tab contains 3 sub-tabs (basic, enriched, music)
+      - Sessions tab shows existing sessions table
+      - Finances tab shows invoices with placeholders for quotes/stats
+      - Projets and Tracks tabs have placeholder content
+    - **Task 2:** Refactored ClientDetail page (3bf25a3)
+      - Restructured to use ClientDetailTabs component
+      - Edit/Delete buttons moved to header for better accessibility
+      - Removed duplicate queries (now in ClientDetailTabs)
+      - Notes section persistent at bottom
+    - **Task 3:** Build validation (e7b3915)
+      - Client package builds successfully
+      - TypeScript compilation passes
+      - Tab navigation works correctly
     - **Final State:**
-      - ClientFormWizard: Reusable component working for create mode
-      - ClientCreate: Refactored to use wizard (54 lines)
-      - Pattern: Multi-step wizard with free navigation established
-      - Build: Client package builds successfully
+      - UI: 5 horizontal tabs with clear navigation
+      - Component: ClientDetailTabs reusable for tab management
+      - Structure: Notes always visible regardless of active tab
+      - Placeholders: Projets and Tracks tabs ready for Plans 22-03, 22-04
     - **Commits:**
-      - 299dfaa: feat(22-01): create ClientFormWizard component
-      - 9406210: refactor(22-01): refactor ClientCreate to use wizard
-      - a0e8d64: build(22-01): validate client package builds successfully
-      - cc3a552: docs(22-01): complete plan summary and update STATE
-    - **Deviations:** 1 auto-fixed (TypeScript type incompatibility for MusicProfileSection onUpdate)
-  - **Next:** Phase 22 Plan 2 - Add ClientDetail tabs (Projets, Tracks, Sessions, Finances) with horizontal navigation at same level.
+      - 7d01a86: feat(22-02): create ClientDetailTabs component with 5 tabs
+      - 3bf25a3: feat(22-02): refactor ClientDetail page with 5 tabs + persistent Notes
+      - e7b3915: test(22-02): validate tab structure builds successfully
+    - **Deviations:** None - plan executed exactly as written
+  - **Next:** Phase 22 Plan 03 - Implement Projets tab with client projects table and relational data display.
