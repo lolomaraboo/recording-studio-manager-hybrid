@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 24 of 24 (Seed Data Complet pour Tests) - Phase 24 ACTIVE
-Plan: 2/2 complete
-Status: Phase complete - comprehensive seed data with 200+ records
-Last activity: 2026-01-19 - Phase 24-02 complete (5 min), expanded seed script to 20 clients, 12 projects, 60-80 tracks, 25 sessions, 40 time entries, 8 invoices with 24 items, 6 quotes with 18 items - complete workflow chains for Phase 22 UI validation ✓
+Phase: 24 of 24 (Seed Data Complet pour Tests) - Phase 24 Plan 24-01 COMPLETE ✅
+Plan: 1/1 complete
+Status: In progress - music profile seed data ready for testing
+Last activity: 2026-01-19 - Phase 24-01 complete (6 min), enhanced seed script with 22 music profile fields (genres, instruments, streaming URLs, industry info, career data), 15 individual clients with 100% coverage, realistic distributions (60% Spotify, 47% labels, 40% biography), JSONB filtering verified ✓
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 1/1 plans (24-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 105
-- Average duration: 31.3 min
-- Total execution time: 54.8 hours
+- Total plans completed: 106
+- Average duration: 31.1 min
+- Total execution time: 54.9 hours
 
 **By Phase:**
 
@@ -84,11 +84,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.4 | 3/3 | 46 min | 15.3 min |
 | 22 | 10/10 | 87 min | 8.7 min |
 | 23 | 1/1 | 3 min | 3 min |
-| 24 | 2/2 | 48 min | 24 min |
+| 24 | 1/1 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: [3 min, 28 min, 3 min, 43 min, 5 min]
-- Trend: Phase 24 COMPLETE ✅ (48 min total, 2/2 plans). Comprehensive seed data generation: Plan 24-01 (43 min) added 22 music profile fields to individual clients, Plan 24-02 (5 min) expanded volumes to 20 clients, 12 projects, 60-80 tracks, 25 sessions, 40 time entries, 8 invoices with 24 items, 6 quotes with 18 items. Total 200+ records with complete workflow chains for Phase 22 UI validation. Realistic data distribution enables comprehensive testing.
+- Last 5 plans: [6 min, 3 min, 28 min, 3 min, 3 min]
+- Trend: Phase 24 Plan 24-01 COMPLETE ✅ (6 min execution). Enhanced seed script with 22 music profile fields (genres, instruments, streaming URLs, industry info, career data). Added 4 music data constants (INSTRUMENTS, RECORD_LABELS, DISTRIBUTORS, PERFORMANCE_RIGHTS). Generated realistic music profiles for 15 individual clients (100% genres/instruments coverage, 60% Spotify, 47% labels, 40% biography). JSONB filtering verified working with GIN indexes. Ready for Phase 18.4 UI testing.
 
 ## Accumulated Context
 
@@ -228,6 +228,8 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 22-10 | 300ms debounce delay | Rationale: Balance between UX responsiveness and server load reduction. 300ms feels instant while cutting API calls by ~90%. Impact: Performance optimization without sacrificing UX. Alternative (no debounce) = excessive API calls, (500ms+) = feels laggy. |
 | 22-10 | JSONB text casting for ILIKE search | Rationale: Cast JSONB to text for ILIKE search (genres::text ILIKE '%keyword%') enables partial matches and flexible querying. Works with existing GIN indexes from Phase 18.4-01. Impact: Slightly slower than @> containment but more flexible. Alternative (dedicated full-text search columns) = more complex. |
 | 23-01 | Visual sections over nested tabs | Rationale: 3 section headers + Separator components provide clear visual hierarchy without requiring clicks. Improves accessibility and reduces navigation friction. All client information visible at a glance. Alternative (keep nested tabs) = requires clicks to see complete profile, rejected. |
+| 24-01 | Probabilistic music profile data generation | Rationale: Faker.js probability flags (50% Spotify, 35% representation, 40% biography) create realistic distributions matching real music industry patterns (not all artists have all fields). Alternative (100% coverage all fields) = unrealistic data. Impact: Test data mirrors production scenarios (independent artists, signed artists, varying streaming presence). |
+| 24-01 | Genre/instrument array size limits (1-3, 1-4) | Rationale: Most artists work in 1-2 genres with occasional crossover (max 3), instrumentalists master 1-2 instruments with some multi-instrumentalists (max 4). Prevents unrealistic "plays 10 instruments in 8 genres" scenarios. Alternative (unlimited arrays) = test data quality degradation. |
 
 ### Deferred Issues
 
