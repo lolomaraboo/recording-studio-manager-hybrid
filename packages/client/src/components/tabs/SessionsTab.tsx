@@ -66,8 +66,6 @@ interface SessionsTabProps {
   rooms: Room[];
 }
 
-type ViewMode = "table" | "cards" | "timeline" | "kanban";
-
 const ALL_COLUMNS = ["session", "salle", "date", "statut"];
 
 const COLUMN_LABELS: Record<string, string> = {

@@ -45,8 +45,6 @@ interface TracksTabProps {
   clientId: number;
 }
 
-type ViewMode = 'liste' | 'cards' | 'table';
-
 const STATUS_LABELS: Record<string, string> = {
   recording: 'Enregistrement',
   editing: 'Édition',

@@ -48,8 +48,6 @@ interface ProjectsTabProps {
   clientId: number;
 }
 
-type ViewMode = "cards" | "liste" | "table" | "kanban";
-
 const STATUS_LABELS = {
   pre_production: "Planifié",
   recording: "En cours",
@@ -121,7 +119,7 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
   const navigate = useNavigate();
 
   // Use preferences hook for database-backed state
-  const { preferences, updatePreferences, resetPreferences, isLoading: prefsLoading } = useTabPreferences(
+  const { preferences, updatePreferences, resetPreferences } = useTabPreferences(
     "client-detail-projects",
     {
       viewMode: "cards",

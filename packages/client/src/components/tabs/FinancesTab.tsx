@@ -72,8 +72,6 @@ interface FinancesTabProps {
   quotes: Quote[];
 }
 
-type ViewMode = "table" | "cards" | "timeline" | "kanban";
-
 const INVOICE_COLUMNS = ["numéro", "date", "montant", "statut"];
 const QUOTE_COLUMNS = ["numéro", "date", "montant", "statut"];
 
