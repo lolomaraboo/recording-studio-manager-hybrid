@@ -3,7 +3,7 @@
  * Music profile fields for artist clients (genres, instruments, streaming, industry, career)
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { FLAT_GENRES, FLAT_INSTRUMENTS } from "@/lib/music-presets";
+import { trpc } from "@/lib/trpc";
+import { Link } from "react-router-dom";
 import {
   Music,
   Guitar,
@@ -72,6 +74,41 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
   useEffect(() => {
     localStorage.setItem('music-profile-panel-state', JSON.stringify(isPanelOpen));
   }, [isPanelOpen]);
+
+  // Load all clients to match industry contacts
+  const { data: allClients } = trpc.clients.list.useQuery({ limit: 1000 });
+
+  // Helper: Find client ID by name (exact match, case-insensitive)
+  const findClientByName = useMemo(() => {
+    const clientMap = new Map<string, number>();
+    allClients?.forEach(c => {
+      clientMap.set(c.name.toLowerCase().trim(), c.id);
+    });
+    return (name: string | null | undefined): number | null => {
+      if (!name) return null;
+      return clientMap.get(name.toLowerCase().trim()) || null;
+    };
+  }, [allClients]);
+
+  // Helper component: Display text or link to client
+  const IndustryContactLink = ({ text }: { text: string | null | undefined }) => {
+    if (!text) return null;
+    const clientId = findClientByName(text);
+
+    if (clientId) {
+      return (
+        <Link
+          to={`/clients/${clientId}`}
+          className="text-sm text-foreground hover:text-primary underline underline-offset-4 transition-colors py-2 flex items-center gap-2"
+        >
+          <span>{text}</span>
+          <ExternalLink className="h-3 w-3 flex-shrink-0" />
+        </Link>
+      );
+    }
+
+    return <p className="text-sm text-foreground py-2">{text}</p>;
+  };
 
   return (
     <div className="space-y-6">
@@ -278,7 +315,7 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
                               className="text-sm"
                             />
                           ) : (
-                            <p className="text-sm text-foreground py-2">{client.recordLabel}</p>
+                            <IndustryContactLink text={client.recordLabel} />
                           )}
                         </div>
                       )}
@@ -293,7 +330,7 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
                               className="text-sm"
                             />
                           ) : (
-                            <p className="text-sm text-foreground py-2">{client.distributor}</p>
+                            <IndustryContactLink text={client.distributor} />
                           )}
                         </div>
                       )}
@@ -308,7 +345,7 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
                               className="text-sm"
                             />
                           ) : (
-                            <p className="text-sm text-foreground py-2">{client.managerContact}</p>
+                            <IndustryContactLink text={client.managerContact} />
                           )}
                         </div>
                       )}
@@ -323,7 +360,7 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
                               className="text-sm"
                             />
                           ) : (
-                            <p className="text-sm text-foreground py-2">{client.publisher}</p>
+                            <IndustryContactLink text={client.publisher} />
                           )}
                         </div>
                       )}
