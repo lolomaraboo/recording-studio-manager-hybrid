@@ -6,6 +6,7 @@ import { MusicProfileSection } from "@/components/MusicProfileSection";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
 import { ProjectsTab } from "./tabs/ProjectsTab";
+import { TracksTab } from "./tabs/TracksTab";
 import {
   Info,
   FolderOpen,
@@ -245,19 +246,9 @@ export function ClientDetailTabs({
         <ProjectsTab clientId={clientId} />
       </TabsContent>
 
-      {/* Tracks Tab - Placeholder */}
+      {/* Tracks Tab */}
       <TabsContent value="tracks" className="mt-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-12">
-              <Music className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">Onglet Tracks - À implémenter</p>
-              <p className="text-sm text-muted-foreground">
-                Cette section affichera la liste des tracks du client
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <TracksTab clientId={clientId} />
       </TabsContent>
 
       {/* Sessions Tab - With 4 view modes */}
