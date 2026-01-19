@@ -1711,3 +1711,23 @@ Reorganiser les pages client (création, modification, détail) pour mieux affic
 **Estimated Effort:** 180-270 min (9 plans × 20-30 min chacun)
 
 **Rationale**: Phase 18.4 a résolu le problème de **data** (22 champs en DB), mais l'**UX** n'a pas été optimisée pour cette quantité d'information. Les studios ont besoin de voir la relation complète client → projets → tracks → finances en un seul endroit. Hub relationnel = amélioration productivité majeure.
+
+---
+
+### Phase 23: Simplification Onglet Informations Client
+
+**Goal**: Supprimer les 3 sous-onglets (informations, enrichi, profil musical) et afficher tous les champs dans une seule vue organisée en sections visuelles distinctes
+
+**Depends on**: Phase 22 (UI client refactoring complete)
+
+**Research**: Unlikely (UI reorganization using existing component patterns)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 23-01-PLAN.md — Remove sub-tabs and create single-view with 3 visual sections (Base/Enrichies/Musique)
+
+**Details**:
+Single-view Informations tab replaces 3 nested sub-tabs with visual sections using Separator components and section headers. All client fields visible in one scrollable view without clicking sub-tabs.
+
+**Rationale**: Phase 22 a créé l'onglet "Informations" avec 3 sous-onglets pour organiser tous les champs client. L'utilisateur souhaite simplifier en affichant tous les champs dans une seule vue avec sections visuellement distinctes (informations de base, contacts enrichis, profil musical) plutôt que de naviguer entre sous-onglets. Améliore l'accessibilité et réduit les clics pour consulter le profil complet d'un client.
