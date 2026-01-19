@@ -858,4 +858,89 @@ export const clientsRouter = router({
         projection,
       };
     }),
+
+  /**
+   * Get projects for a client with aggregated stats
+   * Returns projects with tracksCount and hoursRecorded
+   */
+  getProjects: protectedProcedure
+    .input(z.object({ clientId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Query projects for this client
+      const projectsList = await tenantDb
+        .select()
+        .from(projects)
+        .where(eq(projects.clientId, input.clientId));
+
+      // For each project, get tracks and sessions to calculate stats
+      const projectsWithStats = await Promise.all(
+        projectsList.map(async (project) => {
+          // Get tracks count
+          const projectTracks = await tenantDb
+            .select()
+            .from(tracks)
+            .where(eq(tracks.projectId, project.id));
+
+          // Get sessions for this project to calculate total hours
+          const projectSessions = await tenantDb
+            .select()
+            .from(sessions)
+            .where(eq(sessions.projectId, project.id));
+
+          // Calculate hours recorded from sessions (startTime to endTime)
+          const hoursRecorded = projectSessions.reduce((sum, session) => {
+            if (session.startTime && session.endTime) {
+              const durationMs = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
+              const hours = durationMs / (1000 * 60 * 60);
+              return sum + hours;
+            }
+            return sum;
+          }, 0);
+
+          return {
+            ...project,
+            tracksCount: projectTracks.length,
+            hoursRecorded: Math.round(hoursRecorded * 10) / 10, // Round to 1 decimal
+          };
+        })
+      );
+
+      return projectsWithStats;
+    }),
+
+  /**
+   * Get tracks for a client from all their projects
+   * Returns tracks with project title and artist names
+   */
+  getTracks: protectedProcedure
+    .input(z.object({ clientId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get all projects for this client
+      const clientProjects = await tenantDb.query.projects.findMany({
+        where: eq(projects.clientId, input.clientId),
+      });
+
+      if (clientProjects.length === 0) return [];
+
+      const projectIds = clientProjects.map(p => p.id);
+
+      // Get all tracks from these projects
+      const clientTracks = await tenantDb.query.tracks.findMany({
+        where: inArray(tracks.projectId, projectIds),
+        with: {
+          project: {
+            columns: { title: true },
+          },
+        },
+      });
+
+      return clientTracks.map(track => ({
+        ...track,
+        projectTitle: track.project?.title || "Sans projet",
+      }));
+    }),
 });
