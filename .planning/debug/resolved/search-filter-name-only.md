@@ -1,8 +1,8 @@
 ---
-status: verifying
+status: resolved
 trigger: "Le filtre de recherche unifié (Plan 22-10) cherche seulement dans le nom au lieu de chercher dans nom + email + genres + instruments"
 created: 2026-01-18T00:00:00Z
-updated: 2026-01-18T00:20:00Z
+updated: 2026-01-18T00:25:00Z
 ---
 
 ## Current Focus
