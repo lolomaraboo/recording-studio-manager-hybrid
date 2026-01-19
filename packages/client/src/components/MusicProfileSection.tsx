@@ -76,7 +76,7 @@ export function MusicProfileSection({ client, isEditing, onUpdate }: MusicProfil
   }, [isPanelOpen]);
 
   // Load all clients to match industry contacts
-  const { data: allClients } = trpc.clients.list.useQuery({ limit: 1000 });
+  const { data: allClients } = trpc.clients.list.useQuery({ limit: 100 });
 
   // Helper: Find client ID by name (exact match, case-insensitive)
   const findClientByName = useMemo(() => {
