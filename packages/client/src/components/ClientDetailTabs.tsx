@@ -1,12 +1,11 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EnrichedClientInfo } from "@/components/EnrichedClientInfo";
 import { MusicProfileSection } from "@/components/MusicProfileSection";
+import { SessionsTab } from "./tabs/SessionsTab";
+import { FinancesTab } from "./tabs/FinancesTab";
+import { ProjectsTab } from "./tabs/ProjectsTab";
 import {
   Info,
   FolderOpen,
@@ -20,8 +19,6 @@ import {
   Building,
   MapPin,
 } from "lucide-react";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { trpc } from "@/lib/trpc";
 
 interface ClientDetailTabsProps {
@@ -54,6 +51,7 @@ export function ClientDetailTabs({
   // Fetch related data
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
+  const { data: quotes } = trpc.quotes.list.useQuery({ limit: 100 });
   const { data: rooms } = trpc.rooms.list.useQuery();
 
   // Filter data by client
@@ -65,39 +63,9 @@ export function ClientDetailTabs({
     return invoices?.filter((inv) => inv.clientId === clientId) || [];
   }, [invoices, clientId]);
 
-  const roomMap = useMemo(() => {
-    return (
-      rooms?.reduce((acc, room) => {
-        acc[room.id] = room.name;
-        return acc;
-      }, {} as Record<number, string>) || {}
-    );
-  }, [rooms]);
-
-  const getSessionStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
-      scheduled: { variant: "outline", label: "Programmée" },
-      in_progress: { variant: "default", label: "En cours" },
-      completed: { variant: "secondary", label: "Terminée" },
-      cancelled: { variant: "destructive", label: "Annulée" },
-    };
-
-    const config = variants[status] || variants.scheduled;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
-
-  const getInvoiceStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
-      draft: { variant: "secondary", label: "Brouillon" },
-      sent: { variant: "outline", label: "Envoyée" },
-      paid: { variant: "default", label: "Payée" },
-      cancelled: { variant: "destructive", label: "Annulée" },
-      overdue: { variant: "destructive", label: "En retard" },
-    };
-
-    const config = variants[status] || variants.draft;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
+  const clientQuotes = useMemo(() => {
+    return quotes?.filter((q) => q.clientId === clientId) || [];
+  }, [quotes, clientId]);
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange}>
@@ -274,17 +242,7 @@ export function ClientDetailTabs({
 
       {/* Projets Tab - Placeholder */}
       <TabsContent value="projets" className="mt-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-12">
-              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">Onglet Projets - À implémenter</p>
-              <p className="text-sm text-muted-foreground">
-                Cette section affichera la liste des projets du client
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <ProjectsTab clientId={clientId} />
       </TabsContent>
 
       {/* Tracks Tab - Placeholder */}
@@ -302,162 +260,28 @@ export function ClientDetailTabs({
         </Card>
       </TabsContent>
 
-      {/* Sessions Tab - Keep existing implementation */}
+      {/* Sessions Tab - With 4 view modes */}
       <TabsContent value="sessions" className="mt-4">
         <Card>
           <CardContent className="pt-6">
-            {clientSessions.length > 0 ? (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Session</TableHead>
-                      <TableHead>Salle</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {clientSessions
-                      .sort(
-                        (a, b) =>
-                          new Date(b.startTime).getTime() -
-                          new Date(a.startTime).getTime()
-                      )
-                      .slice(0, 10)
-                      .map((session) => (
-                        <TableRow key={session.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{session.title}</div>
-                              <div className="text-sm text-muted-foreground capitalize">
-                                {session.status}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">{roomMap[session.roomId] || "N/A"}</div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {format(new Date(session.startTime), "dd MMM yyyy", {
-                                locale: fr,
-                              })}
-                            </div>
-                          </TableCell>
-                          <TableCell>{getSessionStatusBadge(session.status)}</TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link to={`/sessions/${session.id}`}>Voir</Link>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm font-medium mb-1">Aucune session enregistrée</p>
-              </div>
-            )}
+            <SessionsTab
+              clientId={clientId}
+              sessions={clientSessions}
+              rooms={rooms || []}
+            />
           </CardContent>
         </Card>
       </TabsContent>
 
-      {/* Finances Tab - Keep existing invoices, add placeholders for quotes/stats */}
+      {/* Finances Tab - Stats + Factures/Quotes with view modes */}
       <TabsContent value="finances" className="mt-4">
         <Card>
           <CardContent className="pt-6">
-            <Tabs defaultValue="invoices">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="invoices">Factures ({clientInvoices.length})</TabsTrigger>
-                <TabsTrigger value="quotes">Devis</TabsTrigger>
-                <TabsTrigger value="stats">Statistiques</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="invoices" className="mt-4">
-                {clientInvoices.length > 0 ? (
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Facture #</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Montant</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {clientInvoices
-                          .sort(
-                            (a, b) =>
-                              new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime()
-                          )
-                          .slice(0, 10)
-                          .map((invoice) => (
-                            <TableRow key={invoice.id}>
-                              <TableCell className="font-medium">
-                                {invoice.invoiceNumber}
-                              </TableCell>
-                              <TableCell>
-                                <div className="text-sm">
-                                  {format(new Date(invoice.issueDate), "dd MMM yyyy", {
-                                    locale: fr,
-                                  })}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <div className="font-semibold">
-                                  {parseFloat(invoice.total || "0").toLocaleString("fr-FR", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
-                                  €
-                                </div>
-                              </TableCell>
-                              <TableCell>{getInvoiceStatusBadge(invoice.status)}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm" asChild>
-                                  <Link to={`/invoices/${invoice.id}`}>Voir</Link>
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm font-medium mb-1">Aucune facture émise</p>
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="quotes" className="mt-4">
-                <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg font-medium mb-2">Devis - À implémenter</p>
-                  <p className="text-sm text-muted-foreground">
-                    Cette section affichera les devis du client
-                  </p>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="stats" className="mt-4">
-                <div className="text-center py-12">
-                  <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg font-medium mb-2">Statistiques financières - À implémenter</p>
-                  <p className="text-sm text-muted-foreground">
-                    Cette section affichera les statistiques financières du client
-                  </p>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <FinancesTab
+              clientId={clientId}
+              invoices={clientInvoices}
+              quotes={clientQuotes}
+            />
           </CardContent>
         </Card>
       </TabsContent>
