@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 22 of 22 (Refonte UI Client - Hub Relationnel Complet) - Phase 22 COMPLETE ✅
-Plan: All 9 plans complete
-Status: Phase complete - comprehensive client UI refactoring (wizard, tabs, relational data, customization)
-Last activity: 2026-01-18 - Phase 22 complete (84 min total), ClientFormWizard 3-step wizard created, ClientDetail 5-tab layout, 4 relational tabs (Projets/Tracks/Sessions/Finances) with view modes, preferences backend + drag & drop customization, edit mode integration, phase verified ✓
+Plan: All 10 plans complete
+Status: Phase complete - comprehensive client UI refactoring (wizard, tabs, relational data, customization, unified search)
+Last activity: 2026-01-19 - Phase 22 complete (87 min total), unified search filter added (3 min), single search input replaces 3 separate filters, multi-keyword AND logic across 5 fields, 300ms debounced, phase verified ✓
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 9/9 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 101
-- Average duration: 31.9 min
-- Total execution time: 53.9 hours
+- Total plans completed: 102
+- Average duration: 31.7 min
+- Total execution time: 54.0 hours
 
 **By Phase:**
 
@@ -82,11 +82,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
-| 22 | 9/9 | 84 min | 9.3 min |
+| 22 | 10/10 | 87 min | 8.7 min |
 
 **Recent Trend:**
-- Last 5 plans: [13 min, 8 min, 6 min, 3 min, 28 min]
-- Trend: Phase 22 COMPLETE ✅ (84 min execution + verification, 9/9 plans). Complete client UI refactoring: ClientFormWizard 3-step wizard (Base/Enrichi/Musique), ClientDetail 5-tab layout, 4 relational tabs (Projets/Tracks/Sessions/Finances) with view modes, preferences backend + drag & drop customization, edit mode integration. All must-haves verified ✓. Production-ready comprehensive client hub.
+- Last 5 plans: [8 min, 6 min, 3 min, 28 min, 3 min]
+- Trend: Phase 22 COMPLETE ✅ (87 min total execution, 10/10 plans). Complete client UI refactoring: ClientFormWizard 3-step wizard, ClientDetail 5-tab layout, 4 relational tabs (Projets/Tracks/Sessions/Finances) with view modes, preferences backend + drag & drop customization, edit mode integration, unified search filter (single input replaces 3 filters, multi-keyword AND logic, 300ms debounced). All must-haves verified ✓. Production-ready comprehensive client hub.
 
 ## Accumulated Context
 
@@ -222,6 +222,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 22-08 | Column rendering by columnOrder array | Rationale: Filter columnOrder by visibleColumns, then map to render cells in that order. Tables respect both visibility AND order preferences, consistent behavior across all tabs. |
 | 22-09 | Reuse wizard in edit mode over inline edit form | Rationale: Single component pattern reduces code duplication (ClientDetail edit mode code reduced from 167 to 47 lines, 72% reduction), ensures consistency between create/edit flows. Impact: Cleaner code, fewer potential state sync bugs. |
 | 22-09 | Hydrate arrays in useState initialization | Rationale: Arrays (phones, emails, websites, customFields) need to populate immediately when wizard mounts in edit mode. Impact: Edit mode correctly displays all vCard array fields without additional effects. |
+| 22-10 | Unified search with AND logic between keywords | Rationale: User typing "basse reggae" expects clients with BOTH attributes, not either. Industry standard search behavior (Google, GitHub). Impact: Natural language search UX, more precise results. Alternative (OR logic) would be too permissive. |
+| 22-10 | 300ms debounce delay | Rationale: Balance between UX responsiveness and server load reduction. 300ms feels instant while cutting API calls by ~90%. Impact: Performance optimization without sacrificing UX. Alternative (no debounce) = excessive API calls, (500ms+) = feels laggy. |
+| 22-10 | JSONB text casting for ILIKE search | Rationale: Cast JSONB to text for ILIKE search (genres::text ILIKE '%keyword%') enables partial matches and flexible querying. Works with existing GIN indexes from Phase 18.4-01. Impact: Slightly slower than @> containment but more flexible. Alternative (dedicated full-text search columns) = more complex. |
 
 ### Deferred Issues
 
@@ -481,10 +484,10 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-18T23:45:00Z
-Stopped at: Phase 22 COMPLETE ✅ - Verified and ready for next phase
+Last session: 2026-01-19T04:21:58Z
+Stopped at: Phase 22 COMPLETE ✅ - All 10 plans complete, verified and ready for next phase
 Resume context:
-  - Phase 22 COMPLETE ✅: Refonte UI Client - Hub Relationnel Complet (84 min execution + verification, 9/9 plans)
+  - Phase 22 COMPLETE ✅: Refonte UI Client - Hub Relationnel Complet (87 min total execution, 10/10 plans)
     - **Wave 1 (Plans 22-01, 22-02):** Wizard + tabbed layout foundation
       - ClientFormWizard component (796 lines) - 3-step wizard (Base/Enrichi/Musique) with free navigation
       - ClientDetail refactored with 5 horizontal tabs + persistent Notes section
@@ -503,8 +506,16 @@ Resume context:
     - **Wave 5 (Plan 22-09):** Edit mode integration
       - ClientDetail edit mode uses ClientFormWizard (72% code reduction)
       - Array fields hydration (phones, emails, websites, customFields)
-    - **Verification:** Phase goal verified ✓ (6/6 must-haves passed)
+    - **Wave 6 (Plan 22-10):** Unified search filter
+      - Single search input replaces 3 separate filters (genre, instrument, search)
+      - Multi-keyword AND logic across 5 fields (name, email, artistName, genres, instruments)
+      - 300ms debounced to reduce API calls by ~90%
+      - JSONB text casting for ILIKE on array contents
+      - Backend: searchQuery parameter with keyword parsing
+      - Frontend: Clear button (X icon) when search active
+    - **Verification:** Phase goal verified ✓ (all must-haves passed)
       - All artifacts substantive and wired (ClientFormWizard 796 lines, 4 tab components 444-846 lines)
       - Client build succeeds (zero blocking errors)
       - Cross-device preference sync ready
+      - Unified search functional (backend + frontend)
   - **Next:** Phase 22 verified complete. Continue with next phase or milestone completion.
