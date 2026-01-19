@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 22 of 22 (Refonte UI Client - Hub Relationnel Complet)
-Plan: 6 of 9 (22-07 COMPLETE ✅)
-Status: In progress - Preferences backend infrastructure complete
-Last activity: 2026-01-19 - Completed 22-07-PLAN.md (3 min), user_preferences table with JSONB storage, migration 0013 applied, preferencesRouter with get/save/reset procedures, upsert pattern for preferences, cross-device sync ready
+Plan: 7 of 9 (22-08 COMPLETE ✅)
+Status: In progress - Drag & drop column reordering complete for all tabs
+Last activity: 2026-01-19 - Completed 22-08-PLAN.md (28 min), drag & drop column reordering with @dnd-kit, GripVertical icons on all table headers, column order persistence to database, all 4 tabs (Projects/Tracks/Sessions/Finances) support drag & drop
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 6/9 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-07 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 7/9 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-07 ✅, 22-08 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 98
-- Average duration: 32.4 min
-- Total execution time: 53.1 hours
+- Total plans completed: 99
+- Average duration: 32.1 min
+- Total execution time: 53.6 hours
 
 **By Phase:**
 
@@ -82,11 +82,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
-| 22 | 6/9 | 41 min | 6.8 min |
+| 22 | 7/9 | 69 min | 9.9 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 6 min, 8 min, 13 min, 3 min]
-- Trend: Phase 22 Plan 07 COMPLETE ✅ (3 min execution). Preferences backend infrastructure complete. user_preferences table with JSONB storage for cross-device sync. Migration 0013 created manually and applied to tenant_24. preferencesRouter with get/save/reset procedures. Upsert pattern for simple client code. Backend ready for Phase 22-08 (Column Visibility & Ordering).
+- Last 5 plans: [6 min, 8 min, 13 min, 3 min, 28 min]
+- Trend: Phase 22 Plan 08 COMPLETE ✅ (28 min execution). Drag & drop column reordering complete for all client detail tabs. Added @dnd-kit library for modern drag & drop support. SortableTableHeader components with GripVertical icons for visual feedback. Tables render columns in preferences.columnOrder order. Column order updates saved to database automatically. Keyboard accessibility via KeyboardSensor. All 4 tabs (Projects/Tracks/Sessions/Finances) fully customizable with drag & drop.
 
 ## Accumulated Context
 
@@ -217,6 +217,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 22-07 | Manual migration creation over Drizzle generate | Rationale: Drizzle interactive prompt asks about unrelated quote_items.service_template_id column, blocking automation. Manual migration is faster and more reliable for known schema changes (precedent: Phase 18.2). |
 | 22-07 | JSONB preferences storage over separate columns | Rationale: Flexible schema allows adding new preference types without migrations. Supports viewMode, visibleColumns, columnOrder, sortBy, sortOrder all in single column. JSON querying capabilities sufficient for this use case. |
 | 22-07 | Upsert pattern in save endpoint | Rationale: Check for existing preference, update if found, insert if not. Simpler client code (no need to distinguish create vs update). PostgreSQL unique constraint prevents duplicates. |
+| 22-08 | @dnd-kit over react-beautiful-dnd for drag & drop | Rationale: Modern library, TypeScript-first, better performance, still actively maintained (react-beautiful-dnd deprecated). Clean API with excellent TypeScript support and built-in accessibility. |
+| 22-08 | SortableTableHeader component per file | Rationale: Avoid shared component import complexity since each tab has slightly different table structure. ~35 lines duplicated across 4 files, but simpler to maintain and modify per-tab. |
+| 22-08 | Column rendering by columnOrder array | Rationale: Filter columnOrder by visibleColumns, then map to render cells in that order. Tables respect both visibility AND order preferences, consistent behavior across all tabs. |
 
 ### Deferred Issues
 
@@ -476,36 +479,31 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-19T02:37:38Z
-Stopped at: Phase 22 Plan 07 COMPLETE ✅ - Preferences backend infrastructure complete
+Last session: 2026-01-19T03:23:16Z
+Stopped at: Phase 22 Plan 08 COMPLETE ✅ - Drag & drop column reordering complete
 Resume context:
-  - Phase 22 Plan 07 COMPLETE ✅: User Preferences Backend (3 min execution, 3/3 tasks)
-    - **Task 1:** Created user_preferences table schema (81c9242)
-      - Added user_preferences table to tenant schema (+29 lines)
-      - JSONB column with TypeScript type for preferences object
-      - Unique constraint on (userId, scope) prevents duplicates
-      - Scopes: client-detail-projects, tracks, sessions, finances-invoices, finances-quotes
-      - Types exported: UserPreference, InsertUserPreference
-      - TypeScript compilation passes
-    - **Task 2:** Generated migration for user_preferences (c822639)
-      - Created migration 0013 manually (Drizzle interactive prompt skipped)
-      - Applied to tenant_24 for local testing
-      - Verified table structure with correct columns and constraints
-      - Unique constraint on (user_id, scope) enforced at database level
-    - **Task 3:** Created preferences tRPC router (973db1c)
-      - Created preferencesRouter with 3 procedures (+102 lines)
-      - GET endpoint returns preferences by scope (null if not found)
-      - SAVE endpoint upserts preferences (update existing or insert new)
-      - RESET endpoint deletes preferences for scope (restore defaults)
-      - Integrated into main appRouter
-      - Uses ctx.getTenantDb() and ctx.userId for tenant isolation
+  - Phase 22 Plan 08 COMPLETE ✅: Column Visibility & Ordering UI (28 min execution, 3/3 tasks)
+    - **Task 1:** useTabPreferences hook ✅ Already complete from Plan 22-07
+    - **Task 2:** Added drag & drop to all tabs (4b154cc, 393e27b)
+      - Installed @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
+      - Created SortableTableHeader component in each tab file (ProjectsTab, TracksTab, SessionsTab, FinancesTab)
+      - Added DndContext wrapper around table elements
+      - Implemented handleDragEnd functions using arrayMove + updatePreferences
+      - Tables now render columns in preferences.columnOrder order
+      - Added GripVertical icons for visual drag handles
+      - FinancesTab has 2 separate drag handlers (invoices and quotes)
+      - Removed unused ViewMode type definitions (TypeScript cleanup)
+    - **Task 3:** Build validation (393e27b)
+      - Client package builds successfully
+      - TypeScript compilation passes (only pre-existing server errors)
+      - All 4 tabs support drag & drop column reordering
     - **Final State:**
-      - Backend: Complete preferences infrastructure for cross-device sync
-      - Database: user_preferences table with JSONB storage
-      - API: GET/SAVE/RESET endpoints ready for frontend integration
+      - Frontend: Complete customization UI for all client detail tabs
+      - Features: View mode toggle + Column visibility toggle + Drag & drop reordering + Reset button
+      - Persistence: All preferences saved to database via useTabPreferences hook
+      - Cross-device sync: Preferences load from database on mount
     - **Commits:**
-      - 81c9242: feat(22-07): add user_preferences table to tenant schema
-      - c822639: feat(22-07): create migration for user_preferences table
-      - 973db1c: feat(22-07): create preferences tRPC router
-    - **Deviations:** None - plan executed exactly as written
-  - **Next:** Phase 22 Plan 08 - Implement column visibility & ordering UI (frontend integration of preferences backend).
+      - 4b154cc: feat(22-08): add drag & drop column reordering to all tabs
+      - 393e27b: fix(22-08): remove unused ViewMode types and prefsLoading variable
+    - **Deviations:** 1 auto-fixed (removed unused code for TypeScript warnings)
+  - **Next:** Phase 22 Plan 09 - Next UI enhancement in Client Hub refactoring phase.
