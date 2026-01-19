@@ -1722,12 +1722,35 @@ Reorganiser les pages client (création, modification, détail) pour mieux affic
 
 **Research**: Unlikely (UI reorganization using existing component patterns)
 
-**Plans**: 1 plan
+**Plans**: 0 plans
 
 Plans:
-- [ ] 23-01-PLAN.md — Remove sub-tabs and create single-view with 3 visual sections (Base/Enrichies/Musique)
+- [ ] TBD (run /gsd:plan-phase 23 to break down)
 
 **Details**:
-Single-view Informations tab replaces 3 nested sub-tabs with visual sections using Separator components and section headers. All client fields visible in one scrollable view without clicking sub-tabs.
+[To be added during planning]
 
 **Rationale**: Phase 22 a créé l'onglet "Informations" avec 3 sous-onglets pour organiser tous les champs client. L'utilisateur souhaite simplifier en affichant tous les champs dans une seule vue avec sections visuellement distinctes (informations de base, contacts enrichis, profil musical) plutôt que de naviguer entre sous-onglets. Améliore l'accessibilité et réduit les clics pour consulter le profil complet d'un client.
+
+---
+
+### Phase 24: Seed Data Complet pour Tests
+
+**Goal**: Create comprehensive seed script generating ~150-200 realistic records with complete music profiles, relationships, and data coverage for all 31 tenant tables
+
+**Depends on**: Phase 23 (UI simplification complete)
+
+**Research**: Unlikely (faker.js patterns, existing seed-realistic-data.ts structure)
+
+**Plans**: 2 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — Enhance seed script with music profile fields (genres, instruments, streaming URLs, industry info)
+- [ ] 24-02-PLAN.md — Expand data volume and complete relationships (15-20 clients, 12 projects, 72 tracks, 25 sessions, 40 time entries)
+
+**Status**: ✅ Planned (2 plans created - ready for execution)
+
+**Details**:
+Enhanced seed script populating ALL fields from Phase 18.4 music profile (22 fields: genres, instruments, streaming URLs, record label, distributor, manager, publisher, PRO, years active, notable works, bio) + complete relationships (projets → tracks → sessions → time entries → invoices/quotes). Volume: ~15-20 clients with enriched profiles, 12-15 projects, 25-30 tracks with artwork/metadata/versions, 20-25 sessions, 10-12 quotes/invoices, 30-40 time entries. Current seed-realistic-data.ts creates ~60-80 records but doesn't populate music fields.
+
+**Rationale**: Phase 18.4 added 22 music profile fields but seed script doesn't populate them - impossible to test search filters, streaming URL displays, industry info rendering, etc. Phase 22 added 5 tabs (Informations/Projets/Tracks/Sessions/Finances) requiring realistic relational data for proper testing. Current seed insufficient for validating complete user workflows across all tabs.
