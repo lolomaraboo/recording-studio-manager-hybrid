@@ -31,14 +31,18 @@ export const clientsRouter = router({
           limit: z.number().min(1).max(100).default(50),
           offset: z.number().min(0).default(0),
           search: z.string().optional(),
-          genre: z.string().optional(), // NEW: Filter by genre
-          instrument: z.string().optional(), // NEW: Filter by instrument
+          searchQuery: z.string().optional(), // Unified search across all fields
         })
         .optional()
     )
     .query(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
-      const { limit = 50, offset = 0, search, genre, instrument } = input || {};
+      const { limit = 50, offset = 0, search, searchQuery } = input || {};
+
+      // Split searchQuery into keywords (space-separated)
+      const keywords = searchQuery
+        ? searchQuery.trim().toLowerCase().split(/\s+/).filter(k => k.length > 0)
+        : [];
 
       // Build base query
       let query = tenantDb
@@ -74,25 +78,27 @@ export const clientsRouter = router({
       // Apply filters conditionally
       const conditions: any[] = [];
 
-      // Search filter (name/email)
+      // Legacy search filter (name/email) - kept for backward compatibility
       if (search) {
         conditions.push(
           sql`${clients.name} ILIKE ${`%${search}%`} OR ${clients.email} ILIKE ${`%${search}%`}`
         );
       }
 
-      // Genre filter using JSONB containment (@>)
-      if (genre) {
-        conditions.push(
-          sql`${clients.genres} @> ${JSON.stringify([genre])}`
+      // Unified search query (keywords with AND logic)
+      // Each keyword must match at least one field (OR within keyword)
+      // All keywords must be present somewhere (AND between keywords)
+      if (keywords.length > 0) {
+        const keywordConditions = keywords.map(keyword =>
+          sql`(
+            ${clients.name} ILIKE ${`%${keyword}%`} OR
+            ${clients.email} ILIKE ${`%${keyword}%`} OR
+            ${clients.artistName} ILIKE ${`%${keyword}%`} OR
+            ${clients.genres}::text ILIKE ${`%${keyword}%`} OR
+            ${clients.instruments}::text ILIKE ${`%${keyword}%`}
+          )`
         );
-      }
-
-      // Instrument filter using JSONB containment (@>)
-      if (instrument) {
-        conditions.push(
-          sql`${clients.instruments} @> ${JSON.stringify([instrument])}`
-        );
+        conditions.push(sql.join(keywordConditions, sql` AND `));
       }
 
       // Apply all conditions with AND logic
