@@ -897,6 +897,8 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 21. Audit Scripts Base de Données | v4.1 | 3/3 | ✅ Complete | 2026-01-17 |
 | 18.4. Music Profile for Artists | v4.1 | 3/3 | ✅ Complete | 2026-01-17 |
 | 22. Refonte UI Client | v4.1 | 9/9 | ✅ Complete | 2026-01-18 |
+| 23. Simplification Onglet Informations | v4.1 | 1/1 | ✅ Complete | 2026-01-19 |
+| 24. Seed Data Complet pour Tests | v4.1 | 2/2 | ✅ Complete | 2026-01-18 |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -906,7 +908,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
 **v4.0 Total**: 24/24 plans ✅ SHIPPED 2026-01-15 (Phases 10-17 finished)
-**v4.1 Total**: 17/19 plans (Phase 18: 1/3 ⏸️, Phase 20: 1/1 ✅, Phase 21: 3/3 ✅, Phase 18.4: 3/3 ✅, Phase 22: 9/9 ✅)
+**v4.1 Total**: 20/22 plans (Phase 18: 1/3 ⏸️, Phase 20: 1/1 ✅, Phase 21: 3/3 ✅, Phase 18.4: 3/3 ✅, Phase 22: 9/9 ✅, Phase 23: 1/1 ✅, Phase 24: 2/2 ✅)
 **v1.0 Total**: 0/17 plans (deferred after v4.1)
 
 ---
@@ -1745,10 +1747,10 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 24-01-PLAN.md — Enhance seed script with music profile fields (genres, instruments, streaming URLs, industry info)
-- [ ] 24-02-PLAN.md — Expand data volume and complete relationships (15-20 clients, 12 projects, 72 tracks, 25 sessions, 40 time entries)
+- [x] 24-01: Enhance seed script with music profile fields (Completed 2026-01-18 - 6 min)
+- [x] 24-02: Expand data volume and complete relationships (Completed 2026-01-18 - 5 min)
 
-**Status**: ✅ Planned (2 plans created - ready for execution)
+**Status**: ✅ Complete (All 2 plans finished - 11 min total)
 
 **Details**:
 Enhanced seed script populating ALL fields from Phase 18.4 music profile (22 fields: genres, instruments, streaming URLs, record label, distributor, manager, publisher, PRO, years active, notable works, bio) + complete relationships (projets → tracks → sessions → time entries → invoices/quotes). Volume: ~15-20 clients with enriched profiles, 12-15 projects, 25-30 tracks with artwork/metadata/versions, 20-25 sessions, 10-12 quotes/invoices, 30-40 time entries. Current seed-realistic-data.ts creates ~60-80 records but doesn't populate music fields.
