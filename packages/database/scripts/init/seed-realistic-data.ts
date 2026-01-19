@@ -211,19 +211,19 @@ async function seedRealisticData() {
     }
     console.log('   ✅ 6 equipment items created');
 
-    // ========== PROJECTS (3) ==========
+    // ========== PROJECTS (12) ==========
     console.log('\n🎵 Creating projects...');
 
     const projects = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 12; i++) {
       const client = faker.helpers.arrayElement(individualClients);
       const projectName = faker.music.songName();
       const genre = faker.helpers.arrayElement(GENRES);
       const projectType = faker.helpers.arrayElement(['album', 'ep', 'single']);
       const status = faker.helpers.arrayElement(['recording', 'mixing', 'mastering', 'completed']);
-      const startDaysAgo = faker.number.int({ min: 10, max: 60 });
-      const deliveryDaysAhead = faker.number.int({ min: 30, max: 90 });
-      const budget = faker.number.int({ min: 5000, max: 25000 });
+      const startDaysAgo = faker.number.int({ min: 10, max: 90 });
+      const deliveryDaysAhead = faker.number.int({ min: 30, max: 120 });
+      const budget = faker.number.int({ min: 3000, max: 30000 });
 
       const [project] = await sql.unsafe(`
         INSERT INTO projects (
@@ -258,12 +258,13 @@ async function seedRealisticData() {
       console.log(`   ✅ ${project.name} (ID: ${project.id})`);
     }
 
-    // ========== TRACKS (12 - 4 per project) ==========
+    // ========== TRACKS (60-80 total - 5-8 per project) ==========
     console.log('\n🎶 Creating tracks...');
 
     let trackCount = 0;
     for (const project of projects) {
-      for (let i = 0; i < 4; i++) {
+      const tracksPerProject = faker.number.int({ min: 5, max: 8 });
+      for (let i = 0; i < tracksPerProject; i++) {
         await sql`
           INSERT INTO tracks (
             project_id,
@@ -286,12 +287,12 @@ async function seedRealisticData() {
             ${i + 1},
             ${faker.helpers.arrayElement(['recording', 'editing', 'mixing', 'completed'])},
             ${faker.number.int({ min: 80, max: 140 })},
-            ${faker.helpers.arrayElement(['C', 'Am', 'G', 'Em', 'D', 'Bm'])},
+            ${faker.helpers.arrayElement(['C', 'Am', 'G', 'Em', 'D', 'Bm', 'F#m', 'A'])},
             ${faker.person.fullName()},
             ${faker.person.fullName()},
             'fr',
             ${JSON.stringify([faker.helpers.arrayElement(GENRES)])},
-            ${faker.helpers.arrayElement(['Energetic', 'Melancholic', 'Upbeat', 'Chill'])},
+            ${faker.helpers.arrayElement(['Energetic', 'Melancholic', 'Upbeat', 'Chill', 'Aggressive', 'Dreamy'])},
             NOW(),
             NOW()
           )
@@ -356,29 +357,33 @@ async function seedRealisticData() {
     }
     console.log(`   ✅ ${taskTypes.length} task types created`);
 
-    // ========== SESSIONS (8) ==========
+    // ========== SESSIONS (25) ==========
     console.log('\n🎬 Creating sessions...');
 
     const sessions = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 25; i++) {
       const client = faker.helpers.arrayElement([...individualClients, ...companyClients]);
       const room = faker.helpers.arrayElement(rooms);
-      const project = faker.helpers.maybe(() => faker.helpers.arrayElement(projects), { probability: 0.5 });
-      const isPast = faker.datatype.boolean();
+      const project = faker.helpers.maybe(() => faker.helpers.arrayElement(projects), { probability: 0.6 });
+      const isPast = faker.datatype.boolean({ probability: 0.6 }); // 60% completed
       const startTime = isPast
-        ? `NOW() - INTERVAL '${faker.number.int({ min: 1, max: 30 })} days'`
-        : `NOW() + INTERVAL '${faker.number.int({ min: 1, max: 14 })} days'`;
+        ? `NOW() - INTERVAL '${faker.number.int({ min: 1, max: 60 })} days'`
+        : `NOW() + INTERVAL '${faker.number.int({ min: 1, max: 30 })} days'`;
 
-      const totalAmount = faker.number.int({ min: 200, max: 800 });
+      const totalAmount = faker.number.int({ min: 200, max: 1000 });
       const depositAmount = Math.floor(totalAmount * 0.3);
 
       const projectId = project?.id || null;
       const title = faker.lorem.words(3).replace(/'/g, "''");
-      const status = isPast ? faker.helpers.arrayElement(['completed', 'completed']) : 'scheduled';
+      const status = isPast ? 'completed' : 'scheduled';
       const depositPaid = faker.datatype.boolean();
-      const paymentStatus = faker.helpers.arrayElement(['paid', 'unpaid', 'partial']);
-      const durationHours = faker.number.int({ min: 2, max: 6 });
-      const daysOffset = isPast ? faker.number.int({ min: 1, max: 30 }) : faker.number.int({ min: 1, max: 14 });
+      const paymentStatus = isPast
+        ? faker.helpers.arrayElement(['paid', 'unpaid', 'partial'])
+        : 'unpaid';
+      const durationHours = faker.number.int({ min: 2, max: 8 });
+      const daysOffset = isPast
+        ? faker.number.int({ min: 1, max: 60 })
+        : faker.number.int({ min: 1, max: 30 });
       const intervalDirection = isPast ? '-' : '+';
 
       const [session] = await sql.unsafe(`
