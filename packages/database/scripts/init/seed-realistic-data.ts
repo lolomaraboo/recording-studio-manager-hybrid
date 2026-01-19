@@ -98,13 +98,13 @@ async function seedRealisticData() {
         ? `https://music.apple.com/artist/${faker.string.alphanumeric(10)}`
         : null;
       const youtubeUrl = faker.datatype.boolean({ probability: 0.6 })
-        ? `https://youtube.com/@${faker.internet.userName()}`
+        ? `https://youtube.com/@${faker.internet.username()}`
         : null;
       const soundcloudUrl = faker.datatype.boolean({ probability: 0.4 })
-        ? `https://soundcloud.com/${faker.internet.userName()}`
+        ? `https://soundcloud.com/${faker.internet.username()}`
         : null;
       const bandcampUrl = faker.datatype.boolean({ probability: 0.3 })
-        ? `https://${faker.internet.userName()}.bandcamp.com`
+        ? `https://${faker.internet.username()}.bandcamp.com`
         : null;
 
       // Industry info (30-40% have representation)
