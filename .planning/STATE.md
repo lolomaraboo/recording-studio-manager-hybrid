@@ -25,18 +25,18 @@
 
 ## Current Position
 
-Phase: 22 of 22 (Refonte UI Client - Hub Relationnel Complet) - Phase 22 COMPLETE ✅
-Plan: All 10 plans complete
-Status: Phase complete - comprehensive client UI refactoring (wizard, tabs, relational data, customization, unified search)
-Last activity: 2026-01-19 - Phase 22 complete (87 min total), unified search filter added (3 min), single search input replaces 3 separate filters, multi-keyword AND logic across 5 fields, 300ms debounced, phase verified ✓
+Phase: 23 of 23 (Simplification Onglet Informations Client) - Phase 23 COMPLETE ✅
+Plan: 1/1 complete
+Status: Phase complete - single-view Informations tab with visual sections
+Last activity: 2026-01-19 - Phase 23 complete (3 min), removed 3 nested sub-tabs, added visual section headers + Separators, all client fields visible in single scrollable view, UX friction reduced ✓
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 102
-- Average duration: 31.7 min
+- Total plans completed: 103
+- Average duration: 31.5 min
 - Total execution time: 54.0 hours
 
 **By Phase:**
@@ -83,10 +83,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
 | 22 | 10/10 | 87 min | 8.7 min |
+| 23 | 1/1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: [8 min, 6 min, 3 min, 28 min, 3 min]
-- Trend: Phase 22 COMPLETE ✅ (87 min total execution, 10/10 plans). Complete client UI refactoring: ClientFormWizard 3-step wizard, ClientDetail 5-tab layout, 4 relational tabs (Projets/Tracks/Sessions/Finances) with view modes, preferences backend + drag & drop customization, edit mode integration, unified search filter (single input replaces 3 filters, multi-keyword AND logic, 300ms debounced). All must-haves verified ✓. Production-ready comprehensive client hub.
+- Last 5 plans: [6 min, 3 min, 28 min, 3 min, 3 min]
+- Trend: Phase 23 COMPLETE ✅ (3 min execution, 1/1 plans). Single-view Informations tab simplification: removed 3 nested sub-tabs, added visual section headers + Separators, all client fields visible in single scrollable view without clicking. UX friction reduced, accessibility improved. Clean refactoring (-6 lines net reduction).
 
 ## Accumulated Context
 
@@ -225,6 +226,7 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 22-10 | Unified search with AND logic between keywords | Rationale: User typing "basse reggae" expects clients with BOTH attributes, not either. Industry standard search behavior (Google, GitHub). Impact: Natural language search UX, more precise results. Alternative (OR logic) would be too permissive. |
 | 22-10 | 300ms debounce delay | Rationale: Balance between UX responsiveness and server load reduction. 300ms feels instant while cutting API calls by ~90%. Impact: Performance optimization without sacrificing UX. Alternative (no debounce) = excessive API calls, (500ms+) = feels laggy. |
 | 22-10 | JSONB text casting for ILIKE search | Rationale: Cast JSONB to text for ILIKE search (genres::text ILIKE '%keyword%') enables partial matches and flexible querying. Works with existing GIN indexes from Phase 18.4-01. Impact: Slightly slower than @> containment but more flexible. Alternative (dedicated full-text search columns) = more complex. |
+| 23-01 | Visual sections over nested tabs | Rationale: 3 section headers + Separator components provide clear visual hierarchy without requiring clicks. Improves accessibility and reduces navigation friction. All client information visible at a glance. Alternative (keep nested tabs) = requires clicks to see complete profile, rejected. |
 
 ### Deferred Issues
 
@@ -400,6 +402,11 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Impact: Pages création/modification client éparpillées, manque accès aux données relationnelles (projets, tracks, finances)
   - Solution: Créer composant ClientForm réutilisable avec sections organisées + ajouter onglets Projets/Tracks/Finances sur ClientDetail
   - Priority: UX enhancement - Améliorer productivité studios avec hub relationnel client complet
+- **2026-01-19:** Phase 23 added after Phase 22 - "Simplification Onglet Informations Client" (ADDED)
+  - Reason: L'onglet "Informations" a 3 sous-onglets (informations, enrichi, profil musical) créant navigation complexe
+  - Impact: Utilisateurs doivent cliquer plusieurs fois pour voir tous les champs d'un client
+  - Solution: Supprimer sous-onglets, afficher tous champs dans vue unique avec sections visuelles distinctes
+  - Priority: UX simplification - Réduire friction navigation, vue d'ensemble immédiate du profil client
 ### Blockers/Concerns Carried Forward
 
 **Resolved in Phase 1 Plan 1:**
@@ -484,38 +491,27 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-19T04:21:58Z
-Stopped at: Phase 22 COMPLETE ✅ - All 10 plans complete, verified and ready for next phase
+Last session: 2026-01-19T04:54:26Z
+Stopped at: Phase 23 COMPLETE ✅ - Single plan complete, UX simplification verified
 Resume context:
-  - Phase 22 COMPLETE ✅: Refonte UI Client - Hub Relationnel Complet (87 min total execution, 10/10 plans)
-    - **Wave 1 (Plans 22-01, 22-02):** Wizard + tabbed layout foundation
-      - ClientFormWizard component (796 lines) - 3-step wizard (Base/Enrichi/Musique) with free navigation
-      - ClientDetail refactored with 5 horizontal tabs + persistent Notes section
-    - **Wave 2 (Plans 22-03, 22-04, 22-05, 22-06):** Relational data tabs
-      - Projets tab with 4 view modes (Cards/Liste/Table/Kanban) + backend getProjects endpoint
-      - Tracks tab with 3 view modes + inline AudioPlayer + getTracks endpoint
-      - Sessions tab with 4 view modes (Table/Cards/Timeline/Kanban)
-      - Finances tab with stats cards + dual tables (Factures/Quotes each with 4 modes) + getFinancialStats
-    - **Wave 3 (Plan 22-07):** Preferences backend
-      - user_preferences table (JSONB storage) + migration 0013
-      - preferences tRPC router with get/save/reset procedures
-    - **Wave 4 (Plan 22-08):** Customization UI
-      - @dnd-kit library integration for drag & drop column reordering
-      - SortableTableHeader components across all 4 tabs
-      - Keyboard accessibility support (arrow keys + Enter/Space)
-    - **Wave 5 (Plan 22-09):** Edit mode integration
-      - ClientDetail edit mode uses ClientFormWizard (72% code reduction)
-      - Array fields hydration (phones, emails, websites, customFields)
-    - **Wave 6 (Plan 22-10):** Unified search filter
-      - Single search input replaces 3 separate filters (genre, instrument, search)
-      - Multi-keyword AND logic across 5 fields (name, email, artistName, genres, instruments)
-      - 300ms debounced to reduce API calls by ~90%
-      - JSONB text casting for ILIKE on array contents
-      - Backend: searchQuery parameter with keyword parsing
-      - Frontend: Clear button (X icon) when search active
-    - **Verification:** Phase goal verified ✓ (all must-haves passed)
-      - All artifacts substantive and wired (ClientFormWizard 796 lines, 4 tab components 444-846 lines)
-      - Client build succeeds (zero blocking errors)
-      - Cross-device preference sync ready
-      - Unified search functional (backend + frontend)
-  - **Next:** Phase 22 verified complete. Continue with next phase or milestone completion.
+  - Phase 23 COMPLETE ✅: Simplification Onglet Informations Client (3 min total execution, 1/1 plans)
+    - **Plan 23-01:** Remove nested sub-tabs from Informations tab
+      - Removed nested Tabs component with 3 sub-triggers (Informations/Enrichies/Musique)
+      - Added 3 visual sections with h3 headers
+      - Added Separator components between sections for visual clarity
+      - Removed unused imports (Users, FileText icons)
+      - Preserved all existing functionality (isEditing logic, EnrichedClientInfo, MusicProfileSection)
+      - Code quality: +41 insertions, -47 deletions (net -6 lines, cleaner code)
+      - Build: ✅ Successful (4.88s)
+      - TypeScript: ✅ Compiles (pre-existing errors unrelated)
+    - **UX Impact:**
+      - All client fields visible in single scrollable view (no clicking sub-tabs)
+      - Clear visual hierarchy with section headers + separators
+      - Improved accessibility for mobility-impaired users
+      - Better mobile experience (single scroll vs nested navigation)
+    - **Verification:** Phase goal verified ✓
+      - Single-view layout functional
+      - Visual sections clearly separated
+      - No regressions in other tabs (Projets, Tracks, Sessions, Finances)
+      - Client build succeeds with zero blocking errors
+  - **Next:** Phase 23 verified complete. Ready for next phase or milestone completion.
