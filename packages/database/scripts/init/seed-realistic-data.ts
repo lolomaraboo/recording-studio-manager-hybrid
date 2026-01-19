@@ -47,11 +47,11 @@ async function seedRealisticData() {
   try {
     faker.seed(12345); // Consistent data
 
-    // ========== INDIVIDUAL CLIENTS (8) ==========
+    // ========== INDIVIDUAL CLIENTS (15) ==========
     console.log('👤 Creating individual clients...');
 
     const individualClients = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 15; i++) {
       const firstName = faker.person.firstName();
       const lastName = faker.person.lastName();
       const artistName = faker.helpers.arrayElement([
@@ -87,11 +87,11 @@ async function seedRealisticData() {
       console.log(`   ✅ ${client.name} (ID: ${client.id})`);
     }
 
-    // ========== COMPANY CLIENTS (4) ==========
+    // ========== COMPANY CLIENTS (5) ==========
     console.log('\n🏢 Creating company clients...');
 
     const companyClients = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const companyName = `${faker.company.name()} ${faker.helpers.arrayElement(COMPANY_TYPES)}`;
       const email = faker.internet.email({ firstName: faker.word.noun() });
       const phone = faker.phone.number('+33 1 ## ## ## ##');
@@ -122,13 +122,13 @@ async function seedRealisticData() {
       console.log(`   ✅ ${company.name} (ID: ${company.id})`);
     }
 
-    // ========== COMPANY MEMBERS (8) ==========
+    // ========== COMPANY MEMBERS (15) ==========
     console.log('\n🔗 Creating company-member relationships...');
 
     let memberCount = 0;
     for (const company of companyClients) {
-      // Each company has 2 members
-      for (let i = 0; i < 2; i++) {
+      // Each company has 3 members
+      for (let i = 0; i < 3; i++) {
         const member = faker.helpers.arrayElement(individualClients);
         const role = faker.person.jobTitle();
         const isPrimary = i === 0;
@@ -140,20 +140,20 @@ async function seedRealisticData() {
         `;
         memberCount++;
       }
-      console.log(`   ✅ ${company.name}: 2 members assigned`);
+      console.log(`   ✅ ${company.name}: 3 members assigned`);
     }
 
-    // ========== CLIENT NOTES (3) ==========
+    // ========== CLIENT NOTES (10) ==========
     console.log('\n📝 Creating client notes...');
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 10; i++) {
       const client = faker.helpers.arrayElement([...individualClients, ...companyClients]);
       await sql`
         INSERT INTO client_notes (client_id, note, created_at)
         VALUES (${client.id}, ${faker.lorem.sentence()}, NOW())
       `;
     }
-    console.log('   ✅ 3 client notes created');
+    console.log('   ✅ 10 client notes created');
 
     // ========== ROOMS (3) ==========
     console.log('\n🏠 Creating studio rooms...');
