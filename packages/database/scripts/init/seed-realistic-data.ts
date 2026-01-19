@@ -38,6 +38,28 @@ const TASK_TYPES_CONFIG = [
   { name: 'Mastering', rate: 120, color: '#1abc9c' },
 ];
 
+
+// Music profile data (Phase 18.4)
+const INSTRUMENTS = [
+  'Vocals', 'Guitar', 'Bass', 'Drums', 'Keyboard', 'Piano',
+  'Synthesizer', 'Saxophone', 'Trumpet', 'Violin', 'Cello',
+  'Flute', 'Clarinet', 'Harmonica', 'Accordion', 'Banjo',
+  'Ukulele', 'Mandolin', 'Production', 'DJ Equipment', 'Beatmaking'
+];
+
+const RECORD_LABELS = [
+  'Universal Music', 'Sony Music', 'Warner Music', 'Indie Records',
+  'Blue Note', 'Def Jam', 'Atlantic Records', 'Capitol Records',
+  'Columbia Records', 'Island Records', 'Self-Released', null // 50% have labels
+];
+
+const DISTRIBUTORS = [
+  'DistroKid', 'CD Baby', 'TuneCore', 'AWAL', 'The Orchard',
+  'Believe Digital', 'Ditto Music', 'Self-Distributed', null
+];
+
+const PERFORMANCE_RIGHTS = ['SACEM', 'SOCAN', 'BMI', 'ASCAP', 'PRS', null];
+
 async function seedRealisticData() {
   console.log('🌱 Seeding realistic data...\n');
   console.log(`   Target: ${DATABASE_URL}\n`);
@@ -60,11 +82,74 @@ async function seedRealisticData() {
       ]);
       const email = faker.internet.email({ firstName, lastName });
       const phone = faker.phone.number('+33 6 ## ## ## ##');
+      // Generate music profile fields (Phase 18.4)
+      const genreCount = faker.number.int({ min: 1, max: 3 });
+      const genres = faker.helpers.arrayElements(GENRES, genreCount);
+
+      const instrumentCount = faker.number.int({ min: 1, max: 4 });
+      const instruments = faker.helpers.arrayElements(INSTRUMENTS, instrumentCount);
+
+      // Streaming platforms (50% have profiles)
+      const hasStreamingProfile = faker.datatype.boolean();
+      const spotifyUrl = hasStreamingProfile
+        ? `https://open.spotify.com/artist/${faker.string.alphanumeric(22)}`
+        : null;
+      const appleMusicUrl = hasStreamingProfile && faker.datatype.boolean({ probability: 0.7 })
+        ? `https://music.apple.com/artist/${faker.string.alphanumeric(10)}`
+        : null;
+      const youtubeUrl = faker.datatype.boolean({ probability: 0.6 })
+        ? `https://youtube.com/@${faker.internet.userName()}`
+        : null;
+      const soundcloudUrl = faker.datatype.boolean({ probability: 0.4 })
+        ? `https://soundcloud.com/${faker.internet.userName()}`
+        : null;
+      const bandcampUrl = faker.datatype.boolean({ probability: 0.3 })
+        ? `https://${faker.internet.userName()}.bandcamp.com`
+        : null;
+
+      // Industry info (30-40% have representation)
+      const hasRepresentation = faker.datatype.boolean({ probability: 0.35 });
+      const recordLabel = hasRepresentation ? faker.helpers.arrayElement(RECORD_LABELS) : null;
+      const distributor = faker.helpers.arrayElement(DISTRIBUTORS);
+      const managerContact = hasRepresentation
+        ? `${faker.person.fullName()} <${faker.internet.email()}>`
+        : null;
+      const publisher = hasRepresentation && faker.datatype.boolean({ probability: 0.5 })
+        ? faker.company.name()
+        : null;
+      const performanceRightsSociety = faker.helpers.arrayElement(PERFORMANCE_RIGHTS);
+
+      // Career info
+      const startYear = faker.number.int({ min: 2010, max: 2020 });
+      const yearsActive = `${startYear}-present`;
+      const notableWorks = faker.datatype.boolean({ probability: 0.4 })
+        ? faker.helpers.arrayElements([
+            `${faker.music.songName()} (${faker.number.int({ min: 2015, max: 2024 })})`,
+            `${faker.music.songName()} (${faker.number.int({ min: 2015, max: 2024 })})`,
+          ], faker.number.int({ min: 1, max: 2 })).join(', ')
+        : null;
+      const awardsRecognition = faker.datatype.boolean({ probability: 0.2 })
+        ? faker.helpers.arrayElement([
+            'Victoires de la Musique 2022',
+            'SACEM Award 2021',
+            'Prix Constantin Nominee',
+            'Regional Music Award Winner'
+          ])
+        : null;
+      const biography = faker.datatype.boolean({ probability: 0.4 })
+        ? faker.lorem.paragraph({ min: 2, max: 4 })
+        : null;
+
 
       const [client] = await sql`
         INSERT INTO clients (
           name, first_name, last_name, email, phone, type, city,
-          artist_name, phones, emails, avatar_url, created_at, updated_at
+          artist_name, phones, emails, avatar_url,
+          genres, instruments,
+          spotify_url, apple_music_url, youtube_url, soundcloud_url, bandcamp_url,
+          record_label, distributor, manager_contact, publisher, performance_rights_society,
+          years_active, notable_works, awards_recognition, biography,
+          created_at, updated_at
         )
         VALUES (
           ${`${firstName} ${lastName}`},
@@ -78,6 +163,22 @@ async function seedRealisticData() {
           ${sql.json([{ type: 'mobile', number: phone }])},
           ${sql.json([{ type: 'work', email }])},
           ${`https://i.pravatar.cc/150?img=${i + 1}`},
+          ${sql.json(genres)},
+          ${sql.json(instruments)},
+          ${spotifyUrl},
+          ${appleMusicUrl},
+          ${youtubeUrl},
+          ${soundcloudUrl},
+          ${bandcampUrl},
+          ${recordLabel},
+          ${distributor},
+          ${managerContact},
+          ${publisher},
+          ${performanceRightsSociety},
+          ${yearsActive},
+          ${notableWorks},
+          ${awardsRecognition},
+          ${biography},
           NOW(),
           NOW()
         )
@@ -423,16 +524,18 @@ async function seedRealisticData() {
       console.log(`   ✅ Session ${i + 1} (ID: ${session.id})`);
     }
 
-    // ========== TIME ENTRIES (5) ==========
+    // ========== TIME ENTRIES (40) ==========
     console.log('\n⏱️  Creating time entries...');
 
-    for (let i = 0; i < 5; i++) {
-      const session = faker.helpers.arrayElement(sessions);
+    const completedSessions = await sql`SELECT id FROM sessions WHERE status = 'completed'`;
+
+    for (let i = 0; i < 40; i++) {
+      const session = faker.helpers.arrayElement(completedSessions);
       const taskType = faker.helpers.arrayElement(taskTypes);
-      const startHoursAgo = faker.number.int({ min: 2, max: 8 });
-      const endHoursAgo = faker.number.int({ min: 1, max: 4 });
-      const durationMinutes = faker.number.int({ min: 60, max: 240 });
-      const hourlyRate = faker.number.int({ min: 50, max: 120 });
+      const startHoursAgo = faker.number.int({ min: 4, max: 120 });
+      const durationMinutes = faker.number.int({ min: 30, max: 360 });
+      const endHoursAgo = startHoursAgo - Math.floor(durationMinutes / 60);
+      const hourlyRate = parseFloat(taskType.hourly_rate || '75');
 
       await sql.unsafe(`
         INSERT INTO time_entries (
@@ -457,22 +560,24 @@ async function seedRealisticData() {
         )
       `);
     }
-    console.log('   ✅ 5 time entries created');
+    console.log('   ✅ 40 time entries created');
 
-    // ========== INVOICES (3) ==========
+    // ========== INVOICES (8) ==========
     console.log('\n💳 Creating invoices...');
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 8; i++) {
       const client = faker.helpers.arrayElement([...individualClients, ...companyClients]);
       const invoiceNumber = `INV-${Date.now()}-${i}`;
-      const subtotal = faker.number.int({ min: 200, max: 1000 });
+      const subtotal = faker.number.int({ min: 500, max: 3000 });
       const taxAmount = Math.floor(subtotal * 0.2);
       const total = subtotal + taxAmount;
-      const depositAmount = Math.floor(total * 0.3);
-      const remainingBalance = total - depositAmount;
-      const issueDaysAgo = faker.number.int({ min: 1, max: 30 });
-      const dueDaysAhead = faker.number.int({ min: 15, max: 60 });
-      const status = faker.helpers.arrayElement(['draft', 'sent', 'paid']);
+      const depositAmount = faker.datatype.boolean({ probability: 0.5 })
+        ? Math.floor(total * 0.3)
+        : null;
+      const remainingBalance = depositAmount ? total - depositAmount : total;
+      const issueDaysAgo = faker.number.int({ min: 1, max: 60 });
+      const dueDaysAhead = faker.number.int({ min: 15, max: 90 });
+      const status = faker.helpers.arrayElement(['draft', 'sent', 'paid', 'overdue']);
 
       await sql.unsafe(`
         INSERT INTO invoices (
@@ -507,17 +612,17 @@ async function seedRealisticData() {
         )
       `);
     }
-    console.log('   ✅ 3 invoices created');
+    console.log('   ✅ 8 invoices created');
 
-    // ========== INVOICE ITEMS (6 - 2 per invoice) ==========
+    // ========== INVOICE ITEMS (24 - 3 per invoice) ==========
     console.log('\n📄 Creating invoice items...');
 
     const invoices = await sql`SELECT id FROM invoices ORDER BY id`;
     for (const invoice of invoices) {
-      for (let i = 0; i < 2; i++) {
-        const quantity = faker.number.int({ min: 1, max: 4 });
-        const unitPrice = faker.number.int({ min: 50, max: 200 });
-        const amount = quantity * unitPrice;
+      for (let i = 0; i < 3; i++) {
+        const quantity = faker.number.float({ min: 1, max: 8, multipleOf: 0.5 });
+        const unitPrice = faker.number.int({ min: 50, max: 300 });
+        const amount = Math.round(quantity * unitPrice * 100) / 100;
 
         await sql`
           INSERT INTO invoice_items (
@@ -530,7 +635,14 @@ async function seedRealisticData() {
           )
           VALUES (
             ${invoice.id},
-            ${faker.commerce.productName()},
+            ${faker.helpers.arrayElement([
+              'Studio Recording Time',
+              'Mixing Session',
+              'Mastering',
+              'Equipment Rental',
+              'Post-production',
+              'Editing',
+            ])},
             ${quantity},
             ${unitPrice},
             ${amount},
@@ -539,18 +651,18 @@ async function seedRealisticData() {
         `;
       }
     }
-    console.log('   ✅ 6 invoice items created');
+    console.log('   ✅ 24 invoice items created');
 
-    // ========== QUOTES (2) ==========
+    // ========== QUOTES (6) ==========
     console.log('\n📋 Creating quotes...');
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 6; i++) {
       const client = faker.helpers.arrayElement([...individualClients, ...companyClients]);
       const quoteNumber = `QUO-${Date.now()}-${i}`;
-      const subtotal = faker.number.int({ min: 500, max: 2000 });
+      const subtotal = faker.number.int({ min: 1000, max: 5000 });
       const taxAmount = Math.floor(subtotal * 0.2);
       const total = subtotal + taxAmount;
-      const status = faker.helpers.arrayElement(['draft', 'sent', 'accepted']);
+      const status = faker.helpers.arrayElement(['draft', 'sent', 'accepted', 'rejected']);
       const validDays = 30;
 
       await sql.unsafe(`
@@ -582,7 +694,48 @@ async function seedRealisticData() {
         )
       `);
     }
-    console.log('   ✅ 2 quotes created');
+    console.log('   ✅ 6 quotes created');
+
+    // ========== QUOTE ITEMS (18 - 3 per quote) ==========
+    console.log('\n📄 Creating quote items...');
+
+    const quotes = await sql`SELECT id FROM quotes ORDER BY id`;
+    for (const quote of quotes) {
+      for (let i = 0; i < 3; i++) {
+        const quantity = faker.number.float({ min: 1, max: 10, multipleOf: 0.5 });
+        const unitPrice = faker.number.int({ min: 75, max: 400 });
+        const amount = Math.round(quantity * unitPrice * 100) / 100;
+
+        await sql`
+          INSERT INTO quote_items (
+            quote_id,
+            description,
+            quantity,
+            unit_price,
+            amount,
+            display_order,
+            created_at
+          )
+          VALUES (
+            ${quote.id},
+            ${faker.helpers.arrayElement([
+              'Album Recording Package (10 hours)',
+              'Mixing Service (per track)',
+              'Mastering (per track)',
+              'Studio Rental (per day)',
+              'Equipment Rental',
+              'Producer Fee',
+            ])},
+            ${quantity},
+            ${unitPrice},
+            ${amount},
+            ${i},
+            NOW()
+          )
+        `;
+      }
+    }
+    console.log('   ✅ 18 quote items created');
 
     // ========== SUMMARY ==========
     console.log('\n📊 Seed summary:');
@@ -603,7 +756,8 @@ async function seedRealisticData() {
         (SELECT COUNT(*) FROM time_entries) as time_entries,
         (SELECT COUNT(*) FROM invoices) as invoices,
         (SELECT COUNT(*) FROM invoice_items) as invoice_items,
-        (SELECT COUNT(*) FROM quotes) as quotes
+        (SELECT COUNT(*) FROM quotes) as quotes,
+        (SELECT COUNT(*) FROM quote_items) as quote_items
     `;
 
     const summary = counts[0];
@@ -622,6 +776,7 @@ async function seedRealisticData() {
     console.log(`   Invoices:             ${summary.invoices}`);
     console.log(`   Invoice items:        ${summary.invoice_items}`);
     console.log(`   Quotes:               ${summary.quotes}`);
+    console.log(`   Quote items:          ${summary.quote_items}`);
 
     const totalRecords =
       parseInt(summary.individuals as string) +
@@ -638,7 +793,8 @@ async function seedRealisticData() {
       parseInt(summary.time_entries as string) +
       parseInt(summary.invoices as string) +
       parseInt(summary.invoice_items as string) +
-      parseInt(summary.quotes as string);
+      parseInt(summary.quotes as string) +
+      parseInt(summary.quote_items as string);
 
     console.log(`\n   Total records:        ${totalRecords}`);
 
