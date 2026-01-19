@@ -235,30 +235,8 @@ export function Clients() {
   const filteredClients = useMemo(() => {
     let result = clientsWithStats;
 
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (client) => {
-          // Search in basic client fields
-          const matchesBasicFields =
-            client.name.toLowerCase().includes(query) ||
-            client.email?.toLowerCase().includes(query) ||
-            client.artistName?.toLowerCase().includes(query);
-
-          // For companies: also search in contact names
-          if (client.type === 'company') {
-            const contacts = contactsByCompany.get(client.id);
-            const matchesContactName = contacts?.some(contact =>
-              contact.memberName.toLowerCase().includes(query)
-            );
-            return matchesBasicFields || matchesContactName;
-          }
-
-          return matchesBasicFields;
-        }
-      );
-    }
+    // Note: Search filtering is now handled by backend via searchQuery parameter
+    // No client-side filtering needed - backend searches all fields (name, email, artistName, genres, instruments)
 
     // Sort
     result = [...result].sort((a, b) => {
@@ -296,7 +274,7 @@ export function Clients() {
     });
 
     return result;
-  }, [clientsWithStats, searchQuery, sortField, sortOrder, contactsByCompany]);
+  }, [clientsWithStats, sortField, sortOrder]);
 
   // Handle column sort
   const handleSort = (field: SortField) => {
