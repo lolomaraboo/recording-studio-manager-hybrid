@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { EnrichedClientInfo } from "@/components/EnrichedClientInfo";
 import { MusicProfileSection } from "@/components/MusicProfileSection";
 import { SessionsTab } from "./tabs/SessionsTab";
@@ -13,8 +14,6 @@ import {
   Music,
   Calendar,
   DollarSign,
-  FileText,
-  Users,
   Mail,
   Phone,
   Building,
@@ -93,27 +92,14 @@ export function ClientDetailTabs({
         </TabsTrigger>
       </TabsList>
 
-      {/* Informations Tab - Contains the 3 existing sub-tabs */}
+      {/* Informations Tab - Single view with 3 visual sections */}
       <TabsContent value="informations" className="mt-4">
         <Card>
-          <CardContent className="pt-6">
-            <Tabs defaultValue="info-basic">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="info-basic" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  Informations
-                </TabsTrigger>
-                <TabsTrigger value="info-enriched" className="gap-2">
-                  <FileText className="h-4 w-4" />
-                  Informations Enrichies
-                </TabsTrigger>
-                <TabsTrigger value="info-music" className="gap-2">
-                  <Music className="h-4 w-4" />
-                  Profil Musical
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="info-basic" className="space-y-4 mt-4">
+          <CardContent className="pt-6 space-y-6">
+            {/* Section 1: Informations de Base */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Informations de Base</h3>
+              <div className="space-y-4">
                 {isEditing ? (
                   <>
                     <div className="space-y-2">
@@ -209,34 +195,42 @@ export function ClientDetailTabs({
                     )}
                   </>
                 )}
-              </TabsContent>
+              </div>
+            </div>
 
-              <TabsContent value="info-enriched">
-                <EnrichedClientInfo
-                  client={formData as any}
-                  isEditing={isEditing}
-                  onUpdate={handleUpdateField as any}
-                  contacts={clientWithContacts?.contacts as any || []}
-                  onAddContact={(contact) => {
-                    addContactMutation.mutate({
-                      clientId: clientId,
-                      ...contact,
-                    });
-                  }}
-                  onDeleteContact={(contactId) => {
-                    deleteContactMutation.mutate({ id: contactId });
-                  }}
-                />
-              </TabsContent>
+            <Separator className="my-6" />
 
-              <TabsContent value="info-music">
-                <MusicProfileSection
-                  client={client}
-                  isEditing={isEditing}
-                  onUpdate={handleUpdateField}
-                />
-              </TabsContent>
-            </Tabs>
+            {/* Section 2: Informations Enrichies */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Informations Enrichies</h3>
+              <EnrichedClientInfo
+                client={formData as any}
+                isEditing={isEditing}
+                onUpdate={handleUpdateField as any}
+                contacts={clientWithContacts?.contacts as any || []}
+                onAddContact={(contact) => {
+                  addContactMutation.mutate({
+                    clientId: clientId,
+                    ...contact,
+                  });
+                }}
+                onDeleteContact={(contactId) => {
+                  deleteContactMutation.mutate({ id: contactId });
+                }}
+              />
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Section 3: Profil Musical */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Profil Musical</h3>
+              <MusicProfileSection
+                client={client}
+                isEditing={isEditing}
+                onUpdate={handleUpdateField}
+              />
+            </div>
           </CardContent>
         </Card>
       </TabsContent>
