@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { eq, desc, sql, inArray, asc } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { router, protectedProcedure } from '../_core/trpc';
-import { clients, clientNotes, clientContacts, companyMembers } from '@rsm/database/tenant';
+import { clients, clientNotes, clientContacts, companyMembers, invoices, quotes, projects, tracks, sessions } from '@rsm/database/tenant';
 import { clientToVCard, parseVCardFile } from '../utils/vcard-service';
 import { clientsToExcel, excelToClients, generateExcelTemplate } from '../utils/excel-service';
 import { clientsToCSV, csvToClients } from '../utils/csv-service';
@@ -814,6 +814,48 @@ export const clientsRouter = router({
       return {
         genreDistribution: topGenres,
         totalClients: clientsWithGenres.length,
+      };
+    }),
+
+  /**
+   * Get financial stats for a client
+   * Returns total paid, pending, quotes open, and projection
+   */
+  getFinancialStats: protectedProcedure
+    .input(z.object({ clientId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Get all invoices for this client
+      const clientInvoices = await tenantDb.query.invoices.findMany({
+        where: eq(invoices.clientId, input.clientId),
+      });
+
+      // Get all quotes for this client
+      const clientQuotes = await tenantDb.query.quotes.findMany({
+        where: eq(quotes.clientId, input.clientId),
+      });
+
+      // Calculate stats
+      const totalPaid = clientInvoices
+        .filter(inv => inv.status === 'paid')
+        .reduce((sum, inv) => sum + parseFloat(inv.total || '0'), 0);
+
+      const pending = clientInvoices
+        .filter(inv => inv.status === 'sent' || inv.status === 'overdue')
+        .reduce((sum, inv) => sum + parseFloat(inv.total || '0'), 0);
+
+      const quotesOpen = clientQuotes
+        .filter(q => q.status === 'sent')
+        .reduce((sum, q) => sum + parseFloat(q.total || '0'), 0);
+
+      const projection = quotesOpen + pending; // Simplified projection
+
+      return {
+        totalPaid,
+        pending,
+        quotesOpen,
+        projection,
       };
     }),
 });
