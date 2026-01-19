@@ -36,8 +36,8 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 
 **Velocity:**
 - Total plans completed: 97
-- Average duration: 33.0 min
-- Total execution time: 53.2 hours
+- Average duration: 32.7 min
+- Total execution time: 53.0 hours
 
 **By Phase:**
 
@@ -82,11 +82,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
-| 22 | 5/9 | 25 min | 5.0 min |
+| 22 | 5/9 | 38 min | 7.6 min |
 
 **Recent Trend:**
-- Last 5 plans: [5 min, 4 min, 4 min, 6 min, 8 min]
-- Trend: Phase 22 Plan 5 COMPLETE ✅ (8 min execution). Sessions tab with 4 view modes complete. SessionsTab component (565 lines) with Table (default), Cards, Timeline, Kanban modes. View mode toggle buttons with localStorage persistence. Timeline splits past/upcoming chronologically. Kanban groups by status (Programmée/En cours/Terminée/Annulée). Status badges with color coding (outline/blue/green/red). Empty state with calendar icon + "Créer une session" CTA button. Duration calculation helper. Room name display. Session click navigates to detail page.
+- Last 5 plans: [4 min, 4 min, 6 min, 8 min, 13 min]
+- Trend: Phase 22 Plan 3 COMPLETE ✅ (13 min execution). Projets tab with 4 view modes complete. ProjectsTab component (390 lines) with Cards (default), Liste, Table, Kanban modes. View mode toggle buttons with localStorage persistence. clients.getProjects endpoint returns projects with aggregated stats (tracksCount, hoursRecorded). Empty state with folder icon + CTA button. Navigation to project detail on card click. Import fix: wouter → react-router-dom.
 
 ## Accumulated Context
 
@@ -210,6 +210,10 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.4-03 | Conditional clear filters button | Rationale: Reduces UI clutter when no filters are active, discoverable when needed. Impact: Clean interface design, intuitive filter management. |
 | 22-01 | Free navigation wizard (all tabs always clickable) | Rationale: Users can jump directly to any step without blocking validation, enabling quick access to music profile fields for established clients. Minimal validation (only name required). Submit button visible on all steps. |
 | 22-01 | Reusable wizard component for create/edit modes | Rationale: Single component pattern reduces code duplication, mode prop switches behavior, initialData prop pre-populates form for edit mode. ClientCreate refactored from 726 to 54 lines (92.5% reduction). |
+| 22-03 | Cards mode as default for projects view | Rationale: Most visual presentation showing all key stats at glance, matches existing Clients page pattern from Phase 19. Alternative (Table) more dense but less scannable. |
+| 22-03 | Kanban columns by production status | Rationale: Recording studio workflow stages: Planifié → En cours (recording/editing) → Mixing → Mastering → Livré. 5 columns match project lifecycle stages. No drag-and-drop (nice-to-have for future). |
+| 22-03 | Calculate hoursRecorded server-side | Rationale: Aggregation logic in endpoint reduces client complexity, reusable across multiple UI views. Formula: Sum of (session.endTime - session.startTime) for all sessions linked to projectId. |
+| 22-03 | Navigate to project detail in same tab | Rationale: Standard SPA navigation pattern, breadcrumb provides return path. No modal/drawer overlay complexity. Alternative (modal) would require additional state management. |
 
 ### Deferred Issues
 
