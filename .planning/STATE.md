@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 22 of 22 (Refonte UI Client - Hub Relationnel Complet)
-Plan: 6 of 9 (22-06 COMPLETE ✅)
-Status: In progress - Finances tab with stats + dual tables complete
-Last activity: 2026-01-19 - Completed 22-06-PLAN.md (6 min), FinancesTab component with financial stats (totalPaid, pending, quotesOpen, projection) + Factures/Quotes tables (each with 4 view modes: Table, Cards, Timeline, Kanban), independent toggles, localStorage persistence, empty states
+Plan: 5 of 9 (22-05 COMPLETE ✅)
+Status: In progress - Sessions tab with 4 view modes complete
+Last activity: 2026-01-19 - Completed 22-05-PLAN.md (8 min), SessionsTab component with 4 view modes (Table, Cards, Timeline, Kanban), view mode toggle buttons, localStorage persistence, Timeline splits past/upcoming, Kanban groups by status, empty state with CTA button
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 6/9 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 5/9 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 96
-- Average duration: 33.2 min
-- Total execution time: 53.1 hours
+- Total plans completed: 97
+- Average duration: 33.0 min
+- Total execution time: 53.2 hours
 
 **By Phase:**
 
@@ -82,11 +82,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
-| 22 | 6/9 | 33 min | 5.5 min |
+| 22 | 5/9 | 25 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 5 min, 4 min, 4 min, 6 min]
-- Trend: Phase 22 Plan 6 COMPLETE ✅ (6 min execution). FinancesTab component with financial dashboard complete. getFinancialStats endpoint added to clients router (totalPaid, pending, quotesOpen, projection). FinancesTab component (582 lines) with 3 sections: stats cards (4 metrics), Factures table (4 view modes), Quotes table (4 view modes). Independent view mode toggles with localStorage persistence. Empty states with CTA buttons. Status badges for 5 invoice + 7 quote statuses. Clickable navigation to detail pages.
+- Last 5 plans: [5 min, 4 min, 4 min, 6 min, 8 min]
+- Trend: Phase 22 Plan 5 COMPLETE ✅ (8 min execution). Sessions tab with 4 view modes complete. SessionsTab component (565 lines) with Table (default), Cards, Timeline, Kanban modes. View mode toggle buttons with localStorage persistence. Timeline splits past/upcoming chronologically. Kanban groups by status (Programmée/En cours/Terminée/Annulée). Status badges with color coding (outline/blue/green/red). Empty state with calendar icon + "Créer une session" CTA button. Duration calculation helper. Room name display. Session click navigates to detail page.
 
 ## Accumulated Context
 
@@ -469,42 +469,35 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-19T02:18:28Z
-Stopped at: Phase 22 Plan 06 COMPLETE ✅ - Finances tab with stats + dual tables complete
+Last session: 2026-01-19T02:26:24Z
+Stopped at: Phase 22 Plan 05 COMPLETE ✅ - Sessions tab with 4 view modes complete
 Resume context:
-  - Phase 22 Plan 06 COMPLETE ✅: Finances Tab Implementation (6 min execution, 3/3 tasks)
-    - **Task 1:** Added getFinancialStats endpoint (6a88a52)
-      - Import invoices and quotes tables in clients router
-      - Calculate totalPaid from paid invoices
-      - Calculate pending from sent/overdue invoices
-      - Calculate quotesOpen from sent quotes
-      - Calculate projection (quotesOpen + pending)
-      - Returns financial metrics for stats cards
-    - **Task 2:** Created FinancesTab component (2f898be)
-      - 582-line component with 3 sections
-      - Section 1: Stats cards (4 metrics with icons and colors)
-      - Section 2: Factures table with 4 view modes (Table, Cards, Timeline, Kanban)
-      - Section 3: Quotes table with 4 view modes (independent toggle)
-      - localStorage persistence for both view modes separately
-      - Empty states with illustrations + CTA buttons
-      - Status badges for 5 invoice + 7 quote statuses
-    - **Task 3:** Integrated FinancesTab into ClientDetailTabs (3d57942)
-      - Import FinancesTab component
-      - Add quotes query: trpc.quotes.list.useQuery({ limit: 100 })
-      - Filter quotes by clientId in useMemo hook
-      - Replace finances TabsContent with FinancesTab component
-      - Remove unused getInvoiceStatusBadge function
-      - Clean up unused imports
-      - Code reduction: -176 lines (88%)
+  - Phase 22 Plan 05 COMPLETE ✅: Sessions Tab Multi-View Display (8 min execution, 2/2 tasks)
+    - **Task 1:** Created SessionsTab component (57a18a3)
+      - 565-line component with 4 view modes (Table, Cards, Timeline, Kanban)
+      - View mode toggle: 4 buttons with icons (Table2, LayoutGrid, CalendarDays, Trello)
+      - localStorage persistence: `sessions-view-mode` key
+      - Mode 1 - Table (default): existing table with sessions sorted by date desc
+      - Mode 2 - Cards: grid layout (2-3 cols) with session cards, room/date/duration/status
+      - Mode 3 - Timeline: chronological split (past sessions desc, upcoming sessions asc)
+      - Mode 4 - Kanban: status-based columns (Programmée/En cours/Terminée/Annulée)
+      - Status badges: color-coded (outline/blue/green/red)
+      - Duration calculation: format as "Xh" or "XhY" from startTime/endTime
+      - Room name display: from roomMap prop
+      - Empty state: calendar icon + "Aucune session pour ce client" + CTA button
+      - CTA navigation: `/sessions/new?clientId=${clientId}` pre-fills client
+      - Session click: navigate to `/sessions/${id}` on card click
+    - **Task 2:** Integrated SessionsTab into ClientDetailTabs (user commit)
+      - Import SessionsTab component
+      - Replace sessions TabsContent with SessionsTab component
+      - Pass clientSessions, rooms props from parent
+      - Remove duplicate roomMap and getSessionStatusBadge functions
+      - Code reduction: ~60 lines (table replaced with component call)
     - **Final State:**
-      - Backend: Financial stats endpoint ready
-      - Frontend: Comprehensive financial dashboard
-      - View modes: 4 toggles for Factures + 4 toggles for Quotes
-      - Navigation: Clickable cards/rows to detail pages
-      - Empty states: CTA buttons for new invoices/quotes
+      - UI: Sessions tab with 4 fully functional view modes
+      - UX: View mode persisted across page refreshes
+      - Navigation: Empty state CTA, card clicks to detail
     - **Commits:**
-      - 6a88a52: feat(22-06): add getFinancialStats endpoint to clients router
-      - 2f898be: feat(22-06): create FinancesTab component with stats + dual tables
-      - 3d57942: feat(22-06): integrate FinancesTab into ClientDetailTabs
+      - 57a18a3: feat(22-05): create SessionsTab component with 4 view modes
     - **Deviations:** None - plan executed exactly as written
-  - **Next:** Phase 22 Plan 07 - Next plan in sequence (check ROADMAP for details).
+  - **Next:** Phase 22 Plan 06 - Implement Finances tab with financial stats + dual tables (Factures + Quotes with view modes).
