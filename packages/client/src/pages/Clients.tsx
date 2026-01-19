@@ -27,7 +27,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { cn, getInitials } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Pencil, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin, Copy } from "lucide-react";
+import { Users, Plus, Search, ArrowLeft, Mail, Phone, Star, FileDown, FileUp, Download, Eye, Pencil, Table as TableIcon, Grid, Columns, ArrowUpDown, ArrowUp, ArrowDown, Building2, MapPin, Copy, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -124,18 +124,26 @@ export function Clients() {
   });
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [genreFilter, setGenreFilter] = useState<string>("");
-  const [instrumentFilter, setInstrumentFilter] = useState<string>("");
+
+  // Debounced search state
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   // Save view mode to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('clientsViewMode', viewMode);
   }, [viewMode]);
 
+  // Debounce searchQuery (300ms delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const { data: clients, isLoading: clientsLoading, refetch } = trpc.clients.list.useQuery({
     limit: 100,
-    genre: genreFilter || undefined,
-    instrument: instrumentFilter || undefined,
+    searchQuery: debouncedSearch || undefined,
   });
   const { data: sessions } = trpc.sessions.list.useQuery({ limit: 100 });
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
@@ -466,52 +474,26 @@ export function Clients() {
           </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-3">
-                {/* Search */}
+                {/* Unified Search Input */}
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Rechercher par nom, email ou entreprise..."
+                    placeholder="Rechercher par nom, instrument, genre, email..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
+                    className="pl-9 pr-9"
                   />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
-
-                {/* Genre Filter */}
-                <div className="w-full sm:w-48">
-                  <Input
-                    placeholder="Filtrer par genre..."
-                    value={genreFilter}
-                    onChange={(e) => setGenreFilter(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-
-                {/* Instrument Filter */}
-                <div className="w-full sm:w-48">
-                  <Input
-                    placeholder="Filtrer par instrument..."
-                    value={instrumentFilter}
-                    onChange={(e) => setInstrumentFilter(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-
-                {/* Clear Filters Button */}
-                {(genreFilter || instrumentFilter) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setGenreFilter("");
-                      setInstrumentFilter("");
-                    }}
-                    className="gap-2 shrink-0"
-                  >
-                    <X className="h-4 w-4" />
-                    Effacer filtres
-                  </Button>
-                )}
               </div>
             </CardContent>
           </Card>
