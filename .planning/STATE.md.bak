@@ -377,11 +377,6 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Result: Clean slate - 1 master DB (7 tables), 1 tenant DB (30+ tables), zero schema mismatches, test data seeded
   - Priority: P0 BLOCKER - User cannot proceed with manual testing until database clean
 
-- **2026-01-18:** Phase 22 added after Phase 21.1 - "Refonte UI Client - Hub Relationnel Complet" (ADDED)
-  - Reason: Phase 18.4 a ajouté 22 champs musicaux mais l'UI n'a pas été réorganisée pour afficher cette quantité d'information
-  - Impact: Pages création/modification client éparpillées, manque accès aux données relationnelles (projets, tracks, finances)
-  - Solution: Créer composant ClientForm réutilisable avec sections organisées + ajouter onglets Projets/Tracks/Finances sur ClientDetail
-  - Priority: UX enhancement - Améliorer productivité studios avec hub relationnel client complet
 ### Blockers/Concerns Carried Forward
 
 **Resolved in Phase 1 Plan 1:**

@@ -894,6 +894,8 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | **v4.1 - Quality Assurance (IN PROGRESS)** | | | | |
 | 18. Audit Complet Toutes Pages | v4.1 | 1/3 | ⏸️ Paused | 2026-01-15 |
 | 20. Affichage Contacts Multiples | v4.1 | 1/1 | ✅ Complete | 2026-01-16 |
+| 21. Audit Scripts Base de Données | v4.1 | 3/3 | ✅ Complete | 2026-01-17 |
+| 18.4. Music Profile for Artists | v4.1 | 3/3 | ✅ Complete | 2026-01-17 |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -903,7 +905,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
 **v4.0 Total**: 24/24 plans ✅ SHIPPED 2026-01-15 (Phases 10-17 finished)
-**v4.1 Total**: 2/4 plans (Phase 18: 1/3, Phase 20: 1/1 ✅)
+**v4.1 Total**: 8/10 plans (Phase 18: 1/3 ⏸️, Phase 20: 1/1 ✅, Phase 21: 3/3 ✅, Phase 18.4: 3/3 ✅)
 **v1.0 Total**: 0/17 plans (deferred after v4.1)
 
 ---
@@ -1426,12 +1428,14 @@ Enrichir les trois vues clients (Table/Grid/Kanban) pour afficher:
 - Script interdependencies and execution order
 - Test data generation strategies for current schema
 
-**Plans**: TBD plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 21 to break down)
+- [x] 21-01: Audit all scripts against current schema - compatibility matrix (audit-report.md) (Completed 2026-01-17)
+- [x] 21-02: Create updated init scripts (create-tenant, seed-base, seed-realistic) (Completed 2026-01-17)
+- [x] 21-03: Archive obsolete scripts and update documentation (Completed 2026-01-17)
 
-**Status**: Not started
+**Status**: ✅ Complete (All 3 plans finished - 22 min total)
 
 **Details**:
 
@@ -1477,6 +1481,48 @@ packages/database/scripts/
 
 **Rationale**: Database scripts written before Phases 10-17 are incompatible with current schema (30+ tenant tables vs ~15 when scripts created). Multiple bugs traced to schema mismatches. Systematic audit prevents future "broken database" sessions. DEVELOPMENT-WORKFLOW.md recommends "increment tenant number" but scripts must still work for fresh tenant creation.
 
+---
+
+### Phase 21.1: Fix Client Portal Authentication Persistence (INSERTED)
+
+**Goal**: Fix critical authentication bug where Client Portal session is not persisted after login, causing E2E tests to fail (6/8 failing)
+
+**Depends on**: Phase 21 (database scripts audit complete)
+
+**Research**: Likely (Client Portal authentication system, session persistence, ProtectedClientRoute investigation)
+
+**Research topics**:
+- Client Portal authentication flow (login → session → redirect)
+- Session cookie configuration for client portal subdomain
+- ProtectedClientRoute implementation and auth context
+- localStorage vs cookie persistence for client sessions
+- Comparison with Admin auth (working) vs Client Portal auth (failing)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 21.1-01-PLAN.md — Migrate Client Portal to express-session cookies (3 tasks: backend login/me/logout, frontend AuthContext/Navigate, E2E tests)
+
+**Details**:
+[To be added during planning]
+
+**Problem Description:**
+- **Symptoms**: E2E tests 6/8 failing, Client Portal login appears successful but session not persisted
+- **Impact**: Clients cannot maintain authenticated session in production
+- **Blocker**: Phase 17 UAT validation blocked, production client portal unusable
+- **Root Cause**: Unknown - requires investigation of ProtectedClientRoute, session cookies, auth context persistence
+- **Decision Reference**: Phase 17-FIX (Rule 4 architectural boundary - stopped at auth system modification)
+
+**Success Criteria:**
+- [ ] Client Portal login persists session across page refreshes
+- [ ] ProtectedClientRoute correctly validates authenticated state
+- [ ] E2E tests pass (8/8 tests green)
+- [ ] Session cookies properly configured for client portal
+- [ ] No regressions in Admin Dashboard authentication
+
+**Rationale**: URGENT BLOCKER discovered during Phase 17 UAT testing. Client Portal authentication completely broken - users can login but session immediately lost on navigation/refresh. Affects real production clients trying to pay invoices. Must fix before any marketing launch (Phase 4-8) as client portal is core product feature. GSD Rule 4 previously deferred this fix to avoid expanding Phase 17 scope, but now requires dedicated phase.
+
+---
 
 ## 📋 v1.0 - Marketing & Launch (Deferred After v4.1)
 
@@ -1517,3 +1563,125 @@ packages/database/scripts/
 - **Current:** Cannot sell to enterprise (>100 employees)
 - **With v2.0:** Enterprise-ready, reseller channel opens ($1M+ potential)
 - **Break-even:** 20-28 enterprise customers @ €199/month (12-18 months)
+
+### Phase 18.4: Music Profile for Artists (INSERTED)
+
+**Goal**: Add comprehensive music profile fields to client records for recording studio management - genres, instruments, streaming links, industry info
+
+**Depends on**: Phase 21.1 (authentication bugs fixed, can resume testing)
+
+**Research**: Complete (JSONB arrays with GIN indexes, shadcn multi-select, URL validation patterns)
+
+**Plans**: 3 plans
+
+Plans:
+- [x] 18.4-01: Add music profile schema + migration (genres/instruments JSONB, streaming URLs, industry fields) (Completed 2026-01-17 - 8 min)
+- [x] 18.4-02: Create MusicProfileSection UI component (genre/instrument multi-select, 11 streaming platforms, industry info) (Completed 2026-01-17 - 10 min)
+- [x] 18.4-03: Integrate filters + genre distribution widget (Clients list filters, Dashboard stats) (Completed 2026-01-17 - 28 min)
+
+**Status**: ✅ Complete (All 3 plans finished - 46 min total)
+
+**Details**:
+
+**Problem (BUG-006 - P1 Critical):**
+Recording Studio Manager app has ZERO music-related fields for artist clients. Discovered during Phase 18-02 manual testing. User: "le bug est trop important pour le faire après" - critical missing feature for core domain.
+
+**Missing Fields:**
+- Genre(s), instruments, vocal range, skill level
+- Streaming platforms (Spotify, Apple Music, SoundCloud, YouTube, Bandcamp, Deezer)
+- Industry info (label, distributor, manager, publisher, performance rights society)
+
+**Solution Architecture:**
+1. **Schema**: 19 new nullable columns in clients table (2 JSONB arrays, 17 varchar/text)
+2. **JSONB arrays with GIN indexes**: PostgreSQL `@>` operator for genre/instrument filtering
+3. **Multi-select UI**: shadcn-multi-select-component with creatable entries (50 preset genres)
+4. **Backward compatible**: All fields nullable, existing clients unaffected
+
+**Migration Strategy (Development):**
+Use "increment tenant number" pattern (create tenant_4, tenant_5 vs debugging migrations). Per DEVELOPMENT-WORKFLOW.md, this is 30 seconds vs 2-3 hours debugging.
+
+**Success Criteria:**
+- [ ] Artists have complete music profile fields in database
+- [ ] Genre/instrument multi-select working in UI
+- [ ] Streaming platform URLs editable and validated
+- [ ] Can filter clients by genre and instrument
+- [ ] Dashboard shows genre distribution stats
+- [ ] Zero P0/P1/P2 bugs introduced
+
+**Estimated Effort:** 2-3 hours total (research complete, ~1.5-2h execution)
+
+**Rationale**: P1 severity bug discovered during comprehensive audit (Phase 18). Recording studio app without music profile = car dealership CRM without tracking which cars customers buy. Must fix before continuing Phase 18-02 testing. User explicitly requested immediate fix vs deferring.
+
+---
+
+### Phase 22: Refonte UI Client - Hub Relationnel Complet
+
+**Goal**: Reorganiser les pages client (création, modification, détail) pour mieux afficher les 22 nouveaux champs musicaux + ajouter accès aux données relationnelles (projets, tracks, finances)
+
+**Depends on**: Phase 18.4 (music profile fields implemented)
+
+**Research**: Unlikely (UI patterns already established, existing component architecture)
+
+**Plans**: 3 plans
+
+Plans:
+Plans:
+- [ ] 22-01-PLAN.md — Create ClientFormSections component with collapsible sections (Identité/Contact/Profil Musical/Adresse/Additionnelles) + refactor ClientCreate.tsx to use it + include music fields in mutation payload
+- [ ] 22-02-PLAN.md — Add backend getRelationalData query + Projects/Tracks/Finances tabs to ClientDetail with project table, track audio player, consolidated financial stats
+- [ ] 22-03-PLAN.md — Refactor ClientDetail edit mode to use ClientFormSections + hydrate all 60+ fields + update clients.update mutation schema for music fields
+
+**Status**: 🔴 Not Started
+
+**Details**:
+
+**Problem:**
+Phase 18.4 a ajouté 22 champs musicaux, mais l'UI n'a pas été réorganisée:
+- Pages création/modification client éparpillées (champs non groupés logiquement)
+- ClientDetail affiche Sessions/Factures mais pas Projets/Tracks
+- Informations relationnelles manquantes (client → projets → tracks → finances)
+
+**Current State:**
+- `ClientDetail.tsx` a 3 onglets (Informations, Informations Enrichies, Profil Musical) ✅
+- Sections "Sessions" et "Factures" dans onglet "Historique"
+- **MANQUE:** Projets, Tracks, vue financière consolidée
+
+**Proposed Architecture:**
+
+**Option A - Onglets horizontaux:**
+```
+[Informations] [Projets] [Tracks] [Sessions] [Finances] [Notes]
+```
+
+**Option B - Sections avec sous-onglets:**
+```
+[Informations: Base | Enrichi | Musique]
+[Relations: Projets | Tracks | Sessions]
+[Finances: Factures | Quotes | Stats]
+[Notes]
+```
+
+**Composant ClientForm réutilisable:**
+- Utilisé par création (`/clients/new`) ET modification (ClientDetail mode édition)
+- Organisation: Sections collapsibles OU onglets selon préférence utilisateur
+- Validation: Type-safe avec zod schema partagé
+
+**Données relationnelles à afficher:**
+1. **Projets:** Liste projets du client avec liens vers détails
+2. **Tracks:** Toutes tracks des projets du client (audio player inline)
+3. **Finances:** Factures + Quotes + stats consolidées (payé, en attente, total)
+4. **Sessions:** Historique déjà existant (garder)
+5. **Notes:** Historique daté déjà existant (garder)
+
+**Success Criteria:**
+- [ ] Pages création/modification client avec UI organisée et claire
+- [ ] Composant ClientForm réutilisable entre création et modification
+- [ ] ClientDetail affiche toutes données relationnelles (projets, tracks, finances)
+- [ ] Navigation fluide entre onglets avec queries optimisées
+- [ ] Formulaires validators type-safe pour tous les 22+ champs musicaux
+- [ ] Zero régression sur fonctionnalités existantes
+
+**Estimated Effort:** 60-90 min (3 plans × 20-30 min chacun)
+
+**Rationale**: Phase 18.4 a résolu le problème de **data** (22 champs en DB), mais l'**UX** n'a pas été optimisée pour cette quantité d'information. Les studios ont besoin de voir la relation complète client → projets → tracks → finances en un seul endroit. Hub relationnel = amélioration productivité majeure.
+
+---
