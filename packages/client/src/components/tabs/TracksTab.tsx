@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { trpc } from '@/lib/trpc';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { Button } from '@/components/ui/button';
@@ -68,7 +68,7 @@ export function TracksTab({ clientId }: TracksTabProps) {
       <div className="py-12 text-center">
         <Music className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <p className="text-muted-foreground mb-4">Aucune track pour ce client</p>
-        <Link href={`/tracks/new?clientId=${clientId}`}>
+        <Link to={`/tracks/new?clientId=${clientId}`}>
           <Button>Créer une track</Button>
         </Link>
       </div>
@@ -137,7 +137,7 @@ export function TracksTab({ clientId }: TracksTabProps) {
 
               {/* Track info */}
               <div className="flex-1 min-w-0">
-                <Link href={`/tracks/${track.id}`}>
+                <Link to={`/tracks/${track.id}`}>
                   <p className="font-medium hover:underline cursor-pointer truncate">
                     {track.title}
                   </p>
@@ -170,7 +170,7 @@ export function TracksTab({ clientId }: TracksTabProps) {
               </div>
 
               {/* Title */}
-              <Link href={`/tracks/${track.id}`}>
+              <Link to={`/tracks/${track.id}`}>
                 <h3 className="font-medium hover:underline cursor-pointer truncate">
                   {track.title}
                 </h3>
@@ -229,7 +229,7 @@ export function TracksTab({ clientId }: TracksTabProps) {
               {tracks.map((track) => (
                 <TableRow key={track.id}>
                   <TableCell className="font-medium">
-                    <Link href={`/tracks/${track.id}`}>
+                    <Link to={`/tracks/${track.id}`}>
                       <span className="hover:underline cursor-pointer">
                         {track.title}
                       </span>
@@ -268,7 +268,7 @@ export function TracksTab({ clientId }: TracksTabProps) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Link href={`/tracks/${track.id}`}>
+                    <Link to={`/tracks/${track.id}`}>
                       <Button size="sm" variant="ghost">
                         Voir
                       </Button>
