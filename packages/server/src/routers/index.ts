@@ -26,6 +26,7 @@ import { superadminRouter } from './superadmin.js';
 import { clientNotesRouter } from './clientNotes.js';
 import { serviceCatalogRouter } from './serviceCatalog.js';
 import { timeTrackingRouter } from './time-tracking.js';
+import { preferencesRouter } from './preferences.js';
 
 /**
  * Main App Router
@@ -48,6 +49,7 @@ import { timeTrackingRouter } from './time-tracking.js';
  * - contracts: Legal contracts CRUD
  * - expenses: Business expenses CRUD
  * - serviceCatalog: Service catalog for quick quote insertion CRUD
+ * - preferences: User preferences for tab customization CRUD
  * - ai: AI Chatbot (Phase 2 - P0 Priority)
  * - search: Global search across all entities
  * - clientPortalAuth: Client Portal Authentication (Phase 4.1)
@@ -86,6 +88,7 @@ export const appRouter = router({
   clientPortalBooking: clientPortalBookingRouter,
   clientPortalStripe: clientPortalStripeRouter,
   timeTracking: timeTrackingRouter,
+  preferences: preferencesRouter,
 });
 
 /**
