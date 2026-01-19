@@ -90,8 +90,9 @@ export const PRESET_GENRES: GenreCategory[] = [
 
 /**
  * Flatten genres for multi-select (all parent + subgenres)
+ * Deduplicated to avoid duplicate keys in React
  */
-export const FLAT_GENRES = PRESET_GENRES.flatMap(g => [g.parent, ...g.subgenres]);
+export const FLAT_GENRES = Array.from(new Set(PRESET_GENRES.flatMap(g => [g.parent, ...g.subgenres])));
 
 /**
  * 12+ instrument families with specific instruments
