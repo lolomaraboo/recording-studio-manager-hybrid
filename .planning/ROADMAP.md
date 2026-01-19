@@ -1622,66 +1622,91 @@ Use "increment tenant number" pattern (create tenant_4, tenant_5 vs debugging mi
 
 **Research**: Unlikely (UI patterns already established, existing component architecture)
 
-**Plans**: 3 plans
+**Plans**: 9 plans
 
 Plans:
-Plans:
-- [ ] 22-01-PLAN.md — Create ClientFormSections component with collapsible sections (Identité/Contact/Profil Musical/Adresse/Additionnelles) + refactor ClientCreate.tsx to use it + include music fields in mutation payload
-- [ ] 22-02-PLAN.md — Add backend getRelationalData query + Projects/Tracks/Finances tabs to ClientDetail with project table, track audio player, consolidated financial stats
-- [ ] 22-03-PLAN.md — Refactor ClientDetail edit mode to use ClientFormSections + hydrate all 60+ fields + update clients.update mutation schema for music fields
+- [ ] 22-01-PLAN.md — ClientFormWizard: 3-step wizard (Base/Enrichi/Musique) with free navigation
+- [ ] 22-02-PLAN.md — ClientDetail tabs: 5 horizontal tabs (Informations/Projets/Tracks/Sessions/Finances) + Notes always visible
+- [ ] 22-03-PLAN.md — Projets tab: 4 view modes (Cards/Liste/Table/Kanban) + backend getProjects endpoint
+- [ ] 22-04-PLAN.md — Tracks tab: 3 view modes (Liste avec player/Cards/Table) + backend getTracks endpoint
+- [ ] 22-05-PLAN.md — Sessions tab: 4 view modes (Table/Cards/Timeline/Kanban)
+- [ ] 22-06-PLAN.md — Finances tab: Stats cards + Factures/Quotes tables (each with 4 view modes) + backend getFinancialStats
+- [ ] 22-07-PLAN.md — Preferences backend: user_preferences table + tRPC router for cross-device sync
+- [ ] 22-08-PLAN.md — Customization UI: columns visibility toggle + drag & drop reordering + useTabPreferences hook
+- [ ] 22-09-PLAN.md — Edit mode integration: ClientFormWizard in edit mode + clients.update mutation for music fields
 
 **Status**: 🔴 Not Started
 
 **Details**:
 
-**Problem:**
-Phase 18.4 a ajouté 22 champs musicaux, mais l'UI n'a pas été réorganisée:
-- Pages création/modification client éparpillées (champs non groupés logiquement)
-- ClientDetail affiche Sessions/Factures mais pas Projets/Tracks
-- Informations relationnelles manquantes (client → projets → tracks → finances)
+**Scope:**
+Reorganiser les pages client (création, modification, détail) pour mieux afficher les 22 nouveaux champs musicaux (Phase 18.4) + ajouter accès aux données relationnelles (projets, tracks, finances).
 
-**Current State:**
-- `ClientDetail.tsx` a 3 onglets (Informations, Informations Enrichies, Profil Musical) ✅
-- Sections "Sessions" et "Factures" dans onglet "Historique"
-- **MANQUE:** Projets, Tracks, vue financière consolidée
+**Architecture Decisions:**
 
-**Proposed Architecture:**
+1. **ClientDetail - Onglets horizontaux:**
+   - [Informations] [Projets] [Tracks] [Sessions] [Finances]
+   - Notes toujours visibles en bas (section fixe, visible sur tous onglets)
+   - Pas de sous-onglets imbriqués
 
-**Option A - Onglets horizontaux:**
-```
-[Informations] [Projets] [Tracks] [Sessions] [Finances] [Notes]
-```
+2. **ClientForm - Wizard 3 étapes:**
+   - Étape 1: Base (nom, email, type, phone, address)
+   - Étape 2: Enrichi (vCard contacts, custom fields)
+   - Étape 3: Musique (22 champs Phase 18.4)
+   - Stepper toujours cliquable - navigation libre entre étapes
+   - Réutilisable pour création ET modification
 
-**Option B - Sections avec sous-onglets:**
-```
-[Informations: Base | Enrichi | Musique]
-[Relations: Projets | Tracks | Sessions]
-[Finances: Factures | Quotes | Stats]
-[Notes]
-```
+3. **Customisation universelle (TOUS les onglets):**
+   - 4 modes d'affichage par onglet (Cards/Liste/Table/Kanban variants)
+   - Toggle colonnes visibles/cachées
+   - Drag & drop pour réordonner colonnes
+   - Préférences sauvegardées en DB (synchronisées cross-device)
 
-**Composant ClientForm réutilisable:**
-- Utilisé par création (`/clients/new`) ET modification (ClientDetail mode édition)
-- Organisation: Sections collapsibles OU onglets selon préférence utilisateur
-- Validation: Type-safe avec zod schema partagé
+**Content - Onglet Projets (4 modes):**
+1. Cards avec stats (défaut)
+2. Liste compacte
+3. Table enrichie
+4. Kanban par statut
 
-**Données relationnelles à afficher:**
-1. **Projets:** Liste projets du client avec liens vers détails
-2. **Tracks:** Toutes tracks des projets du client (audio player inline)
-3. **Finances:** Factures + Quotes + stats consolidées (payé, en attente, total)
-4. **Sessions:** Historique déjà existant (garder)
-5. **Notes:** Historique daté déjà existant (garder)
+**Content - Onglet Tracks (3 modes):**
+1. Liste avec audio player inline
+2. Cards visuelles avec artwork
+3. Table simple metadata
+
+**Content - Onglet Sessions (4 modes):**
+1. Table (mode actuel)
+2. Cards compactes
+3. Timeline/Calendar view
+4. Kanban par statut
+
+**Content - Onglet Finances (structure + 4 modes):**
+- Stats cards: Total payé, En attente, Quotes ouverts, Projection
+- Table Factures (4 modes): Table/Cards/Timeline/Kanban
+- Table Quotes (4 modes): Table/Cards/Timeline/Kanban
+
+**Navigation:**
+- Clic sur projet/track/facture → navigate vers page détail (même onglet)
+- Breadcrumb pour retour
+
+**Empty states:**
+- Illustrés (icône Lucide) + message + bouton CTA
+
+**Storage préférences:**
+- Table user_preferences en DB
+- Synchronisées cross-device
 
 **Success Criteria:**
-- [ ] Pages création/modification client avec UI organisée et claire
-- [ ] Composant ClientForm réutilisable entre création et modification
-- [ ] ClientDetail affiche toutes données relationnelles (projets, tracks, finances)
-- [ ] Navigation fluide entre onglets avec queries optimisées
-- [ ] Formulaires validators type-safe pour tous les 22+ champs musicaux
-- [ ] Zero régression sur fonctionnalités existantes
+- [ ] ClientFormWizard créé avec 3 étapes (navigation libre)
+- [ ] ClientDetail a 5 tabs + Notes section fixe
+- [ ] Projets tab avec 4 modes d'affichage
+- [ ] Tracks tab avec 3 modes + audio player
+- [ ] Sessions tab avec 4 modes
+- [ ] Finances tab avec stats + 2 tables (Factures/Quotes) avec 4 modes chacun
+- [ ] Préférences stockées en DB (cross-device sync)
+- [ ] Customisation avancée (toggle colonnes, drag & drop)
+- [ ] Edit mode utilise wizard
+- [ ] Zero régressions
 
-**Estimated Effort:** 60-90 min (3 plans × 20-30 min chacun)
+**Estimated Effort:** 180-270 min (9 plans × 20-30 min chacun)
 
 **Rationale**: Phase 18.4 a résolu le problème de **data** (22 champs en DB), mais l'**UX** n'a pas été optimisée pour cette quantité d'information. Les studios ont besoin de voir la relation complète client → projets → tracks → finances en un seul endroit. Hub relationnel = amélioration productivité majeure.
-
----
