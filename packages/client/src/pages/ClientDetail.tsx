@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -20,14 +19,8 @@ import {
   ArrowLeft,
   Edit,
   Trash2,
-  Save,
-  X,
-  Calendar,
-  Star,
   Users,
 } from "lucide-react";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 
 export default function ClientDetail() {
@@ -51,12 +44,6 @@ export default function ClientDetail() {
 
   // Fetch client data
   const { data: client, isLoading, refetch } = trpc.clients.get.useQuery(
-    { id: Number(id) },
-    { enabled: !!id }
-  );
-
-  // Fetch client with contacts (for vCard tab)
-  const { data: clientWithContacts } = trpc.clients.getWithContacts.useQuery(
     { id: Number(id) },
     { enabled: !!id }
   );
@@ -85,27 +72,6 @@ export default function ClientDetail() {
     onSuccess: () => {
       toast.success("Client supprimé");
       navigate("/clients");
-    },
-    onError: (error) => {
-      toast.error(`Erreur: ${error.message}`);
-    },
-  });
-
-  // Contact mutations
-  const addContactMutation = trpc.clients.addContact.useMutation({
-    onSuccess: () => {
-      toast.success("Contact ajouté");
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(`Erreur: ${error.message}`);
-    },
-  });
-
-  const deleteContactMutation = trpc.clients.deleteContact.useMutation({
-    onSuccess: () => {
-      toast.success("Contact supprimé");
-      refetch();
     },
     onError: (error) => {
       toast.error(`Erreur: ${error.message}`);
