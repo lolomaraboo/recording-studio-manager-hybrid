@@ -1235,3 +1235,32 @@ export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
 
 export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
 export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
+
+/**
+ * User Preferences table (Tenant DB)
+ * Stores user preferences for tab customization (columns visibility, order)
+ * Enables cross-device synchronization of view preferences
+ */
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  scope: varchar("scope", { length: 100 }).notNull(), // e.g., "client-detail-projects", "client-detail-tracks"
+  preferences: jsonb("preferences").notNull().$type<{
+    viewMode?: string;
+    visibleColumns?: string[];
+    columnOrder?: string[];
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }>(), // Preferences object with viewMode, columns, sorting, etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  // Unique constraint: one preference row per user per scope
+  userScopeUnique: {
+    columns: [table.userId, table.scope],
+    name: "user_scope_unique",
+  },
+}));
+
+export type UserPreference = typeof userPreferences.$inferSelect;
+export type InsertUserPreference = typeof userPreferences.$inferInsert;
