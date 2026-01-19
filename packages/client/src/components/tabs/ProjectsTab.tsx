@@ -23,8 +23,26 @@ import {
   Clock,
   Euro,
   Settings,
+  GripVertical,
 } from "lucide-react";
 import { useTabPreferences } from "@/hooks/useTabPreferences";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface ProjectsTabProps {
   clientId: number;
@@ -56,6 +74,49 @@ const STATUS_COLORS = {
 
 const ALL_COLUMNS = ["titre", "statut", "tracks", "sessions", "budget", "genre", "date"];
 
+const COLUMN_LABELS: Record<string, string> = {
+  titre: "Titre",
+  statut: "Statut",
+  tracks: "Tracks",
+  sessions: "Sessions",
+  budget: "Budget",
+  genre: "Genre",
+  date: "Date",
+};
+
+// Sortable table header component
+function SortableTableHeader({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <th
+      ref={setNodeRef}
+      style={style}
+      className="text-left p-3 font-medium cursor-move"
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex items-center gap-2">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        {children}
+      </div>
+    </th>
+  );
+}
+
 export function ProjectsTab({ clientId }: ProjectsTabProps) {
   const navigate = useNavigate();
 
@@ -71,6 +132,27 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
 
   // Fetch projects with stats
   const { data: projects, isLoading } = trpc.clients.getProjects.useQuery({ clientId });
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end for column reordering
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = preferences.columnOrder.indexOf(active.id as string);
+      const newIndex = preferences.columnOrder.indexOf(over.id as string);
+
+      const newOrder = arrayMove(preferences.columnOrder, oldIndex, newIndex);
+      updatePreferences({ columnOrder: newOrder });
+    }
+  };
 
   const formatBudget = (budget: string | null, spent: string | null) => {
     if (!budget && !spent) return null;
@@ -259,54 +341,116 @@ export function ProjectsTab({ clientId }: ProjectsTabProps) {
       {/* Table Mode */}
       {preferences.viewMode === "table" && (
         <div className="border rounded-lg">
-          <table className="w-full">
-            <thead className="bg-muted/50">
-              <tr>
-                {preferences.visibleColumns.includes("titre") && <th className="text-left p-3 font-medium">Titre</th>}
-                {preferences.visibleColumns.includes("statut") && <th className="text-left p-3 font-medium">Statut</th>}
-                {preferences.visibleColumns.includes("tracks") && <th className="text-left p-3 font-medium">Tracks</th>}
-                {preferences.visibleColumns.includes("sessions") && <th className="text-left p-3 font-medium">Sessions</th>}
-                {preferences.visibleColumns.includes("budget") && <th className="text-left p-3 font-medium">Budget</th>}
-                {preferences.visibleColumns.includes("genre") && <th className="text-left p-3 font-medium">Genre</th>}
-                {preferences.visibleColumns.includes("date") && <th className="text-left p-3 font-medium">Date</th>}
-                <th className="text-left p-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects?.map((project) => (
-                <tr
-                  key={project.id}
-                  className="border-t hover:bg-accent cursor-pointer"
-                  onClick={() => navigate(`/projects/${project.id}`)}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <SortableContext
+                  items={preferences.columnOrder.filter((col) =>
+                    preferences.visibleColumns.includes(col)
+                  )}
+                  strategy={horizontalListSortingStrategy}
                 >
-                  {preferences.visibleColumns.includes("titre") && <td className="p-3 font-medium">{project.name}</td>}
-                  {preferences.visibleColumns.includes("statut") && (
+                  <tr>
+                    {preferences.columnOrder
+                      .filter((col) => preferences.visibleColumns.includes(col))
+                      .map((col) => (
+                        <SortableTableHeader key={col} id={col}>
+                          {COLUMN_LABELS[col]}
+                        </SortableTableHeader>
+                      ))}
+                    <th className="text-left p-3 font-medium">Actions</th>
+                  </tr>
+                </SortableContext>
+              </thead>
+              <tbody>
+                {projects?.map((project) => (
+                  <tr
+                    key={project.id}
+                    className="border-t hover:bg-accent cursor-pointer"
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                  >
+                    {preferences.columnOrder
+                      .filter((col) => preferences.visibleColumns.includes(col))
+                      .map((col) => {
+                        if (col === "titre") {
+                          return (
+                            <td key={col} className="p-3 font-medium">
+                              {project.name}
+                            </td>
+                          );
+                        }
+                        if (col === "statut") {
+                          return (
+                            <td key={col} className="p-3">
+                              <Badge
+                                className={
+                                  STATUS_COLORS[
+                                    project.status as keyof typeof STATUS_COLORS
+                                  ]
+                                }
+                              >
+                                {
+                                  STATUS_LABELS[
+                                    project.status as keyof typeof STATUS_LABELS
+                                  ]
+                                }
+                              </Badge>
+                            </td>
+                          );
+                        }
+                        if (col === "tracks") {
+                          return (
+                            <td key={col} className="p-3">
+                              {project.tracksCount}
+                            </td>
+                          );
+                        }
+                        if (col === "sessions") {
+                          return (
+                            <td key={col} className="p-3">
+                              {project.hoursRecorded}h
+                            </td>
+                          );
+                        }
+                        if (col === "budget") {
+                          return (
+                            <td key={col} className="p-3">
+                              {formatBudget(project.budget, project.totalCost) || "-"}
+                            </td>
+                          );
+                        }
+                        if (col === "genre") {
+                          return (
+                            <td key={col} className="p-3">
+                              {project.genre || "-"}
+                            </td>
+                          );
+                        }
+                        if (col === "date") {
+                          return (
+                            <td key={col} className="p-3">
+                              {project.createdAt
+                                ? new Date(project.createdAt).toLocaleDateString("fr-FR")
+                                : "-"}
+                            </td>
+                          );
+                        }
+                        return null;
+                      })}
                     <td className="p-3">
-                      <Badge className={STATUS_COLORS[project.status as keyof typeof STATUS_COLORS]}>
-                        {STATUS_LABELS[project.status as keyof typeof STATUS_LABELS]}
-                      </Badge>
+                      <Button variant="ghost" size="sm">
+                        Voir
+                      </Button>
                     </td>
-                  )}
-                  {preferences.visibleColumns.includes("tracks") && <td className="p-3">{project.tracksCount}</td>}
-                  {preferences.visibleColumns.includes("sessions") && <td className="p-3">{project.hoursRecorded}h</td>}
-                  {preferences.visibleColumns.includes("budget") && <td className="p-3">{formatBudget(project.budget, project.totalCost) || "-"}</td>}
-                  {preferences.visibleColumns.includes("genre") && <td className="p-3">{project.genre || "-"}</td>}
-                  {preferences.visibleColumns.includes("date") && (
-                    <td className="p-3">
-                      {project.createdAt
-                        ? new Date(project.createdAt).toLocaleDateString("fr-FR")
-                        : "-"}
-                    </td>
-                  )}
-                  <td className="p-3">
-                    <Button variant="ghost" size="sm">
-                      Voir
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </DndContext>
         </div>
       )}
 

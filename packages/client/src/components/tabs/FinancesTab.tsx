@@ -24,11 +24,29 @@ import {
   FileText,
   Plus,
   Settings,
+  GripVertical,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { trpc } from "@/lib/trpc";
 import { useTabPreferences } from "@/hooks/useTabPreferences";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Invoice {
   id: number;
@@ -58,6 +76,46 @@ type ViewMode = "table" | "cards" | "timeline" | "kanban";
 
 const INVOICE_COLUMNS = ["numéro", "date", "montant", "statut"];
 const QUOTE_COLUMNS = ["numéro", "date", "montant", "statut"];
+
+const COLUMN_LABELS: Record<string, string> = {
+  numéro: "Numéro",
+  date: "Date",
+  montant: "Montant",
+  statut: "Statut",
+};
+
+// Sortable table header component
+function SortableTableHeader({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableHead
+      ref={setNodeRef}
+      style={style}
+      className="cursor-move"
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex items-center gap-2">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        {children}
+      </div>
+    </TableHead>
+  );
+}
 
 export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
   // Use preferences hook for invoices (separate scope)
@@ -90,6 +148,40 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
 
   // Query financial stats
   const { data: stats } = trpc.clients.getFinancialStats.useQuery({ clientId });
+
+  // Drag and drop sensors (shared for both tables)
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end for invoices
+  const handleInvoicesDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = invoicesPreferences.columnOrder.indexOf(active.id as string);
+      const newIndex = invoicesPreferences.columnOrder.indexOf(over.id as string);
+
+      const newOrder = arrayMove(invoicesPreferences.columnOrder, oldIndex, newIndex);
+      updateInvoicesPreferences({ columnOrder: newOrder });
+    }
+  };
+
+  // Handle drag end for quotes
+  const handleQuotesDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = quotesPreferences.columnOrder.indexOf(active.id as string);
+      const newIndex = quotesPreferences.columnOrder.indexOf(over.id as string);
+
+      const newOrder = arrayMove(quotesPreferences.columnOrder, oldIndex, newIndex);
+      updateQuotesPreferences({ columnOrder: newOrder });
+    }
+  };
 
   // Invoice status badge
   const getInvoiceStatusBadge = (status: string) => {
@@ -202,32 +294,77 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
 
     if (invoicesPreferences.viewMode === "table") {
       return (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoices.map((inv) => (
-              <TableRow key={inv.id}>
-                <TableCell className="font-medium">{inv.invoiceNumber}</TableCell>
-                <TableCell>{format(new Date(inv.issueDate), "dd MMM yyyy", { locale: fr })}</TableCell>
-                <TableCell>{parseFloat(inv.total).toFixed(2)}€</TableCell>
-                <TableCell>{getInvoiceStatusBadge(inv.status)}</TableCell>
-                <TableCell>
-                  <Link to={`/invoices/${inv.id}`}>
-                    <Button variant="ghost" size="sm">Voir</Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleInvoicesDragEnd}
+        >
+          <Table>
+            <TableHeader>
+              <SortableContext
+                items={invoicesPreferences.columnOrder.filter((col) =>
+                  invoicesPreferences.visibleColumns.includes(col)
+                )}
+                strategy={horizontalListSortingStrategy}
+              >
+                <TableRow>
+                  {invoicesPreferences.columnOrder
+                    .filter((col) => invoicesPreferences.visibleColumns.includes(col))
+                    .map((col) => (
+                      <SortableTableHeader key={col} id={col}>
+                        {COLUMN_LABELS[col]}
+                      </SortableTableHeader>
+                    ))}
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </SortableContext>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((inv) => (
+                <TableRow key={inv.id}>
+                  {invoicesPreferences.columnOrder
+                    .filter((col) => invoicesPreferences.visibleColumns.includes(col))
+                    .map((col) => {
+                      if (col === "numéro") {
+                        return (
+                          <TableCell key={col} className="font-medium">
+                            {inv.invoiceNumber}
+                          </TableCell>
+                        );
+                      }
+                      if (col === "date") {
+                        return (
+                          <TableCell key={col}>
+                            {format(new Date(inv.issueDate), "dd MMM yyyy", { locale: fr })}
+                          </TableCell>
+                        );
+                      }
+                      if (col === "montant") {
+                        return (
+                          <TableCell key={col}>
+                            {parseFloat(inv.total).toFixed(2)}€
+                          </TableCell>
+                        );
+                      }
+                      if (col === "statut") {
+                        return (
+                          <TableCell key={col}>
+                            {getInvoiceStatusBadge(inv.status)}
+                          </TableCell>
+                        );
+                      }
+                      return null;
+                    })}
+                  <TableCell>
+                    <Link to={`/invoices/${inv.id}`}>
+                      <Button variant="ghost" size="sm">Voir</Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DndContext>
       );
     }
 
@@ -343,32 +480,77 @@ export function FinancesTab({ clientId, invoices, quotes }: FinancesTabProps) {
 
     if (quotesPreferences.viewMode === "table") {
       return (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Numéro</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Montant</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {quotes.map((q) => (
-              <TableRow key={q.id}>
-                <TableCell className="font-medium">{q.quoteNumber}</TableCell>
-                <TableCell>{format(new Date(q.createdAt), "dd MMM yyyy", { locale: fr })}</TableCell>
-                <TableCell>{parseFloat(q.total).toFixed(2)}€</TableCell>
-                <TableCell>{getQuoteStatusBadge(q.status)}</TableCell>
-                <TableCell>
-                  <Link to={`/quotes/${q.id}`}>
-                    <Button variant="ghost" size="sm">Voir</Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleQuotesDragEnd}
+        >
+          <Table>
+            <TableHeader>
+              <SortableContext
+                items={quotesPreferences.columnOrder.filter((col) =>
+                  quotesPreferences.visibleColumns.includes(col)
+                )}
+                strategy={horizontalListSortingStrategy}
+              >
+                <TableRow>
+                  {quotesPreferences.columnOrder
+                    .filter((col) => quotesPreferences.visibleColumns.includes(col))
+                    .map((col) => (
+                      <SortableTableHeader key={col} id={col}>
+                        {COLUMN_LABELS[col]}
+                      </SortableTableHeader>
+                    ))}
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </SortableContext>
+            </TableHeader>
+            <TableBody>
+              {quotes.map((q) => (
+                <TableRow key={q.id}>
+                  {quotesPreferences.columnOrder
+                    .filter((col) => quotesPreferences.visibleColumns.includes(col))
+                    .map((col) => {
+                      if (col === "numéro") {
+                        return (
+                          <TableCell key={col} className="font-medium">
+                            {q.quoteNumber}
+                          </TableCell>
+                        );
+                      }
+                      if (col === "date") {
+                        return (
+                          <TableCell key={col}>
+                            {format(new Date(q.createdAt), "dd MMM yyyy", { locale: fr })}
+                          </TableCell>
+                        );
+                      }
+                      if (col === "montant") {
+                        return (
+                          <TableCell key={col}>
+                            {parseFloat(q.total).toFixed(2)}€
+                          </TableCell>
+                        );
+                      }
+                      if (col === "statut") {
+                        return (
+                          <TableCell key={col}>
+                            {getQuoteStatusBadge(q.status)}
+                          </TableCell>
+                        );
+                      }
+                      return null;
+                    })}
+                  <TableCell>
+                    <Link to={`/quotes/${q.id}`}>
+                      <Button variant="ghost" size="sm">Voir</Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DndContext>
       );
     }
 

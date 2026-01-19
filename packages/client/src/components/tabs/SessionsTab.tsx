@@ -22,10 +22,28 @@ import {
   Clock,
   MapPin,
   Settings,
+  GripVertical,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useTabPreferences } from "@/hooks/useTabPreferences";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Session {
   id: number;
@@ -52,6 +70,46 @@ type ViewMode = "table" | "cards" | "timeline" | "kanban";
 
 const ALL_COLUMNS = ["session", "salle", "date", "statut"];
 
+const COLUMN_LABELS: Record<string, string> = {
+  session: "Session",
+  salle: "Salle",
+  date: "Date",
+  statut: "Statut",
+};
+
+// Sortable table header component
+function SortableTableHeader({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableHead
+      ref={setNodeRef}
+      style={style}
+      className="cursor-move"
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex items-center gap-2">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        {children}
+      </div>
+    </TableHead>
+  );
+}
+
 export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
   const navigate = useNavigate();
 
@@ -64,6 +122,27 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
       columnOrder: ["session", "salle", "date", "statut"],
     }
   );
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end for column reordering
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = preferences.columnOrder.indexOf(active.id as string);
+      const newIndex = preferences.columnOrder.indexOf(over.id as string);
+
+      const newOrder = arrayMove(preferences.columnOrder, oldIndex, newIndex);
+      updatePreferences({ columnOrder: newOrder });
+    }
+  };
 
   // Room mapping
   const roomMap = useMemo(() => {
@@ -223,60 +302,91 @@ export function SessionsTab({ clientId, sessions, rooms }: SessionsTabProps) {
       {/* Table Mode */}
       {preferences.viewMode === "table" && (
         <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {preferences.visibleColumns.includes("session") && <TableHead>Session</TableHead>}
-                {preferences.visibleColumns.includes("salle") && <TableHead>Salle</TableHead>}
-                {preferences.visibleColumns.includes("date") && <TableHead>Date</TableHead>}
-                {preferences.visibleColumns.includes("statut") && <TableHead>Statut</TableHead>}
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sessions
-                .sort(
-                  (a, b) =>
-                    new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
-                )
-                .map((session) => (
-                  <TableRow key={session.id}>
-                    {preferences.visibleColumns.includes("session") && (
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{session.title}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {calculateDuration(session.startTime, session.endTime)}
-                          </div>
-                        </div>
-                      </TableCell>
-                    )}
-                    {preferences.visibleColumns.includes("salle") && (
-                      <TableCell>
-                        <div className="text-sm">{roomMap[session.roomId] || "N/A"}</div>
-                      </TableCell>
-                    )}
-                    {preferences.visibleColumns.includes("date") && (
-                      <TableCell>
-                        <div className="text-sm">
-                          {format(new Date(session.startTime), "dd MMM yyyy", {
-                            locale: fr,
-                          })}
-                        </div>
-                      </TableCell>
-                    )}
-                    {preferences.visibleColumns.includes("statut") && (
-                      <TableCell>{getSessionStatusBadge(session.status)}</TableCell>
-                    )}
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/sessions/${session.id}`}>Voir</Link>
-                      </Button>
-                    </TableCell>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <Table>
+              <TableHeader>
+                <SortableContext
+                  items={preferences.columnOrder.filter((col) =>
+                    preferences.visibleColumns.includes(col)
+                  )}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <TableRow>
+                    {preferences.columnOrder
+                      .filter((col) => preferences.visibleColumns.includes(col))
+                      .map((col) => (
+                        <SortableTableHeader key={col} id={col}>
+                          {COLUMN_LABELS[col]}
+                        </SortableTableHeader>
+                      ))}
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-            </TableBody>
-          </Table>
+                </SortableContext>
+              </TableHeader>
+              <TableBody>
+                {sessions
+                  .sort(
+                    (a, b) =>
+                      new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+                  )
+                  .map((session) => (
+                    <TableRow key={session.id}>
+                      {preferences.columnOrder
+                        .filter((col) => preferences.visibleColumns.includes(col))
+                        .map((col) => {
+                          if (col === "session") {
+                            return (
+                              <TableCell key={col}>
+                                <div>
+                                  <div className="font-medium">{session.title}</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {calculateDuration(session.startTime, session.endTime)}
+                                  </div>
+                                </div>
+                              </TableCell>
+                            );
+                          }
+                          if (col === "salle") {
+                            return (
+                              <TableCell key={col}>
+                                <div className="text-sm">{roomMap[session.roomId] || "N/A"}</div>
+                              </TableCell>
+                            );
+                          }
+                          if (col === "date") {
+                            return (
+                              <TableCell key={col}>
+                                <div className="text-sm">
+                                  {format(new Date(session.startTime), "dd MMM yyyy", {
+                                    locale: fr,
+                                  })}
+                                </div>
+                              </TableCell>
+                            );
+                          }
+                          if (col === "statut") {
+                            return (
+                              <TableCell key={col}>
+                                {getSessionStatusBadge(session.status)}
+                              </TableCell>
+                            );
+                          }
+                          return null;
+                        })}
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link to={`/sessions/${session.id}`}>Voir</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </DndContext>
         </div>
       )}
 

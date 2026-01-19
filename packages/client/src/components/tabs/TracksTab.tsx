@@ -21,8 +21,25 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-import { ListMusic, LayoutGrid, Table2, Music, Settings } from 'lucide-react';
+import { ListMusic, LayoutGrid, Table2, Music, Settings, GripVertical } from 'lucide-react';
 import { useTabPreferences } from '@/hooks/useTabPreferences';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface TracksTabProps {
   clientId: number;
@@ -48,6 +65,48 @@ const STATUS_COLORS: Record<string, string> = {
 
 const ALL_COLUMNS = ["titre", "projet", "artistes", "durée", "statut", "version"];
 
+const COLUMN_LABELS: Record<string, string> = {
+  titre: "Titre",
+  projet: "Projet",
+  artistes: "Artistes",
+  durée: "Durée",
+  statut: "Statut",
+  version: "Version",
+};
+
+// Sortable table header component
+function SortableTableHeader({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableHead
+      ref={setNodeRef}
+      style={style}
+      className="cursor-move"
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex items-center gap-2">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        {children}
+      </div>
+    </TableHead>
+  );
+}
+
 export function TracksTab({ clientId }: TracksTabProps) {
   // Use preferences hook for database-backed state
   const { preferences, updatePreferences, resetPreferences } = useTabPreferences(
@@ -63,6 +122,27 @@ export function TracksTab({ clientId }: TracksTabProps) {
   const { data: tracks = [], isLoading } = trpc.clients.getTracks.useQuery({
     clientId,
   });
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end for column reordering
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = preferences.columnOrder.indexOf(active.id as string);
+      const newIndex = preferences.columnOrder.indexOf(over.id as string);
+
+      const newOrder = arrayMove(preferences.columnOrder, oldIndex, newIndex);
+      updatePreferences({ columnOrder: newOrder });
+    }
+  };
 
   // Helper to format duration (seconds to MM:SS)
   const formatDuration = (seconds: number | null): string => {
@@ -257,77 +337,108 @@ export function TracksTab({ clientId }: TracksTabProps) {
       {/* Mode 3: Table simple (metadata) */}
       {preferences.viewMode === 'table' && (
         <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {preferences.visibleColumns.includes("titre") && <TableHead>Titre</TableHead>}
-                {preferences.visibleColumns.includes("projet") && <TableHead>Projet</TableHead>}
-                {preferences.visibleColumns.includes("artistes") && <TableHead>Artistes</TableHead>}
-                {preferences.visibleColumns.includes("durée") && <TableHead>Durée</TableHead>}
-                {preferences.visibleColumns.includes("statut") && <TableHead>Statut</TableHead>}
-                {preferences.visibleColumns.includes("version") && <TableHead>Version</TableHead>}
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tracks.map((track) => (
-                <TableRow key={track.id}>
-                  {preferences.visibleColumns.includes("titre") && (
-                    <TableCell className="font-medium">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <Table>
+              <TableHeader>
+                <SortableContext
+                  items={preferences.columnOrder.filter((col) =>
+                    preferences.visibleColumns.includes(col)
+                  )}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <TableRow>
+                    {preferences.columnOrder
+                      .filter((col) => preferences.visibleColumns.includes(col))
+                      .map((col) => (
+                        <SortableTableHeader key={col} id={col}>
+                          {COLUMN_LABELS[col]}
+                        </SortableTableHeader>
+                      ))}
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </SortableContext>
+              </TableHeader>
+              <TableBody>
+                {tracks.map((track) => (
+                  <TableRow key={track.id}>
+                    {preferences.columnOrder
+                      .filter((col) => preferences.visibleColumns.includes(col))
+                      .map((col) => {
+                        if (col === "titre") {
+                          return (
+                            <TableCell key={col} className="font-medium">
+                              <Link to={`/tracks/${track.id}`}>
+                                <span className="hover:underline cursor-pointer">
+                                  {track.title}
+                                </span>
+                              </Link>
+                            </TableCell>
+                          );
+                        }
+                        if (col === "projet") {
+                          return <TableCell key={col}>{track.projectTitle}</TableCell>;
+                        }
+                        if (col === "artistes") {
+                          return <TableCell key={col}>{track.composer || 'Inconnu'}</TableCell>;
+                        }
+                        if (col === "durée") {
+                          return <TableCell key={col}>{formatDuration(track.duration)}</TableCell>;
+                        }
+                        if (col === "statut") {
+                          return (
+                            <TableCell key={col}>
+                              <Badge className={STATUS_COLORS[track.status] || 'bg-gray-500'}>
+                                {STATUS_LABELS[track.status] || track.status}
+                              </Badge>
+                            </TableCell>
+                          );
+                        }
+                        if (col === "version") {
+                          return (
+                            <TableCell key={col}>
+                              <div className="flex gap-1 text-xs">
+                                {track.demoUrl && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Demo
+                                  </Badge>
+                                )}
+                                {track.roughMixUrl && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Rough
+                                  </Badge>
+                                )}
+                                {track.finalMixUrl && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Final
+                                  </Badge>
+                                )}
+                                {track.masterUrl && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Master
+                                  </Badge>
+                                )}
+                              </div>
+                            </TableCell>
+                          );
+                        }
+                        return null;
+                      })}
+                    <TableCell>
                       <Link to={`/tracks/${track.id}`}>
-                        <span className="hover:underline cursor-pointer">
-                          {track.title}
-                        </span>
+                        <Button size="sm" variant="ghost">
+                          Voir
+                        </Button>
                       </Link>
                     </TableCell>
-                  )}
-                  {preferences.visibleColumns.includes("projet") && <TableCell>{track.projectTitle}</TableCell>}
-                  {preferences.visibleColumns.includes("artistes") && <TableCell>{track.composer || 'Inconnu'}</TableCell>}
-                  {preferences.visibleColumns.includes("durée") && <TableCell>{formatDuration(track.duration)}</TableCell>}
-                  {preferences.visibleColumns.includes("statut") && (
-                    <TableCell>
-                      <Badge className={STATUS_COLORS[track.status] || 'bg-gray-500'}>
-                        {STATUS_LABELS[track.status] || track.status}
-                      </Badge>
-                    </TableCell>
-                  )}
-                  {preferences.visibleColumns.includes("version") && (
-                    <TableCell>
-                      <div className="flex gap-1 text-xs">
-                        {track.demoUrl && (
-                          <Badge variant="outline" className="text-xs">
-                            Demo
-                          </Badge>
-                        )}
-                        {track.roughMixUrl && (
-                          <Badge variant="outline" className="text-xs">
-                            Rough
-                          </Badge>
-                        )}
-                        {track.finalMixUrl && (
-                          <Badge variant="outline" className="text-xs">
-                            Final
-                          </Badge>
-                        )}
-                        {track.masterUrl && (
-                          <Badge variant="outline" className="text-xs">
-                            Master
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                  )}
-                  <TableCell>
-                    <Link to={`/tracks/${track.id}`}>
-                      <Button size="sm" variant="ghost">
-                        Voir
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </DndContext>
         </div>
       )}
     </div>
