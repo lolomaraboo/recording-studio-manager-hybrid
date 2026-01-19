@@ -30,6 +30,11 @@ interface ClientFormData {
   email?: string;
   phone?: string;
 
+  // Contact arrays (vCard enriched)
+  phones?: Array<{ type: string; number: string }>;
+  emails?: Array<{ type: string; email: string }>;
+  websites?: Array<{ type: string; url: string }>;
+
   // Address
   address?: string;
   street?: string;
@@ -41,6 +46,7 @@ interface ClientFormData {
   // Additional
   birthday?: string;
   gender?: string;
+  customFields?: Array<{ label: string; type: string; value: any }>;
 
   // Files
   avatarUrl?: string;
