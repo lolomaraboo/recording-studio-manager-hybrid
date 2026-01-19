@@ -469,38 +469,34 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-17T15:30:00Z
-Stopped at: Phase 18.4 COMPLETE ✅ - Verified and ready for next phase
+Last session: 2026-01-19T02:13:51Z
+Stopped at: Phase 22 Plan 1 COMPLETE ✅ - Wizard component ready for next plan
 Resume context:
-  - Phase 18.4 COMPLETE ✅: Music Profile for Artists (46 min execution + verification, 3/3 plans)
-    - **Plan 18.4-01:** Database schema extension (8 min)
-      - Extended clients table with 22 music profile fields (genres, instruments, streaming, industry, career)
-      - Created migration 0012 with GIN indexes for JSONB arrays
-      - Validated with tenant_24 database
-    - **Plan 18.4-02:** UI component implementation (10 min)
-      - Created music-presets.ts with 17 genre categories, 13 instrument families (130+ genres, 80+ instruments)
-      - Created MusicProfileSection.tsx component (339 lines) - main view + collapsible panel + localStorage state
-    - **Plan 18.4-03:** UI integration and filters (28 min)
-      - **Task 1:** Tabbed ClientDetail interface (Informations, Informations Enrichies, Profil Musical)
-      - **Task 2:** Genre/instrument filters on Clients list page with real-time filtering
-      - **Task 3:** Backend JSONB containment filters using PostgreSQL @> operator with dynamic query builder
-      - **Task 4:** Genre distribution Dashboard widget showing top 5 genres with ranking badges
+  - Phase 22 Plan 1 COMPLETE ✅: ClientFormWizard Component (4 min execution, 3/3 tasks)
+    - **Task 1:** Create ClientFormWizard component (299dfaa)
+      - 782-line reusable component with 3-step wizard navigation
+      - Step 1: Base fields (name, type, structured name, simple contact, address, birthday, gender, avatar/logo)
+      - Step 2: Enriched vCard arrays (phones, emails, websites, custom fields)
+      - Step 3: Music profile (22 fields via MusicProfileSection from Phase 18.4)
+      - Free navigation pattern: all tabs always clickable (no blocking validation)
+      - Submit button visible on all steps (not just last step)
+    - **Task 2:** Refactor ClientCreate to use wizard (9406210)
+      - Simplified from 726 lines to 54 lines (92.5% reduction)
+      - Preserved breadcrumb navigation, error handling, success redirect
+      - All form state delegated to wizard component
+    - **Task 3:** Build and validate (a0e8d64)
+      - Vite build succeeds: "✓ built in 5.74s"
+      - Zero blocking errors in new files
+      - MusicProfileSection integration verified
     - **Final State:**
-      - Database: 22 music profile fields in clients table (migration 0012, GIN indexes)
-      - UI: Fully integrated MusicProfileSection in ClientDetail with 3-tab interface
-      - Filtering: Genre/instrument filters on Clients list with backend JSONB @> queries
-      - Analytics: Dashboard widget displaying top 5 genres across all clients
-      - Backend: clients.stats endpoint for aggregated genre data, dynamic query builder for conditional filters
-      - Build: Client package builds successfully, TypeScript compilation passes
+      - ClientFormWizard: Reusable component working for create mode
+      - ClientCreate: Refactored to use wizard (54 lines)
+      - Pattern: Multi-step wizard with free navigation established
+      - Build: Client package builds successfully
     - **Commits:**
-      - a7ee1ba: feat(18.4-03): add Music Profile tab to ClientDetail page
-      - 13515d1: feat(18.4-03): add genre/instrument filters to Clients list
-      - 073fe45: feat(18.4-03): implement backend JSONB containment filters
-      - c621951: feat(18.4-03): add genre distribution widget to Dashboard
-    - **Verification:** Phase goal verified ✓ (5/5 must-haves passed)
-      - All database schema changes confirmed in tenant_24
-      - UI components functional and integrated
-      - Backend JSONB queries working with GIN indexes
-      - Dashboard analytics operational
-      - Zero P0/P1/P2 bugs introduced
-  - **Next:** Phase 18.4 verified and complete. Resume Phase 18 (Audit Complet Toutes Pages) - plans 18-02 and 18-03 remain to systematically test all 58 pages for zero-bug production quality.
+      - 299dfaa: feat(22-01): create ClientFormWizard component
+      - 9406210: refactor(22-01): refactor ClientCreate to use wizard
+      - a0e8d64: build(22-01): validate client package builds successfully
+      - cc3a552: docs(22-01): complete plan summary and update STATE
+    - **Deviations:** 1 auto-fixed (TypeScript type incompatibility for MusicProfileSection onUpdate)
+  - **Next:** Phase 22 Plan 2 - Add ClientDetail tabs (Projets, Tracks, Sessions, Finances) with horizontal navigation at same level.
