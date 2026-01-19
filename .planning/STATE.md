@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 18.4 of 21 (Music Profile for Artists) - Phase 18.4 COMPLETE ✅
-Plan: All 3 plans complete
-Status: Phase complete - comprehensive music profile system (database, UI, filters, analytics)
-Last activity: 2026-01-17 - Phase 18.4 complete (46 min), 22 music fields added to schema, MusicProfileSection component created, filters integrated with JSONB @> queries, Dashboard genre widget, phase verified ✓
+Phase: 22 of 22 (Refonte UI Client - Hub Relationnel Complet)
+Plan: 2 of 9 (22-02 COMPLETE ✅)
+Status: In progress - tab-based navigation structure created for client detail
+Last activity: 2026-01-19 - Completed 22-02-PLAN.md (5 min), ClientDetailTabs component with 5 horizontal tabs (Informations, Projets, Tracks, Sessions, Finances), Notes section persistent at bottom, placeholder tabs for future plans
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 2/9 plans (22-01 ✅, 22-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 90
-- Average duration: 34.7 min
-- Total execution time: 52.1 hours
+- Total plans completed: 92
+- Average duration: 33.9 min
+- Total execution time: 52.3 hours
 
 **By Phase:**
 
@@ -82,10 +82,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 21 | 3/3 | 22 min | 7.3 min |
 | 21.1 | 1/1 | 5 min | 5 min |
 | 18.4 | 3/3 | 46 min | 15.3 min |
+| 22 | 2/9 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [5 min, 8 min, 10 min, 28 min, verification]
-- Trend: Phase 18.4 COMPLETE ✅ (46 min execution + verification). Complete music profile system for recording studio artist management. BUG-006 (P1 severity) resolved. Database schema extended (22 fields, GIN indexes), MusicProfileSection UI component (339 lines), tabbed ClientDetail interface, genre/instrument filters with JSONB @> queries, Dashboard genre distribution widget. All must-haves verified ✓. Production-ready.
+- Last 5 plans: [28 min, verification, 4 min, 5 min, current]
+- Trend: Phase 22 Plan 2 COMPLETE ✅ (5 min execution). Tab-based navigation for ClientDetail page. ClientDetailTabs component (466 lines) with 5 horizontal tabs (Informations, Projets, Tracks, Sessions, Finances). Notes section persistent at bottom. Informations tab contains 3 sub-tabs (basic, enriched, music). Placeholder tabs ready for Plans 22-03 and 22-04. Edit/Delete buttons moved to header for better accessibility.
 
 ## Accumulated Context
 
@@ -207,6 +208,8 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 18.4-03 | Dynamic query builder pattern | Rationale: Avoids query duplication, conditionally adds WHERE clauses only when filters are provided. Impact: Clean, maintainable code for optional filters, easy to add more filters in future. |
 | 18.4-03 | Server-side genre aggregation in stats endpoint | Rationale: Accurate counts across all clients, not just currently loaded page, reusable for future analytics. Impact: Enables reliable dashboard widget, foundation for future reporting features. |
 | 18.4-03 | Conditional clear filters button | Rationale: Reduces UI clutter when no filters are active, discoverable when needed. Impact: Clean interface design, intuitive filter management. |
+| 22-01 | Free navigation wizard (all tabs always clickable) | Rationale: Users can jump directly to any step without blocking validation, enabling quick access to music profile fields for established clients. Minimal validation (only name required). Submit button visible on all steps. |
+| 22-01 | Reusable wizard component for create/edit modes | Rationale: Single component pattern reduces code duplication, mode prop switches behavior, initialData prop pre-populates form for edit mode. ClientCreate refactored from 726 to 54 lines (92.5% reduction). |
 
 ### Deferred Issues
 
