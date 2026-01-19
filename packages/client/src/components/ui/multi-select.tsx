@@ -134,33 +134,19 @@ export function MultiSelect({
             />
           </div>
         </div>
-        {!disabled && isOpen && (inputValue || availableOptions.length > 0) && (
+        {!disabled && isOpen && availableOptions.length > 0 && (
           <div className="relative mt-2">
             <div className="absolute w-full z-10 top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
               <CommandGroup className="h-full overflow-auto max-h-60">
-                {availableOptions.length > 0 ? (
-                  availableOptions.map((option) => (
-                    <CommandItem
-                      key={option.value}
-                      onSelect={() => handleSelect(option.value)}
-                      className="cursor-pointer"
-                    >
-                      {option.label}
-                    </CommandItem>
-                  ))
-                ) : (
-                  <CommandEmpty>
-                    {creatable && inputValue ? (
-                      <div className="text-sm text-muted-foreground py-2 px-2">
-                        Appuyez sur Entrée pour ajouter "{inputValue}"
-                      </div>
-                    ) : (
-                      <div className="text-sm text-muted-foreground py-2 px-2">
-                        Aucun résultat trouvé
-                      </div>
-                    )}
-                  </CommandEmpty>
-                )}
+                {availableOptions.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    onSelect={() => handleSelect(option.value)}
+                    className="cursor-pointer"
+                  >
+                    {option.label}
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </div>
           </div>
