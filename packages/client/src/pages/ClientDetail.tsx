@@ -352,7 +352,6 @@ export default function ClientDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </div>
     </div>
   );
 }
