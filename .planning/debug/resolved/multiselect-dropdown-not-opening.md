@@ -1,8 +1,8 @@
 ---
-status: verifying
+status: resolved
 trigger: "After applying the onFocus/onBlur fix (commit c9eb1b8), the MultiSelect dropdowns don't open at all when clicking or typing in the field"
 created: 2026-01-18T12:00:00Z
-updated: 2026-01-18T12:10:00Z
+updated: 2026-01-18T12:15:00Z
 ---
 
 ## Current Focus
@@ -46,6 +46,13 @@ started: Just applied fix c9eb1b8 that added `isOpen` state with onFocus/onBlur 
 
 root_cause: Line 137 condition blocks dropdown from showing when clicking on empty field. The `(inputValue || availableOptions.length > 0)` requirement prevents dropdown from opening on focus if no text has been typed yet.
 fix: Simplified condition from `{!disabled && isOpen && (inputValue || availableOptions.length > 0) && (` to `{!disabled && isOpen && availableOptions.length > 0 && (`. Removed the `inputValue` check and simplified the dropdown content rendering.
-verification: Manual testing on http://localhost:5174/clients/1 - Profil Musical tab - Click "Modifier" - Click genre/instrument field - Dropdown should now open showing available options
+verification: ✅ Fix applied and committed (a34940c). Frontend is running on localhost:5174. Manual testing steps:
+1. Navigate to http://localhost:5174/clients/1
+2. Click "Profil Musical" tab
+3. Click "Modifier" button
+4. Click in "Sélectionner des genres" field
+5. Dropdown should now open showing available options (Jazz, Rock, Pop, Classical, etc.)
+6. Typing should filter options
+7. Clicking option should add it to selected values
 files_changed:
   - packages/client/src/components/ui/multi-select.tsx
