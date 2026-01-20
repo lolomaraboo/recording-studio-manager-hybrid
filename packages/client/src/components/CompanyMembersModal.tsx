@@ -46,6 +46,12 @@ export function CompanyMembersModal({
   const [newRole, setNewRole] = useState("");
   const [isPrimary, setIsPrimary] = useState(false);
 
+  // Query for existing roles (for autocomplete)
+  const { data: existingRoles = [] } = trpc.clients.getRoles.useQuery(
+    undefined,
+    { enabled: open }
+  );
+
   // Query for existing relationships
   const membersQuery =
     clientType === "company"
@@ -320,7 +326,7 @@ export function CompanyMembersModal({
               </Select>
             </div>
 
-            {/* Role input */}
+            {/* Role input with autocomplete */}
             <div>
               <label className="text-sm font-medium mb-1.5 block">
                 Rôle (optionnel)
@@ -328,8 +334,14 @@ export function CompanyMembersModal({
               <Input
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
-                placeholder="Ex: Directeur Général, Lead Vocalist..."
+                placeholder="Ex: Ingénieur du son, Producteur, Manager..."
+                list="roles-datalist"
               />
+              <datalist id="roles-datalist">
+                {existingRoles.map((role) => (
+                  <option key={role} value={role} />
+                ))}
+              </datalist>
             </div>
 
             {/* Primary checkbox */}

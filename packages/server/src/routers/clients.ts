@@ -1169,4 +1169,21 @@ export const clientsRouter = router({
         message: 'Member removed successfully',
       };
     }),
+
+  /**
+   * Get distinct roles from company_members for autocomplete
+   * Returns array of role strings
+   */
+  getRoles: protectedProcedure.query(async ({ ctx }) => {
+    const tenantDb = await ctx.getTenantDb();
+
+    // Get distinct non-null, non-empty roles
+    const roles = await tenantDb
+      .selectDistinct({ role: companyMembers.role })
+      .from(companyMembers)
+      .where(sql`${companyMembers.role} IS NOT NULL AND ${companyMembers.role} != ''`)
+      .orderBy(asc(companyMembers.role));
+
+    return roles.map(r => r.role!);
+  }),
 });
