@@ -982,4 +982,155 @@ export const clientsRouter = router({
         projectTitle: track.projectTitle || "Sans projet",
       }));
     }),
+
+  /**
+   * Add member to company (or company to individual)
+   * Many-to-many relationship via company_members table
+   */
+  addMember: protectedProcedure
+    .input(z.object({
+      companyId: z.number(),
+      memberId: z.number(),
+      role: z.string().nullable().optional(),
+      isPrimary: z.boolean().default(false),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Validate that both clients exist
+      const [company, member] = await Promise.all([
+        tenantDb.select().from(clients).where(eq(clients.id, input.companyId)).limit(1),
+        tenantDb.select().from(clients).where(eq(clients.id, input.memberId)).limit(1),
+      ]);
+
+      if (!company.length) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Company client not found',
+        });
+      }
+
+      if (!member.length) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Member client not found',
+        });
+      }
+
+      // Validate types
+      if (company[0].type !== 'company') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Company must be of type "company"',
+        });
+      }
+
+      if (member[0].type !== 'individual') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Member must be of type "individual"',
+        });
+      }
+
+      // Check if relationship already exists
+      const existing = await tenantDb
+        .select()
+        .from(companyMembers)
+        .where(
+          sql`${companyMembers.companyClientId} = ${input.companyId} AND ${companyMembers.memberClientId} = ${input.memberId}`
+        )
+        .limit(1);
+
+      if (existing.length > 0) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'This member is already linked to this company',
+        });
+      }
+
+      // Insert relationship
+      const [newMembership] = await tenantDb
+        .insert(companyMembers)
+        .values({
+          companyClientId: input.companyId,
+          memberClientId: input.memberId,
+          role: input.role || null,
+          isPrimary: input.isPrimary,
+        })
+        .returning();
+
+      return {
+        success: true,
+        membership: newMembership,
+      };
+    }),
+
+  /**
+   * Update member role and/or isPrimary status
+   */
+  updateMember: protectedProcedure
+    .input(z.object({
+      id: z.number(), // company_members.id
+      role: z.string().nullable().optional(),
+      isPrimary: z.boolean().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Build update object dynamically
+      const updates: any = {
+        updatedAt: new Date(),
+      };
+
+      if (input.role !== undefined) {
+        updates.role = input.role;
+      }
+
+      if (input.isPrimary !== undefined) {
+        updates.isPrimary = input.isPrimary;
+      }
+
+      const [updated] = await tenantDb
+        .update(companyMembers)
+        .set(updates)
+        .where(eq(companyMembers.id, input.id))
+        .returning();
+
+      if (!updated) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Membership not found',
+        });
+      }
+
+      return updated;
+    }),
+
+  /**
+   * Remove member from company
+   */
+  removeMember: protectedProcedure
+    .input(z.object({
+      id: z.number(), // company_members.id
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const [deleted] = await tenantDb
+        .delete(companyMembers)
+        .where(eq(companyMembers.id, input.id))
+        .returning();
+
+      if (!deleted) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Membership not found',
+        });
+      }
+
+      return {
+        success: true,
+        message: 'Member removed successfully',
+      };
+    }),
 });
