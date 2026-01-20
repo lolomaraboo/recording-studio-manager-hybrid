@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { MusicProfileSection } from "@/components/MusicProfileSection";
+import { CompanyMembersIndicator } from "@/components/CompanyMembersIndicator";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
 import { ProjectsTab } from "./tabs/ProjectsTab";
@@ -128,7 +129,7 @@ export function ClientDetailTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange}>
-      <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="informations" className="gap-2">
           <Info className="h-4 w-4" />
           Informations
@@ -152,70 +153,11 @@ export function ClientDetailTabs({
       </TabsList>
 
       {/* Informations Tab - Single view with 2 visual sections */}
-      <TabsContent value="informations" className="mt-2 space-y-4">
+      <TabsContent value="informations" className="mt-1 space-y-2">
         {/* Section 1: Informations de Base */}
         <Card>
-          <CardContent className="pt-6">
-            <h3 className="text-lg font-semibold mb-4">Informations de Base</h3>
-
-              <div className="flex gap-6">
-                {/* Photo/Logo à gauche */}
-                <div className="flex-shrink-0">
-                  <div className="flex flex-col items-center gap-4">
-                    {/* Preview */}
-                    <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                      {client.avatarUrl || client.logoUrl ? (
-                        <img
-                          src={client.type === "individual" ? client.avatarUrl : client.logoUrl}
-                          alt={client.firstName || "Client"}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-4xl text-muted-foreground">
-                          {client.type === "individual" ? (
-                            <User className="w-12 h-12" />
-                          ) : (
-                            <Building2 className="w-12 h-12" />
-                          )}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Upload Button */}
-                    {isEditing && (
-                      <div>
-                        <input
-                          type="file"
-                          id="avatar-upload"
-                          accept="image/png,image/jpeg,image/jpg,image/webp"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-
-                            if (client.type === "individual") {
-                              handleUploadAvatar(file);
-                            } else {
-                              handleUploadLogo(file);
-                            }
-                          }}
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => document.getElementById("avatar-upload")?.click()}
-                          disabled={uploadingAvatar || uploadingLogo}
-                        >
-                          <Upload className="mr-2 h-4 w-4" />
-                          {uploadingAvatar || uploadingLogo ? "Uploading..." : "Modifier"}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Informations de contact à droite */}
-                <div className="flex-1 space-y-2">
+          <CardContent className="pt-3">
+              <div className="space-y-1">
                   {isEditing ? (
                     <>
                       {/* Nom complet */}
@@ -232,7 +174,7 @@ export function ClientDetailTabs({
                       {/* Champs de nom structuré (pour individus) */}
                       {client.type === "individual" && (
                         <>
-                          <div className="grid gap-4 md:grid-cols-2">
+                          <div className="grid gap-2 md:grid-cols-2">
                             <div className="space-y-2">
                               <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
                               <select
@@ -259,7 +201,7 @@ export function ClientDetailTabs({
                             </div>
                           </div>
 
-                          <div className="grid gap-4 md:grid-cols-2">
+                          <div className="grid gap-2 md:grid-cols-2">
                             <div className="space-y-2">
                               <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
                               <input
@@ -431,23 +373,13 @@ export function ClientDetailTabs({
                           rows={2}
                         />
                       </div>
-
-                      {/* Separator */}
-                      <Separator className="my-4" />
-
-                      {/* Profil Musical en mode édition */}
-                      <MusicProfileSection
-                        client={client}
-                        isEditing={isEditing}
-                        onUpdate={handleUpdateField}
-                      />
                     </>
                   ) : (
                     <>
                       {/* Affichage des informations de nom */}
                       {(client.prefix || client.firstName || client.middleName || client.lastName || client.suffix) && (
-                        <div className="text-sm">
-                          <span className="font-medium">
+                        <div className="text-base">
+                          <span className="font-semibold">
                             {[client.prefix, client.firstName, client.middleName, client.lastName, client.suffix]
                               .filter(Boolean)
                               .join(" ")}
@@ -457,16 +389,16 @@ export function ClientDetailTabs({
 
                       {client.artistName && (
                         <div className="flex items-center gap-2">
-                          <Building className="h-4 w-4 text-muted-foreground" />
-                          <p className="text-sm">{client.artistName}</p>
+                          <Building className="h-5 w-5 text-muted-foreground" />
+                          <p className="text-base font-medium">{client.artistName}</p>
                         </div>
                       )}
 
                       {/* Affichage de l'email simple (legacy) */}
                       {client.email && (!client.emails || client.emails.length === 0) && (
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <a href={`mailto:${client.email}`} className="text-sm hover:underline">
+                          <Mail className="h-5 w-5 text-muted-foreground" />
+                          <a href={`mailto:${client.email}`} className="text-base hover:underline">
                             {client.email}
                           </a>
                         </div>
@@ -477,11 +409,11 @@ export function ClientDetailTabs({
                         <div className="space-y-1">
                           {client.emails.map((email: any, index: number) => (
                             <div key={index} className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-muted-foreground" />
-                              <a href={`mailto:${email.email}`} className="text-sm hover:underline">
+                              <Mail className="h-5 w-5 text-muted-foreground" />
+                              <a href={`mailto:${email.email}`} className="text-base hover:underline">
                                 {email.email}
                               </a>
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-sm text-muted-foreground">
                                 ({email.type === 'work' ? 'Travail' : email.type === 'personal' ? 'Personnel' : 'Autre'})
                               </span>
                             </div>
@@ -492,8 +424,8 @@ export function ClientDetailTabs({
                       {/* Affichage du téléphone simple (legacy) */}
                       {client.phone && (!client.phones || client.phones.length === 0) && (
                         <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
-                          <a href={`tel:${client.phone}`} className="text-sm hover:underline">
+                          <Phone className="h-5 w-5 text-muted-foreground" />
+                          <a href={`tel:${client.phone}`} className="text-base hover:underline">
                             {client.phone}
                           </a>
                         </div>
@@ -504,11 +436,11 @@ export function ClientDetailTabs({
                         <div className="space-y-1">
                           {client.phones.map((phone: any, index: number) => (
                             <div key={index} className="flex items-center gap-2">
-                              <Phone className="h-4 w-4 text-muted-foreground" />
-                              <a href={`tel:${phone.number}`} className="text-sm hover:underline">
+                              <Phone className="h-5 w-5 text-muted-foreground" />
+                              <a href={`tel:${phone.number}`} className="text-base hover:underline">
                                 {phone.number}
                               </a>
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-sm text-muted-foreground">
                                 ({phone.type === 'mobile' ? 'Mobile' : phone.type === 'work' ? 'Travail' : 'Domicile'})
                               </span>
                             </div>
@@ -518,44 +450,51 @@ export function ClientDetailTabs({
 
                       {client.address && (
                         <div className="flex items-start gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                          <p className="text-sm whitespace-pre-wrap">{client.address}</p>
+                          <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                          <p className="text-base whitespace-pre-wrap">{client.address}</p>
                         </div>
                       )}
 
                       {!client.prefix && !client.firstName && !client.lastName && !client.artistName && !client.email && !client.phone && !client.address && (
                         <p className="text-sm text-muted-foreground">Aucune information de contact</p>
                       )}
-
-                      {/* Separator */}
-                      <Separator className="my-4" />
-
-                      {/* Profil Musical en mode lecture */}
-                      <MusicProfileSection
-                        client={client}
-                        isEditing={isEditing}
-                        onUpdate={handleUpdateField}
-                      />
                     </>
                   )}
                 </div>
+
+              <Separator className="my-4" />
+
+              {/* Company Members / Individual Companies Section */}
+              <CompanyMembersIndicator
+                clientId={clientId}
+                clientType={client.type}
+                clientName={client.name}
+              />
+
+              {/* Profil Musical */}
+              <div className="mt-4">
+                <MusicProfileSection
+                  client={client}
+                  isEditing={isEditing}
+                  onUpdate={handleUpdateField}
+                />
               </div>
           </CardContent>
         </Card>
       </TabsContent>
 
       {/* Projets Tab - Placeholder */}
-      <TabsContent value="projets" className="mt-4">
+      <TabsContent value="projets" className="mt-2">
         <ProjectsTab clientId={clientId} />
       </TabsContent>
 
       {/* Tracks Tab */}
-      <TabsContent value="tracks" className="mt-4">
+      <TabsContent value="tracks" className="mt-2">
         <TracksTab clientId={clientId} />
       </TabsContent>
 
       {/* Sessions Tab - With 4 view modes */}
-      <TabsContent value="sessions" className="mt-4">
+      <TabsContent value="sessions" className="mt-2">
         <Card>
           <CardContent className="pt-6">
             <SessionsTab
@@ -568,7 +507,7 @@ export function ClientDetailTabs({
       </TabsContent>
 
       {/* Finances Tab - Stats + Factures/Quotes with view modes */}
-      <TabsContent value="finances" className="mt-4">
+      <TabsContent value="finances" className="mt-2">
         <Card>
           <CardContent className="pt-6">
             <FinancesTab
