@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 24 of 24 (Seed Data Complet pour Tests) - Phase 24 COMPLETE ✅
-Plan: 2/2 complete
-Status: Phase complete - comprehensive seed data with music profiles and complete relationships
-Last activity: 2026-01-18 - Phase 24 complete (11 min total), enhanced seed script with 22 music profile fields + expanded data volume to 250+ records covering all 31 tenant tables ✓
+Phase: 25 of 25 (Gestion Relations Client-Entreprise) - Phase 25 COMPLETE ✅
+Plan: 1/1 complete
+Status: Phase complete - full CRUD UI for company-member relationships
+Last activity: 2026-01-20 - Phase 25 complete (6 min total), many-to-many relationship management UI with bidirectional modal, inline role editing, and symmetrical integration ✓
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 1/1 plans (25-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 107
-- Average duration: 30.9 min
-- Total execution time: 55.1 hours
+- Total plans completed: 108
+- Average duration: 30.7 min
+- Total execution time: 55.2 hours
 
 **By Phase:**
 
@@ -85,10 +85,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 22 | 10/10 | 87 min | 8.7 min |
 | 23 | 1/1 | 3 min | 3 min |
 | 24 | 2/2 | 11 min | 5.5 min |
+| 25 | 1/1 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: [5 min, 6 min, 3 min, 28 min, 4 min]
-- Trend: Phase 24 COMPLETE ✅ (11 min total, 2/2 plans). Enhanced seed script with comprehensive music profiles (genres, instruments, streaming URLs, industry info, career data) + expanded data volume to 250+ records. Plan 24-01 (6 min): Added 22 music profile fields with 100% coverage on 15 clients. Plan 24-02 (5 min): Expanded to 20 clients, 12 projects, 60-80 tracks, 25 sessions, 40 time entries, 8 invoices with items, 6 quotes with items. Complete workflow chains ready for Phase 22 UI validation.
+- Last 5 plans: [6 min, 5 min, 3 min, various 22-series plans]
+- Trend: Phase 25 COMPLETE ✅ (6 min total, 1/1 plan). Full CRUD UI for many-to-many company-member relationships. Bidirectional modal component (handles both company→members and individual→companies views), inline role editing, searchable dropdown, preview indicator with smart truncation. Backend endpoints: addMember, updateMember, removeMember, getCompanies. TypeScript 0 errors, production build successful.
 
 ## Accumulated Context
 
@@ -230,6 +231,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 23-01 | Visual sections over nested tabs | Rationale: 3 section headers + Separator components provide clear visual hierarchy without requiring clicks. Improves accessibility and reduces navigation friction. All client information visible at a glance. Alternative (keep nested tabs) = requires clicks to see complete profile, rejected. |
 | 24-01 | Probabilistic music profile data generation | Rationale: Faker.js probability flags (50% Spotify, 35% representation, 40% biography) create realistic distributions matching real music industry patterns (not all artists have all fields). Alternative (100% coverage all fields) = unrealistic data. Impact: Test data mirrors production scenarios (independent artists, signed artists, varying streaming presence). |
 | 24-01 | Genre/instrument array size limits (1-3, 1-4) | Rationale: Most artists work in 1-2 genres with occasional crossover (max 3), instrumentalists master 1-2 instruments with some multi-instrumentalists (max 4). Prevents unrealistic "plays 10 instruments in 8 genres" scenarios. Alternative (unlimited arrays) = test data quality degradation. |
+| 25-01 | Single bidirectional modal component | Rationale: DRY principle, reduce code duplication, consistent UX across both views. clientType prop switches behavior between company→members and individual→companies modes. Same mutations work for both directions. Alternative (separate components) = 700+ lines duplicated, maintenance burden doubled. |
+| 25-01 | Inline role editing (onChange + onBlur pattern) | Rationale: Reduce friction, fewer clicks, more fluid UX. No separate edit button needed. onChange updates local state, onBlur calls updateMutation if changed. Pattern matches industry standards (Google Sheets, Notion inline editing). |
+| 25-01 | Preview truncation rules (≤3 show all, >3 truncate) | Rationale: Balance between showing useful preview and avoiding UI overflow. Format: "3 membres : Alex (Ingénieur), Sophie (Prod), Marc (Manager)" vs "5 membres : Alex (Ingénieur), Sophie (Prod)...". Alternative (always show all) = can break layout with 10+ members, alternative (always truncate) = less useful for common case (2-3 members). |
 
 ### Deferred Issues
 
@@ -410,6 +414,11 @@ See `.planning/ISSUES.md` for full details and resolution steps.
   - Impact: Utilisateurs doivent cliquer plusieurs fois pour voir tous les champs d'un client
   - Solution: Supprimer sous-onglets, afficher tous champs dans vue unique avec sections visuelles distinctes
   - Priority: UX simplification - Réduire friction navigation, vue d'ensemble immédiate du profil client
+- **2026-01-19:** Phase 25 added after Phase 24 - "Gestion Relations Client-Entreprise" (ADDED)
+  - Reason: Table companyMembers existe en DB avec relations many-to-many mais aucune UI pour gérer ces relations
+  - Impact: Studios ne peuvent pas lier contacts individuels aux entreprises clientes (ex: ingénieur du son membre d'un label)
+  - Solution: Créer endpoints API manquants (addMember, removeMember, updateMember) + UI complète (onglet Membres pour entreprises, section Entreprises pour individus)
+  - Priority: Feature gap - Fonctionnalité relationnelle essentielle pour gestion professionnelle des contacts
 ### Blockers/Concerns Carried Forward
 
 **Resolved in Phase 1 Plan 1:**
@@ -494,27 +503,31 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-19T06:23:37Z
-Stopped at: Phase 24 COMPLETE ✅ - Comprehensive seed data generation complete
+Last session: 2026-01-20T21:12:50Z
+Stopped at: Phase 25 COMPLETE ✅ - Company-member relationship management UI complete
 Resume context:
-  - Phase 24 COMPLETE ✅: Seed Data Complet pour Tests (48 min total execution, 2/2 plans)
-    - **Plan 24-01:** Add music profile fields to seed script (43 min, 3 tasks)
-      - Added 22 music profile fields to individual clients (genres, instruments, streaming URLs, industry info, career details)
-      - Generated realistic music profile data with varied distributions (50% streaming profiles, 35% representation, etc.)
-      - Realistic biography, notable works, awards generation with probability-based variety
-      - Commit: e2b1234 (placeholder - actual hash from Phase 24-01 execution)
-    - **Plan 24-02:** Expand data volumes for comprehensive testing (5 min, 3 tasks)
-      - **Task 1:** Expanded client volume to 20 (15 individual, 5 company) - `cb079d9`
-      - **Task 2:** Expanded projects (12), tracks (60-80), sessions (25) - `337f54c`
-      - **Task 3:** Expanded time entries (40), invoices (8 with 24 items), quotes (6 with 18 items) - `1beffd4`
-      - Total records: 200+ with complete workflow chains
+  - Phase 25 COMPLETE ✅: Gestion Relations Client-Entreprise (6 min total execution, 1/1 plan)
+    - **Plan 25-01:** Full CRUD UI for many-to-many relationships (6 min, 3 tasks)
+      - **Task 1:** Backend endpoints (addMember, updateMember, removeMember, getCompanies) - `dc586e6`, `87bafbe`
+        - Validation: Type checking (company/individual), duplicate prevention, error handling
+        - 4 new endpoints total (including getCompanies for individual view)
+      - **Task 2:** CompanyMembersModal component (362 lines) - `9d25e77`
+        - Bidirectional: Single component handles both company→members and individual→companies views
+        - Inline role editing with onChange + onBlur save pattern
+        - Searchable dropdown, isPrimary checkbox, toast notifications
+        - Auto-invalidates 5 queries after mutations
+      - **Task 3:** CompanyMembersIndicator component + integration (90 lines) - `3141bd3`
+        - Preview with smart truncation (≤3 show all, >3 truncate with ellipsis)
+        - Integrated into ClientDetailTabs after contact info section
+        - Symmetrical placement for both client types
     - **Key achievements:**
-      - Realistic data distribution for all 16 tenant tables
-      - Complete workflow chains: quote → project → tracks → sessions → time entries → invoices
-      - Varied data states (draft/sent/paid, scheduled/completed, individual/company)
-      - Ready for Phase 22 UI validation with sufficient test volume
-    - **Verification:** Script runs without syntax errors ✓
-      - All relationships properly linked (project_id → tracks, session_id → time_entries)
-      - Summary output includes all 16 tables including quote_items
-      - Total line count: 810 lines (concise implementation)
-  - **Next:** Phase 24 verified complete. Seed script ready for development and testing use.
+      - Complete bidirectional relationship management (company ↔ individual)
+      - Reusable modal pattern (clientType prop switches behavior)
+      - Inline editing UX (no separate edit buttons)
+      - TypeScript 0 errors, production build successful
+    - **Verification:** All success criteria met ✓
+      - 3 new backend endpoints with full validation
+      - Modal handles both views with single component
+      - Preview indicator shows count + names
+      - Integration symmetrical for both types
+  - **Next:** Phase 25 verified complete. Ready for manual testing and production deployment.
