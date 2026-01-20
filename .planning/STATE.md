@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 25 of 25 (Gestion Relations Client-Entreprise) - Phase 25 COMPLETE ✅
-Plan: 1/1 complete
-Status: Phase complete - full CRUD UI for company-member relationships
-Last activity: 2026-01-20 - Phase 25 complete (6 min total), many-to-many relationship management UI with bidirectional modal, inline role editing, and symmetrical integration ✓
+Plan: 2/2 complete
+Status: Phase complete - full CRUD UI with role autocomplete
+Last activity: 2026-01-20 - Phase 25 complete (8 min total: 25-01 6min + 25-02 2min), bidirectional relationship management with getRoles endpoint and HTML5 datalist autocomplete preventing role duplicates ✓
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 1/1 plans (25-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 108
-- Average duration: 30.7 min
-- Total execution time: 55.2 hours
+- Total plans completed: 109
+- Average duration: 30.4 min
+- Total execution time: 55.3 hours
 
 **By Phase:**
 
@@ -85,11 +85,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 22 | 10/10 | 87 min | 8.7 min |
 | 23 | 1/1 | 3 min | 3 min |
 | 24 | 2/2 | 11 min | 5.5 min |
-| 25 | 1/1 | 6 min | 6 min |
+| 25 | 2/2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: [6 min, 5 min, 3 min, various 22-series plans]
-- Trend: Phase 25 COMPLETE ✅ (6 min total, 1/1 plan). Full CRUD UI for many-to-many company-member relationships. Bidirectional modal component (handles both company→members and individual→companies views), inline role editing, searchable dropdown, preview indicator with smart truncation. Backend endpoints: addMember, updateMember, removeMember, getCompanies. TypeScript 0 errors, production build successful.
+- Last 5 plans: [2 min, 6 min, 5 min, 3 min, various 22-series plans]
+- Trend: Phase 25 COMPLETE ✅ (8 min total, 2/2 plans). Full CRUD UI for many-to-many company-member relationships with role autocomplete. Plan 25-01 (6 min): Bidirectional modal, inline editing, 4 backend endpoints (addMember, updateMember, removeMember, getCompanies). Plan 25-02 (2 min): getRoles endpoint + HTML5 datalist autocomplete prevents role duplicates ("Ingénieur du son" vs "Ingénieur Son"). TypeScript 0 errors, production build successful.
 
 ## Accumulated Context
 
@@ -234,6 +234,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 25-01 | Single bidirectional modal component | Rationale: DRY principle, reduce code duplication, consistent UX across both views. clientType prop switches behavior between company→members and individual→companies modes. Same mutations work for both directions. Alternative (separate components) = 700+ lines duplicated, maintenance burden doubled. |
 | 25-01 | Inline role editing (onChange + onBlur pattern) | Rationale: Reduce friction, fewer clicks, more fluid UX. No separate edit button needed. onChange updates local state, onBlur calls updateMutation if changed. Pattern matches industry standards (Google Sheets, Notion inline editing). |
 | 25-01 | Preview truncation rules (≤3 show all, >3 truncate) | Rationale: Balance between showing useful preview and avoiding UI overflow. Format: "3 membres : Alex (Ingénieur), Sophie (Prod), Marc (Manager)" vs "5 membres : Alex (Ingénieur), Sophie (Prod)...". Alternative (always show all) = can break layout with 10+ members, alternative (always truncate) = less useful for common case (2-3 members). |
+| 25-02 | HTML5 datalist over Popover/Command for autocomplete | Rationale: Simpler implementation, native browser support, no additional library dependencies. Popover/Command would add ~200 lines of UI code, datalist requires 4 lines. Trade-off: Less visual customization but fully functional autocomplete with keyboard navigation. Lightweight solution for simple use case. |
+| 25-02 | Distinct query on company_members.role | Rationale: Returns unique roles only, prevents duplicate suggestions, SQL-level filtering for performance. Implementation: selectDistinct({ role }) with WHERE role IS NOT NULL AND role != '' filter. Clean autocomplete list with no duplicates or empty entries. |
+| 25-02 | Conditional query enable based on modal open | Rationale: Avoid unnecessary API calls when modal closed (performance optimization). Implementation: { enabled: open } in useQuery options. Query only runs when modal is actually being used. |
 
 ### Deferred Issues
 
@@ -503,10 +506,10 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-20T21:12:50Z
-Stopped at: Phase 25 COMPLETE ✅ - Company-member relationship management UI complete
+Last session: 2026-01-20T21:18:36Z
+Stopped at: Phase 25 COMPLETE ✅ - Company-member relationship management UI with role autocomplete complete
 Resume context:
-  - Phase 25 COMPLETE ✅: Gestion Relations Client-Entreprise (6 min total execution, 1/1 plan)
+  - Phase 25 COMPLETE ✅: Gestion Relations Client-Entreprise (8 min total execution, 2/2 plans)
     - **Plan 25-01:** Full CRUD UI for many-to-many relationships (6 min, 3 tasks)
       - **Task 1:** Backend endpoints (addMember, updateMember, removeMember, getCompanies) - `dc586e6`, `87bafbe`
         - Validation: Type checking (company/individual), duplicate prevention, error handling
@@ -520,14 +523,24 @@ Resume context:
         - Preview with smart truncation (≤3 show all, >3 truncate with ellipsis)
         - Integrated into ClientDetailTabs after contact info section
         - Symmetrical placement for both client types
-    - **Key achievements:**
+    - **Key achievements (25-01):**
       - Complete bidirectional relationship management (company ↔ individual)
       - Reusable modal pattern (clientType prop switches behavior)
       - Inline editing UX (no separate edit buttons)
       - TypeScript 0 errors, production build successful
+    - **Plan 25-02:** Role autocomplete feature (2 min, 1 task)
+      - **Task 3:** getRoles endpoint + HTML5 datalist autocomplete - `3dff88c`
+        - Backend: Distinct query on company_members.role (non-null, non-empty, ordered)
+        - Frontend: HTML5 datalist integration with conditional enable
+        - Lightweight solution (4 lines vs ~30+ for Popover pattern)
+    - **Key achievements (25-02):**
+      - Role autocomplete prevents duplicates ("Ingénieur du son" vs "Ingénieur Son")
+      - Conditional query optimization (only when modal open)
+      - Native browser support (no library dependencies)
     - **Verification:** All success criteria met ✓
-      - 3 new backend endpoints with full validation
+      - 4 backend endpoints total (addMember, updateMember, removeMember, getCompanies, getRoles)
       - Modal handles both views with single component
-      - Preview indicator shows count + names
-      - Integration symmetrical for both types
-  - **Next:** Phase 25 verified complete. Ready for manual testing and production deployment.
+      - Role autocomplete suggests existing roles
+      - Bidirectional UI works (add/remove from either view updates both)
+      - TypeScript 0 errors, production build successful
+  - **Next:** Phase 25 verified complete. Ready for manual testing and production deployment. Full company-member relationship management system with role consistency.
