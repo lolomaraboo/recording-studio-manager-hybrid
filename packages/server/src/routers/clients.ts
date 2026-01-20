@@ -239,6 +239,42 @@ export const clientsRouter = router({
   }),
 
   /**
+   * Get companies for a specific individual (for individual view)
+   * Returns company clients linked to this individual via company_members table
+   */
+  getCompanies: protectedProcedure
+    .input(z.object({ memberId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const companyClients = alias(clients, 'companyClients');
+
+      // Get all companies this individual is linked to
+      const companies = await tenantDb
+        .select({
+          id: companyMembers.id,
+          role: companyMembers.role,
+          isPrimary: companyMembers.isPrimary,
+          company: {
+            id: companyClients.id,
+            name: companyClients.name,
+            email: companyClients.email,
+            phone: companyClients.phone,
+            logoUrl: companyClients.logoUrl,
+          },
+        })
+        .from(companyMembers)
+        .innerJoin(companyClients, eq(companyMembers.companyClientId, companyClients.id))
+        .where(eq(companyMembers.memberClientId, input.memberId))
+        .orderBy(
+          desc(companyMembers.isPrimary),
+          asc(companyClients.name)
+        );
+
+      return companies;
+    }),
+
+  /**
    * Create new client
    */
   create: protectedProcedure
