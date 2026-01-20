@@ -899,6 +899,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 22. Refonte UI Client | v4.1 | 9/9 | ✅ Complete | 2026-01-18 |
 | 23. Simplification Onglet Informations | v4.1 | 1/1 | ✅ Complete | 2026-01-19 |
 | 24. Seed Data Complet pour Tests | v4.1 | 2/2 | ✅ Complete | 2026-01-18 |
+| 25. Gestion Relations Client-Entreprise | v4.1 | 0/0 | Not planned | - |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -1756,3 +1757,45 @@ Plans:
 Enhanced seed script populating ALL fields from Phase 18.4 music profile (22 fields: genres, instruments, streaming URLs, record label, distributor, manager, publisher, PRO, years active, notable works, bio) + complete relationships (projets → tracks → sessions → time entries → invoices/quotes). Volume: ~15-20 clients with enriched profiles, 12-15 projects, 25-30 tracks with artwork/metadata/versions, 20-25 sessions, 10-12 quotes/invoices, 30-40 time entries. Current seed-realistic-data.ts creates ~60-80 records but doesn't populate music fields.
 
 **Rationale**: Phase 18.4 added 22 music profile fields but seed script doesn't populate them - impossible to test search filters, streaming URL displays, industry info rendering, etc. Phase 22 added 5 tabs (Informations/Projets/Tracks/Sessions/Finances) requiring realistic relational data for proper testing. Current seed insufficient for validating complete user workflows across all tabs.
+---
+
+### Phase 25: Gestion Relations Client-Entreprise
+
+**Goal**: Implémenter l'UI complète pour gérer les relations many-to-many entre clients individuels et entreprises via la table companyMembers (add/remove/update members avec rôles)
+
+**Depends on**: Phase 24 (Seed data complete)
+
+**Research**: Unlikely (UI patterns établis, API endpoints existants partiel)
+
+**Plans**: 2 plans
+
+Plans:
+- [ ] 25-01-PLAN.md — Backend endpoints (addMember, updateMember, removeMember) + Modal & Indicator components
+- [ ] 25-02-PLAN.md — Individual view (getCompanies endpoint) + Role autocomplete
+
+**Status**: Not started
+
+**Details**:
+Phase 25 completes the many-to-many relationship UI between individual clients and company clients.
+
+**Plan 01 (Wave 1):**
+- Backend: Add 3 missing tRPC endpoints (addMember, updateMember, removeMember)
+- Frontend: Create CompanyMembersModal component (full CRUD, inline role editing)
+- Frontend: Create CompanyMembersIndicator component (clickable preview)
+- Integration: Add to ClientDetailTabs in Informations section (after contact details)
+
+**Plan 02 (Wave 2):**
+- Backend: Add getCompanies endpoint (reverse direction of getMembers)
+- Backend: Add getRoles endpoint (distinct roles for autocomplete)
+- Frontend: Update modal for individual view (companies list)
+- Frontend: Add role autocomplete to prevent typos
+
+**Key Features:**
+- Bidirectional UI (company → members, individual → companies)
+- Inline role editing (onChange + onBlur save)
+- Primary contact badge display
+- Searchable dropdown (filters individual/company correctly)
+- Role autocomplete (suggests existing roles, prevents duplicates)
+- Toast notifications for all actions
+
+**Rationale**: La table companyMembers existe en DB avec relations many-to-many (company_client_id, member_client_id, role, isPrimary) et API partiels (getMembers, getAllMembers), mais aucune UI pour créer/modifier/supprimer ces relations. Les studios doivent pouvoir lier contacts individuels aux entreprises clientes (ex: "Alexandre Grand - Ingénieur du son" membre de "Sound Production SARL"). Manque endpoints API (addMember, removeMember, updateMember) + UI complète (onglet Membres pour entreprises, section Entreprises pour individus).
