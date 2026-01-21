@@ -16,7 +16,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { NotesHistory } from "@/components/NotesHistory";
 import { ClientDetailTabs } from "@/components/ClientDetailTabs";
-import { ClientFormWizard } from "@/components/ClientFormWizard";
+import { ClientEditForm } from "@/components/ClientEditForm";
 import {
   ArrowLeft,
   Edit,
@@ -304,31 +304,38 @@ export default function ClientDetail() {
           )}
         </div>
 
-        {/* Conditional rendering: Edit mode (wizard) vs View mode (tabs) */}
-        {isEditing ? (
-          <ClientFormWizard
-            mode="edit"
-            initialData={client as any}
-            onSubmit={handleUpdate}
-            onCancel={() => toggleEditMode(false)}
-          />
-        ) : (
-          <ClientDetailTabs
-            clientId={client.id}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            client={client}
-            isEditing={false}
-            formData={formData || client}
-            setFormData={setFormData}
-            handleUpdateField={handleUpdateField}
-            clientWithContacts={clientWithContacts}
-            addContactMutation={addContactMutation}
-            deleteContactMutation={deleteContactMutation}
-            companies={companies}
-            members={members}
-          />
+        {/* Edit mode: Sticky action buttons */}
+        {isEditing && (
+          <Card className="sticky top-2 z-10 bg-background/95 backdrop-blur">
+            <CardContent className="py-3 px-4">
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => toggleEditMode(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={() => handleUpdate(formData)}>
+                  Enregistrer les modifications
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Client detail tabs - same for view and edit modes */}
+        <ClientDetailTabs
+          clientId={client.id}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          client={client}
+          isEditing={isEditing}
+          formData={formData || client}
+          setFormData={setFormData}
+          handleUpdateField={handleUpdateField}
+          clientWithContacts={clientWithContacts}
+          addContactMutation={addContactMutation}
+          deleteContactMutation={deleteContactMutation}
+          companies={companies}
+          members={members}
+        />
 
         {/* Notes Section - ALWAYS VISIBLE */}
         <Card className="mt-2">
