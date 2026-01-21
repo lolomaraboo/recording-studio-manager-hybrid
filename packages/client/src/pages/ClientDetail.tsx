@@ -234,7 +234,10 @@ export default function ClientDetail() {
                           {item.isPrimary && (
                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                           )}
-                          {item.company?.name || "Inconnu"}
+                          <span>{item.company?.name || "Inconnu"}</span>
+                          {item.role && (
+                            <span className="text-xs text-muted-foreground ml-1">({item.role})</span>
+                          )}
                         </Badge>
                       </Link>
                     ))}
@@ -252,7 +255,10 @@ export default function ClientDetail() {
                           {item.isPrimary && (
                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                           )}
-                          {item.member?.name || "Inconnu"}
+                          <span>{item.member?.name || "Inconnu"}</span>
+                          {item.role && (
+                            <span className="text-xs text-muted-foreground ml-1">({item.role})</span>
+                          )}
                         </Badge>
                       </Link>
                     ))}
