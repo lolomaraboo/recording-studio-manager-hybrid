@@ -18,6 +18,7 @@ import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
 import { ProjectsTab } from "./tabs/ProjectsTab";
 import { TracksTab } from "./tabs/TracksTab";
+import { ClientEditForm } from "./ClientEditForm";
 import {
   Info,
   FolderOpen,
@@ -185,229 +186,16 @@ export function ClientDetailTabs({
 
       {/* Informations Tab - Single view with 2 visual sections */}
       <TabsContent value="informations" className="mt-1 space-y-2">
-        {/* Section 1: Informations de Base */}
-        <Card>
-          <CardContent className="pt-3">
+        {isEditing ? (
+          <ClientEditForm
+            formData={formData}
+            setFormData={setFormData}
+          />
+        ) : (
+          <Card>
+            <CardContent className="pt-3">
               <div className="space-y-0.5">
-                  {isEditing ? (
-                    <>
-                      {/* Nom complet */}
-                      <div className="space-y-0.5">
-                        <label htmlFor="name" className="text-sm font-medium">Nom complet</label>
-                        <input
-                          id="name"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                      </div>
-
-                      {/* Champs de nom structuré (pour individus) */}
-                      {client.type === "individual" && (
-                        <>
-                          <div className="grid gap-2 md:grid-cols-2">
-                            <div className="space-y-0.5">
-                              <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
-                              <select
-                                id="prefix"
-                                value={formData.prefix || ""}
-                                onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                                className="w-full px-3 py-2 border rounded"
-                              >
-                                <option value="">-</option>
-                                <option value="M.">M.</option>
-                                <option value="Mme">Mme</option>
-                                <option value="Dr.">Dr.</option>
-                              </select>
-                            </div>
-
-                            <div className="space-y-0.5">
-                              <label htmlFor="firstName" className="text-sm font-medium">Prénom</label>
-                              <input
-                                id="firstName"
-                                className="w-full px-3 py-2 border rounded-md"
-                                value={formData.firstName || ""}
-                                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid gap-2 md:grid-cols-2">
-                            <div className="space-y-0.5">
-                              <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
-                              <input
-                                id="middleName"
-                                className="w-full px-3 py-2 border rounded-md"
-                                value={formData.middleName || ""}
-                                onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
-                              />
-                            </div>
-
-                            <div className="space-y-0.5">
-                              <label htmlFor="lastName" className="text-sm font-medium">Nom</label>
-                              <input
-                                id="lastName"
-                                className="w-full px-3 py-2 border rounded-md"
-                                value={formData.lastName || ""}
-                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-0.5">
-                            <label htmlFor="suffix" className="text-sm font-medium">Suffixe</label>
-                            <input
-                              id="suffix"
-                              className="w-full px-3 py-2 border rounded-md"
-                              value={formData.suffix || ""}
-                              onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
-                              placeholder="Jr., III, etc."
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Nom d'artiste */}
-                      <div className="space-y-0.5">
-                        <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste</label>
-                        <input
-                          id="artistName"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.artistName || ""}
-                          onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                        />
-                      </div>
-
-                      {/* Emails multiples */}
-                      <div className="space-y-0.5">
-                        <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium">Emails</label>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const emails = [...(formData.emails || []), { type: "work", email: "" }];
-                              setFormData({ ...formData, emails });
-                            }}
-                          >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Ajouter
-                          </Button>
-                        </div>
-                        <div className="space-y-0.5">
-                          {(formData.emails || []).map((email: any, index: number) => (
-                            <div key={index} className="flex gap-2">
-                              <select
-                                value={email.type}
-                                onChange={(e) => {
-                                  const emails = [...(formData.emails || [])];
-                                  emails[index] = { ...emails[index], type: e.target.value };
-                                  setFormData({ ...formData, emails });
-                                }}
-                                className="w-32 px-3 py-2 border rounded"
-                              >
-                                <option value="work">Travail</option>
-                                <option value="personal">Personnel</option>
-                                <option value="other">Autre</option>
-                              </select>
-                              <input
-                                type="email"
-                                value={email.email}
-                                onChange={(e) => {
-                                  const emails = [...(formData.emails || [])];
-                                  emails[index] = { ...emails[index], email: e.target.value };
-                                  setFormData({ ...formData, emails });
-                                }}
-                                placeholder="Email"
-                                className="flex-1 px-3 py-2 border rounded-md"
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const emails = (formData.emails || []).filter((_: any, i: number) => i !== index);
-                                  setFormData({ ...formData, emails });
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Téléphones multiples */}
-                      <div className="space-y-0.5">
-                        <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium">Téléphones</label>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const phones = [...(formData.phones || []), { type: "mobile", number: "" }];
-                              setFormData({ ...formData, phones });
-                            }}
-                          >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Ajouter
-                          </Button>
-                        </div>
-                        <div className="space-y-0.5">
-                          {(formData.phones || []).map((phone: any, index: number) => (
-                            <div key={index} className="flex gap-2">
-                              <select
-                                value={phone.type}
-                                onChange={(e) => {
-                                  const phones = [...(formData.phones || [])];
-                                  phones[index] = { ...phones[index], type: e.target.value };
-                                  setFormData({ ...formData, phones });
-                                }}
-                                className="w-32 px-3 py-2 border rounded"
-                              >
-                                <option value="mobile">Mobile</option>
-                                <option value="work">Travail</option>
-                                <option value="home">Domicile</option>
-                              </select>
-                              <input
-                                value={phone.number}
-                                onChange={(e) => {
-                                  const phones = [...(formData.phones || [])];
-                                  phones[index] = { ...phones[index], number: e.target.value };
-                                  setFormData({ ...formData, phones });
-                                }}
-                                placeholder="Numéro"
-                                className="flex-1 px-3 py-2 border rounded-md"
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const phones = (formData.phones || []).filter((_: any, i: number) => i !== index);
-                                  setFormData({ ...formData, phones });
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Adresse */}
-                      <div className="space-y-0.5">
-                        <label htmlFor="address" className="text-sm font-medium">Adresse</label>
-                        <textarea
-                          id="address"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.address || ""}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                          rows={2}
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Affichage des informations de nom */}
+                {/* Affichage des informations de nom */}
                       {(client.prefix || client.firstName || client.middleName || client.lastName || client.suffix) && (
                         <div className="text-sm">
                           <span className="font-semibold">
@@ -767,15 +555,13 @@ export function ClientDetailTabs({
                         </div>
                       )}
 
-                      {!client.prefix && !client.firstName && !client.lastName && !client.artistName && !client.email && !client.phone && !client.address && (
-                        <p className="text-sm text-muted-foreground">Aucune information de contact</p>
-                      )}
-                    </>
-                  )}
-                </div>
-
-          </CardContent>
-        </Card>
+                {!client.prefix && !client.firstName && !client.lastName && !client.artistName && !client.email && !client.phone && !client.address && (
+                  <p className="text-sm text-muted-foreground">Aucune information de contact</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </TabsContent>
 
       {/* Projets Tab - Placeholder */}
