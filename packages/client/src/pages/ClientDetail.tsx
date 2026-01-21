@@ -3,6 +3,8 @@ import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -19,9 +21,20 @@ import {
   ArrowLeft,
   Edit,
   Trash2,
-  Users,
+  Guitar,
+  Music,
 } from "lucide-react";
 import { toast } from "sonner";
+
+// Helper function to get initials from name
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 export default function ClientDetail() {
   const { id } = useParams<{ id: string }>();
@@ -173,21 +186,57 @@ export default function ClientDetail() {
     <div className="container pt-2 pb-4 px-2">
       <div className="space-y-2">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex items-start gap-4 flex-1">
+            <Button variant="ghost" size="icon" asChild className="mt-1">
               <Link to="/clients">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h2 className="text-3xl font-bold flex items-center gap-2">
-              <Users className="h-8 w-8 text-primary" />
-              {client.name}
-            </h2>
+            <div className="flex items-start gap-4 flex-1">
+              <Avatar className="h-24 w-24 flex-shrink-0">
+                <AvatarImage
+                  src={(client.type === 'company' ? client.logoUrl : client.avatarUrl) || undefined}
+                  alt={client.name}
+                />
+                <AvatarFallback className="bg-primary text-primary-foreground text-3xl">
+                  {getInitials(client.name)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-2 flex-1 min-w-0">
+                <h2 className="text-4xl font-bold leading-tight">
+                  {client.type === 'individual' && client.artistName
+                    ? client.artistName
+                    : client.name}
+                </h2>
+                {/* Instruments */}
+                {(client.instruments || []).length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {(client.instruments || []).map((instrument: string, idx: number) => (
+                      <Badge key={`inst-${idx}`} variant="outline" className="flex items-center gap-1">
+                        <Guitar className="h-3 w-3" />
+                        {instrument}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {/* Genres */}
+                {(client.genres || []).length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {(client.genres || []).map((genre: string, idx: number) => (
+                      <Badge key={`genre-${idx}`} variant="outline" className="flex items-center gap-1">
+                        <Music className="h-3 w-3" />
+                        {genre}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           {/* Edit/Delete buttons - only show when NOT editing */}
           {!isEditing && (
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 flex-shrink-0">
               <Button variant="outline" size="sm" onClick={() => toggleEditMode(true)} title="Modifier les informations du client">
                 <Edit className="mr-2 h-4 w-4" />
                 Modifier
