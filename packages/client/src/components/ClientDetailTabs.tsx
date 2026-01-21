@@ -4,6 +4,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  SiSpotify,
+  SiApplemusic,
+  SiYoutube,
+  SiSoundcloud,
+  SiBandcamp,
+  SiDeezer,
+  SiTidal,
+  SiAmazonmusic,
+  SiAudiomack,
+  SiBeatport,
+} from "react-icons/si";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
 import { ProjectsTab } from "./tabs/ProjectsTab";
@@ -518,93 +530,93 @@ export function ClientDetailTabs({
                       {(client.spotifyUrl || client.appleMusicUrl || client.youtubeUrl || client.soundcloudUrl ||
                         client.bandcampUrl || client.deezerUrl || client.tidalUrl || client.amazonMusicUrl ||
                         client.audiomackUrl || client.beatportUrl || client.otherPlatformsUrl) && (
-                        <div className="pt-2 border-t">
-                          <h4 className="text-sm font-semibold mb-2">Plateformes de streaming</h4>
-                          <div className="space-y-1">
+                        <div className="pt-3 border-t mt-3">
+                          <h4 className="text-sm font-semibold mb-3 text-foreground">Plateformes de streaming</h4>
+                          <div className="space-y-2">
                             {client.spotifyUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.spotifyUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiSpotify className="h-5 w-5 text-[#1DB954]" />
+                                <a href={client.spotifyUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Spotify
                                 </a>
                               </div>
                             )}
                             {client.appleMusicUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiApplemusic className="h-5 w-5 text-[#FA243C]" />
+                                <a href={client.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Apple Music
                                 </a>
                               </div>
                             )}
                             {client.youtubeUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiYoutube className="h-5 w-5 text-[#FF0000]" />
+                                <a href={client.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   YouTube
                                 </a>
                               </div>
                             )}
                             {client.soundcloudUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.soundcloudUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiSoundcloud className="h-5 w-5 text-[#FF5500]" />
+                                <a href={client.soundcloudUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   SoundCloud
                                 </a>
                               </div>
                             )}
                             {client.bandcampUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.bandcampUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiBandcamp className="h-5 w-5 text-[#629AA9]" />
+                                <a href={client.bandcampUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Bandcamp
                                 </a>
                               </div>
                             )}
                             {client.deezerUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.deezerUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiDeezer className="h-5 w-5 text-[#FF0092]" />
+                                <a href={client.deezerUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Deezer
                                 </a>
                               </div>
                             )}
                             {client.tidalUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.tidalUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiTidal className="h-5 w-5 text-[#000000] dark:text-white" />
+                                <a href={client.tidalUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Tidal
                                 </a>
                               </div>
                             )}
                             {client.amazonMusicUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.amazonMusicUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiAmazonmusic className="h-5 w-5 text-[#00A8E1]" />
+                                <a href={client.amazonMusicUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Amazon Music
                                 </a>
                               </div>
                             )}
                             {client.audiomackUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.audiomackUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiAudiomack className="h-5 w-5 text-[#FFA200]" />
+                                <a href={client.audiomackUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Audiomack
                                 </a>
                               </div>
                             )}
                             {client.beatportUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <a href={client.beatportUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                              <div className="flex items-center gap-3">
+                                <SiBeatport className="h-5 w-5 text-[#94D500]" />
+                                <a href={client.beatportUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Beatport
                                 </a>
                               </div>
                             )}
                             {client.otherPlatformsUrl && (
-                              <div className="flex items-center gap-2">
-                                <Music className="h-4 w-4 text-muted-foreground" />
-                                <div className="text-sm whitespace-pre-wrap">{client.otherPlatformsUrl}</div>
+                              <div className="flex items-start gap-3">
+                                <Music className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <div className="text-base whitespace-pre-wrap">{client.otherPlatformsUrl}</div>
                               </div>
                             )}
                           </div>
@@ -613,23 +625,38 @@ export function ClientDetailTabs({
 
                       {/* Industry Information */}
                       {(client.recordLabel || client.distributor || client.managerContact || client.publisher || client.performanceRightsSociety) && (
-                        <div className="pt-2 border-t">
-                          <h4 className="text-sm font-semibold mb-2">Informations professionnelles</h4>
-                          <div className="space-y-1 text-sm">
+                        <div className="pt-3 border-t mt-3">
+                          <h4 className="text-sm font-semibold mb-3 text-foreground">Informations professionnelles</h4>
+                          <div className="space-y-2">
                             {client.recordLabel && (
-                              <div><span className="font-medium">Label:</span> {client.recordLabel}</div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base font-semibold min-w-[140px]">Label:</span>
+                                <span className="text-base">{client.recordLabel}</span>
+                              </div>
                             )}
                             {client.distributor && (
-                              <div><span className="font-medium">Distributeur:</span> {client.distributor}</div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base font-semibold min-w-[140px]">Distributeur:</span>
+                                <span className="text-base">{client.distributor}</span>
+                              </div>
                             )}
                             {client.managerContact && (
-                              <div><span className="font-medium">Manager:</span> {client.managerContact}</div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base font-semibold min-w-[140px]">Manager:</span>
+                                <span className="text-base">{client.managerContact}</span>
+                              </div>
                             )}
                             {client.publisher && (
-                              <div><span className="font-medium">Éditeur:</span> {client.publisher}</div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base font-semibold min-w-[140px]">Éditeur:</span>
+                                <span className="text-base">{client.publisher}</span>
+                              </div>
                             )}
                             {client.performanceRightsSociety && (
-                              <div><span className="font-medium">Société de droits:</span> {client.performanceRightsSociety}</div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base font-semibold min-w-[140px]">Société de droits:</span>
+                                <span className="text-base">{client.performanceRightsSociety}</span>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -637,28 +664,31 @@ export function ClientDetailTabs({
 
                       {/* Career Information */}
                       {(client.yearsActive || client.notableWorks || client.awardsRecognition || client.biography) && (
-                        <div className="pt-2 border-t">
-                          <h4 className="text-sm font-semibold mb-2">Carrière</h4>
-                          <div className="space-y-2 text-sm">
+                        <div className="pt-3 border-t mt-3">
+                          <h4 className="text-sm font-semibold mb-3 text-foreground">Carrière</h4>
+                          <div className="space-y-3">
                             {client.yearsActive && (
-                              <div><span className="font-medium">Années actives:</span> {client.yearsActive}</div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base font-semibold min-w-[140px]">Années actives:</span>
+                                <span className="text-base">{client.yearsActive}</span>
+                              </div>
                             )}
                             {client.notableWorks && (
                               <div>
-                                <span className="font-medium">Œuvres notables:</span>
-                                <p className="whitespace-pre-wrap mt-1">{client.notableWorks}</p>
+                                <h5 className="text-base font-semibold mb-1">Œuvres notables</h5>
+                                <p className="text-base whitespace-pre-wrap">{client.notableWorks}</p>
                               </div>
                             )}
                             {client.awardsRecognition && (
                               <div>
-                                <span className="font-medium">Prix et distinctions:</span>
-                                <p className="whitespace-pre-wrap mt-1">{client.awardsRecognition}</p>
+                                <h5 className="text-base font-semibold mb-1">Prix et distinctions</h5>
+                                <p className="text-base whitespace-pre-wrap">{client.awardsRecognition}</p>
                               </div>
                             )}
                             {client.biography && (
                               <div>
-                                <span className="font-medium">Biographie:</span>
-                                <p className="whitespace-pre-wrap mt-1">{client.biography}</p>
+                                <h5 className="text-base font-semibold mb-1">Biographie</h5>
+                                <p className="text-base whitespace-pre-wrap leading-relaxed">{client.biography}</p>
                               </div>
                             )}
                           </div>
@@ -667,9 +697,9 @@ export function ClientDetailTabs({
 
                       {/* Notes */}
                       {client.notes && (
-                        <div className="pt-2 border-t">
-                          <h4 className="text-sm font-semibold mb-2">Notes</h4>
-                          <p className="text-sm whitespace-pre-wrap">{client.notes}</p>
+                        <div className="pt-3 border-t mt-3">
+                          <h4 className="text-sm font-semibold mb-3 text-foreground">Notes internes</h4>
+                          <p className="text-base whitespace-pre-wrap leading-relaxed bg-muted/50 p-3 rounded-md">{client.notes}</p>
                         </div>
                       )}
 
