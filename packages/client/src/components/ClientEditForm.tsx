@@ -20,7 +20,9 @@ import {
   Trash2,
   Upload,
   X,
+  Users,
 } from "lucide-react";
+import { CompanyMembersIndicator } from "@/components/CompanyMembersIndicator";
 
 interface ClientEditFormProps {
   formData: any;
@@ -59,7 +61,7 @@ export function ClientEditForm({
       if (event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
         event.preventDefault();
 
-        const allAccordions = ["identite", "coordonnees", "profil-artistique", "streaming", "notes-studio"];
+        const allAccordions = ["identite", "coordonnees", "relations-professionnelles", "profil-artistique", "streaming", "notes-studio"];
 
         // If any closed, open all. If all open, close all.
         if (openItems.length < allAccordions.length) {
@@ -709,7 +711,35 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 3: Profil Artistique (genres, instruments, professional, career) */}
+      {/* Accordéon 3: Relations professionnelles */}
+      <AccordionItem value="relations-professionnelles">
+        <Card>
+          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Relations professionnelles
+            </h3>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="px-4 pb-3 space-y-3">
+              {formData.id ? (
+                <CompanyMembersIndicator
+                  clientId={formData.id}
+                  clientType={formData.type}
+                  clientName={formData.name || formData.companyName || ''}
+                  isEditing={true}
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Enregistrez d'abord ce client pour gérer les relations professionnelles.
+                </p>
+              )}
+            </div>
+          </AccordionContent>
+        </Card>
+      </AccordionItem>
+
+      {/* Accordéon 4: Profil Artistique (genres, instruments, professional, career) */}
       <AccordionItem value="profil-artistique">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -880,7 +910,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 4: Plateformes de Streaming */}
+      {/* Accordéon 5: Plateformes de Streaming */}
       <AccordionItem value="streaming">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -1037,7 +1067,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 5: Notes Studio (renamed from Personal Information) */}
+      {/* Accordéon 6: Notes Studio (renamed from Personal Information) */}
       <AccordionItem value="notes-studio">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
