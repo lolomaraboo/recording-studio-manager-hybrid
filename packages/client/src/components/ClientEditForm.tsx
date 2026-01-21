@@ -112,16 +112,17 @@ export function ClientEditForm({
                 </div>
               </div>
 
-              {/* Nom complet */}
+              {/* Nom complet (auto-generated, readonly) */}
               <div>
                 <label htmlFor="name" className="text-sm font-medium">
                   Nom complet
                 </label>
                 <input
                   id="name"
-                  className="w-full px-3 py-2 border rounded-md mt-1"
+                  className="w-full px-3 py-2 border rounded-md mt-1 bg-muted cursor-not-allowed"
                   value={formData.name || ""}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  readOnly
+                  placeholder="Se génère automatiquement"
                 />
               </div>
 
