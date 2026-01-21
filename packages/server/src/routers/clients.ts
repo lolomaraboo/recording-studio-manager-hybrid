@@ -446,10 +446,25 @@ export const clientsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
+      // Filter out invalid/read-only fields before updating
+      const {
+        id,
+        userId,
+        createdAt,
+        updatedAt,
+        clientNotes,
+        ...validData
+      } = input.data as any;
+
+      // Convert empty strings to null for date fields (PostgreSQL requirement)
+      if (validData.birthday === '') {
+        validData.birthday = null;
+      }
+
       const [updated] = await tenantDb
         .update(clients)
         .set({
-          ...input.data,
+          ...validData,
           updatedAt: new Date(),
         } as any)
         .where(eq(clients.id, input.id))
