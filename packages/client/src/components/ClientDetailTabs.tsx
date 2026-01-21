@@ -10,11 +10,8 @@ import {
   SiYoutube,
   SiSoundcloud,
   SiBandcamp,
-  SiDeezer,
   SiTidal,
   SiAmazonmusic,
-  SiAudiomack,
-  SiBeatport,
 } from "react-icons/si";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
@@ -575,7 +572,7 @@ export function ClientDetailTabs({
                             )}
                             {client.deezerUrl && (
                               <div className="flex items-center gap-3">
-                                <SiDeezer className="h-5 w-5 text-[#FF0092]" />
+                                <Music className="h-5 w-5 text-[#FF0092]" />
                                 <a href={client.deezerUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Deezer
                                 </a>
@@ -599,7 +596,7 @@ export function ClientDetailTabs({
                             )}
                             {client.audiomackUrl && (
                               <div className="flex items-center gap-3">
-                                <SiAudiomack className="h-5 w-5 text-[#FFA200]" />
+                                <Music className="h-5 w-5 text-[#FFA200]" />
                                 <a href={client.audiomackUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Audiomack
                                 </a>
@@ -607,7 +604,7 @@ export function ClientDetailTabs({
                             )}
                             {client.beatportUrl && (
                               <div className="flex items-center gap-3">
-                                <SiBeatport className="h-5 w-5 text-[#94D500]" />
+                                <Music className="h-5 w-5 text-[#94D500]" />
                                 <a href={client.beatportUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
                                   Beatport
                                 </a>
