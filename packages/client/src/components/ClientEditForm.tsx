@@ -87,6 +87,99 @@ export function ClientEditForm({
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
+              {/* Nom d'artiste - TOP POSITION */}
+              <div>
+                <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste / Pseudo</label>
+                <input
+                  id="artistName"
+                  className="w-full px-3 py-2 border rounded-md mt-1"
+                  value={formData.artistName || ""}
+                  onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
+                />
+              </div>
+
+              {/* Nom complet (auto-generated, readonly) - BELOW artistName */}
+              <div>
+                <label htmlFor="name" className="text-sm font-medium">
+                  Nom complet
+                </label>
+                <input
+                  id="name"
+                  className="w-full px-3 py-2 border rounded-md mt-1 bg-muted cursor-not-allowed"
+                  value={formData.name || ""}
+                  readOnly
+                  placeholder="Se génère automatiquement"
+                />
+              </div>
+
+              {/* Champs de nom structuré (pour individus) */}
+              {formData.type === "individual" && (
+                <>
+                  {/* Row: Nom de famille + Prénom */}
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div>
+                      <label htmlFor="lastName" className="text-sm font-medium">Nom de famille</label>
+                      <input
+                        id="lastName"
+                        className="w-full px-3 py-2 border rounded-md mt-1"
+                        value={formData.lastName || ""}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="firstName" className="text-sm font-medium">Prénom</label>
+                      <input
+                        id="firstName"
+                        className="w-full px-3 py-2 border rounded-md mt-1"
+                        value={formData.firstName || ""}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row: Civilité + Nom du milieu */}
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div>
+                      <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
+                      <select
+                        id="prefix"
+                        value={formData.prefix || ""}
+                        onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
+                        className="w-full px-3 py-2 border rounded mt-1"
+                      >
+                        <option value="">-</option>
+                        <option value="M.">M.</option>
+                        <option value="Mme">Mme</option>
+                        <option value="Dr.">Dr.</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
+                      <input
+                        id="middleName"
+                        className="w-full px-3 py-2 border rounded-md mt-1"
+                        value={formData.middleName || ""}
+                        onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Suffixe - bottom of name fields */}
+                  <div>
+                    <label htmlFor="suffix" className="text-sm font-medium">Suffixe</label>
+                    <input
+                      id="suffix"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.suffix || ""}
+                      onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
+                      placeholder="Jr., III, etc."
+                    />
+                  </div>
+                </>
+              )}
+
               {/* Type de client */}
               <div>
                 <label className="text-sm font-medium">Type de client</label>
@@ -110,96 +203,6 @@ export function ClientEditForm({
                     Entreprise
                   </Button>
                 </div>
-              </div>
-
-              {/* Nom complet (auto-generated, readonly) */}
-              <div>
-                <label htmlFor="name" className="text-sm font-medium">
-                  Nom complet
-                </label>
-                <input
-                  id="name"
-                  className="w-full px-3 py-2 border rounded-md mt-1 bg-muted cursor-not-allowed"
-                  value={formData.name || ""}
-                  readOnly
-                  placeholder="Se génère automatiquement"
-                />
-              </div>
-
-              {/* Champs de nom structuré (pour individus) */}
-              {formData.type === "individual" && (
-                <>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div>
-                      <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
-                      <select
-                        id="prefix"
-                        value={formData.prefix || ""}
-                        onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                        className="w-full px-3 py-2 border rounded mt-1"
-                      >
-                        <option value="">-</option>
-                        <option value="M.">M.</option>
-                        <option value="Mme">Mme</option>
-                        <option value="Dr.">Dr.</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label htmlFor="firstName" className="text-sm font-medium">Prénom</label>
-                      <input
-                        id="firstName"
-                        className="w-full px-3 py-2 border rounded-md mt-1"
-                        value={formData.firstName || ""}
-                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div>
-                      <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
-                      <input
-                        id="middleName"
-                        className="w-full px-3 py-2 border rounded-md mt-1"
-                        value={formData.middleName || ""}
-                        onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="lastName" className="text-sm font-medium">Nom de famille</label>
-                      <input
-                        id="lastName"
-                        className="w-full px-3 py-2 border rounded-md mt-1"
-                        value={formData.lastName || ""}
-                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="suffix" className="text-sm font-medium">Suffixe</label>
-                    <input
-                      id="suffix"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.suffix || ""}
-                      onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
-                      placeholder="Jr., III, etc."
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Nom d'artiste */}
-              <div>
-                <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste / Pseudo</label>
-                <input
-                  id="artistName"
-                  className="w-full px-3 py-2 border rounded-md mt-1"
-                  value={formData.artistName || ""}
-                  onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                />
               </div>
 
               {/* Birthday */}
