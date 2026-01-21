@@ -171,7 +171,7 @@ export function ClientEditForm({
                         id="prefix"
                         value={formData.prefix || ""}
                         onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                        className="w-full px-3 py-2 border rounded mt-1"
+                        className="w-full px-3 py-2 border rounded-md mt-1"
                       >
                         <option value="">-</option>
                         <option value="M.">M.</option>
@@ -224,7 +224,7 @@ export function ClientEditForm({
                   id="gender"
                   value={formData.gender || ""}
                   onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                  className="w-full px-3 py-2 border rounded mt-1"
+                  className="w-full px-3 py-2 border rounded-md mt-1"
                 >
                   <option value="">-</option>
                   <option value="male">Homme</option>
@@ -265,7 +265,7 @@ export function ClientEditForm({
                                 phones[index] = { ...phones[index], type: e.target.value };
                                 setFormData({ ...formData, phones });
                               }}
-                              className="px-3 py-2 border rounded text-sm"
+                              className="px-3 py-2 border rounded-md text-sm"
                             >
                               <option value="mobile">Mobile</option>
                               <option value="work">Travail</option>
@@ -332,7 +332,7 @@ export function ClientEditForm({
                                 emails[index] = { ...emails[index], type: e.target.value };
                                 setFormData({ ...formData, emails });
                               }}
-                              className="px-3 py-2 border rounded text-sm"
+                              className="px-3 py-2 border rounded-md text-sm"
                             >
                               <option value="work">Travail</option>
                               <option value="personal">Personnel</option>
@@ -400,7 +400,7 @@ export function ClientEditForm({
                                 websites[index] = { ...websites[index], type: e.target.value };
                                 setFormData({ ...formData, websites });
                               }}
-                              className="px-3 py-2 border rounded text-sm"
+                              className="px-3 py-2 border rounded-md text-sm"
                             >
                               <option value="website">Site web</option>
                               <option value="portfolio">Portfolio</option>
@@ -486,7 +486,7 @@ export function ClientEditForm({
                             addresses[index] = { ...addresses[index], type: e.target.value };
                             setFormData({ ...formData, addresses });
                           }}
-                          className="px-3 py-2 border rounded text-sm"
+                          className="px-3 py-2 border rounded-md text-sm"
                         >
                           <option value="home">Domicile</option>
                           <option value="work">Travail</option>
@@ -995,7 +995,7 @@ export function ClientEditForm({
                           customFields[index] = { ...customFields[index], type: e.target.value };
                           setFormData({ ...formData, customFields });
                         }}
-                        className="w-32 px-3 py-2 border rounded"
+                        className="w-32 px-3 py-2 border rounded-md"
                       >
                         <option value="text">Texte</option>
                         <option value="number">Nombre</option>
