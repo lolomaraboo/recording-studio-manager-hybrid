@@ -166,11 +166,11 @@ export function ClientDetailTabs({
         {/* Section 1: Informations de Base */}
         <Card>
           <CardContent className="pt-3">
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                   {isEditing ? (
                     <>
                       {/* Nom complet */}
-                      <div className="space-y-2">
+                      <div className="space-y-0.5">
                         <label htmlFor="name" className="text-sm font-medium">Nom complet</label>
                         <input
                           id="name"
@@ -184,7 +184,7 @@ export function ClientDetailTabs({
                       {client.type === "individual" && (
                         <>
                           <div className="grid gap-2 md:grid-cols-2">
-                            <div className="space-y-2">
+                            <div className="space-y-0.5">
                               <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
                               <select
                                 id="prefix"
@@ -199,7 +199,7 @@ export function ClientDetailTabs({
                               </select>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-0.5">
                               <label htmlFor="firstName" className="text-sm font-medium">Prénom</label>
                               <input
                                 id="firstName"
@@ -211,7 +211,7 @@ export function ClientDetailTabs({
                           </div>
 
                           <div className="grid gap-2 md:grid-cols-2">
-                            <div className="space-y-2">
+                            <div className="space-y-0.5">
                               <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
                               <input
                                 id="middleName"
@@ -221,7 +221,7 @@ export function ClientDetailTabs({
                               />
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-0.5">
                               <label htmlFor="lastName" className="text-sm font-medium">Nom</label>
                               <input
                                 id="lastName"
@@ -232,7 +232,7 @@ export function ClientDetailTabs({
                             </div>
                           </div>
 
-                          <div className="space-y-2">
+                          <div className="space-y-0.5">
                             <label htmlFor="suffix" className="text-sm font-medium">Suffixe</label>
                             <input
                               id="suffix"
@@ -246,7 +246,7 @@ export function ClientDetailTabs({
                       )}
 
                       {/* Nom d'artiste */}
-                      <div className="space-y-2">
+                      <div className="space-y-0.5">
                         <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste</label>
                         <input
                           id="artistName"
@@ -257,7 +257,7 @@ export function ClientDetailTabs({
                       </div>
 
                       {/* Emails multiples */}
-                      <div className="space-y-2">
+                      <div className="space-y-0.5">
                         <div className="flex items-center justify-between">
                           <label className="text-sm font-medium">Emails</label>
                           <Button
@@ -272,7 +272,7 @@ export function ClientDetailTabs({
                             Ajouter
                           </Button>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-0.5">
                           {(formData.emails || []).map((email: any, index: number) => (
                             <div key={index} className="flex gap-2">
                               <select
@@ -315,7 +315,7 @@ export function ClientDetailTabs({
                       </div>
 
                       {/* Téléphones multiples */}
-                      <div className="space-y-2">
+                      <div className="space-y-0.5">
                         <div className="flex items-center justify-between">
                           <label className="text-sm font-medium">Téléphones</label>
                           <Button
@@ -330,7 +330,7 @@ export function ClientDetailTabs({
                             Ajouter
                           </Button>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-0.5">
                           {(formData.phones || []).map((phone: any, index: number) => (
                             <div key={index} className="flex gap-2">
                               <select
@@ -372,7 +372,7 @@ export function ClientDetailTabs({
                       </div>
 
                       {/* Adresse */}
-                      <div className="space-y-2">
+                      <div className="space-y-0.5">
                         <label htmlFor="address" className="text-sm font-medium">Adresse</label>
                         <textarea
                           id="address"
@@ -387,7 +387,7 @@ export function ClientDetailTabs({
                     <>
                       {/* Affichage des informations de nom */}
                       {(client.prefix || client.firstName || client.middleName || client.lastName || client.suffix) && (
-                        <div className="text-base">
+                        <div className="text-sm">
                           <span className="font-semibold">
                             {[client.prefix, client.firstName, client.middleName, client.lastName, client.suffix]
                               .filter(Boolean)
@@ -397,17 +397,17 @@ export function ClientDetailTabs({
                       )}
 
                       {client.artistName && (
-                        <div className="flex items-center gap-2">
-                          <Building className="h-5 w-5 text-muted-foreground" />
-                          <p className="text-base font-medium">{client.artistName}</p>
+                        <div className="flex items-center gap-1.5">
+                          <Building className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-sm font-medium">{client.artistName}</p>
                         </div>
                       )}
 
                       {/* Affichage de l'email simple (legacy) */}
                       {client.email && (!client.emails || client.emails.length === 0) && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-5 w-5 text-muted-foreground" />
-                          <a href={`mailto:${client.email}`} className="text-base hover:underline">
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <a href={`mailto:${client.email}`} className="text-sm hover:underline">
                             {client.email}
                           </a>
                         </div>
@@ -415,11 +415,11 @@ export function ClientDetailTabs({
 
                       {/* Affichage des emails multiples */}
                       {(client.emails && client.emails.length > 0) && (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {client.emails.map((email: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <Mail className="h-5 w-5 text-muted-foreground" />
-                              <a href={`mailto:${email.email}`} className="text-base hover:underline">
+                            <div key={index} className="flex items-center gap-1.5">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              <a href={`mailto:${email.email}`} className="text-sm hover:underline">
                                 {email.email}
                               </a>
                               <span className="text-sm text-muted-foreground">
@@ -432,9 +432,9 @@ export function ClientDetailTabs({
 
                       {/* Affichage du téléphone simple (legacy) */}
                       {client.phone && (!client.phones || client.phones.length === 0) && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-5 w-5 text-muted-foreground" />
-                          <a href={`tel:${client.phone}`} className="text-base hover:underline">
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          <a href={`tel:${client.phone}`} className="text-sm hover:underline">
                             {client.phone}
                           </a>
                         </div>
@@ -442,11 +442,11 @@ export function ClientDetailTabs({
 
                       {/* Affichage des téléphones multiples */}
                       {(client.phones && client.phones.length > 0) && (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {client.phones.map((phone: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <Phone className="h-5 w-5 text-muted-foreground" />
-                              <a href={`tel:${phone.number}`} className="text-base hover:underline">
+                            <div key={index} className="flex items-center gap-1.5">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              <a href={`tel:${phone.number}`} className="text-sm hover:underline">
                                 {phone.number}
                               </a>
                               <span className="text-sm text-muted-foreground">
@@ -458,17 +458,17 @@ export function ClientDetailTabs({
                       )}
 
                       {client.address && (
-                        <div className="flex items-start gap-2">
-                          <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <p className="text-base whitespace-pre-wrap">{client.address}</p>
+                        <div className="flex items-start gap-1.5">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <p className="text-sm whitespace-pre-wrap">{client.address}</p>
                         </div>
                       )}
 
                       {/* Structured Address Fields */}
                       {(client.street || client.city || client.postalCode || client.region || client.country) && (
-                        <div className="flex items-start gap-2">
-                          <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <div className="text-base">
+                        <div className="flex items-start gap-1.5">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <div className="text-sm">
                             {client.street && <div>{client.street}</div>}
                             <div>
                               {[client.postalCode, client.city].filter(Boolean).join(' ')}
@@ -481,9 +481,9 @@ export function ClientDetailTabs({
 
                       {/* Birthday */}
                       {client.birthday && (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-5 w-5 text-muted-foreground" />
-                          <p className="text-base">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-sm">
                             {new Date(client.birthday).toLocaleDateString('fr-FR', {
                               year: 'numeric',
                               month: 'long',
@@ -495,23 +495,23 @@ export function ClientDetailTabs({
 
                       {/* Gender */}
                       {client.gender && (
-                        <div className="flex items-center gap-2">
-                          <Users className="h-5 w-5 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4 text-muted-foreground" />
                           <p className="text-base capitalize">{client.gender}</p>
                         </div>
                       )}
 
                       {/* Websites */}
                       {(client.websites && client.websites.length > 0) && (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {client.websites.map((website: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <Globe className="h-5 w-5 text-muted-foreground" />
+                            <div key={index} className="flex items-center gap-1.5">
+                              <Globe className="h-4 w-4 text-muted-foreground" />
                               <a
                                 href={website.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-base hover:underline"
+                                className="text-sm hover:underline"
                               >
                                 {website.url}
                               </a>
@@ -527,92 +527,92 @@ export function ClientDetailTabs({
                       {(client.spotifyUrl || client.appleMusicUrl || client.youtubeUrl || client.soundcloudUrl ||
                         client.bandcampUrl || client.deezerUrl || client.tidalUrl || client.amazonMusicUrl ||
                         client.audiomackUrl || client.beatportUrl || client.otherPlatformsUrl) && (
-                        <div className="pt-3 border-t mt-3">
-                          <h4 className="text-sm font-semibold mb-3 text-foreground">Plateformes de streaming</h4>
-                          <div className="space-y-2">
+                        <div className="pt-2 border-t mt-2">
+                          <h4 className="text-sm font-semibold mb-1.5 text-foreground">Plateformes de streaming</h4>
+                          <div className="space-y-0.5">
                             {client.spotifyUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiSpotify className="h-5 w-5 text-[#1DB954]" />
-                                <a href={client.spotifyUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiSpotify className="h-4 w-4 text-[#1DB954]" />
+                                <a href={client.spotifyUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Spotify
                                 </a>
                               </div>
                             )}
                             {client.appleMusicUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiApplemusic className="h-5 w-5 text-[#FA243C]" />
-                                <a href={client.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiApplemusic className="h-4 w-4 text-[#FA243C]" />
+                                <a href={client.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Apple Music
                                 </a>
                               </div>
                             )}
                             {client.youtubeUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiYoutube className="h-5 w-5 text-[#FF0000]" />
-                                <a href={client.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiYoutube className="h-4 w-4 text-[#FF0000]" />
+                                <a href={client.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   YouTube
                                 </a>
                               </div>
                             )}
                             {client.soundcloudUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiSoundcloud className="h-5 w-5 text-[#FF5500]" />
-                                <a href={client.soundcloudUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiSoundcloud className="h-4 w-4 text-[#FF5500]" />
+                                <a href={client.soundcloudUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   SoundCloud
                                 </a>
                               </div>
                             )}
                             {client.bandcampUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiBandcamp className="h-5 w-5 text-[#629AA9]" />
-                                <a href={client.bandcampUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiBandcamp className="h-4 w-4 text-[#629AA9]" />
+                                <a href={client.bandcampUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Bandcamp
                                 </a>
                               </div>
                             )}
                             {client.deezerUrl && (
-                              <div className="flex items-center gap-3">
-                                <Music className="h-5 w-5 text-[#FF0092]" />
-                                <a href={client.deezerUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <Music className="h-4 w-4 text-[#FF0092]" />
+                                <a href={client.deezerUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Deezer
                                 </a>
                               </div>
                             )}
                             {client.tidalUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiTidal className="h-5 w-5 text-[#000000] dark:text-white" />
-                                <a href={client.tidalUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiTidal className="h-4 w-4 text-[#000000] dark:text-white" />
+                                <a href={client.tidalUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Tidal
                                 </a>
                               </div>
                             )}
                             {client.amazonMusicUrl && (
-                              <div className="flex items-center gap-3">
-                                <SiAmazonmusic className="h-5 w-5 text-[#00A8E1]" />
-                                <a href={client.amazonMusicUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <SiAmazonmusic className="h-4 w-4 text-[#00A8E1]" />
+                                <a href={client.amazonMusicUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Amazon Music
                                 </a>
                               </div>
                             )}
                             {client.audiomackUrl && (
-                              <div className="flex items-center gap-3">
-                                <Music className="h-5 w-5 text-[#FFA200]" />
-                                <a href={client.audiomackUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <Music className="h-4 w-4 text-[#FFA200]" />
+                                <a href={client.audiomackUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Audiomack
                                 </a>
                               </div>
                             )}
                             {client.beatportUrl && (
-                              <div className="flex items-center gap-3">
-                                <Music className="h-5 w-5 text-[#94D500]" />
-                                <a href={client.beatportUrl} target="_blank" rel="noopener noreferrer" className="text-base hover:underline font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <Music className="h-4 w-4 text-[#94D500]" />
+                                <a href={client.beatportUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline font-medium">
                                   Beatport
                                 </a>
                               </div>
                             )}
                             {client.otherPlatformsUrl && (
-                              <div className="flex items-start gap-3">
-                                <Music className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <div className="flex items-start gap-1.5">
+                                <Music className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                 <div className="text-base whitespace-pre-wrap">{client.otherPlatformsUrl}</div>
                               </div>
                             )}
@@ -622,37 +622,37 @@ export function ClientDetailTabs({
 
                       {/* Industry Information */}
                       {(client.recordLabel || client.distributor || client.managerContact || client.publisher || client.performanceRightsSociety) && (
-                        <div className="pt-3 border-t mt-3">
-                          <h4 className="text-sm font-semibold mb-3 text-foreground">Informations professionnelles</h4>
-                          <div className="space-y-2">
+                        <div className="pt-2 border-t mt-2">
+                          <h4 className="text-sm font-semibold mb-1.5 text-foreground">Informations professionnelles</h4>
+                          <div className="space-y-0.5">
                             {client.recordLabel && (
-                              <div className="flex items-start gap-2">
-                                <span className="text-base font-semibold min-w-[140px]">Label:</span>
-                                <span className="text-base">{client.recordLabel}</span>
+                              <div className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">Label:</span>
+                                <span className="text-sm">{client.recordLabel}</span>
                               </div>
                             )}
                             {client.distributor && (
-                              <div className="flex items-start gap-2">
-                                <span className="text-base font-semibold min-w-[140px]">Distributeur:</span>
-                                <span className="text-base">{client.distributor}</span>
+                              <div className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">Distributeur:</span>
+                                <span className="text-sm">{client.distributor}</span>
                               </div>
                             )}
                             {client.managerContact && (
-                              <div className="flex items-start gap-2">
-                                <span className="text-base font-semibold min-w-[140px]">Manager:</span>
-                                <span className="text-base">{client.managerContact}</span>
+                              <div className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">Manager:</span>
+                                <span className="text-sm">{client.managerContact}</span>
                               </div>
                             )}
                             {client.publisher && (
-                              <div className="flex items-start gap-2">
-                                <span className="text-base font-semibold min-w-[140px]">Éditeur:</span>
-                                <span className="text-base">{client.publisher}</span>
+                              <div className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">Éditeur:</span>
+                                <span className="text-sm">{client.publisher}</span>
                               </div>
                             )}
                             {client.performanceRightsSociety && (
-                              <div className="flex items-start gap-2">
-                                <span className="text-base font-semibold min-w-[140px]">Société de droits:</span>
-                                <span className="text-base">{client.performanceRightsSociety}</span>
+                              <div className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">Société de droits:</span>
+                                <span className="text-sm">{client.performanceRightsSociety}</span>
                               </div>
                             )}
                           </div>
@@ -661,31 +661,31 @@ export function ClientDetailTabs({
 
                       {/* Career Information */}
                       {(client.yearsActive || client.notableWorks || client.awardsRecognition || client.biography) && (
-                        <div className="pt-3 border-t mt-3">
-                          <h4 className="text-sm font-semibold mb-3 text-foreground">Carrière</h4>
-                          <div className="space-y-3">
+                        <div className="pt-2 border-t mt-2">
+                          <h4 className="text-sm font-semibold mb-1.5 text-foreground">Carrière</h4>
+                          <div className="space-y-0.5">
                             {client.yearsActive && (
-                              <div className="flex items-start gap-2">
-                                <span className="text-base font-semibold min-w-[140px]">Années actives:</span>
-                                <span className="text-base">{client.yearsActive}</span>
+                              <div className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">Années actives:</span>
+                                <span className="text-sm">{client.yearsActive}</span>
                               </div>
                             )}
                             {client.notableWorks && (
                               <div>
-                                <h5 className="text-base font-semibold mb-1">Œuvres notables</h5>
-                                <p className="text-base whitespace-pre-wrap">{client.notableWorks}</p>
+                                <h5 className="text-sm font-semibold mb-0.5">Œuvres notables</h5>
+                                <p className="text-sm whitespace-pre-wrap">{client.notableWorks}</p>
                               </div>
                             )}
                             {client.awardsRecognition && (
                               <div>
-                                <h5 className="text-base font-semibold mb-1">Prix et distinctions</h5>
-                                <p className="text-base whitespace-pre-wrap">{client.awardsRecognition}</p>
+                                <h5 className="text-sm font-semibold mb-0.5">Prix et distinctions</h5>
+                                <p className="text-sm whitespace-pre-wrap">{client.awardsRecognition}</p>
                               </div>
                             )}
                             {client.biography && (
                               <div>
-                                <h5 className="text-base font-semibold mb-1">Biographie</h5>
-                                <p className="text-base whitespace-pre-wrap leading-relaxed">{client.biography}</p>
+                                <h5 className="text-sm font-semibold mb-0.5">Biographie</h5>
+                                <p className="text-sm whitespace-pre-wrap leading-relaxed">{client.biography}</p>
                               </div>
                             )}
                           </div>
@@ -694,9 +694,9 @@ export function ClientDetailTabs({
 
                       {/* Notes */}
                       {client.notes && (
-                        <div className="pt-3 border-t mt-3">
-                          <h4 className="text-sm font-semibold mb-3 text-foreground">Notes internes</h4>
-                          <p className="text-base whitespace-pre-wrap leading-relaxed bg-muted/50 p-3 rounded-md">{client.notes}</p>
+                        <div className="pt-2 border-t mt-2">
+                          <h4 className="text-sm font-semibold mb-1.5 text-foreground">Notes internes</h4>
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed bg-muted/50 p-2 rounded-md">{client.notes}</p>
                         </div>
                       )}
 
