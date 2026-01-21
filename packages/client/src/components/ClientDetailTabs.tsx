@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -49,6 +50,8 @@ interface ClientDetailTabsProps {
   clientWithContacts: any;
   addContactMutation: any;
   deleteContactMutation: any;
+  companies: any[];
+  members: any[];
 }
 
 export function ClientDetailTabs({
@@ -63,6 +66,8 @@ export function ClientDetailTabs({
   clientWithContacts,
   addContactMutation,
   deleteContactMutation,
+  companies,
+  members,
 }: ClientDetailTabsProps) {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -72,6 +77,23 @@ export function ClientDetailTabs({
   const { data: invoices } = trpc.invoices.list.useQuery({ limit: 100 });
   const { data: quotes } = trpc.quotes.list.useQuery({ limit: 100 });
   const { data: rooms } = trpc.rooms.list.useQuery();
+  const { data: allClients = [] } = trpc.clients.list.useQuery({ limit: 100 });
+
+  // Helper function to find a client by name in all clients
+  const findClientByName = (name: string): number | null => {
+    if (!name) return null;
+
+    // Remove email from manager contact if present (e.g., "Miss Becky Rogahn <email@...>")
+    const cleanName = name.replace(/<[^>]+>/, '').trim();
+
+    // Search in all clients by name or artistName
+    const foundClient = allClients.find((c: any) =>
+      c.name?.toLowerCase() === cleanName.toLowerCase() ||
+      c.artistName?.toLowerCase() === cleanName.toLowerCase()
+    );
+
+    return foundClient?.id || null;
+  };
 
   const handleUploadAvatar = async (file: File) => {
     setUploadingAvatar(true);
@@ -625,36 +647,81 @@ export function ClientDetailTabs({
                         <div className="pt-2 border-t mt-2">
                           <h4 className="text-sm font-semibold mb-1.5 text-foreground">Informations professionnelles</h4>
                           <div className="space-y-0.5">
-                            {client.recordLabel && (
-                              <div className="flex items-start gap-1.5">
-                                <span className="text-sm font-semibold min-w-[120px]">Label:</span>
-                                <span className="text-sm">{client.recordLabel}</span>
-                              </div>
-                            )}
-                            {client.distributor && (
-                              <div className="flex items-start gap-1.5">
-                                <span className="text-sm font-semibold min-w-[120px]">Distributeur:</span>
-                                <span className="text-sm">{client.distributor}</span>
-                              </div>
-                            )}
-                            {client.managerContact && (
-                              <div className="flex items-start gap-1.5">
-                                <span className="text-sm font-semibold min-w-[120px]">Manager:</span>
-                                <span className="text-sm">{client.managerContact}</span>
-                              </div>
-                            )}
-                            {client.publisher && (
-                              <div className="flex items-start gap-1.5">
-                                <span className="text-sm font-semibold min-w-[120px]">Éditeur:</span>
-                                <span className="text-sm">{client.publisher}</span>
-                              </div>
-                            )}
-                            {client.performanceRightsSociety && (
-                              <div className="flex items-start gap-1.5">
-                                <span className="text-sm font-semibold min-w-[120px]">Société de droits:</span>
-                                <span className="text-sm">{client.performanceRightsSociety}</span>
-                              </div>
-                            )}
+                            {client.recordLabel && (() => {
+                              const clientId = findClientByName(client.recordLabel);
+                              return (
+                                <div className="flex items-start gap-1.5">
+                                  <span className="text-sm font-semibold min-w-[120px]">Label:</span>
+                                  {clientId ? (
+                                    <Link to={`/clients/${clientId}`} className="text-sm text-primary hover:underline">
+                                      {client.recordLabel}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-sm">{client.recordLabel}</span>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                            {client.distributor && (() => {
+                              const clientId = findClientByName(client.distributor);
+                              return (
+                                <div className="flex items-start gap-1.5">
+                                  <span className="text-sm font-semibold min-w-[120px]">Distributeur:</span>
+                                  {clientId ? (
+                                    <Link to={`/clients/${clientId}`} className="text-sm text-primary hover:underline">
+                                      {client.distributor}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-sm">{client.distributor}</span>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                            {client.managerContact && (() => {
+                              const clientId = findClientByName(client.managerContact);
+                              return (
+                                <div className="flex items-start gap-1.5">
+                                  <span className="text-sm font-semibold min-w-[120px]">Manager:</span>
+                                  {clientId ? (
+                                    <Link to={`/clients/${clientId}`} className="text-sm text-primary hover:underline">
+                                      {client.managerContact}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-sm">{client.managerContact}</span>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                            {client.publisher && (() => {
+                              const clientId = findClientByName(client.publisher);
+                              return (
+                                <div className="flex items-start gap-1.5">
+                                  <span className="text-sm font-semibold min-w-[120px]">Éditeur:</span>
+                                  {clientId ? (
+                                    <Link to={`/clients/${clientId}`} className="text-sm text-primary hover:underline">
+                                      {client.publisher}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-sm">{client.publisher}</span>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                            {client.performanceRightsSociety && (() => {
+                              const clientId = findClientByName(client.performanceRightsSociety);
+                              return (
+                                <div className="flex items-start gap-1.5">
+                                  <span className="text-sm font-semibold min-w-[120px]">Société de droits:</span>
+                                  {clientId ? (
+                                    <Link to={`/clients/${clientId}`} className="text-sm text-primary hover:underline">
+                                      {client.performanceRightsSociety}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-sm">{client.performanceRightsSociety}</span>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       )}

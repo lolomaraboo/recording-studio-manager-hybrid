@@ -325,6 +325,8 @@ export default function ClientDetail() {
             clientWithContacts={clientWithContacts}
             addContactMutation={addContactMutation}
             deleteContactMutation={deleteContactMutation}
+            companies={companies}
+            members={members}
           />
         )}
 
