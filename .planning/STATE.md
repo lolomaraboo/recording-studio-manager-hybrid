@@ -25,10 +25,10 @@
 
 ## Current Position
 
-Phase: 26 of 26 (Formulaire Client avec Accordéons - Refonte UI Mode Édition) - Phase 26 COMPLETE ✅
-Plan: 1/1 complete (26-01 ✅)
-Status: Phase complete
-Last activity: 2026-01-20 - Completed 26-01-PLAN.md (accordion-based edit form with 7 sections, wizard pattern eliminated)
+Phase: 26.1 of 26.1 (Réorganisation Accordéons - Logique Studio d'Enregistrement) - Phase 26.1 NOT STARTED
+Plan: 0/0 complete (not yet planned)
+Status: Phase added, awaiting planning
+Last activity: 2026-01-20 - Phase 26.1 added to roadmap (reorganize 7 accordions → 5 sections following studio workflow logic: Identité → Profil Artistique → Coordonnées → Relations Pro → Notes Studio)
 
 Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅)
 
@@ -257,6 +257,12 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 ### Roadmap Evolution
 
+- **2026-01-20:** Phase 26.1 added after Phase 26: "Réorganisation Accordéons - Logique Studio d'Enregistrement" (ADDED)
+  - Reason: User feedback that 7 accordion structure doesn't follow studio recording workflow logic
+  - Impact: Musical profile (core business) positioned 5th instead of 2nd, contact info scattered across 2 sections
+  - Solution: Reorganize 7 → 5 fused accordions (Identité, Profil Artistique, Coordonnées, Relations Pro, Notes Studio)
+  - Benefits: Studio workflow priority (identity → artistic profile → contact → relations → notes), 28% less navigation, grouped logical sections
+  - Priority: UX optimization - Align UI structure with actual studio business processes
 - **2026-01-16:** Phase 21.1 inserted after Phase 21: "Fix Client Portal Authentication Persistence" (URGENT - INSERTED)
   - Reason: Critical authentication bug blocking Phase 17 UAT and production Client Portal
   - Impact: E2E tests 6/8 failing, clients cannot maintain authenticated session

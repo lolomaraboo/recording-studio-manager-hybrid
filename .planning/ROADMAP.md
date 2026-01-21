@@ -1812,9 +1812,9 @@ Phase 25 completes the many-to-many relationship UI between individual clients a
 **Plans**: 1 plan
 
 Plans:
-- [ ] 26-01-PLAN.md — Complete accordion-based edit form + integrate into ClientDetailTabs (4 tasks: complete 7 accordions, remove wizard, integrate tabs, manual testing)
+- [x] 26-01-PLAN.md — Complete accordion-based edit form + integrate into ClientDetailTabs (4 tasks: complete 7 accordions, remove wizard, integrate tabs, manual testing)
 
-**Status**: Not started
+**Status**: Complete (2026-01-20)
 
 **Details**:
 Phase 26 refactors the client edit form from a wizard pattern to accordion-based sections matching the view page design.
@@ -1858,4 +1858,68 @@ Replace ClientFormWizard with accordion-based ClientEditForm component:
 - ClientDetailTabs.tsx (818 lines) - needs conditional rendering update
 
 **Rationale**: User reported design inconsistency between view and edit pages. Current wizard pattern (ClientFormWizard) creates 5-step navigation overhead. Accordion pattern matches the view page structure (tabs + sections), reduces clicks, improves UX consistency. All fields remain accessible but organized logically. ClientEditForm already exists with 2 accordions complete - just needs 5 more sections added to reach parity with wizard.
+
+### Phase 26.1: Réorganisation Accordéons - Logique Studio d'Enregistrement
+
+**Goal**: Réorganiser les 7 accordéons en 5 sections fusionnées suivant la logique métier d'un studio (Identité → Profil Artistique → Coordonnées → Relations Pro → Notes Studio)
+
+**Depends on**: Phase 26 (Accordion-based edit form complete)
+
+**Research**: Unlikely (regroupement de sections existantes, pas de nouvelles fonctionnalités)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 26.1-01-PLAN.md — Restructure ClientEditForm: 7 → 5 accordéons regroupés (3 tasks: refactor accordions, update labels, manual testing)
+
+**Status**: Not started
+
+**Details**:
+Phase 26.1 réorganise les accordéons selon la logique workflow d'un studio d'enregistrement.
+
+**Current Issue:**
+- Structure actuelle: 7 accordéons séparés (base, contact, adresse, enrichies, profil musical, photo, entreprises)
+- Ordre non optimal: profil musical en 5e position alors que c'est le cœur du métier
+- Informations éparpillées: contact et adresse séparés, profil musical divisé
+
+**Solution (Option A - Structure Fusionnée):**
+
+**1. Identité** (fusionné: base + photo)
+- Type client, nom complet, nom d'artiste
+- Photo de profil
+- *Rationale: Identité visuelle immédiate en premier*
+
+**2. Profil Artistique** (fusionné: profil musical complet)
+- Artistique: Genres, instruments, label actuel
+- Streaming: Spotify, Apple Music, YouTube, SoundCloud, Bandcamp, etc.
+- Carrière: Biographie, représentation, réseaux sociaux, années actives, œuvres notables
+- *Rationale: Le cœur du métier studio en 2e position*
+
+**3. Coordonnées** (fusionné: contact + adresse)
+- Téléphones, emails, sites web
+- Adresses physiques complètes
+- *Rationale: Tout regroupé pour joindre le client*
+
+**4. Relations Professionnelles** (renommé: entreprises liées)
+- Membres d'entreprises / Entreprises liées
+- *Rationale: Terminologie plus professionnelle*
+
+**5. Notes Studio** (renommé: informations enrichies)
+- Notes internes, tags, champs personnalisés
+- *Rationale: Clarifier usage interne studio*
+
+**Key Benefits:**
+- ✅ 7 → 5 accordéons (moins de navigation)
+- ✅ Priorité métier (profil artistique en 2e, pas 5e)
+- ✅ Regroupement logique (tout le contact ensemble)
+- ✅ Terminologie studio ("Profil Artistique" > "Profil musical")
+- ✅ Workflow optimisé (identité → artistique → contact → relations → notes)
+
+**Technical Approach:**
+- Refactor ClientEditForm.tsx: fusionner accordéons existants
+- Pas de changements aux champs (juste réorganisation visuelle)
+- Mise à jour des titres et descriptions
+- Conservation de toute la logique formData existante
+
+**Rationale**: User feedback indique que l'organisation actuelle ne suit pas la logique métier d'un studio. Profil artistique devrait être prioritaire (position 2 vs 5 actuel). Regrouper contact+adresse réduit navigation. Terminologie "Profil Artistique" et "Notes Studio" plus claire que "Profil musical" et "Informations enrichies".
 
