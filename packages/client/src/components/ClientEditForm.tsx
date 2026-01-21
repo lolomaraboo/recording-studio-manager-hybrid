@@ -18,6 +18,8 @@ import {
   Building2,
   Plus,
   Trash2,
+  Upload,
+  X,
 } from "lucide-react";
 
 interface ClientEditFormProps {
@@ -72,6 +74,51 @@ export function ClientEditForm({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [openItems]);
 
+  // Avatar/Logo upload handlers
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload/avatar", {
+        method: "POST",
+        body: uploadFormData,
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+      const result = await response.json();
+      setFormData((prev: any) => ({ ...prev, avatarUrl: result.data.url }));
+    } catch (error) {
+      console.error("Avatar upload error:", error);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload/logo", {
+        method: "POST",
+        body: uploadFormData,
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+      const result = await response.json();
+      setFormData((prev: any) => ({ ...prev, logoUrl: result.data.url }));
+    } catch (error) {
+      console.error("Logo upload error:", error);
+    }
+  };
+
   return (
     <Accordion
       type="multiple"
@@ -109,6 +156,50 @@ export function ClientEditForm({
                     <Building2 className="h-4 w-4 mr-2" />
                     Entreprise
                   </Button>
+                </div>
+              </div>
+
+              {/* Avatar/Logo upload */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {formData.type === "individual" ? "Photo de profil" : "Logo de l'entreprise"}
+                </label>
+                <div className="flex items-center gap-4">
+                  {(formData.avatarUrl || formData.logoUrl) && (
+                    <div className="relative h-20 w-20 rounded-lg overflow-hidden border">
+                      <img
+                        src={formData.type === "individual" ? formData.avatarUrl : formData.logoUrl}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            [formData.type === "individual" ? "avatarUrl" : "logoUrl"]: "",
+                          })
+                        }
+                        className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={formData.type === "individual" ? handleAvatarUpload : handleLogoUpload}
+                      className="hidden"
+                    />
+                    <div className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent">
+                      <Upload className="h-4 w-4" />
+                      <span className="text-sm">
+                        {formData.type === "individual" ? "Télécharger une photo" : "Télécharger un logo"}
+                      </span>
+                    </div>
+                  </label>
                 </div>
               </div>
 
