@@ -245,394 +245,372 @@ export function ClientEditForm({
             <h3 className="text-lg font-semibold">Coordonnées</h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
+            <div className="px-4 pb-3 space-y-4">
               {/* Section 1: Contact */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Contact</h4>
-                <div className="space-y-3">
-                  {/* Email principal & Téléphone principal - same row */}
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div>
-                      <label htmlFor="email" className="text-sm font-medium">Email principal</label>
-                      <input
-                        id="email"
-                        type="email"
-                        className="w-full px-3 py-2 border rounded-md mt-1"
-                        value={formData.email || ""}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="email@exemple.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="phone" className="text-sm font-medium">Téléphone principal</label>
-                      <input
-                        id="phone"
-                        className="w-full px-3 py-2 border rounded-md mt-1"
-                        value={formData.phone || ""}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="+33 6 12 34 56 78"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Emails multiples - collapsible with "Add" button */}
+                <div className="space-y-4">
+                  {/* Téléphones - 3-column grid */}
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium">Emails multiples</label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        type="button"
-                        onClick={() => {
-                          const emails = [...(formData.emails || []), { type: "work", email: "" }];
-                          setFormData({ ...formData, emails });
-                        }}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Ajouter un email
-                      </Button>
-                    </div>
-                    {(formData.emails || []).length > 0 && (
-                      <div className="space-y-2">
-                        {formData.emails.map((email: any, index: number) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              type="email"
-                              value={email.email}
-                              onChange={(e) => {
-                                const emails = [...(formData.emails || [])];
-                                emails[index] = { ...emails[index], email: e.target.value };
-                                setFormData({ ...formData, emails });
-                              }}
-                              placeholder="Email"
-                              className="flex-1 px-3 py-2 border rounded-md"
-                            />
-                            <select
-                              value={email.type}
-                              onChange={(e) => {
-                                const emails = [...(formData.emails || [])];
-                                emails[index] = { ...emails[index], type: e.target.value };
-                                setFormData({ ...formData, emails });
-                              }}
-                              className="w-32 px-3 py-2 border rounded"
-                            >
-                              <option value="work">Travail</option>
-                              <option value="personal">Personnel</option>
-                              <option value="other">Autre</option>
-                            </select>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              type="button"
-                              onClick={() => {
-                                const emails = (formData.emails || []).filter((_: any, i: number) => i !== index);
-                                setFormData({ ...formData, emails });
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Téléphones multiples - collapsible with "Add" button */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium">Téléphones multiples</label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        type="button"
-                        onClick={() => {
-                          const phones = [...(formData.phones || []), { type: "mobile", number: "" }];
-                          setFormData({ ...formData, phones });
-                        }}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Ajouter un téléphone
-                      </Button>
-                    </div>
-                    {(formData.phones || []).length > 0 && (
-                      <div className="space-y-2">
-                        {formData.phones.map((phone: any, index: number) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              value={phone.number}
-                              onChange={(e) => {
-                                const phones = [...(formData.phones || [])];
-                                phones[index] = { ...phones[index], number: e.target.value };
-                                setFormData({ ...formData, phones });
-                              }}
-                              placeholder="Numéro"
-                              className="flex-1 px-3 py-2 border rounded-md"
-                            />
+                    <label className="text-sm font-medium mb-2 block">Téléphones</label>
+                    <div className="space-y-2">
+                      {(() => {
+                        const phones = (formData.phones || []).length > 0 ? formData.phones : [{ type: "mobile", number: "" }];
+                        return phones.map((phone: any, index: number) => (
+                          <div key={index} className="grid grid-cols-[120px_1fr_80px] gap-2 items-center">
                             <select
                               value={phone.type}
                               onChange={(e) => {
-                                const phones = [...(formData.phones || [])];
+                                const phones = [...(formData.phones || [{ type: "mobile", number: "" }])];
                                 phones[index] = { ...phones[index], type: e.target.value };
                                 setFormData({ ...formData, phones });
                               }}
-                              className="w-32 px-3 py-2 border rounded"
+                              className="px-3 py-2 border rounded text-sm"
                             >
                               <option value="mobile">Mobile</option>
                               <option value="work">Travail</option>
                               <option value="home">Domicile</option>
                             </select>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              type="button"
-                              onClick={() => {
-                                const phones = (formData.phones || []).filter((_: any, i: number) => i !== index);
+                            <input
+                              value={phone.number}
+                              onChange={(e) => {
+                                const phones = [...(formData.phones || [{ type: "mobile", number: "" }])];
+                                phones[index] = { ...phones[index], number: e.target.value };
                                 setFormData({ ...formData, phones });
                               }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Sites web multiples - collapsible with "Add" button */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium">Sites web</label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        type="button"
-                        onClick={() => {
-                          const websites = [...(formData.websites || []), { type: "website", url: "" }];
-                          setFormData({ ...formData, websites });
-                        }}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Ajouter un website
-                      </Button>
-                    </div>
-                    {(formData.websites || []).length > 0 && (
-                      <div className="space-y-2">
-                        {formData.websites.map((website: any, index: number) => (
-                          <div key={index} className="flex gap-2">
-                            <input
-                              type="url"
-                              value={website.url}
-                              onChange={(e) => {
-                                const websites = [...(formData.websites || [])];
-                                websites[index] = { ...websites[index], url: e.target.value };
-                                setFormData({ ...formData, websites });
-                              }}
-                              placeholder="https://..."
-                              className="flex-1 px-3 py-2 border rounded-md"
+                              placeholder="+33 6 12 34 56 78"
+                              className="px-3 py-2 border rounded-md text-sm"
                             />
-                            <input
-                              value={website.type}
-                              onChange={(e) => {
-                                const websites = [...(formData.websites || [])];
-                                websites[index] = { ...websites[index], type: e.target.value };
-                                setFormData({ ...formData, websites });
-                              }}
-                              placeholder="Type (ex: portfolio, blog)"
-                              className="w-48 px-3 py-2 border rounded-md"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              type="button"
-                              onClick={() => {
-                                const websites = (formData.websites || []).filter((_: any, i: number) => i !== index);
-                                setFormData({ ...formData, websites });
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Visual separator between sections */}
-              <div className="border-t pt-3 mt-3"></div>
-
-              {/* Section 2: Adresses */}
-              <div>
-                <h4 className="text-sm font-semibold mb-3">Adresses</h4>
-                <div className="space-y-3">
-                  {/* Adresse simple (backward compat) */}
-                  <div>
-                    <label htmlFor="address" className="text-sm font-medium">Adresse simple</label>
-                    <textarea
-                      id="address"
-                      rows={2}
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.address || ""}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      placeholder="123 Rue de la Musique, 75001 Paris, France"
-                    />
-                  </div>
-
-                  {/* OR separator */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 border-t"></div>
-                    <span className="text-xs text-muted-foreground">OU</span>
-                    <div className="flex-1 border-t"></div>
-                  </div>
-
-                  {/* Adresse structurée */}
-                  <div>
-                    <label className="text-sm font-medium">Adresse structurée</label>
-                    <div className="mt-2 space-y-2">
-                      <input
-                        id="street"
-                        className="w-full px-3 py-2 border rounded-md"
-                        value={formData.street || ""}
-                        onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                        placeholder="Rue"
-                      />
-                      <div className="grid gap-2 md:grid-cols-2">
-                        <input
-                          id="city"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.city || ""}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                          placeholder="Ville"
-                        />
-                        <input
-                          id="postalCode"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.postalCode || ""}
-                          onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                          placeholder="Code postal"
-                        />
-                      </div>
-                      <div className="grid gap-2 md:grid-cols-2">
-                        <input
-                          id="region"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.region || ""}
-                          onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                          placeholder="Région"
-                        />
-                        <input
-                          id="country"
-                          className="w-full px-3 py-2 border rounded-md"
-                          value={formData.country || ""}
-                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                          placeholder="Pays"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Adresses multiples - collapsible with "Add" button */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium">Adresses multiples</label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        type="button"
-                        onClick={() => {
-                          const addresses = [...(formData.addresses || []), {
-                            type: "home",
-                            street: "",
-                            city: "",
-                            postalCode: "",
-                            country: ""
-                          }];
-                          setFormData({ ...formData, addresses });
-                        }}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Ajouter une adresse
-                      </Button>
-                    </div>
-                    {(formData.addresses || []).length > 0 && (
-                      <div className="space-y-3">
-                        {formData.addresses.map((addr: any, index: number) => (
-                          <Card key={index} className="p-3 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <select
-                                value={addr.type}
-                                onChange={(e) => {
-                                  const addresses = [...(formData.addresses || [])];
-                                  addresses[index] = { ...addresses[index], type: e.target.value };
-                                  setFormData({ ...formData, addresses });
-                                }}
-                                className="w-32 px-3 py-2 border rounded"
-                              >
-                                <option value="home">Domicile</option>
-                                <option value="work">Travail</option>
-                                <option value="other">Autre</option>
-                              </select>
+                            <div className="flex gap-1">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 type="button"
                                 onClick={() => {
-                                  const addresses = (formData.addresses || []).filter((_: any, i: number) => i !== index);
-                                  setFormData({ ...formData, addresses });
+                                  const phones = [...(formData.phones || [{ type: "mobile", number: "" }]), { type: "mobile", number: "" }];
+                                  setFormData({ ...formData, phones });
                                 }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                type="button"
+                                onClick={() => {
+                                  const phones = (formData.phones || []).filter((_: any, i: number) => i !== index);
+                                  if (phones.length === 0) {
+                                    phones.push({ type: "mobile", number: "" });
+                                  }
+                                  setFormData({ ...formData, phones });
+                                }}
+                                disabled={phones.length === 1}
+                                className="h-8 w-8 p-0"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                            <input
-                              value={addr.street || ""}
-                              onChange={(e) => {
-                                const addresses = [...(formData.addresses || [])];
-                                addresses[index] = { ...addresses[index], street: e.target.value };
-                                setFormData({ ...formData, addresses });
-                              }}
-                              placeholder="Rue"
-                              className="w-full px-3 py-2 border rounded-md"
-                            />
-                            <div className="grid gap-2 md:grid-cols-2">
-                              <input
-                                value={addr.city || ""}
-                                onChange={(e) => {
-                                  const addresses = [...(formData.addresses || [])];
-                                  addresses[index] = { ...addresses[index], city: e.target.value };
-                                  setFormData({ ...formData, addresses });
-                                }}
-                                placeholder="Ville"
-                                className="w-full px-3 py-2 border rounded-md"
-                              />
-                              <input
-                                value={addr.postalCode || ""}
-                                onChange={(e) => {
-                                  const addresses = [...(formData.addresses || [])];
-                                  addresses[index] = { ...addresses[index], postalCode: e.target.value };
-                                  setFormData({ ...formData, addresses });
-                                }}
-                                placeholder="Code postal"
-                                className="w-full px-3 py-2 border rounded-md"
-                              />
-                            </div>
-                            <input
-                              value={addr.country || ""}
-                              onChange={(e) => {
-                                const addresses = [...(formData.addresses || [])];
-                                addresses[index] = { ...addresses[index], country: e.target.value };
-                                setFormData({ ...formData, addresses });
-                              }}
-                              placeholder="Pays"
-                              className="w-full px-3 py-2 border rounded-md"
-                            />
-                          </Card>
-                        ))}
-                      </div>
-                    )}
+                          </div>
+                        ));
+                      })()}
+                    </div>
                   </div>
+
+                  {/* Emails - 3-column grid */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Emails</label>
+                    <div className="space-y-2">
+                      {(() => {
+                        const emails = (formData.emails || []).length > 0 ? formData.emails : [{ type: "work", email: "" }];
+                        return emails.map((email: any, index: number) => (
+                          <div key={index} className="grid grid-cols-[120px_1fr_80px] gap-2 items-center">
+                            <select
+                              value={email.type}
+                              onChange={(e) => {
+                                const emails = [...(formData.emails || [{ type: "work", email: "" }])];
+                                emails[index] = { ...emails[index], type: e.target.value };
+                                setFormData({ ...formData, emails });
+                              }}
+                              className="px-3 py-2 border rounded text-sm"
+                            >
+                              <option value="work">Travail</option>
+                              <option value="personal">Personnel</option>
+                              <option value="other">Autre</option>
+                            </select>
+                            <input
+                              type="email"
+                              value={email.email}
+                              onChange={(e) => {
+                                const emails = [...(formData.emails || [{ type: "work", email: "" }])];
+                                emails[index] = { ...emails[index], email: e.target.value };
+                                setFormData({ ...formData, emails });
+                              }}
+                              placeholder="email@exemple.com"
+                              className="px-3 py-2 border rounded-md text-sm"
+                            />
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                type="button"
+                                onClick={() => {
+                                  const emails = [...(formData.emails || [{ type: "work", email: "" }]), { type: "work", email: "" }];
+                                  setFormData({ ...formData, emails });
+                                }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                type="button"
+                                onClick={() => {
+                                  const emails = (formData.emails || []).filter((_: any, i: number) => i !== index);
+                                  if (emails.length === 0) {
+                                    emails.push({ type: "work", email: "" });
+                                  }
+                                  setFormData({ ...formData, emails });
+                                }}
+                                disabled={emails.length === 1}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Websites - 3-column grid */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Sites web</label>
+                    <div className="space-y-2">
+                      {(() => {
+                        const websites = (formData.websites || []).length > 0 ? formData.websites : [{ type: "website", url: "" }];
+                        return websites.map((website: any, index: number) => (
+                          <div key={index} className="grid grid-cols-[120px_1fr_80px] gap-2 items-center">
+                            <select
+                              value={website.type}
+                              onChange={(e) => {
+                                const websites = [...(formData.websites || [{ type: "website", url: "" }])];
+                                websites[index] = { ...websites[index], type: e.target.value };
+                                setFormData({ ...formData, websites });
+                              }}
+                              className="px-3 py-2 border rounded text-sm"
+                            >
+                              <option value="website">Site web</option>
+                              <option value="portfolio">Portfolio</option>
+                              <option value="social">Réseaux sociaux</option>
+                              <option value="other">Autre</option>
+                            </select>
+                            <input
+                              type="url"
+                              value={website.url}
+                              onChange={(e) => {
+                                const websites = [...(formData.websites || [{ type: "website", url: "" }])];
+                                websites[index] = { ...websites[index], url: e.target.value };
+                                setFormData({ ...formData, websites });
+                              }}
+                              placeholder="https://..."
+                              className="px-3 py-2 border rounded-md text-sm"
+                            />
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                type="button"
+                                onClick={() => {
+                                  const websites = [...(formData.websites || [{ type: "website", url: "" }]), { type: "website", url: "" }];
+                                  setFormData({ ...formData, websites });
+                                }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                type="button"
+                                onClick={() => {
+                                  const websites = (formData.websites || []).filter((_: any, i: number) => i !== index);
+                                  if (websites.length === 0) {
+                                    websites.push({ type: "website", url: "" });
+                                  }
+                                  setFormData({ ...formData, websites });
+                                }}
+                                disabled={websites.length === 1}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual separator between sections */}
+              <div className="border-t"></div>
+
+              {/* Section 2: Adresses */}
+              <div>
+                <h4 className="text-sm font-semibold mb-3">Adresses</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const addresses = (formData.addresses || []).length > 0 ? formData.addresses : [{
+                      type: "home",
+                      street: "",
+                      city: "",
+                      postalCode: "",
+                      country: ""
+                    }];
+                    return addresses.map((addr: any, index: number) => (
+                      <div key={index} className="grid grid-cols-[120px_1fr_80px] gap-2 items-start">
+                        <select
+                          value={addr.type}
+                          onChange={(e) => {
+                            const addresses = [...(formData.addresses || [{
+                              type: "home",
+                              street: "",
+                              city: "",
+                              postalCode: "",
+                              country: ""
+                            }])];
+                            addresses[index] = { ...addresses[index], type: e.target.value };
+                            setFormData({ ...formData, addresses });
+                          }}
+                          className="px-3 py-2 border rounded text-sm"
+                        >
+                          <option value="home">Domicile</option>
+                          <option value="work">Travail</option>
+                          <option value="other">Autre</option>
+                        </select>
+                        <div className="space-y-2">
+                          <input
+                            value={addr.street || ""}
+                            onChange={(e) => {
+                              const addresses = [...(formData.addresses || [{
+                                type: "home",
+                                street: "",
+                                city: "",
+                                postalCode: "",
+                                country: ""
+                              }])];
+                              addresses[index] = { ...addresses[index], street: e.target.value };
+                              setFormData({ ...formData, addresses });
+                            }}
+                            placeholder="Rue"
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                          <div className="grid gap-2 grid-cols-2">
+                            <input
+                              value={addr.city || ""}
+                              onChange={(e) => {
+                                const addresses = [...(formData.addresses || [{
+                                  type: "home",
+                                  street: "",
+                                  city: "",
+                                  postalCode: "",
+                                  country: ""
+                                }])];
+                                addresses[index] = { ...addresses[index], city: e.target.value };
+                                setFormData({ ...formData, addresses });
+                              }}
+                              placeholder="Ville"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                            <input
+                              value={addr.postalCode || ""}
+                              onChange={(e) => {
+                                const addresses = [...(formData.addresses || [{
+                                  type: "home",
+                                  street: "",
+                                  city: "",
+                                  postalCode: "",
+                                  country: ""
+                                }])];
+                                addresses[index] = { ...addresses[index], postalCode: e.target.value };
+                                setFormData({ ...formData, addresses });
+                              }}
+                              placeholder="Code postal"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                          </div>
+                          <input
+                            value={addr.country || ""}
+                            onChange={(e) => {
+                              const addresses = [...(formData.addresses || [{
+                                type: "home",
+                                street: "",
+                                city: "",
+                                postalCode: "",
+                                country: ""
+                              }])];
+                              addresses[index] = { ...addresses[index], country: e.target.value };
+                              setFormData({ ...formData, addresses });
+                            }}
+                            placeholder="Pays"
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            type="button"
+                            onClick={() => {
+                              const addresses = [...(formData.addresses || [{
+                                type: "home",
+                                street: "",
+                                city: "",
+                                postalCode: "",
+                                country: ""
+                              }]), {
+                                type: "home",
+                                street: "",
+                                city: "",
+                                postalCode: "",
+                                country: ""
+                              }];
+                              setFormData({ ...formData, addresses });
+                            }}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            type="button"
+                            onClick={() => {
+                              const addresses = (formData.addresses || []).filter((_: any, i: number) => i !== index);
+                              if (addresses.length === 0) {
+                                addresses.push({
+                                  type: "home",
+                                  street: "",
+                                  city: "",
+                                  postalCode: "",
+                                  country: ""
+                                });
+                              }
+                              setFormData({ ...formData, addresses });
+                            }}
+                            disabled={addresses.length === 1}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ));
+                  })()}
                 </div>
               </div>
             </div>
