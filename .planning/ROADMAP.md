@@ -1799,3 +1799,63 @@ Phase 25 completes the many-to-many relationship UI between individual clients a
 - Toast notifications for all actions
 
 **Rationale**: La table companyMembers existe en DB avec relations many-to-many (company_client_id, member_client_id, role, isPrimary) et API partiels (getMembers, getAllMembers), mais aucune UI pour créer/modifier/supprimer ces relations. Les studios doivent pouvoir lier contacts individuels aux entreprises clientes (ex: "Alexandre Grand - Ingénieur du son" membre de "Sound Production SARL"). Manque endpoints API (addMember, removeMember, updateMember) + UI complète (onglet Membres pour entreprises, section Entreprises pour individus).
+---
+
+### Phase 26: Formulaire Client avec Accordéons - Refonte UI Mode Édition
+
+**Goal**: Remplacer le wizard ClientFormWizard par des accordéons dans l'onglet Informations pour cohérence avec la page de visualisation
+
+**Depends on**: Phase 25 (Gestion relations client-entreprise complete)
+
+**Research**: Unlikely (UI patterns établis, composants shadcn/ui accordion déjà utilisés)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 26-01-PLAN.md — Complete accordion-based edit form + integrate into ClientDetailTabs (4 tasks: complete 7 accordions, remove wizard, integrate tabs, manual testing)
+
+**Status**: Not started
+
+**Details**:
+Phase 26 refactors the client edit form from a wizard pattern to accordion-based sections matching the view page design.
+
+**Current Issue:**
+- View page (http://localhost:5174/clients/4) uses tabs with clean sections
+- Edit mode (http://localhost:5174/clients/4?edit=true) uses ClientFormWizard with stepper navigation
+- Design inconsistency creates cognitive friction for users
+
+**Solution:**
+Replace ClientFormWizard with accordion-based ClientEditForm component:
+- Complete existing ClientEditForm.tsx with 7 accordion sections (currently only 2 complete)
+- Within "Informations" tab, use accordions for sections:
+  - Identité (type, nom complet, structured name, artistName, photo)
+  - Contact (emails multiples, téléphones multiples, sites web)
+  - Adresse (adresse structurée avec street/city/postalCode/region/country)
+  - Personnel (birthday, gender, customFields)
+  - Plateformes streaming (11 streaming platform URLs)
+  - Professionnel (recordLabel, distributor, managerContact, publisher, performanceRightsSociety)
+  - Carrière (yearsActive, notableWorks, awardsRecognition, biography, genres, instruments)
+- Integrate into ClientDetailTabs when isEditing=true
+- Remove ClientFormWizard references from ClientDetail.tsx
+
+**Key Benefits:**
+- Visual consistency between view and edit modes
+- All 40+ vCard fields accessible in organized sections
+- Reduced cognitive load (no stepper navigation)
+- Maintains existing formData/setFormData pattern
+- All tabs remain accessible in edit mode (Projets, Tracks, Sessions, Finances)
+
+**Technical Approach:**
+- Complete ClientEditForm.tsx with 5 missing accordions (Address, Personal, Streaming, Professional, Career)
+- Remove unused ClientFormWizard import from ClientDetail.tsx
+- Update ClientDetailTabs to conditionally render ClientEditForm when isEditing=true
+- Preserve all existing fields from ClientFormWizard (40+ vCard fields)
+- Reuse shadcn/ui Accordion component (already in project)
+
+**Implementation Status:**
+- ClientEditForm.tsx exists with partial implementation (2/7 accordions complete - Identity, Contact)
+- ClientFormWizard.tsx exists (796 lines) - will be deprecated after this phase
+- ClientDetailTabs.tsx (818 lines) - needs conditional rendering update
+
+**Rationale**: User reported design inconsistency between view and edit pages. Current wizard pattern (ClientFormWizard) creates 5-step navigation overhead. Accordion pattern matches the view page structure (tabs + sections), reduces clicks, improves UX consistency. All fields remain accessible but organized logically. ClientEditForm already exists with 2 accordions complete - just needs 5 more sections added to reach parity with wizard.
+
