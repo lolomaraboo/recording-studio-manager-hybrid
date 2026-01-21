@@ -21,6 +21,10 @@ import {
   Upload,
   X,
   Users,
+  MapPin,
+  Music,
+  Radio,
+  FileText,
 } from "lucide-react";
 import { CompanyMembersIndicator } from "@/components/CompanyMembersIndicator";
 
@@ -132,7 +136,10 @@ export function ClientEditForm({
       <AccordionItem value="identite">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Identité</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Identité
+            </h3>
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
@@ -335,7 +342,10 @@ export function ClientEditForm({
       <AccordionItem value="coordonnees">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Coordonnées</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Coordonnées
+            </h3>
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-4">
@@ -743,7 +753,10 @@ export function ClientEditForm({
       <AccordionItem value="profil-artistique">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Profil Artistique</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Music className="h-5 w-5 text-primary" />
+              Profil Artistique
+            </h3>
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
@@ -914,7 +927,10 @@ export function ClientEditForm({
       <AccordionItem value="streaming">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Plateformes de Streaming</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Radio className="h-5 w-5 text-primary" />
+              Plateformes de Streaming
+            </h3>
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
@@ -1071,7 +1087,10 @@ export function ClientEditForm({
       <AccordionItem value="notes-studio">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Notes Studio</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              Champs Personnalisés
+            </h3>
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
