@@ -1870,9 +1870,9 @@ Replace ClientFormWizard with accordion-based ClientEditForm component:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 26.1-01-PLAN.md — Restructure ClientEditForm: 7 → 5 accordéons regroupés (3 tasks: refactor accordions, update labels, manual testing)
+- [x] 26.1-01-PLAN.md — Restructure ClientEditForm: 7 → 5 accordéons regroupés (3 tasks: refactor accordions, update labels, manual testing)
 
-**Status**: Not started
+**Status**: Ready for execution
 
 **Details**:
 Phase 26.1 réorganise les accordéons selon la logique workflow d'un studio d'enregistrement.
