@@ -292,7 +292,7 @@ export function ClientEditForm({
                                 }}
                                 className="h-8 w-8 p-0"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-4 w-4 text-muted-foreground" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -360,7 +360,7 @@ export function ClientEditForm({
                                 }}
                                 className="h-8 w-8 p-0"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-4 w-4 text-muted-foreground" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -429,7 +429,7 @@ export function ClientEditForm({
                                 }}
                                 className="h-8 w-8 p-0"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-4 w-4 text-muted-foreground" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -583,7 +583,7 @@ export function ClientEditForm({
                             }}
                             className="h-8 w-8 p-0"
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-4 w-4 text-muted-foreground" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -971,7 +971,7 @@ export function ClientEditForm({
                       setFormData({ ...formData, customFields });
                     }}
                   >
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="mr-2 h-4 w-4 text-muted-foreground" />
                     Ajouter
                   </Button>
                 </div>
