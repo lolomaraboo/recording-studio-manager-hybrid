@@ -221,8 +221,8 @@ export default function ClientDetail() {
                   <div className="flex flex-wrap gap-2">
                     {companies.map((item: any) => (
                       <Link
-                        key={item.companyId}
-                        to={`/clients/${item.companyId}`}
+                        key={item.company?.id}
+                        to={`/clients/${item.company?.id}`}
                       >
                         <Badge variant="secondary" className="flex items-center gap-1 hover:bg-secondary/80 transition-colors">
                           {item.isPrimary && (

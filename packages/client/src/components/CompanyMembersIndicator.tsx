@@ -60,7 +60,7 @@ export function CompanyMembersIndicator({
           </div>
           {members.map((item: any) => {
             const entity = clientType === "company" ? item.member : item.company;
-            const entityId = clientType === "company" ? item.memberId : item.companyId;
+            const entityId = clientType === "company" ? item.member?.id : item.company?.id;
             const name = entity?.name || "Inconnu";
 
             return (
