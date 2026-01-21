@@ -32,6 +32,25 @@ export function ClientEditForm({
   // State to manage open accordions for Alt key toggle
   const [openItems, setOpenItems] = useState<string[]>(["identite"]);
 
+  // Auto-fill "Nom complet" from structured name fields
+  useEffect(() => {
+    // Only auto-fill for individual clients
+    if (formData.type === "individual") {
+      const parts = [
+        formData.prefix,
+        formData.firstName,
+        formData.middleName,
+        formData.lastName,
+        formData.suffix
+      ].filter(Boolean);
+
+      if (parts.length > 0) {
+        const autoName = parts.join(' ');
+        setFormData((prev: any) => ({ ...prev, name: autoName }));
+      }
+    }
+  }, [formData.prefix, formData.firstName, formData.middleName, formData.lastName, formData.suffix, formData.type, setFormData]);
+
   // Handle Alt key to toggle all accordions
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -96,7 +115,7 @@ export function ClientEditForm({
               {/* Nom complet */}
               <div>
                 <label htmlFor="name" className="text-sm font-medium">
-                  Nom complet <span className="text-destructive">*</span>
+                  Nom complet
                 </label>
                 <input
                   id="name"
