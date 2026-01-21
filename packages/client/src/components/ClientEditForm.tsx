@@ -292,7 +292,7 @@ export function ClientEditForm({
                                 }}
                                 className="h-8 w-8 p-0"
                               >
-                                <Plus className="h-4 w-4 text-muted-foreground" />
+                                <Plus className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -308,7 +308,7 @@ export function ClientEditForm({
                                 disabled={phones.length === 1}
                                 className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -360,7 +360,7 @@ export function ClientEditForm({
                                 }}
                                 className="h-8 w-8 p-0"
                               >
-                                <Plus className="h-4 w-4 text-muted-foreground" />
+                                <Plus className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -376,7 +376,7 @@ export function ClientEditForm({
                                 disabled={emails.length === 1}
                                 className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -429,7 +429,7 @@ export function ClientEditForm({
                                 }}
                                 className="h-8 w-8 p-0"
                               >
-                                <Plus className="h-4 w-4 text-muted-foreground" />
+                                <Plus className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -445,7 +445,7 @@ export function ClientEditForm({
                                 disabled={websites.length === 1}
                                 className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -583,7 +583,7 @@ export function ClientEditForm({
                             }}
                             className="h-8 w-8 p-0"
                           >
-                            <Plus className="h-4 w-4 text-muted-foreground" />
+                            <Plus className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -605,7 +605,7 @@ export function ClientEditForm({
                             disabled={addresses.length === 1}
                             className="h-8 w-8 p-0"
                           >
-                            <Trash2 className="h-4 w-4 text-muted-foreground" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -971,7 +971,7 @@ export function ClientEditForm({
                       setFormData({ ...formData, customFields });
                     }}
                   >
-                    <Plus className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Ajouter
                   </Button>
                 </div>
@@ -1021,7 +1021,7 @@ export function ClientEditForm({
                           setFormData({ ...formData, customFields });
                         }}
                       >
-                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   ))}
