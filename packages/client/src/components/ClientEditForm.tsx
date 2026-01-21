@@ -159,50 +159,6 @@ export function ClientEditForm({
                 </div>
               </div>
 
-              {/* Avatar/Logo upload */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {formData.type === "individual" ? "Photo de profil" : "Logo de l'entreprise"}
-                </label>
-                <div className="flex items-center gap-4">
-                  {(formData.avatarUrl || formData.logoUrl) && (
-                    <div className="relative h-20 w-20 rounded-lg overflow-hidden border">
-                      <img
-                        src={formData.type === "individual" ? formData.avatarUrl : formData.logoUrl}
-                        alt="Preview"
-                        className="h-full w-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setFormData({
-                            ...formData,
-                            [formData.type === "individual" ? "avatarUrl" : "logoUrl"]: "",
-                          })
-                        }
-                        className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
-                  <label className="cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={formData.type === "individual" ? handleAvatarUpload : handleLogoUpload}
-                      className="hidden"
-                    />
-                    <div className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent">
-                      <Upload className="h-4 w-4" />
-                      <span className="text-sm">
-                        {formData.type === "individual" ? "Télécharger une photo" : "Télécharger un logo"}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
               {/* Nom d'artiste - SECOND POSITION */}
               <div>
                 <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste / Pseudo</label>
@@ -323,6 +279,50 @@ export function ClientEditForm({
                   <option value="other">Autre</option>
                   <option value="prefer_not_to_say">Préfère ne pas répondre</option>
                 </select>
+              </div>
+
+              {/* Avatar/Logo upload */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {formData.type === "individual" ? "Photo de profil" : "Logo de l'entreprise"}
+                </label>
+                <div className="flex items-center gap-4">
+                  {(formData.avatarUrl || formData.logoUrl) && (
+                    <div className="relative h-20 w-20 rounded-lg overflow-hidden border">
+                      <img
+                        src={formData.type === "individual" ? formData.avatarUrl : formData.logoUrl}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            [formData.type === "individual" ? "avatarUrl" : "logoUrl"]: "",
+                          })
+                        }
+                        className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={formData.type === "individual" ? handleAvatarUpload : handleLogoUpload}
+                      className="hidden"
+                    />
+                    <div className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent">
+                      <Upload className="h-4 w-4" />
+                      <span className="text-sm">
+                        {formData.type === "individual" ? "Télécharger une photo" : "Télécharger un logo"}
+                      </span>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
           </AccordionContent>
