@@ -31,7 +31,7 @@ export function ClientEditForm({
   return (
     <Accordion
       type="multiple"
-      defaultValue={["identite", "profil-artistique", "coordonnees", "relations-professionnelles", "notes-studio"]}
+      defaultValue={["identite", "profil-artistique", "streaming", "coordonnees", "relations-professionnelles", "notes-studio"]}
       className="space-y-2"
     >
       {/* Accordéon 1: Identité */}
@@ -160,7 +160,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 2: Profil Artistique (FUSED: streaming + professional + career) */}
+      {/* Accordéon 2: Profil Artistique (genres, instruments, professional, career) */}
       <AccordionItem value="profil-artistique">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -199,155 +199,6 @@ export function ClientEditForm({
                         setFormData({ ...formData, instruments });
                       }}
                       placeholder="Guitare, Piano, Basse (séparés par virgules)"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Subsection: Streaming Platforms */}
-              <div className="border-t pt-3 mt-3">
-                <h4 className="text-sm font-semibold mb-2">Plateformes de streaming</h4>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {/* Spotify */}
-                  <div>
-                    <label htmlFor="spotifyUrl" className="text-sm font-medium">Spotify</label>
-                    <input
-                      id="spotifyUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.spotifyUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, spotifyUrl: e.target.value })}
-                      placeholder="https://open.spotify.com/artist/..."
-                    />
-                  </div>
-
-                  {/* Apple Music */}
-                  <div>
-                    <label htmlFor="appleMusicUrl" className="text-sm font-medium">Apple Music</label>
-                    <input
-                      id="appleMusicUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.appleMusicUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, appleMusicUrl: e.target.value })}
-                      placeholder="https://music.apple.com/artist/..."
-                    />
-                  </div>
-
-                  {/* YouTube */}
-                  <div>
-                    <label htmlFor="youtubeUrl" className="text-sm font-medium">YouTube</label>
-                    <input
-                      id="youtubeUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.youtubeUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
-                      placeholder="https://youtube.com/@..."
-                    />
-                  </div>
-
-                  {/* SoundCloud */}
-                  <div>
-                    <label htmlFor="soundcloudUrl" className="text-sm font-medium">SoundCloud</label>
-                    <input
-                      id="soundcloudUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.soundcloudUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, soundcloudUrl: e.target.value })}
-                      placeholder="https://soundcloud.com/..."
-                    />
-                  </div>
-
-                  {/* Bandcamp */}
-                  <div>
-                    <label htmlFor="bandcampUrl" className="text-sm font-medium">Bandcamp</label>
-                    <input
-                      id="bandcampUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.bandcampUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, bandcampUrl: e.target.value })}
-                      placeholder="https://artist.bandcamp.com"
-                    />
-                  </div>
-
-                  {/* Deezer */}
-                  <div>
-                    <label htmlFor="deezerUrl" className="text-sm font-medium">Deezer</label>
-                    <input
-                      id="deezerUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.deezerUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, deezerUrl: e.target.value })}
-                      placeholder="https://www.deezer.com/artist/..."
-                    />
-                  </div>
-
-                  {/* Tidal */}
-                  <div>
-                    <label htmlFor="tidalUrl" className="text-sm font-medium">Tidal</label>
-                    <input
-                      id="tidalUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.tidalUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, tidalUrl: e.target.value })}
-                      placeholder="https://tidal.com/artist/..."
-                    />
-                  </div>
-
-                  {/* Amazon Music */}
-                  <div>
-                    <label htmlFor="amazonMusicUrl" className="text-sm font-medium">Amazon Music</label>
-                    <input
-                      id="amazonMusicUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.amazonMusicUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, amazonMusicUrl: e.target.value })}
-                      placeholder="https://music.amazon.com/artists/..."
-                    />
-                  </div>
-
-                  {/* Audiomack */}
-                  <div>
-                    <label htmlFor="audiomackUrl" className="text-sm font-medium">Audiomack</label>
-                    <input
-                      id="audiomackUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.audiomackUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, audiomackUrl: e.target.value })}
-                      placeholder="https://audiomack.com/..."
-                    />
-                  </div>
-
-                  {/* Beatport */}
-                  <div>
-                    <label htmlFor="beatportUrl" className="text-sm font-medium">Beatport</label>
-                    <input
-                      id="beatportUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.beatportUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, beatportUrl: e.target.value })}
-                      placeholder="https://www.beatport.com/artist/..."
-                    />
-                  </div>
-
-                  {/* Other platforms */}
-                  <div>
-                    <label htmlFor="otherPlatformsUrl" className="text-sm font-medium">Autres plateformes</label>
-                    <input
-                      id="otherPlatformsUrl"
-                      type="url"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.otherPlatformsUrl || ""}
-                      onChange={(e) => setFormData({ ...formData, otherPlatformsUrl: e.target.value })}
-                      placeholder="https://..."
                     />
                   </div>
                 </div>
@@ -480,7 +331,164 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 3: Coordonnées (FUSED: contact + address) */}
+      {/* Accordéon 3: Plateformes de Streaming */}
+      <AccordionItem value="streaming">
+        <Card>
+          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+            <h3 className="text-lg font-semibold">Plateformes de Streaming</h3>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="px-4 pb-3 space-y-3">
+              <div className="grid gap-3 md:grid-cols-2">
+                {/* Spotify */}
+                <div>
+                  <label htmlFor="spotifyUrl" className="text-sm font-medium">Spotify</label>
+                  <input
+                    id="spotifyUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.spotifyUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, spotifyUrl: e.target.value })}
+                    placeholder="https://open.spotify.com/artist/..."
+                  />
+                </div>
+
+                {/* Apple Music */}
+                <div>
+                  <label htmlFor="appleMusicUrl" className="text-sm font-medium">Apple Music</label>
+                  <input
+                    id="appleMusicUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.appleMusicUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, appleMusicUrl: e.target.value })}
+                    placeholder="https://music.apple.com/artist/..."
+                  />
+                </div>
+
+                {/* YouTube */}
+                <div>
+                  <label htmlFor="youtubeUrl" className="text-sm font-medium">YouTube</label>
+                  <input
+                    id="youtubeUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.youtubeUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                    placeholder="https://youtube.com/@..."
+                  />
+                </div>
+
+                {/* SoundCloud */}
+                <div>
+                  <label htmlFor="soundcloudUrl" className="text-sm font-medium">SoundCloud</label>
+                  <input
+                    id="soundcloudUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.soundcloudUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, soundcloudUrl: e.target.value })}
+                    placeholder="https://soundcloud.com/..."
+                  />
+                </div>
+
+                {/* Bandcamp */}
+                <div>
+                  <label htmlFor="bandcampUrl" className="text-sm font-medium">Bandcamp</label>
+                  <input
+                    id="bandcampUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.bandcampUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, bandcampUrl: e.target.value })}
+                    placeholder="https://artist.bandcamp.com"
+                  />
+                </div>
+
+                {/* Deezer */}
+                <div>
+                  <label htmlFor="deezerUrl" className="text-sm font-medium">Deezer</label>
+                  <input
+                    id="deezerUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.deezerUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, deezerUrl: e.target.value })}
+                    placeholder="https://www.deezer.com/artist/..."
+                  />
+                </div>
+
+                {/* Tidal */}
+                <div>
+                  <label htmlFor="tidalUrl" className="text-sm font-medium">Tidal</label>
+                  <input
+                    id="tidalUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.tidalUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, tidalUrl: e.target.value })}
+                    placeholder="https://tidal.com/artist/..."
+                  />
+                </div>
+
+                {/* Amazon Music */}
+                <div>
+                  <label htmlFor="amazonMusicUrl" className="text-sm font-medium">Amazon Music</label>
+                  <input
+                    id="amazonMusicUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.amazonMusicUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, amazonMusicUrl: e.target.value })}
+                    placeholder="https://music.amazon.com/artists/..."
+                  />
+                </div>
+
+                {/* Audiomack */}
+                <div>
+                  <label htmlFor="audiomackUrl" className="text-sm font-medium">Audiomack</label>
+                  <input
+                    id="audiomackUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.audiomackUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, audiomackUrl: e.target.value })}
+                    placeholder="https://audiomack.com/..."
+                  />
+                </div>
+
+                {/* Beatport */}
+                <div>
+                  <label htmlFor="beatportUrl" className="text-sm font-medium">Beatport</label>
+                  <input
+                    id="beatportUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.beatportUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, beatportUrl: e.target.value })}
+                    placeholder="https://www.beatport.com/artist/..."
+                  />
+                </div>
+
+                {/* Other platforms */}
+                <div>
+                  <label htmlFor="otherPlatformsUrl" className="text-sm font-medium">Autres plateformes</label>
+                  <input
+                    id="otherPlatformsUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.otherPlatformsUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, otherPlatformsUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+            </div>
+          </AccordionContent>
+        </Card>
+      </AccordionItem>
+
+      {/* Accordéon 4: Coordonnées (FUSED: contact + address) */}
       <AccordionItem value="coordonnees">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -884,7 +892,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 4: Relations Professionnelles (placeholder) */}
+      {/* Accordéon 5: Relations Professionnelles (placeholder) */}
       <AccordionItem value="relations-professionnelles">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -900,7 +908,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 5: Notes Studio (renamed from Personal Information) */}
+      {/* Accordéon 6: Notes Studio (renamed from Personal Information) */}
       <AccordionItem value="notes-studio">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
