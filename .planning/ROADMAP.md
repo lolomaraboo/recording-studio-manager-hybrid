@@ -1923,3 +1923,58 @@ Phase 26.1 réorganise les accordéons selon la logique workflow d'un studio d'e
 
 **Rationale**: User feedback indique que l'organisation actuelle ne suit pas la logique métier d'un studio. Profil artistique devrait être prioritaire (position 2 vs 5 actuel). Regrouper contact+adresse réduit navigation. Terminologie "Profil Artistique" et "Notes Studio" plus claire que "Profil musical" et "Informations enrichies".
 
+### Phase 26.2: Restaurer Relations Professionnelles
+
+**Goal**: Restaurer la fonctionnalité Phase 25 (gestion relations client-entreprise) qui a été supprimée lors de la refonte UI Phase 26/26.1
+
+**Depends on**: Phase 26.1 (Accordion reorganization complete)
+
+**Research**: Complete (composants existent déjà, juste réintégration UI)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 26.2-01-PLAN.md — Restore Relations feature in VIEW and EDIT modes (integrate CompanyMembersIndicator + add 6th accordion)
+
+**Status**: Ready for execution
+
+**Details**:
+Phase 26.2 restores the company-individual relationship management that was accidentally removed during Phase 26/26.1 UI refactoring.
+
+**Problem:**
+- Phase 25 implemented CompanyMembersModal + CompanyMembersIndicator + 5 backend endpoints
+- Phase 26/26.1 refactored edit form (wizard → accordions) but removed UI integration
+- Users can no longer see/edit relationships in VIEW or EDIT modes
+
+**Solution:**
+
+**Task 1 - VIEW Mode (ClientDetailTabs):**
+- Import CompanyMembersIndicator
+- Integrate indicator after contact section
+- Add Separator for visual separation
+- Position: Between contact info and music profile (same as Phase 25)
+
+**Task 2 - EDIT Mode (ClientEditForm):**
+- Import CompanyMembersIndicator
+- Update Alt key accordion list (add "relations-professionnelles")
+- Add 6th accordion "Relations professionnelles"
+- Position: 3rd (after Coordonnées, before Profil Artistique)
+- Default state: Closed (only Identité open)
+- Conditional rendering: show indicator if formData.id exists, placeholder otherwise
+
+**Technical Details:**
+- Reuse existing Phase 25 components (CompanyMembersModal 374 lines, CompanyMembersIndicator 93 lines)
+- Backend already functional (5 endpoints: addMember, updateMember, removeMember, getCompanies, getRoles)
+- No schema changes needed (company_members table exists)
+- CompanyMembersIndicator handles all queries and modal logic internally
+
+**User Requirements (from discussion):**
+1. Phase number: 26.2
+2. Default state: Closed (Option A)
+3. Position: 3rd accordion after Coordonnées (Option C)
+4. Name: "Relations professionnelles"
+
+**Rationale**: Phase 25 functionality was lost during Phase 26/26.1 UI refactoring. Users reported inability to add/edit company relationships from individual client pages. This phase restores full CRUD capability in both VIEW and EDIT modes while maintaining the new accordion-based design from Phase 26.1.
+
+---
+
