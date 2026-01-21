@@ -31,7 +31,7 @@ export function ClientEditForm({
   return (
     <Accordion
       type="multiple"
-      defaultValue={["identite", "profil-artistique", "streaming", "coordonnees", "relations-professionnelles", "notes-studio"]}
+      defaultValue={["identite", "profil-artistique", "streaming", "coordonnees", "notes-studio"]}
       className="space-y-2"
     >
       {/* Accordéon 1: Identité */}
@@ -154,6 +154,35 @@ export function ClientEditForm({
                   value={formData.artistName || ""}
                   onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                 />
+              </div>
+
+              {/* Birthday */}
+              <div>
+                <label htmlFor="birthday" className="text-sm font-medium">Date de naissance</label>
+                <input
+                  id="birthday"
+                  type="date"
+                  className="w-full px-3 py-2 border rounded-md mt-1"
+                  value={formData.birthday || ""}
+                  onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label htmlFor="gender" className="text-sm font-medium">Genre</label>
+                <select
+                  id="gender"
+                  value={formData.gender || ""}
+                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  className="w-full px-3 py-2 border rounded mt-1"
+                >
+                  <option value="">-</option>
+                  <option value="male">Homme</option>
+                  <option value="female">Femme</option>
+                  <option value="other">Autre</option>
+                  <option value="prefer_not_to_say">Préfère ne pas répondre</option>
+                </select>
               </div>
             </div>
           </AccordionContent>
@@ -892,23 +921,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 5: Relations Professionnelles (placeholder) */}
-      <AccordionItem value="relations-professionnelles">
-        <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Relations Professionnelles</h3>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="px-4 pb-3">
-              <p className="text-sm text-muted-foreground">
-                Les relations professionnelles (membres d'entreprises) sont gérées dans l'onglet "Informations" de la page de détail du client.
-              </p>
-            </div>
-          </AccordionContent>
-        </Card>
-      </AccordionItem>
-
-      {/* Accordéon 6: Notes Studio (renamed from Personal Information) */}
+      {/* Accordéon 5: Notes Studio (renamed from Personal Information) */}
       <AccordionItem value="notes-studio">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -916,35 +929,6 @@ export function ClientEditForm({
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
-              {/* Birthday */}
-              <div>
-                <label htmlFor="birthday" className="text-sm font-medium">Date de naissance</label>
-                <input
-                  id="birthday"
-                  type="date"
-                  className="w-full px-3 py-2 border rounded-md mt-1"
-                  value={formData.birthday || ""}
-                  onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-                />
-              </div>
-
-              {/* Gender */}
-              <div>
-                <label htmlFor="gender" className="text-sm font-medium">Genre</label>
-                <select
-                  id="gender"
-                  value={formData.gender || ""}
-                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                  className="w-full px-3 py-2 border rounded mt-1"
-                >
-                  <option value="">-</option>
-                  <option value="male">Homme</option>
-                  <option value="female">Femme</option>
-                  <option value="other">Autre</option>
-                  <option value="prefer_not_to_say">Préfère ne pas répondre</option>
-                </select>
-              </div>
-
               {/* Custom fields array */}
               <div>
                 <div className="flex items-center justify-between mb-2">
