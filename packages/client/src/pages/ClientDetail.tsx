@@ -109,15 +109,25 @@ export default function ClientDetail() {
     },
   });
 
-  // Helper to convert null to empty strings for backend validation
+  // Helper to convert null to empty strings for backend validation (recursively)
   const sanitizeFormData = (data: any): any => {
-    const sanitized = { ...data };
-    Object.keys(sanitized).forEach(key => {
-      if (sanitized[key] === null) {
-        sanitized[key] = "";
-      }
-    });
-    return sanitized;
+    if (data === null) {
+      return "";
+    }
+
+    if (Array.isArray(data)) {
+      return data.map(item => sanitizeFormData(item));
+    }
+
+    if (typeof data === "object" && data !== null) {
+      const sanitized: any = {};
+      Object.keys(data).forEach(key => {
+        sanitized[key] = sanitizeFormData(data[key]);
+      });
+      return sanitized;
+    }
+
+    return data;
   };
 
   // Handle update from wizard
