@@ -87,7 +87,32 @@ export function ClientEditForm({
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-4 pb-3 space-y-3">
-              {/* Nom d'artiste - TOP POSITION */}
+              {/* Type de client - TOP POSITION */}
+              <div>
+                <label className="text-sm font-medium">Type de client</label>
+                <div className="flex gap-2 mt-1">
+                  <Button
+                    type="button"
+                    variant={formData.type === "individual" ? "default" : "outline"}
+                    onClick={() => setFormData({ ...formData, type: "individual" })}
+                    className="flex-1"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Particulier
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.type === "company" ? "default" : "outline"}
+                    onClick={() => setFormData({ ...formData, type: "company" })}
+                    className="flex-1"
+                  >
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Entreprise
+                  </Button>
+                </div>
+              </div>
+
+              {/* Nom d'artiste - SECOND POSITION */}
               <div>
                 <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste / Pseudo</label>
                 <input
@@ -179,31 +204,6 @@ export function ClientEditForm({
                   </div>
                 </>
               )}
-
-              {/* Type de client */}
-              <div>
-                <label className="text-sm font-medium">Type de client</label>
-                <div className="flex gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant={formData.type === "individual" ? "default" : "outline"}
-                    onClick={() => setFormData({ ...formData, type: "individual" })}
-                    className="flex-1"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    Particulier
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={formData.type === "company" ? "default" : "outline"}
-                    onClick={() => setFormData({ ...formData, type: "company" })}
-                    className="flex-1"
-                  >
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Entreprise
-                  </Button>
-                </div>
-              </div>
 
               {/* Birthday */}
               <div>
