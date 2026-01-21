@@ -4,6 +4,7 @@
  * Cohérent avec la page de visualisation (mêmes tabs, organisation similaire)
  */
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -28,10 +29,35 @@ export function ClientEditForm({
   formData,
   setFormData,
 }: ClientEditFormProps) {
+  // State to manage open accordions for Alt key toggle
+  const [openItems, setOpenItems] = useState<string[]>(["identite"]);
+
+  // Handle Alt key to toggle all accordions
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+        event.preventDefault();
+
+        const allAccordions = ["identite", "coordonnees", "profil-artistique", "streaming", "notes-studio"];
+
+        // If any closed, open all. If all open, close all.
+        if (openItems.length < allAccordions.length) {
+          setOpenItems(allAccordions);
+        } else {
+          setOpenItems([]);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openItems]);
+
   return (
     <Accordion
       type="multiple"
-      defaultValue={["identite", "profil-artistique", "streaming", "coordonnees", "notes-studio"]}
+      value={openItems}
+      onValueChange={setOpenItems}
       className="space-y-2"
     >
       {/* Accordéon 1: Identité */}
@@ -189,335 +215,7 @@ export function ClientEditForm({
         </Card>
       </AccordionItem>
 
-      {/* Accordéon 2: Profil Artistique (genres, instruments, professional, career) */}
-      <AccordionItem value="profil-artistique">
-        <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Profil Artistique</h3>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
-              {/* Subsection: Genres & Instruments */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Genres & Instruments</h4>
-                <div className="space-y-3">
-                  {/* Genres (array converted to comma-separated for simple editing) */}
-                  <div>
-                    <label htmlFor="genres" className="text-sm font-medium">Genres musicaux</label>
-                    <input
-                      id="genres"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={Array.isArray(formData.genres) ? formData.genres.join(", ") : ""}
-                      onChange={(e) => {
-                        const genres = e.target.value.split(",").map(g => g.trim()).filter(g => g);
-                        setFormData({ ...formData, genres });
-                      }}
-                      placeholder="Rock, Jazz, Hip-Hop (séparés par virgules)"
-                    />
-                  </div>
-
-                  {/* Instruments (array converted to comma-separated for simple editing) */}
-                  <div>
-                    <label htmlFor="instruments" className="text-sm font-medium">Instruments</label>
-                    <input
-                      id="instruments"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={Array.isArray(formData.instruments) ? formData.instruments.join(", ") : ""}
-                      onChange={(e) => {
-                        const instruments = e.target.value.split(",").map(i => i.trim()).filter(i => i);
-                        setFormData({ ...formData, instruments });
-                      }}
-                      placeholder="Guitare, Piano, Basse (séparés par virgules)"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Subsection: Informations Professionnelles */}
-              <div className="border-t pt-3 mt-3">
-                <h4 className="text-sm font-semibold mb-2">Informations professionnelles</h4>
-                <div className="space-y-3">
-                  {/* Record label */}
-                  <div>
-                    <label htmlFor="recordLabel" className="text-sm font-medium">Label</label>
-                    <input
-                      id="recordLabel"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.recordLabel || ""}
-                      onChange={(e) => setFormData({ ...formData, recordLabel: e.target.value })}
-                      placeholder="Nom du label"
-                    />
-                  </div>
-
-                  {/* Distributor */}
-                  <div>
-                    <label htmlFor="distributor" className="text-sm font-medium">Distributeur</label>
-                    <input
-                      id="distributor"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.distributor || ""}
-                      onChange={(e) => setFormData({ ...formData, distributor: e.target.value })}
-                      placeholder="Nom du distributeur"
-                    />
-                  </div>
-
-                  {/* Manager contact */}
-                  <div>
-                    <label htmlFor="managerContact" className="text-sm font-medium">Contact manager</label>
-                    <input
-                      id="managerContact"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.managerContact || ""}
-                      onChange={(e) => setFormData({ ...formData, managerContact: e.target.value })}
-                      placeholder="Nom ou email du manager"
-                    />
-                  </div>
-
-                  {/* Publisher */}
-                  <div>
-                    <label htmlFor="publisher" className="text-sm font-medium">Éditeur</label>
-                    <input
-                      id="publisher"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.publisher || ""}
-                      onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                      placeholder="Nom de l'éditeur"
-                    />
-                  </div>
-
-                  {/* Performance rights society */}
-                  <div>
-                    <label htmlFor="performanceRightsSociety" className="text-sm font-medium">Société de gestion collective</label>
-                    <input
-                      id="performanceRightsSociety"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.performanceRightsSociety || ""}
-                      onChange={(e) => setFormData({ ...formData, performanceRightsSociety: e.target.value })}
-                      placeholder="SACEM, ASCAP, BMI, etc."
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Subsection: Carrière */}
-              <div className="border-t pt-3 mt-3">
-                <h4 className="text-sm font-semibold mb-2">Carrière</h4>
-                <div className="space-y-3">
-                  {/* Years active */}
-                  <div>
-                    <label htmlFor="yearsActive" className="text-sm font-medium">Années d'activité</label>
-                    <input
-                      id="yearsActive"
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.yearsActive || ""}
-                      onChange={(e) => setFormData({ ...formData, yearsActive: e.target.value })}
-                      placeholder="2015-présent, 2010-2020, etc."
-                    />
-                  </div>
-
-                  {/* Notable works */}
-                  <div>
-                    <label htmlFor="notableWorks" className="text-sm font-medium">Œuvres notables</label>
-                    <textarea
-                      id="notableWorks"
-                      rows={3}
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.notableWorks || ""}
-                      onChange={(e) => setFormData({ ...formData, notableWorks: e.target.value })}
-                      placeholder="Albums, singles, collaborations importantes..."
-                    />
-                  </div>
-
-                  {/* Awards & recognition */}
-                  <div>
-                    <label htmlFor="awardsRecognition" className="text-sm font-medium">Récompenses & Distinctions</label>
-                    <textarea
-                      id="awardsRecognition"
-                      rows={3}
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.awardsRecognition || ""}
-                      onChange={(e) => setFormData({ ...formData, awardsRecognition: e.target.value })}
-                      placeholder="Grammy, Victoires de la Musique, nominations..."
-                    />
-                  </div>
-
-                  {/* Biography */}
-                  <div>
-                    <label htmlFor="biography" className="text-sm font-medium">Biographie</label>
-                    <textarea
-                      id="biography"
-                      rows={5}
-                      className="w-full px-3 py-2 border rounded-md mt-1"
-                      value={formData.biography || ""}
-                      onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
-                      placeholder="Histoire de l'artiste, influences, parcours..."
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </AccordionContent>
-        </Card>
-      </AccordionItem>
-
-      {/* Accordéon 3: Plateformes de Streaming */}
-      <AccordionItem value="streaming">
-        <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <h3 className="text-lg font-semibold">Plateformes de Streaming</h3>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
-              <div className="grid gap-3 md:grid-cols-2">
-                {/* Spotify */}
-                <div>
-                  <label htmlFor="spotifyUrl" className="text-sm font-medium">Spotify</label>
-                  <input
-                    id="spotifyUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.spotifyUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, spotifyUrl: e.target.value })}
-                    placeholder="https://open.spotify.com/artist/..."
-                  />
-                </div>
-
-                {/* Apple Music */}
-                <div>
-                  <label htmlFor="appleMusicUrl" className="text-sm font-medium">Apple Music</label>
-                  <input
-                    id="appleMusicUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.appleMusicUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, appleMusicUrl: e.target.value })}
-                    placeholder="https://music.apple.com/artist/..."
-                  />
-                </div>
-
-                {/* YouTube */}
-                <div>
-                  <label htmlFor="youtubeUrl" className="text-sm font-medium">YouTube</label>
-                  <input
-                    id="youtubeUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.youtubeUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
-                    placeholder="https://youtube.com/@..."
-                  />
-                </div>
-
-                {/* SoundCloud */}
-                <div>
-                  <label htmlFor="soundcloudUrl" className="text-sm font-medium">SoundCloud</label>
-                  <input
-                    id="soundcloudUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.soundcloudUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, soundcloudUrl: e.target.value })}
-                    placeholder="https://soundcloud.com/..."
-                  />
-                </div>
-
-                {/* Bandcamp */}
-                <div>
-                  <label htmlFor="bandcampUrl" className="text-sm font-medium">Bandcamp</label>
-                  <input
-                    id="bandcampUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.bandcampUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, bandcampUrl: e.target.value })}
-                    placeholder="https://artist.bandcamp.com"
-                  />
-                </div>
-
-                {/* Deezer */}
-                <div>
-                  <label htmlFor="deezerUrl" className="text-sm font-medium">Deezer</label>
-                  <input
-                    id="deezerUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.deezerUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, deezerUrl: e.target.value })}
-                    placeholder="https://www.deezer.com/artist/..."
-                  />
-                </div>
-
-                {/* Tidal */}
-                <div>
-                  <label htmlFor="tidalUrl" className="text-sm font-medium">Tidal</label>
-                  <input
-                    id="tidalUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.tidalUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, tidalUrl: e.target.value })}
-                    placeholder="https://tidal.com/artist/..."
-                  />
-                </div>
-
-                {/* Amazon Music */}
-                <div>
-                  <label htmlFor="amazonMusicUrl" className="text-sm font-medium">Amazon Music</label>
-                  <input
-                    id="amazonMusicUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.amazonMusicUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, amazonMusicUrl: e.target.value })}
-                    placeholder="https://music.amazon.com/artists/..."
-                  />
-                </div>
-
-                {/* Audiomack */}
-                <div>
-                  <label htmlFor="audiomackUrl" className="text-sm font-medium">Audiomack</label>
-                  <input
-                    id="audiomackUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.audiomackUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, audiomackUrl: e.target.value })}
-                    placeholder="https://audiomack.com/..."
-                  />
-                </div>
-
-                {/* Beatport */}
-                <div>
-                  <label htmlFor="beatportUrl" className="text-sm font-medium">Beatport</label>
-                  <input
-                    id="beatportUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.beatportUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, beatportUrl: e.target.value })}
-                    placeholder="https://www.beatport.com/artist/..."
-                  />
-                </div>
-
-                {/* Other platforms */}
-                <div>
-                  <label htmlFor="otherPlatformsUrl" className="text-sm font-medium">Autres plateformes</label>
-                  <input
-                    id="otherPlatformsUrl"
-                    type="url"
-                    className="w-full px-3 py-2 border rounded-md mt-1"
-                    value={formData.otherPlatformsUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, otherPlatformsUrl: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
-            </div>
-          </AccordionContent>
-        </Card>
-      </AccordionItem>
-
-      {/* Accordéon 4: Coordonnées (FUSED: contact + address) */}
+      {/* Accordéon 2: Coordonnées (MOVED TO POSITION 2) */}
       <AccordionItem value="coordonnees">
         <Card>
           <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -914,6 +612,334 @@ export function ClientEditForm({
                       ))}
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </AccordionContent>
+        </Card>
+      </AccordionItem>
+
+      {/* Accordéon 3: Profil Artistique (genres, instruments, professional, career) */}
+      <AccordionItem value="profil-artistique">
+        <Card>
+          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+            <h3 className="text-lg font-semibold">Profil Artistique</h3>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="px-4 pb-3 space-y-3">
+              {/* Subsection: Genres & Instruments */}
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Genres & Instruments</h4>
+                <div className="space-y-3">
+                  {/* Genres (array converted to comma-separated for simple editing) */}
+                  <div>
+                    <label htmlFor="genres" className="text-sm font-medium">Genres musicaux</label>
+                    <input
+                      id="genres"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={Array.isArray(formData.genres) ? formData.genres.join(", ") : ""}
+                      onChange={(e) => {
+                        const genres = e.target.value.split(",").map(g => g.trim()).filter(g => g);
+                        setFormData({ ...formData, genres });
+                      }}
+                      placeholder="Rock, Jazz, Hip-Hop (séparés par virgules)"
+                    />
+                  </div>
+
+                  {/* Instruments (array converted to comma-separated for simple editing) */}
+                  <div>
+                    <label htmlFor="instruments" className="text-sm font-medium">Instruments</label>
+                    <input
+                      id="instruments"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={Array.isArray(formData.instruments) ? formData.instruments.join(", ") : ""}
+                      onChange={(e) => {
+                        const instruments = e.target.value.split(",").map(i => i.trim()).filter(i => i);
+                        setFormData({ ...formData, instruments });
+                      }}
+                      placeholder="Guitare, Piano, Basse (séparés par virgules)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Subsection: Informations Professionnelles */}
+              <div className="border-t pt-3 mt-3">
+                <h4 className="text-sm font-semibold mb-2">Informations professionnelles</h4>
+                <div className="space-y-3">
+                  {/* Record label */}
+                  <div>
+                    <label htmlFor="recordLabel" className="text-sm font-medium">Label</label>
+                    <input
+                      id="recordLabel"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.recordLabel || ""}
+                      onChange={(e) => setFormData({ ...formData, recordLabel: e.target.value })}
+                      placeholder="Nom du label"
+                    />
+                  </div>
+
+                  {/* Distributor */}
+                  <div>
+                    <label htmlFor="distributor" className="text-sm font-medium">Distributeur</label>
+                    <input
+                      id="distributor"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.distributor || ""}
+                      onChange={(e) => setFormData({ ...formData, distributor: e.target.value })}
+                      placeholder="Nom du distributeur"
+                    />
+                  </div>
+
+                  {/* Manager contact */}
+                  <div>
+                    <label htmlFor="managerContact" className="text-sm font-medium">Contact manager</label>
+                    <input
+                      id="managerContact"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.managerContact || ""}
+                      onChange={(e) => setFormData({ ...formData, managerContact: e.target.value })}
+                      placeholder="Nom ou email du manager"
+                    />
+                  </div>
+
+                  {/* Publisher */}
+                  <div>
+                    <label htmlFor="publisher" className="text-sm font-medium">Éditeur</label>
+                    <input
+                      id="publisher"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.publisher || ""}
+                      onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+                      placeholder="Nom de l'éditeur"
+                    />
+                  </div>
+
+                  {/* Performance rights society */}
+                  <div>
+                    <label htmlFor="performanceRightsSociety" className="text-sm font-medium">Société de gestion collective</label>
+                    <input
+                      id="performanceRightsSociety"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.performanceRightsSociety || ""}
+                      onChange={(e) => setFormData({ ...formData, performanceRightsSociety: e.target.value })}
+                      placeholder="SACEM, ASCAP, BMI, etc."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Subsection: Carrière */}
+              <div className="border-t pt-3 mt-3">
+                <h4 className="text-sm font-semibold mb-2">Carrière</h4>
+                <div className="space-y-3">
+                  {/* Years active */}
+                  <div>
+                    <label htmlFor="yearsActive" className="text-sm font-medium">Années d'activité</label>
+                    <input
+                      id="yearsActive"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.yearsActive || ""}
+                      onChange={(e) => setFormData({ ...formData, yearsActive: e.target.value })}
+                      placeholder="2015-présent, 2010-2020, etc."
+                    />
+                  </div>
+
+                  {/* Notable works */}
+                  <div>
+                    <label htmlFor="notableWorks" className="text-sm font-medium">Œuvres notables</label>
+                    <textarea
+                      id="notableWorks"
+                      rows={3}
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.notableWorks || ""}
+                      onChange={(e) => setFormData({ ...formData, notableWorks: e.target.value })}
+                      placeholder="Albums, singles, collaborations importantes..."
+                    />
+                  </div>
+
+                  {/* Awards & recognition */}
+                  <div>
+                    <label htmlFor="awardsRecognition" className="text-sm font-medium">Récompenses & Distinctions</label>
+                    <textarea
+                      id="awardsRecognition"
+                      rows={3}
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.awardsRecognition || ""}
+                      onChange={(e) => setFormData({ ...formData, awardsRecognition: e.target.value })}
+                      placeholder="Grammy, Victoires de la Musique, nominations..."
+                    />
+                  </div>
+
+                  {/* Biography */}
+                  <div>
+                    <label htmlFor="biography" className="text-sm font-medium">Biographie</label>
+                    <textarea
+                      id="biography"
+                      rows={5}
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.biography || ""}
+                      onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
+                      placeholder="Histoire de l'artiste, influences, parcours..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AccordionContent>
+        </Card>
+      </AccordionItem>
+
+      {/* Accordéon 4: Plateformes de Streaming */}
+      <AccordionItem value="streaming">
+        <Card>
+          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+            <h3 className="text-lg font-semibold">Plateformes de Streaming</h3>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="px-4 pb-3 space-y-3">
+              <div className="grid gap-3 md:grid-cols-2">
+                {/* Spotify */}
+                <div>
+                  <label htmlFor="spotifyUrl" className="text-sm font-medium">Spotify</label>
+                  <input
+                    id="spotifyUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.spotifyUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, spotifyUrl: e.target.value })}
+                    placeholder="https://open.spotify.com/artist/..."
+                  />
+                </div>
+
+                {/* Apple Music */}
+                <div>
+                  <label htmlFor="appleMusicUrl" className="text-sm font-medium">Apple Music</label>
+                  <input
+                    id="appleMusicUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.appleMusicUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, appleMusicUrl: e.target.value })}
+                    placeholder="https://music.apple.com/artist/..."
+                  />
+                </div>
+
+                {/* YouTube */}
+                <div>
+                  <label htmlFor="youtubeUrl" className="text-sm font-medium">YouTube</label>
+                  <input
+                    id="youtubeUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.youtubeUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                    placeholder="https://youtube.com/@..."
+                  />
+                </div>
+
+                {/* SoundCloud */}
+                <div>
+                  <label htmlFor="soundcloudUrl" className="text-sm font-medium">SoundCloud</label>
+                  <input
+                    id="soundcloudUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.soundcloudUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, soundcloudUrl: e.target.value })}
+                    placeholder="https://soundcloud.com/..."
+                  />
+                </div>
+
+                {/* Bandcamp */}
+                <div>
+                  <label htmlFor="bandcampUrl" className="text-sm font-medium">Bandcamp</label>
+                  <input
+                    id="bandcampUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.bandcampUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, bandcampUrl: e.target.value })}
+                    placeholder="https://artist.bandcamp.com"
+                  />
+                </div>
+
+                {/* Deezer */}
+                <div>
+                  <label htmlFor="deezerUrl" className="text-sm font-medium">Deezer</label>
+                  <input
+                    id="deezerUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.deezerUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, deezerUrl: e.target.value })}
+                    placeholder="https://www.deezer.com/artist/..."
+                  />
+                </div>
+
+                {/* Tidal */}
+                <div>
+                  <label htmlFor="tidalUrl" className="text-sm font-medium">Tidal</label>
+                  <input
+                    id="tidalUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.tidalUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, tidalUrl: e.target.value })}
+                    placeholder="https://tidal.com/artist/..."
+                  />
+                </div>
+
+                {/* Amazon Music */}
+                <div>
+                  <label htmlFor="amazonMusicUrl" className="text-sm font-medium">Amazon Music</label>
+                  <input
+                    id="amazonMusicUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.amazonMusicUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, amazonMusicUrl: e.target.value })}
+                    placeholder="https://music.amazon.com/artists/..."
+                  />
+                </div>
+
+                {/* Audiomack */}
+                <div>
+                  <label htmlFor="audiomackUrl" className="text-sm font-medium">Audiomack</label>
+                  <input
+                    id="audiomackUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.audiomackUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, audiomackUrl: e.target.value })}
+                    placeholder="https://audiomack.com/..."
+                  />
+                </div>
+
+                {/* Beatport */}
+                <div>
+                  <label htmlFor="beatportUrl" className="text-sm font-medium">Beatport</label>
+                  <input
+                    id="beatportUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.beatportUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, beatportUrl: e.target.value })}
+                    placeholder="https://www.beatport.com/artist/..."
+                  />
+                </div>
+
+                {/* Other platforms */}
+                <div>
+                  <label htmlFor="otherPlatformsUrl" className="text-sm font-medium">Autres plateformes</label>
+                  <input
+                    id="otherPlatformsUrl"
+                    type="url"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.otherPlatformsUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, otherPlatformsUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
                 </div>
               </div>
             </div>
