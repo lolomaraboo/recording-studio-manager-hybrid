@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 26.1 of 26.1 (Réorganisation Accordéons - Logique Studio d'Enregistrement) - Phase 26.1 NOT STARTED
-Plan: 0/0 complete (not yet planned)
-Status: Phase added, awaiting planning
-Last activity: 2026-01-20 - Phase 26.1 added to roadmap (reorganize 7 accordions → 5 sections following studio workflow logic: Identité → Profil Artistique → Coordonnées → Relations Pro → Notes Studio)
+Phase: 26.1 of 26.1 (Réorganisation Accordéons - Logique Studio d'Enregistrement) - Phase 26.1 COMPLETE ✅
+Plan: 1/1 complete (26.1-01 ✅)
+Status: Phase complete
+Last activity: 2026-01-21 - Phase 26.1 COMPLETE ✅ (47 min total, 13 tasks with iterative user feedback)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 110
-- Average duration: 30.2 min
-- Total execution time: 55.4 hours
+- Total plans completed: 111
+- Average duration: 30.6 min
+- Total execution time: 56.6 hours
 
 **By Phase:**
 
@@ -87,10 +87,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 24 | 2/2 | 11 min | 5.5 min |
 | 25 | 2/2 | 8 min | 4 min |
 | 26 | 1/1 | 7 min | 7 min |
+| 26.1 | 1/1 | 47 min | 47 min |
 
 **Recent Trend:**
-- Last 5 plans: [6 min, 5 min, 3 min, 2 min, 7 min]
-- Trend: Phase 26 COMPLETE ✅ (7 min total, 1/1 plans). Accordion-based edit form eliminates wizard pattern for consistent view/edit UX. Plan 26-01 (7 min): ClientEditForm with 7 accordion sections (1008 lines), all 22 music profile fields + vCard enriched fields, replaced 215 lines inline code with 7-line component (93% reduction). Visual consistency between view/edit modes, zero cognitive friction. TypeScript 0 errors, production build successful.
+- Last 5 plans: [3 min, 2 min, 7 min, 47 min]
+- Trend: Phase 26.1 COMPLETE ✅ (47 min total, 1/1 plans). Iterative accordion reorganization with 13 commits based on user feedback. Plan 26.1-01 (47 min): 7→5 accordions following studio workflow, 3-column grid contact fields, consistent icon colors (Plus + Trash2 in text-muted-foreground), auto-fill readonly Nom complet, Alt key toggle, artistName top position. User-driven improvements: deleted Relations Pro accordion, moved birthday/gender to Identité, Type de client at top, reorganized Coordonnées with subsections, rounded select corners. Zero data loss, TypeScript 0 errors, production build successful.
 
 ## Accumulated Context
 
@@ -241,6 +242,18 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26-01 | Accordion pattern over wizard for edit mode | Rationale: Eliminates cognitive friction when switching between view and edit modes by using the same visual structure. All fields accessible without navigation steps. Impact: 93% code reduction in informations tab, zero UX friction. Alternative (keep wizard) = maintains visual disconnect between view/edit. |
 | 26-01 | All accordions open by default | Rationale: Users can see and edit all sections immediately without clicking. Better UX for comprehensive client profiles with 50+ fields. defaultValue array includes all 7 accordion values. Alternative (collapsed) = requires clicks to discover sections. |
 | 26-01 | Comma-separated input for genres/instruments | Rationale: Simpler implementation than tag input components. Sufficient for editing existing data. Pattern: "Rock, Jazz, Hip-Hop" → splits on comma. Alternative (tag component) = more complex but better UX for future. Trade-off: simplicity vs perfect UX. |
+| 26.1-01 | 5 accordions following studio workflow logic | Rationale: 7→5 restructure reduces navigation by 28%, consolidates related fields (musical profile, contact info). Studio workflow priority: Identité → Coordonnées → Profil Artistique → Streaming → Notes Studio (NOT scattered across 7 sections). Musical profile positioned 2nd (core business) instead of 5th. Impact: Faster navigation, logical grouping, workflow alignment. |
+| 26.1-01 | Delete Relations Professionnelles accordion | Rationale: Company members managed in ClientDetailTabs CompanyMembersModal (Phase 25), not in edit form. Accordion contained only info message redirecting users. Impact: Simplifies edit form, removes empty section. Company member management remains fully functional via modal. |
+| 26.1-01 | Move birthday and gender to Identité | Rationale: Personal identity fields grouped with other identity data (name, artistName, type). More logical than separate "Personal" accordion. Impact: Better field organization, reduces accordion count. |
+| 26.1-01 | Keep only customFields in Notes Studio | Rationale: After moving birthday/gender to Identité and deleting Relations Pro, Notes Studio simplified to only customFields array. Clean separation: identity data in Identité, studio-specific notes in Notes Studio. Impact: Clear purpose per accordion. |
+| 26.1-01 | Default accordion state: only Identité open | Rationale: Reduces visual overwhelm when opening edit mode. Users can expand other accordions as needed. Identité (type, name, artistName) most critical for quick edits. Alternative (all open) = overwhelming for 50+ fields. Alt key shortcut enables opening all at once. |
+| 26.1-01 | Readonly auto-generated Nom complet | Rationale: Prevents manual editing conflicts with structured name fields (prefix, firstName, lastName, suffix). Auto-fills via useEffect from structured components. Visual indicators: bg-muted, cursor-not-allowed, placeholder "Se génère automatiquement". Impact: Data integrity, no duplicate entry. |
+| 26.1-01 | Type de client at top of Identité | Rationale: Critical business context must be visible first. Determines if artistName or companyName is primary identifier. Workflow: Set type → relevant fields appear below. Impact: Clearer workflow, no confusion about client categorization. |
+| 26.1-01 | artistName above structured name fields | Rationale: For artists/musicians, stage name is primary identity. Structured name (firstName, lastName, prefix) is secondary administrative data. Visual hierarchy: artistName → Nom complet (auto-generated) → structured fields. Impact: Matches industry practice (artists known by stage names). |
+| 26.1-01 | 3-column grid for contact arrays | Rationale: Consistent layout across phones, emails, websites, addresses. grid-cols-[120px_1fr_80px] = type selector (120px) | input field (flex) | actions (Plus + Trash2, 80px). Impact: Visual consistency, predictable layout, efficient space usage. |
+| 26.1-01 | Rounded corners on all select elements | Rationale: Visual consistency with input fields (rounded-md class). Previous sharp corners broke design harmony. Applied to prefix, gender, type selectors in contact arrays. Impact: Polished UI, consistent styling. |
+| 26.1-01 | Consistent icon colors (text-muted-foreground) | Rationale: Plus icons inherited black from button text, Trash2 icons had explicit gray class. Visual confusion: some black, some gray. Solution: Apply text-muted-foreground to ALL action icons (Plus + Trash2). Impact: Visual consistency, professional appearance. |
+| 26.1-01 | Alt key accordion toggle | Rationale: Power user feature for batch operations. Alt key opens all accordions if any closed, closes all if all open. No Ctrl/Meta/Shift modifiers (avoids browser/OS conflicts). Impact: Efficiency for users editing many fields. |
 
 ### Deferred Issues
 
@@ -516,9 +529,76 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-20T22:15:23Z
-Stopped at: Phase 26 COMPLETE ✅ - Accordion-based client edit form replaces wizard pattern
+Last session: 2026-01-21T21:43:14Z
+Stopped at: Phase 26.1 COMPLETE ✅ - Accordion reorganization with studio workflow logic
 Resume context:
+  - Phase 26.1 COMPLETE ✅: Réorganisation Accordéons - Logique Studio d'Enregistrement (47 min total execution, 1/1 plans)
+    - **Plan 26.1-01:** 7→5 accordion restructure with iterative user feedback (47 min, 13 tasks)
+      - **Task 1:** Restructure 7 accordions to 5 fused sections - `d523669`
+        - Initial refactor: Identity, Profil Artistique, Coordonnées, Relations Pro, Notes Studio
+        - Fused streaming + professional + career into Profil Artistique
+        - Fused contact + address into Coordonnées
+      - **Task 2:** Create 6th accordion for Streaming Platforms - `a8dbeae`
+        - User requested separate streaming accordion (11 platform URLs)
+        - Subsection separation with border-t in Profil Artistique
+      - **Task 3:** User modifications (delete Relations Pro, move birthday/gender) - `ebcc787`
+        - Deleted Relations Professionnelles accordion completely
+        - Moved birthday and gender to Identité
+        - Kept only customFields in Notes Studio
+      - **Task 4:** Reorder accordions, set default state, add Alt key toggle - `a3774f3`
+        - New order: Identité, Coordonnées, Profil Artistique, Streaming, Notes Studio
+        - Default state: only Identité open
+        - Alt key listener: toggle all open/close
+      - **Task 5:** Auto-fill Nom complet from structured fields - `0b39e91`
+        - useEffect auto-generates from prefix, firstName, middleName, lastName, suffix
+        - Only for individual clients (not companies)
+      - **Task 6:** Make Nom complet readonly - `a3396f3`
+        - Added readOnly, bg-muted, cursor-not-allowed classes
+        - Placeholder: "Se génère automatiquement"
+      - **Task 7:** Reorder Identité fields (artistName top) - `23ae908`
+        - New order: Type de client, artistName, Nom complet, structured name, birthday, gender
+      - **Task 8:** Move Type de client to top position - `f1fced9`
+        - Critical business context first (determines if artistName or companyName primary)
+      - **Task 9:** Reorganize Coordonnées with cleaner structure - `3d1d8e9`
+        - Added subsection headers: Contact (phones, emails, websites), Adresses (addresses array)
+        - Visual separator with border-t between sections
+      - **Task 10:** Complete 3-column grid redesign - `6cbc14a`
+        - Applied grid-cols-[120px_1fr_80px] to phones, emails, websites, addresses
+        - Type selector (120px) | input (flex) | actions (Plus + Trash2, 80px)
+      - **Task 11:** Add rounded corners to all selects - `f3fa4b1`
+        - Applied rounded-md to prefix, gender, contact type selectors
+        - Visual consistency with input fields
+      - **Task 12:** Standardize Trash2 icon colors - `5630d73`
+        - Verified all 5 Trash2 icons had text-muted-foreground
+        - Issue was Plus icons (see Task 13)
+      - **Task 13:** Standardize Plus icon colors (root cause fix) - `d60ddf5`
+        - Added text-muted-foreground to all 5 Plus icons
+        - Root cause: Plus icons inherited black from button text, Trash2 had explicit gray
+        - Now all action icons consistent gray color
+    - **Key achievements (26.1-01):**
+      - 7→5 accordion restructure (28% navigation reduction)
+      - Studio workflow logic: identity → contact → artistic profile → streaming → notes
+      - Musical profile positioned 2nd (core business focus)
+      - All contact info unified in single Coordonnées accordion
+      - 3-column grid layout for all array contact fields
+      - Consistent icon colors (Plus and Trash2 both text-muted-foreground)
+      - Auto-fill readonly Nom complet from structured name components
+      - Alt key shortcut for batch accordion operations
+      - Type de client and artistName prioritized at top of Identité
+      - Rounded corners on all select elements
+      - 13 atomic commits with user feedback loop
+    - **Verification:** All success criteria met ✓
+      - 5 accordion sections ✓
+      - Studio workflow order ✓
+      - Musical profile 2nd position ✓
+      - All contact fields in Coordonnées ✓
+      - 3-column grid contact arrays ✓
+      - Consistent icon colors ✓
+      - Auto-fill readonly Nom complet ✓
+      - Alt key toggle ✓
+      - TypeScript 0 errors ✓
+      - Production build successful ✓
+  - **Next:** Phase 26.1 verified complete. Ready for next phase or feature development. ClientEditForm fully optimized for studio workflow with 5 accordions, consistent UX, and all 50+ fields accessible.
   - Phase 26 COMPLETE ✅: Formulaire Client avec Accordéons (7 min total execution, 1/1 plans)
     - **Plan 26-01:** Accordion-based edit form refactoring (7 min, 3 tasks + documentation)
       - **Task 1:** Complete ClientEditForm with 7 accordion sections - `e5f4bfe`
