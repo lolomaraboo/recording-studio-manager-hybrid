@@ -308,7 +308,7 @@ export function ClientEditForm({
                                 disabled={phones.length === 1}
                                 className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 text-muted-foreground" />
                               </Button>
                             </div>
                           </div>
@@ -376,7 +376,7 @@ export function ClientEditForm({
                                 disabled={emails.length === 1}
                                 className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 text-muted-foreground" />
                               </Button>
                             </div>
                           </div>
@@ -445,7 +445,7 @@ export function ClientEditForm({
                                 disabled={websites.length === 1}
                                 className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 text-muted-foreground" />
                               </Button>
                             </div>
                           </div>
@@ -605,7 +605,7 @@ export function ClientEditForm({
                             disabled={addresses.length === 1}
                             className="h-8 w-8 p-0"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         </div>
                       </div>
@@ -1021,7 +1021,7 @@ export function ClientEditForm({
                           setFormData({ ...formData, customFields });
                         }}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
                       </Button>
                     </div>
                   ))}
