@@ -25,18 +25,18 @@
 
 ## Current Position
 
-Phase: 26.1 of 26.1 (Réorganisation Accordéons - Logique Studio d'Enregistrement) - Phase 26.1 COMPLETE ✅
-Plan: 1/1 complete (26.1-01 ✅)
+Phase: 26.2 of 26.2 (Restaurer Relations Professionnelles) - Phase 26.2 COMPLETE ✅
+Plan: 1/1 complete (26.2-01 ✅)
 Status: Phase complete
-Last activity: 2026-01-21 - Phase 26.1 COMPLETE ✅ (47 min total, 13 tasks with iterative user feedback)
+Last activity: 2026-01-21 - Phase 26.2 COMPLETE ✅ (2 min total, verification of pre-existing implementation)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 111
-- Average duration: 30.6 min
+- Total plans completed: 112
+- Average duration: 30.3 min
 - Total execution time: 56.6 hours
 
 **By Phase:**
@@ -88,10 +88,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 25 | 2/2 | 8 min | 4 min |
 | 26 | 1/1 | 7 min | 7 min |
 | 26.1 | 1/1 | 47 min | 47 min |
+| 26.2 | 1/1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: [3 min, 2 min, 7 min, 47 min]
-- Trend: Phase 26.1 COMPLETE ✅ (47 min total, 1/1 plans). Iterative accordion reorganization with 13 commits based on user feedback. Plan 26.1-01 (47 min): 7→5 accordions following studio workflow, 3-column grid contact fields, consistent icon colors (Plus + Trash2 in text-muted-foreground), auto-fill readonly Nom complet, Alt key toggle, artistName top position. User-driven improvements: deleted Relations Pro accordion, moved birthday/gender to Identité, Type de client at top, reorganized Coordonnées with subsections, rounded select corners. Zero data loss, TypeScript 0 errors, production build successful.
+- Last 5 plans: [2 min, 7 min, 47 min, 2 min]
+- Trend: Phase 26.2 COMPLETE ✅ (2 min total, 1/1 plans). Verification phase - implementation already complete from previous session. Plan 26.2-01 (2 min): Verified 6th accordion "Relations professionnelles" at position 3 in ClientEditForm.tsx. Phase 25 functionality fully restored in EDIT mode with CompanyMembersIndicator integration, conditional rendering for creation mode, Alt key toggle updated. Zero new code needed, all success criteria met.
 
 ## Accumulated Context
 
@@ -253,6 +254,8 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26.1-01 | 3-column grid for contact arrays | Rationale: Consistent layout across phones, emails, websites, addresses. grid-cols-[120px_1fr_80px] = type selector (120px) | input field (flex) | actions (Plus + Trash2, 80px). Impact: Visual consistency, predictable layout, efficient space usage. |
 | 26.1-01 | Rounded corners on all select elements | Rationale: Visual consistency with input fields (rounded-md class). Previous sharp corners broke design harmony. Applied to prefix, gender, type selectors in contact arrays. Impact: Polished UI, consistent styling. |
 | 26.1-01 | Consistent icon colors (text-muted-foreground) | Rationale: Plus icons inherited black from button text, Trash2 icons had explicit gray class. Visual confusion: some black, some gray. Solution: Apply text-muted-foreground to ALL action icons (Plus + Trash2). Impact: Visual consistency, professional appearance. |
+| 26.2-01 | 6th accordion position 3 (after Coordonnées) | Rationale: Professional relationships are business context that comes after contact info but before artistic profile. Workflow logic: identity → contact → relations → creative profile. Impact: Intuitive navigation for studio managers managing client networks. |
+| 26.2-01 | Conditional rendering prevents creation mode crash | Rationale: In creation mode, formData.id is undefined (client not yet saved). CompanyMembersIndicator queries backend with clientId, would crash. Solution: Check formData.id existence, show placeholder if undefined. Impact: Graceful UX degradation, clear user guidance. |
 | 26.1-01 | Alt key accordion toggle | Rationale: Power user feature for batch operations. Alt key opens all accordions if any closed, closes all if all open. No Ctrl/Meta/Shift modifiers (avoids browser/OS conflicts). Impact: Efficiency for users editing many fields. |
 
 ### Deferred Issues
@@ -529,9 +532,32 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-21T21:43:14Z
-Stopped at: Phase 26.1 COMPLETE ✅ - Accordion reorganization with studio workflow logic
+Last session: 2026-01-21T23:42:40Z
+Stopped at: Phase 26.2 COMPLETE ✅ - Restored Relations professionnelles accordion in EDIT mode
 Resume context:
+  - Phase 26.2 COMPLETE ✅: Restaurer Relations Professionnelles (2 min total execution, 1/1 plans)
+    - **Plan 26.2-01:** Verification phase - implementation already complete (2 min, 1 task)
+      - **Task 1:** Verify 6th accordion "Relations professionnelles" - `f846eb8` (from previous session)
+        - Position 3 confirmed (after Coordonnées, before Profil Artistique)
+        - CompanyMembersIndicator integration verified
+        - Conditional rendering for creation mode (formData.id check)
+        - Alt key handler updated (6 accordions in allAccordions array)
+        - Users icon with text-primary color (Phase 26.1 consistency)
+        - Closed by default (Phase 26.1 pattern)
+    - **Key achievements (26.2-01):**
+      - Phase 25 professional relationship management fully restored in EDIT mode
+      - Zero new code needed (implementation from previous session correct)
+      - All success criteria verified: position, integration, conditional rendering, Alt key
+      - TypeScript 0 errors in ClientEditForm.tsx
+      - Production build successful (1.7MB bundle)
+    - **Verification:** All success criteria met ✓
+      - 6th accordion at position 3 ✓
+      - CompanyMembersIndicator integrated ✓
+      - Conditional rendering prevents crash ✓
+      - Alt key toggles 6 accordions ✓
+      - TypeScript 0 errors ✓
+      - Production build successful ✓
+  - **Next:** Phase 26.2 verified complete. Ready for manual browser testing. Full 6-accordion edit form with Phase 25 relationship management restored.
   - Phase 26.1 COMPLETE ✅: Réorganisation Accordéons - Logique Studio d'Enregistrement (47 min total execution, 1/1 plans)
     - **Plan 26.1-01:** 7→5 accordion restructure with iterative user feedback (47 min, 13 tasks)
       - **Task 1:** Restructure 7 accordions to 5 fused sections - `d523669`
