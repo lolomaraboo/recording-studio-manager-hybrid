@@ -75,6 +75,12 @@ export default function ClientDetail() {
     { enabled: !!id && client?.type === 'individual' }
   );
 
+  // Fetch members for companies
+  const { data: members = [] } = trpc.clients.getMembers.useQuery(
+    { companyId: Number(id) },
+    { enabled: !!id && client?.type === 'company' }
+  );
+
   // Initialize formData when client loads
   if (client && !formData) {
     setFormData(client);
@@ -229,6 +235,24 @@ export default function ClientDetail() {
                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                           )}
                           {item.company?.name || "Inconnu"}
+                        </Badge>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {/* Members for companies */}
+                {client.type === 'company' && members.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {members.map((item: any) => (
+                      <Link
+                        key={item.member?.id}
+                        to={`/clients/${item.member?.id}`}
+                      >
+                        <Badge variant="secondary" className="flex items-center gap-1 hover:bg-secondary/80 transition-colors">
+                          {item.isPrimary && (
+                            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                          )}
+                          {item.member?.name || "Inconnu"}
                         </Badge>
                       </Link>
                     ))}
