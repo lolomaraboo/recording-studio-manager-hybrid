@@ -23,6 +23,7 @@ import {
   Trash2,
   Guitar,
   Music,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,6 +67,12 @@ export default function ClientDetail() {
   const { data: clientWithContacts } = trpc.clients.getWithContacts.useQuery(
     { id: Number(id) },
     { enabled: !!id }
+  );
+
+  // Fetch companies for individuals
+  const { data: companies = [] } = trpc.clients.getCompanies.useQuery(
+    { memberId: Number(id) },
+    { enabled: !!id && client?.type === 'individual' }
   );
 
   // Initialize formData when client loads
@@ -209,6 +216,24 @@ export default function ClientDetail() {
                     ? client.artistName
                     : client.name}
                 </h2>
+                {/* Companies for individuals */}
+                {client.type === 'individual' && companies.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {companies.map((item: any) => (
+                      <Link
+                        key={item.companyId}
+                        to={`/clients/${item.companyId}`}
+                      >
+                        <Badge variant="secondary" className="flex items-center gap-1 hover:bg-secondary/80 transition-colors">
+                          {item.isPrimary && (
+                            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                          )}
+                          {item.company?.name || "Inconnu"}
+                        </Badge>
+                      </Link>
+                    ))}
+                  </div>
+                )}
                 {/* Instruments */}
                 {(client.instruments || []).length > 0 && (
                   <div className="flex flex-wrap gap-2">

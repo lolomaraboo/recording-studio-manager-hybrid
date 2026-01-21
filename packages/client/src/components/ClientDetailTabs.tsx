@@ -4,8 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { MusicProfileSection } from "@/components/MusicProfileSection";
-import { CompanyMembersIndicator } from "@/components/CompanyMembersIndicator";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { FinancesTab } from "./tabs/FinancesTab";
 import { ProjectsTab } from "./tabs/ProjectsTab";
@@ -25,6 +23,8 @@ import {
   Building2,
   Plus,
   Trash2,
+  Globe,
+  Users,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
@@ -455,6 +455,224 @@ export function ClientDetailTabs({
                         </div>
                       )}
 
+                      {/* Structured Address Fields */}
+                      {(client.street || client.city || client.postalCode || client.region || client.country) && (
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                          <div className="text-base">
+                            {client.street && <div>{client.street}</div>}
+                            <div>
+                              {[client.postalCode, client.city].filter(Boolean).join(' ')}
+                            </div>
+                            {client.region && <div>{client.region}</div>}
+                            {client.country && <div>{client.country}</div>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Birthday */}
+                      {client.birthday && (
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-5 w-5 text-muted-foreground" />
+                          <p className="text-base">
+                            {new Date(client.birthday).toLocaleDateString('fr-FR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Gender */}
+                      {client.gender && (
+                        <div className="flex items-center gap-2">
+                          <Users className="h-5 w-5 text-muted-foreground" />
+                          <p className="text-base capitalize">{client.gender}</p>
+                        </div>
+                      )}
+
+                      {/* Websites */}
+                      {(client.websites && client.websites.length > 0) && (
+                        <div className="space-y-1">
+                          {client.websites.map((website: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <Globe className="h-5 w-5 text-muted-foreground" />
+                              <a
+                                href={website.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-base hover:underline"
+                              >
+                                {website.url}
+                              </a>
+                              <span className="text-sm text-muted-foreground">
+                                ({website.type})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Music Streaming Platforms */}
+                      {(client.spotifyUrl || client.appleMusicUrl || client.youtubeUrl || client.soundcloudUrl ||
+                        client.bandcampUrl || client.deezerUrl || client.tidalUrl || client.amazonMusicUrl ||
+                        client.audiomackUrl || client.beatportUrl || client.otherPlatformsUrl) && (
+                        <div className="pt-2 border-t">
+                          <h4 className="text-sm font-semibold mb-2">Plateformes de streaming</h4>
+                          <div className="space-y-1">
+                            {client.spotifyUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.spotifyUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Spotify
+                                </a>
+                              </div>
+                            )}
+                            {client.appleMusicUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.appleMusicUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Apple Music
+                                </a>
+                              </div>
+                            )}
+                            {client.youtubeUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  YouTube
+                                </a>
+                              </div>
+                            )}
+                            {client.soundcloudUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.soundcloudUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  SoundCloud
+                                </a>
+                              </div>
+                            )}
+                            {client.bandcampUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.bandcampUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Bandcamp
+                                </a>
+                              </div>
+                            )}
+                            {client.deezerUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.deezerUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Deezer
+                                </a>
+                              </div>
+                            )}
+                            {client.tidalUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.tidalUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Tidal
+                                </a>
+                              </div>
+                            )}
+                            {client.amazonMusicUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.amazonMusicUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Amazon Music
+                                </a>
+                              </div>
+                            )}
+                            {client.audiomackUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.audiomackUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Audiomack
+                                </a>
+                              </div>
+                            )}
+                            {client.beatportUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <a href={client.beatportUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                  Beatport
+                                </a>
+                              </div>
+                            )}
+                            {client.otherPlatformsUrl && (
+                              <div className="flex items-center gap-2">
+                                <Music className="h-4 w-4 text-muted-foreground" />
+                                <div className="text-sm whitespace-pre-wrap">{client.otherPlatformsUrl}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Industry Information */}
+                      {(client.recordLabel || client.distributor || client.managerContact || client.publisher || client.performanceRightsSociety) && (
+                        <div className="pt-2 border-t">
+                          <h4 className="text-sm font-semibold mb-2">Informations professionnelles</h4>
+                          <div className="space-y-1 text-sm">
+                            {client.recordLabel && (
+                              <div><span className="font-medium">Label:</span> {client.recordLabel}</div>
+                            )}
+                            {client.distributor && (
+                              <div><span className="font-medium">Distributeur:</span> {client.distributor}</div>
+                            )}
+                            {client.managerContact && (
+                              <div><span className="font-medium">Manager:</span> {client.managerContact}</div>
+                            )}
+                            {client.publisher && (
+                              <div><span className="font-medium">Éditeur:</span> {client.publisher}</div>
+                            )}
+                            {client.performanceRightsSociety && (
+                              <div><span className="font-medium">Société de droits:</span> {client.performanceRightsSociety}</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Career Information */}
+                      {(client.yearsActive || client.notableWorks || client.awardsRecognition || client.biography) && (
+                        <div className="pt-2 border-t">
+                          <h4 className="text-sm font-semibold mb-2">Carrière</h4>
+                          <div className="space-y-2 text-sm">
+                            {client.yearsActive && (
+                              <div><span className="font-medium">Années actives:</span> {client.yearsActive}</div>
+                            )}
+                            {client.notableWorks && (
+                              <div>
+                                <span className="font-medium">Œuvres notables:</span>
+                                <p className="whitespace-pre-wrap mt-1">{client.notableWorks}</p>
+                              </div>
+                            )}
+                            {client.awardsRecognition && (
+                              <div>
+                                <span className="font-medium">Prix et distinctions:</span>
+                                <p className="whitespace-pre-wrap mt-1">{client.awardsRecognition}</p>
+                              </div>
+                            )}
+                            {client.biography && (
+                              <div>
+                                <span className="font-medium">Biographie:</span>
+                                <p className="whitespace-pre-wrap mt-1">{client.biography}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Notes */}
+                      {client.notes && (
+                        <div className="pt-2 border-t">
+                          <h4 className="text-sm font-semibold mb-2">Notes</h4>
+                          <p className="text-sm whitespace-pre-wrap">{client.notes}</p>
+                        </div>
+                      )}
+
                       {!client.prefix && !client.firstName && !client.lastName && !client.artistName && !client.email && !client.phone && !client.address && (
                         <p className="text-sm text-muted-foreground">Aucune information de contact</p>
                       )}
@@ -462,23 +680,6 @@ export function ClientDetailTabs({
                   )}
                 </div>
 
-              <Separator className="my-4" />
-
-              {/* Company Members / Individual Companies Section */}
-              <CompanyMembersIndicator
-                clientId={clientId}
-                clientType={client.type}
-                clientName={client.name}
-              />
-
-              {/* Profil Musical */}
-              <div className="mt-4">
-                <MusicProfileSection
-                  client={client}
-                  isEditing={isEditing}
-                  onUpdate={handleUpdateField}
-                />
-              </div>
           </CardContent>
         </Card>
       </TabsContent>
