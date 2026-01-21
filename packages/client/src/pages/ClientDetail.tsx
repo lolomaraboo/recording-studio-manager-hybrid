@@ -109,10 +109,22 @@ export default function ClientDetail() {
     },
   });
 
+  // Helper to convert null to empty strings for backend validation
+  const sanitizeFormData = (data: any): any => {
+    const sanitized = { ...data };
+    Object.keys(sanitized).forEach(key => {
+      if (sanitized[key] === null) {
+        sanitized[key] = "";
+      }
+    });
+    return sanitized;
+  };
+
   // Handle update from wizard
   const handleUpdate = (data: any) => {
+    const sanitizedData = sanitizeFormData(data);
     updateMutation.mutate(
-      { id: Number(id), data },
+      { id: Number(id), data: sanitizedData },
       {
         onSuccess: () => {
           toast.success("Client mis à jour");
@@ -130,8 +142,9 @@ export default function ClientDetail() {
   const handleUpdateField = (updates: any) => {
     const updatedData = { ...formData, ...updates };
     setFormData(updatedData);
+    const sanitizedUpdates = sanitizeFormData(updates);
     updateMutation.mutate(
-      { id: Number(id), data: updates },
+      { id: Number(id), data: sanitizedUpdates },
       {
         onSuccess: () => {
           toast.success("Modification enregistrée");
