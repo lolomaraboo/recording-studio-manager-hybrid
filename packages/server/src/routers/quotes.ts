@@ -588,10 +588,10 @@ export const quotesRouter = router({
         });
       }
 
-      if (quote.status !== 'sent' && quote.status !== 'cancelled') {
+      if (quote.status !== 'sent' && quote.status !== 'cancelled' && quote.status !== 'rejected') {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'Only sent or cancelled quotes can be reverted to draft',
+          message: 'Only sent, cancelled, or rejected quotes can be reverted to draft',
         });
       }
 
@@ -601,6 +601,7 @@ export const quotesRouter = router({
           status: 'draft',
           sentAt: null,
           expiresAt: null,
+          respondedAt: null,
           updatedAt: new Date(),
         })
         .where(eq(quotes.id, input.quoteId))

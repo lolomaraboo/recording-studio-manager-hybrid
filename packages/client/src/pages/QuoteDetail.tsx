@@ -520,16 +520,16 @@ export default function QuoteDetail() {
                     </div>
                   )}
 
-                  {/* CANCELLED: Can revert to draft */}
-                  {quote.status === "cancelled" && (
+                  {/* CANCELLED/REJECTED: Can revert to draft */}
+                  {(quote.status === "cancelled" || quote.status === "rejected") && (
                     <Button variant="secondary" onClick={handleRevertToDraft} disabled={revertToDraftMutation.isPending}>
                       <Undo2 className="h-4 w-4 mr-2" />
                       Remettre en brouillon
                     </Button>
                   )}
 
-                  {/* REJECTED/CONVERTED: No actions */}
-                  {(quote.status === "rejected" || quote.status === "converted_to_project") && (
+                  {/* CONVERTED: No actions */}
+                  {quote.status === "converted_to_project" && (
                     <div className="text-sm text-muted-foreground">
                       Aucune action disponible pour ce devis.
                     </div>
