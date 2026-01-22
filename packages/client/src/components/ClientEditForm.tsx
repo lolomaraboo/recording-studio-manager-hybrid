@@ -185,16 +185,18 @@ export function ClientEditForm({
             </AccordionTrigger>
             <AccordionContent>
               <div className="px-4 pb-3 space-y-1">
-                {/* Nom d'artiste - TOP POSITION IN IDENTITY ACCORDION */}
-              <div>
-                <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste / Pseudo</label>
-                <input
-                  id="artistName"
-                  className="w-full px-3 py-2 border rounded-md mt-1"
-                  value={formData.artistName || ""}
-                  onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                />
-              </div>
+                {/* Nom d'artiste - Only for individuals */}
+              {formData.type === "individual" && (
+                <div>
+                  <label htmlFor="artistName" className="text-sm font-medium">Nom d'artiste / Pseudo</label>
+                  <input
+                    id="artistName"
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    value={formData.artistName || ""}
+                    onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
+                  />
+                </div>
+              )}
 
               {/* Nom complet / Raison sociale */}
               <div>
