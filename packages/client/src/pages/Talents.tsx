@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,9 +30,41 @@ import {
 } from "@/components/ui/table";
 import { Link } from "react-router-dom";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Music, Mail, Phone, Globe, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2, Music, Mail, Phone, Globe, ArrowLeft, TableIcon, Grid, Columns, Copy, Star } from "lucide-react";
 import { toast } from "sonner";
 import { TALENT_TYPES, TALENT_TYPE_LABELS, type TalentType } from "@rsm/shared";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { cn, getInitials } from "@/lib/utils";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+
+type ViewMode = 'table' | 'grid' | 'kanban';
+type SortField = 'name' | 'talentType' | 'sessions' | 'lastSession';
+type SortOrder = 'asc' | 'desc';
+
+/**
+ * Copy button for email/phone with toast feedback
+ */
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copié!`);
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-5 w-5 p-0"
+      onClick={handleCopy}
+      title={`Copier ${label.toLowerCase()}`}
+    >
+      <Copy className="h-3 w-3" />
+    </Button>
+  );
+}
 
 export default function Talents() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -40,6 +72,17 @@ export default function Talents() {
   const [selectedTalent, setSelectedTalent] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<TalentType | "all">("all");
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('talentsViewMode');
+    return (saved as ViewMode) || 'table';
+  });
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+  // Save view mode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('talentsViewMode', viewMode);
+  }, [viewMode]);
 
   const { data: talents, refetch } = trpc.musicians.list.useQuery(
     selectedType === "all" ? undefined : { talentType: selectedType }
@@ -120,31 +163,42 @@ export default function Talents() {
         </Tabs>
       </div>
 
-      {/* Statistiques */}
+      {/* Stats Cards */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription>Total</CardDescription>
+              <CardDescription className="text-sm">Total talents</CardDescription>
               <CardTitle className="text-3xl">{stats.total}</CardTitle>
             </CardHeader>
           </Card>
+
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription>Avec email</CardDescription>
-              <CardTitle className="text-3xl">{stats.withEmail}</CardTitle>
+              <CardDescription className="text-sm">Performers VIP</CardDescription>
+              <CardTitle className="text-3xl flex items-center gap-2">
+                {stats.vipPerformers}
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+              </CardTitle>
             </CardHeader>
           </Card>
+
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription>Avec téléphone</CardDescription>
-              <CardTitle className="text-3xl">{stats.withPhone}</CardTitle>
+              <CardDescription className="text-sm">Total crédits</CardDescription>
+              <CardTitle className="text-3xl">{stats.totalCredits}</CardTitle>
             </CardHeader>
           </Card>
+
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription>Avec site web</CardDescription>
-              <CardTitle className="text-3xl">{stats.withWebsite || 0}</CardTitle>
+              <CardDescription className="text-sm">Dernière activité</CardDescription>
+              <CardTitle className="text-lg">
+                {stats.lastActivityDate ?
+                  format(new Date(stats.lastActivityDate), "dd MMM yyyy", { locale: fr })
+                  : "Jamais"
+                }
+              </CardTitle>
             </CardHeader>
           </Card>
         </div>
@@ -173,10 +227,38 @@ export default function Talents() {
       {/* Liste des talents */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Liste des talents</CardTitle>
-          <CardDescription className="text-sm">Gérez votre base de données de talents</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Liste des talents</CardTitle>
+              <CardDescription className="text-sm">Gérez votre base de données de talents</CardDescription>
+            </div>
+            <div className="flex gap-1">
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+              >
+                <TableIcon className="h-3 w-3" />
+              </Button>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid className="h-3 w-3" />
+              </Button>
+              <Button
+                variant={viewMode === 'kanban' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('kanban')}
+              >
+                <Columns className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
+          {viewMode === 'table' && (
           <Table>
             <TableHeader>
               <TableRow>
@@ -290,6 +372,7 @@ export default function Talents() {
               )}
             </TableBody>
           </Table>
+          )}
         </CardContent>
       </Card>
 
