@@ -149,7 +149,7 @@ export default function Services() {
 
     const data = {
       name: formData.name.trim(),
-      description: formData.description.trim() || null,
+      description: formData.description.trim() || undefined,
       category: formData.category,
       unitPrice: formData.unitPrice,
       vatRateId: formData.vatRateId!,
