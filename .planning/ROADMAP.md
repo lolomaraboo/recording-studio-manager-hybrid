@@ -2200,7 +2200,6 @@ Plans:
 **Details**:
 Appliquer le pattern accordion établi (Phases 22-29) à Equipment. Créer EquipmentEditForm avec 4 accordions (Identité, Spécifications Techniques, Informations Financières, Maintenance & Statut) couvrant les 16 champs du schéma. Convertir EquipmentCreate.tsx de formulaire inline (220 lignes) en page accordion (~120 lignes) réutilisant EquipmentEditForm.
 
-**Rationale**: EquipmentCreate existe mais utilise formulaire inline sans accordions. Harmonisation améliore cohérence UX (12/12 ressources), maintenabilité (form component réutilisable), et UX (localStorage persistence + Alt+Click toggle).
 
 ---
 ---
