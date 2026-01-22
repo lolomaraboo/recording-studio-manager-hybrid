@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 27 of 27 (Affichage Conditionnel Selon Type Client) - Phase 27 COMPLETE ✅
-Plan: 1/1 complete (27-01 ✅)
+Plan: 2/2 complete (27-01 ✅, 27-02 ✅)
 Status: Phase complete
-Last activity: 2026-01-22 - Phase 27 COMPLETE ✅ (2 min total, conditional rendering for client type)
+Last activity: 2026-01-22 - Phase 27 COMPLETE ✅ (4 min total, conditional rendering for client type including birthday/gender fields)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 1/1 plans (27-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 113
-- Average duration: 30.1 min
-- Total execution time: 56.6 hours
+- Total plans completed: 114
+- Average duration: 29.9 min
+- Total execution time: 56.7 hours
 
 **By Phase:**
 
@@ -89,11 +89,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26 | 1/1 | 7 min | 7 min |
 | 26.1 | 1/1 | 47 min | 47 min |
 | 26.2 | 1/1 | 2 min | 2 min |
-| 27 | 1/1 | 2 min | 2 min |
+| 27 | 2/2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: [7 min, 47 min, 2 min, 2 min]
-- Trend: Phase 27 COMPLETE ✅ (2 min total, 1/1 plans). Conditional rendering implementation. Plan 27-01 (2 min): Wrapped Profil Artistique and Streaming accordions in formData.type === "individual" conditionals, updated Alt key handler to dynamic accordion list (4 for company, 6 for individual). Company clients now see clean 4-accordion form without music-related clutter. Individual clients unchanged (all 6 accordions). Zero deviations, straightforward implementation.
+- Last 5 plans: [47 min, 2 min, 2 min, 2 min]
+- Trend: Phase 27 COMPLETE ✅ (4 min total, 2/2 plans). Full conditional rendering implementation. Plan 27-01 (2 min): Wrapped Profil Artistique and Streaming accordions in formData.type === "individual" conditionals, dynamic Alt key handler (4 for company, 6 for individual). Plan 27-02 (2 min): Gap closure - wrapped birthday and gender fields in same conditional pattern. Company clients now see clean 4-field Identité section, individuals unchanged. Zero deviations, straightforward implementation.
 
 ## Accumulated Context
 
@@ -261,6 +261,8 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 27-01 | Conditional rendering for music accordions | Rationale: Companies (labels, studios, management) don't have personal music profiles. Profil Artistique and Streaming sections create visual clutter and user confusion for company clients. Solution: Wrap both accordions in formData.type === "individual" conditional. Impact: Clean 4-accordion form for companies, unchanged 6-accordion form for individuals. |
 | 27-01 | Dynamic Alt key accordion list | Rationale: Alt+Click should toggle only VISIBLE accordions. Company clients see 4 accordions, individuals see 6. Dynamic allAccordions calculation based on formData.type ensures correct toggle behavior for each type. Impact: Keyboard shortcut adapts to client type context. |
 | 27-01 | artistName field remains unconditional | Rationale: Companies can use artistName for brand/trading name separate from legal companyName. Individual artists use it for stage name. Business requirement to keep this field visible for both types. Impact: Flexible naming support for both client types. |
+| 27-02 | Birthday and gender conditional rendering | Rationale: Birthday and gender are personal identity attributes that apply only to individuals, not companies. Wrapping both in same conditional block reduces code duplication and maintains consistency with structured name pattern. Impact: Company clients see clean 4-field Identité (Type, artistName, companyName, name), individual clients see full identity form (6+ fields). |
+| 27-02 | Fragment wrapper for grouped conditionals | Rationale: React requires single child for conditional rendering. Fragment (`<>...</>`) allows multiple elements (birthday + gender) without adding extra DOM nodes. Matches existing structured name pattern (lines 214-279). Impact: Cleaner JSX, consistent pattern across all individual-specific fields. |
 
 ### Deferred Issues
 
@@ -542,10 +544,10 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-22T01:22:19Z
-Stopped at: Phase 27 COMPLETE ✅ - Conditional rendering for music-related accordions
+Last session: 2026-01-22T01:40:08Z
+Stopped at: Phase 27 COMPLETE ✅ - Full conditional rendering for client type (accordions + birthday/gender)
 Resume context:
-  - Phase 27 COMPLETE ✅: Affichage Conditionnel Selon Type Client (2 min total execution, 1/1 plans)
+  - Phase 27 COMPLETE ✅: Affichage Conditionnel Selon Type Client (4 min total execution, 2/2 plans)
     - **Plan 27-01:** Conditional accordion rendering based on client type (2 min, 1 task)
       - **Task 1:** Conditional rendering for music-related accordions - `26611b8`
         - Wrapped Profil Artistique accordion in formData.type === "individual" conditional
@@ -554,21 +556,28 @@ Resume context:
         - Company clients now see 4 accordions: Identité, Coordonnées, Relations Pro, Champs Personnalisés
         - Individual clients see all 6 accordions (unchanged experience)
         - artistName field remains visible for both types (business requirement)
-    - **Key achievements (27-01):**
-      - Clean form UX for company clients without music-related clutter
-      - Dynamic keyboard shortcut behavior adapting to client type
-      - Zero deviations, straightforward implementation
-      - All success criteria verified: position, integration, conditional rendering, Alt key
-      - TypeScript 0 errors in ClientEditForm.tsx
+    - **Plan 27-02:** Gap closure - Birthday and gender conditional rendering (2 min, 1 task)
+      - **Task 1:** Wrap birthday and gender fields in conditional rendering - `6da844e`
+        - Birthday field only renders when formData.type === "individual"
+        - Gender field only renders when formData.type === "individual"
+        - Both fields wrapped in same conditional block with Fragment wrapper
+        - Matched existing pattern from structured name fields (lines 214-279)
+        - Company clients now see clean 4-field Identité (Type, artistName, companyName, name)
+        - Individual clients unchanged (all identity fields visible)
+    - **Key achievements (Phase 27):**
+      - Complete type-specific UI adaptation for client forms
+      - Company clients see minimal, relevant fields only (no music-related sections or personal fields)
+      - Individual clients retain full form with all 6 accordions and personal fields
+      - Zero deviations across both plans
       - Production build successful (1.7MB bundle)
-    - **Verification:** All success criteria met ✓
-      - 6th accordion at position 3 ✓
-      - CompanyMembersIndicator integrated ✓
-      - Conditional rendering prevents crash ✓
-      - Alt key toggles 6 accordions ✓
-      - TypeScript 0 errors ✓
+      - Gap closure verified - all must-haves from 27-VERIFICATION.md satisfied
+    - **Verification:** Phase 27 gaps CLOSED ✓
+      - Music accordions conditional (27-01) ✓
+      - Birthday/gender conditional (27-02) ✓
+      - Dynamic visibility complete ✓
+      - TypeScript passes (pre-existing errors unrelated) ✓
       - Production build successful ✓
-  - **Next:** Phase 26.2 verified complete. Ready for manual browser testing. Full 6-accordion edit form with Phase 25 relationship management restored.
+  - **Next:** Phase 27 verified complete. Ready for production deployment. Company clients now have clean, context-appropriate forms without individual-specific fields.
   - Phase 26.1 COMPLETE ✅: Réorganisation Accordéons - Logique Studio d'Enregistrement (47 min total execution, 1/1 plans)
     - **Plan 26.1-01:** 7→5 accordion restructure with iterative user feedback (47 min, 13 tasks)
       - **Task 1:** Restructure 7 accordions to 5 fused sections - `d523669`
