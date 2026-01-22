@@ -10,6 +10,7 @@ type ServiceCategory = "Studio" | "Post-production" | "Location matériel" | "Au
 
 export default function ServiceCreate() {
   const navigate = useNavigate();
+  const utils = trpc.useUtils();
 
   // Fetch default VAT rate
   const { data: vatRates } = trpc.vatRates.list.useQuery();
@@ -17,6 +18,7 @@ export default function ServiceCreate() {
   // Create mutation
   const createMutation = trpc.serviceCatalog.create.useMutation({
     onSuccess: () => {
+      utils.serviceCatalog.list.invalidate();
       toast.success("Service créé avec succès");
       navigate("/services");
     },
