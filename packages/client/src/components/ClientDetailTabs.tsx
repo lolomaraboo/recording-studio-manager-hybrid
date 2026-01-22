@@ -553,6 +553,21 @@ export function ClientDetailTabs({
                         </div>
                       )}
 
+                      {/* Custom Fields */}
+                      {(client.customFields && client.customFields.length > 0) && (
+                        <div className="pt-2 border-t mt-2">
+                          <h4 className="text-sm font-semibold mb-1.5 text-foreground">Champs personnalisés</h4>
+                          <div className="space-y-0.5">
+                            {client.customFields.map((field: any, index: number) => (
+                              <div key={index} className="flex items-start gap-1.5">
+                                <span className="text-sm font-semibold min-w-[120px]">{field.label}:</span>
+                                <span className="text-sm">{field.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Notes */}
                       {client.notes && (
                         <div className="pt-2 border-t mt-2">
