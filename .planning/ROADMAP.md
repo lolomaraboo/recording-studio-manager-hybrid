@@ -2127,3 +2127,58 @@ Plans:
 **Rationale**: Page /clients a reçu 9 phases d'améliorations UI (Phases 19, 20, 22, 23, 24, 25, 26, 26.1, 27) transformant une simple liste en hub relationnel moderne avec 3 modes d'affichage, tri, stats, et UX professionnelle. Page /talents liste harmonisée (28-01/02/03) mais detail page et formulaire édition restent anciens patterns (wizard, inline forms). Gap closure plans (28-04, 28-05) complètent harmonisation totale en appliquant patterns Phases 22-26 (tabs, accordions, visual hierarchy). Users managing talents (musicians, engineers, producers) méritent la même qualité UX que clients partout dans l'app.
 
 ---
+
+### Phase 29: Harmonisation Services - Routing Cohérent
+
+**Goal**: Remplacer le Dialog modal par une page dédiée /services/new pour cohérence avec toutes les autres ressources (clients, sessions, invoices, equipment, rooms, projects, quotes, contracts, expenses, talents, tracks)
+
+**Depends on**: Phase 28 (harmonisation patterns établis)
+
+**Research**: Minimal (pattern existant réutilisé de 11 autres pages)
+
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 29-01-PLAN.md — ServiceCreate page + ServiceEditForm component + routing update
+
+**Status**: Ready for execution
+
+**Details**:
+
+**Pattern Application:**
+Phase 29 applies the established harmonization pattern (Phases 22-28) to Services:
+- Create dedicated `/services/new` page (ServiceCreate.tsx)
+- Create accordion-based form component (ServiceEditForm.tsx with 2 sections)
+- Replace Dialog modal with Link navigation
+- Register route in App.tsx
+
+**Why 2 Accordions (not 5 like TalentEditForm):**
+Services has only 6 fields (name, description, category, unitPrice, taxRate, defaultQuantity):
+- **Accordion 1 - Identité du Service:** name, category, description (3 fields)
+- **Accordion 2 - Tarification:** unitPrice, taxRate, defaultQuantity (3 fields)
+
+**Template:** TalentEditForm (Phase 28) - 300 lines with 5 accordions → ServiceEditForm ~200 lines with 2 accordions
+
+**Changes:**
+1. Create ServiceCreate.tsx (~110 lines)
+2. Create ServiceEditForm.tsx (~200 lines)
+3. Update Services.tsx: Remove Dialog code (lines 350-493), change button to Link navigation
+4. Update App.tsx: Add /services/new route
+
+**Code Impact:**
+- Lines added: ~310 (ServiceCreate + ServiceEditForm)
+- Lines removed: ~150 (Dialog code from Services.tsx)
+- Net: +160 lines
+- Files created: 2
+- Files modified: 2
+
+**Pattern Consistency:**
+After Phase 29, all 12 resources use dedicated `/resource/new` pages:
+- clients, sessions, invoices, equipment, rooms, projects
+- quotes, contracts, expenses, talents, tracks, **services** ✅
+
+
+**Rationale**: Services est la SEULE ressource de l'application utilisant un Dialog modal au lieu de pages dédiées /new. Cette incohérence crée confusion UX (pourquoi Services se comporte différemment?) et problèmes navigation (URL non partageable, back button). Harmoniser Services avec le pattern établi par 11 autres ressources améliore cohérence globale, maintenabilité, et UX prévisible.
+
+---
