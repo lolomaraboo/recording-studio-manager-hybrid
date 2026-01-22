@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 28 of 28 (Harmonisation UI Talents) - Phase 28 IN PROGRESS 🔄
-Plan: 1/3 complete (28-01 ✅)
+Plan: 2/3 complete (28-01 ✅, 28-02 ✅)
 Status: In progress
-Last activity: 2026-01-21 - Completed 28-01 (1 min, enhanced musicians backend with search/sorting/stats)
+Last activity: 2026-01-21 - Completed 28-02 (2 min, added ViewMode toggles, stats cards, CopyButton foundation)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 1/3 plans (28-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 2/3 plans (28-01 ✅, 28-02 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 115
-- Average duration: 29.6 min
-- Total execution time: 56.7 hours
+- Total plans completed: 116
+- Average duration: 29.3 min
+- Total execution time: 56.8 hours
 
 **By Phase:**
 
@@ -90,11 +90,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26.1 | 1/1 | 47 min | 47 min |
 | 26.2 | 1/1 | 2 min | 2 min |
 | 27 | 2/2 | 4 min | 2 min |
-| 28 | 1/3 | 1 min | 1 min |
+| 28 | 2/3 | 3 min | 1.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [2 min, 2 min, 2 min, 2 min, 1 min]
-- Trend: Phase 28 IN PROGRESS 🔄 (1/3 plans, 1 min so far). Plan 28-01 (1 min): Enhanced musicians backend router - server-side search across 7 fields (JSONB text casting for genres/instruments), sorting by 4 fields, new listWithStats with LEFT JOIN trackCredits, enhanced getStats with VIP performers (>10 credits) and totalCredits metrics. Schema adaptation: used trackCredits instead of sessions (no direct relationship). Zero TypeScript errors, production-ready endpoints.
+- Last 5 plans: [2 min, 2 min, 2 min, 1 min, 2 min]
+- Trend: Phase 28 IN PROGRESS 🔄 (2/3 plans, 3 min so far). Plan 28-02 (2 min): Added ViewMode state with localStorage persistence (table/grid/kanban), toggle buttons in CardHeader, stats cards redesigned with musician-specific KPIs (VIP performers >10 credits with Star icon, total credits, last activity with French date), CopyButton component for email/phone copying, Avatar component imports. Foundation complete for Grid/Kanban implementations. Zero deviations, build successful.
 
 ## Accumulated Context
 
@@ -545,38 +545,48 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-21T23:55:29Z
-Stopped at: Phase 28 IN PROGRESS 🔄 - Completed 28-01, enhanced musicians backend router
+Last session: 2026-01-21T23:59:24Z
+Stopped at: Phase 28 IN PROGRESS 🔄 - Completed 28-02, added ViewMode toggles and stats cards foundation
 Resume context:
-  - Phase 28 IN PROGRESS 🔄: Harmonisation UI Talents (1 min so far, 1/3 plans complete)
+  - Phase 28 IN PROGRESS 🔄: Harmonisation UI Talents (3 min so far, 2/3 plans complete)
+    - **Plan 28-02:** Talents UI foundation components (2 min, 3 tasks) - COMPLETE ✅
+      - **Tasks 1-3:** ViewMode, Stats, and Components - `e8b8216`
+        - **Task 1:** ViewMode state with localStorage persistence
+          - Added type definitions (ViewMode, SortField, SortOrder)
+          - State initialization from localStorage key 'talentsViewMode'
+          - useEffect for persistence on viewMode change
+          - Toggle buttons (Table/Grid/Kanban) in CardHeader
+          - Active button highlighted with 'default' variant
+          - Conditional table rendering: {viewMode === 'table' && (...)}
+        - **Task 2:** Stats cards with musician-specific KPIs
+          - 4-card grid layout (md:grid-cols-2 lg:grid-cols-4)
+          - Card 1: Total talents (stats.total)
+          - Card 2: Performers VIP (stats.vipPerformers) with Star icon (yellow-500 fill)
+          - Card 3: Total crédits (stats.totalCredits)
+          - Card 4: Dernière activité (stats.lastActivityDate) with French date format
+          - Replaced old stats (withEmail, withPhone, withWebsite)
+          - Adapted to backend response (totalCredits, lastActivityDate)
+        - **Task 3:** CopyButton component and Avatar imports
+          - CopyButton function component (email/phone copy with toast)
+          - Avatar component imported (AvatarImage, AvatarFallback)
+          - getInitials utility imported from @/lib/utils
+          - date-fns imports (format, fr locale)
+          - Icons added: TableIcon, Grid, Columns, Copy, Star
+    - **Key achievements (28-02):**
+      - ViewMode state functional with 3 modes (table/grid/kanban)
+      - localStorage persistence working ('talentsViewMode' key)
+      - Stats cards displaying VIP performers with visual icon
+      - French date formatting for last activity (dd MMM yyyy)
+      - Foundation components ready for Grid/Kanban views
+      - Zero deviations from plan
+      - Build successful (1697KB bundle)
+    - **Deviations (28-02):**
+      - None - plan executed exactly as written
+    - **Next:** Phase 28-03 - Talents.tsx Grid/Kanban view implementations
     - **Plan 28-01:** Enhanced musicians backend router (1 min, 3 tasks) - COMPLETE ✅
-      - **Task 1:** Add server-side search with debounced filtering - `5d26c94`
-        - Added searchQuery, sortField, sortOrder parameters to list endpoint
-        - Search across 7 fields: name, stageName, email, bio, genres, instruments, notes
-        - JSONB text casting for genres/instruments: `genres::text ILIKE '%keyword%'`
-        - Sorting support: name, talentType, credits, updatedAt (ASC/DESC)
-        - Conditional WHERE clause builder with and()/or() combinators
-      - **Task 2:** Enhanced stats endpoint with VIP performers - `5d26c94`
-        - Replaced basic stats (withEmail, withPhone, withWebsite) with meaningful metrics
-        - New metrics: total, vipPerformers (>10 track credits), totalCredits, lastActivityDate
-        - LEFT JOIN trackCredits, GROUP BY musicianId, COUNT(*) aggregation
-      - **Task 3:** Add listWithStats endpoint for enriched data - `5d26c94`
-        - New endpoint with creditsCount computed field
-        - LEFT JOIN trackCredits with COUNT(DISTINCT trackCredits.id)
-        - Zero-credit musicians included (LEFT JOIN ensures all appear)
-        - Sorting by credits count: ORDER BY COUNT DESC shows most active first
-        - Same search/filter logic as list endpoint
-    - **Key achievements (28-01):**
-      - Schema adaptation: Used trackCredits instead of sessions (no direct relationship)
-      - JSONB search pattern: `::text` casting for array field searching
-      - Dual endpoint strategy: lightweight list + heavy listWithStats
-      - VIP threshold: >10 track credits = high-volume performers
-      - TypeScript 0 errors, production-ready endpoints
-    - **Deviations (28-01):**
-      - Changed metrics from sessions-based to trackCredits-based (schema has no musicianId in sessions)
-      - Sort fields adjusted: removed 'sessions'/'lastSession', added 'credits'/'updatedAt'
-      - All auto-fixed with Rule 1/2 (bug/missing critical functionality)
-    - **Next:** Phase 28-02 - Talents.tsx UI harmonization (frontend implementation with view modes)
+      - Backend search/sort/stats endpoints ready
+      - trackCredits-based metrics (VIP threshold >10 credits)
+      - JSONB text casting for array field searching
   - Phase 27 COMPLETE ✅: Affichage Conditionnel Selon Type Client (4 min total execution, 2/2 plans)
     - **Plan 27-01:** Conditional accordion rendering based on client type (2 min, 1 task)
       - **Task 1:** Conditional rendering for music-related accordions - `26611b8`
