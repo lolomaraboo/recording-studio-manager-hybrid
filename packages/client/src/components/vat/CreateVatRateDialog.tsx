@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface CreateVatRateDialogProps {
   open: boolean;
@@ -23,7 +23,6 @@ export function CreateVatRateDialog({
   open,
   onOpenChange,
 }: CreateVatRateDialogProps) {
-  const { toast } = useToast();
   const [name, setName] = useState('');
   const [rate, setRate] = useState('');
   const [isDefault, setIsDefault] = useState(false);
@@ -33,10 +32,7 @@ export function CreateVatRateDialog({
   const createMutation = trpc.vatRates.create.useMutation({
     onSuccess: () => {
       utils.vatRates.list.invalidate();
-      toast({
-        title: 'Taux créé',
-        description: 'Le nouveau taux de TVA a été créé avec succès.',
-      });
+      toast.success('Nouveau taux de TVA créé avec succès');
       onOpenChange(false);
       // Reset form
       setName('');
@@ -44,11 +40,7 @@ export function CreateVatRateDialog({
       setIsDefault(false);
     },
     onError: (error) => {
-      toast({
-        title: 'Erreur',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error(`Erreur: ${error.message}`);
     },
   });
 
@@ -56,11 +48,7 @@ export function CreateVatRateDialog({
     e.preventDefault();
     const rateNumber = parseFloat(rate);
     if (isNaN(rateNumber) || rateNumber < 0 || rateNumber > 100) {
-      toast({
-        title: 'Taux invalide',
-        description: 'Le taux doit être un nombre entre 0 et 100.',
-        variant: 'destructive',
-      });
+      toast.error('Le taux doit être un nombre entre 0 et 100');
       return;
     }
     createMutation.mutate({ name, rate: rateNumber, isDefault });

@@ -36,10 +36,9 @@ import {
 import { MoreHorizontal, Plus, Star, Archive, Edit } from 'lucide-react';
 import { CreateVatRateDialog } from './CreateVatRateDialog';
 import { EditVatRateDialog } from './EditVatRateDialog';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export function VatRatesSection() {
-  const { toast } = useToast();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingRate, setEditingRate] = useState<any>(null);
@@ -52,34 +51,20 @@ export function VatRatesSection() {
   const setDefaultMutation = trpc.vatRates.setDefault.useMutation({
     onSuccess: () => {
       utils.vatRates.list.invalidate();
-      toast({
-        title: 'Taux par défaut modifié',
-        description: 'Le nouveau taux par défaut a été enregistré.',
-      });
+      toast.success('Taux par défaut modifié');
     },
     onError: (error) => {
-      toast({
-        title: 'Erreur',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error(`Erreur: ${error.message}`);
     },
   });
 
   const archiveMutation = trpc.vatRates.archive.useMutation({
     onSuccess: () => {
       utils.vatRates.list.invalidate();
-      toast({
-        title: 'Taux archivé',
-        description: 'Le taux de TVA a été archivé avec succès.',
-      });
+      toast.success('Taux de TVA archivé avec succès');
     },
     onError: (error) => {
-      toast({
-        title: 'Impossible d\'archiver',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error(`Impossible d'archiver: ${error.message}`);
     },
   });
 

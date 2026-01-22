@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface EditVatRateDialogProps {
   open: boolean;
@@ -24,7 +24,6 @@ export function EditVatRateDialog({
   onOpenChange,
   rate,
 }: EditVatRateDialogProps) {
-  const { toast } = useToast();
   const [name, setName] = useState(rate.name);
 
   useEffect(() => {
@@ -36,18 +35,11 @@ export function EditVatRateDialog({
   const updateMutation = trpc.vatRates.update.useMutation({
     onSuccess: () => {
       utils.vatRates.list.invalidate();
-      toast({
-        title: 'Taux modifié',
-        description: 'Le taux de TVA a été modifié avec succès.',
-      });
+      toast.success('Taux de TVA modifié avec succès');
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({
-        title: 'Erreur',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error(`Erreur: ${error.message}`);
     },
   });
 
