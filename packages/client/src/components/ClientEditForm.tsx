@@ -196,17 +196,20 @@ export function ClientEditForm({
                 />
               </div>
 
-              {/* Nom complet (auto-generated, readonly) */}
+              {/* Nom complet / Raison sociale */}
               <div>
                 <label htmlFor="name" className="text-sm font-medium">
-                  Nom complet
+                  {formData.type === "individual" ? "Nom complet" : "Raison sociale"}
                 </label>
                 <input
                   id="name"
-                  className="w-full px-3 py-2 border rounded-md mt-1 bg-muted cursor-not-allowed"
+                  className={`w-full px-3 py-2 border rounded-md mt-1 ${
+                    formData.type === "individual" ? "bg-muted cursor-not-allowed" : ""
+                  }`}
                   value={formData.name || ""}
-                  readOnly
-                  placeholder="Se génère automatiquement"
+                  readOnly={formData.type === "individual"}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder={formData.type === "individual" ? "Se génère automatiquement" : "Nom de l'entreprise"}
                 />
               </div>
 
