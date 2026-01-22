@@ -1981,7 +1981,8 @@ Phase 26.2 restores the company-individual relationship management that was acci
 **Plans**: 1 plan
 
 Plans:
-- [ ] 27-01-PLAN.md — Conditional rendering for music-related accordions
+- [x] 27-01-PLAN.md — Conditional rendering for music-related accordions
+- [ ] 27-02-PLAN.md — Fix birthday and gender conditional rendering (gap closure)
 
 **Details**:
 
