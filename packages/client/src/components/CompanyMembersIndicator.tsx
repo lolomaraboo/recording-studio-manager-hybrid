@@ -31,21 +31,16 @@ export function CompanyMembersIndicator({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">
-          {clientType === "company" ? "Membres" : "Entreprises"}
-        </h3>
-        {isEditing && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowModal(true)}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            {clientType === "company" ? "Ajouter un membre" : "Ajouter une entreprise"}
-          </Button>
-        )}
-      </div>
+      {isEditing && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowModal(true)}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          {clientType === "company" ? "Ajouter un membre" : "Ajouter une entreprise"}
+        </Button>
+      )}
 
       {count === 0 ? (
         <div className="text-sm text-muted-foreground p-3 border rounded">
