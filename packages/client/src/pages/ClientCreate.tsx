@@ -1,12 +1,57 @@
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ClientFormWizard } from "@/components/ClientFormWizard";
+import { Card, CardContent } from "@/components/ui/card";
+import { ClientEditForm } from "@/components/ClientEditForm";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, Save } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ClientCreate() {
   const navigate = useNavigate();
+
+  // Form data state - initialized with default values
+  const [formData, setFormData] = useState<any>({
+    type: "individual",
+    name: "",
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    prefix: "",
+    suffix: "",
+    artistName: "",
+    birthday: "",
+    gender: "",
+    avatarUrl: "",
+    logoUrl: "",
+    phones: [],
+    emails: [],
+    websites: [],
+    addresses: [],
+    customFields: [],
+    genres: [],
+    instruments: [],
+    spotifyUrl: "",
+    appleMusicUrl: "",
+    youtubeUrl: "",
+    soundcloudUrl: "",
+    bandcampUrl: "",
+    deezerUrl: "",
+    tidalUrl: "",
+    amazonMusicUrl: "",
+    audiomackUrl: "",
+    beatportUrl: "",
+    otherPlatformsUrl: "",
+    recordLabel: "",
+    distributor: "",
+    managerContact: "",
+    publisher: "",
+    performanceRightsSociety: "",
+    yearsActive: "",
+    notableWorks: "",
+    awardsRecognition: "",
+    biography: "",
+  });
 
   // Create mutation
   const createMutation = trpc.clients.create.useMutation({
@@ -20,8 +65,24 @@ export default function ClientCreate() {
   });
 
   // Handle form submission
-  const handleSubmit = (data: any) => {
-    createMutation.mutate(data);
+  const handleSubmit = () => {
+    // Minimal validation: only name required
+    if (!formData.name || formData.name.trim().length < 2) {
+      toast.error("Le nom est requis (min. 2 caractères)");
+      return;
+    }
+
+    // Map addresses array back to flat fields for database (if needed)
+    const dataToSave = { ...formData };
+    if (formData.addresses && formData.addresses.length > 0) {
+      const addr = formData.addresses[0]; // Use first address
+      dataToSave.street = addr.street || "";
+      dataToSave.city = addr.city || "";
+      dataToSave.postalCode = addr.postalCode || "";
+      dataToSave.country = addr.country || "";
+    }
+
+    createMutation.mutate(dataToSave);
   };
 
   return (
@@ -42,11 +103,31 @@ export default function ClientCreate() {
           </div>
         </div>
 
-        {/* Wizard Form */}
-        <ClientFormWizard
-          mode="create"
-          onSubmit={handleSubmit}
-          onCancel={() => navigate("/clients")}
+        {/* Sticky action buttons */}
+        <Card className="sticky top-2 z-10 bg-background/95 backdrop-blur">
+          <CardContent className="py-3 px-4">
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/clients")}
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={createMutation.isPending}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Créer le client
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Edit Form with Accordions */}
+        <ClientEditForm
+          formData={formData}
+          setFormData={setFormData}
         />
       </div>
     </div>
