@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 28 of 28 (Harmonisation UI Talents) - Phase 28 COMPLETE ✅
-Plan: 5/5 complete (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅)
-Status: Phase complete - ALL GAP CLOSURE PLANS COMPLETE
-Last activity: 2026-01-22 - Completed 28-05 (4 min, TalentEditForm accordion pattern, wizard eliminated, 58% code reduction)
+Phase: 29 of 29 (Harmonisation Services Routing Cohérent) - Phase 29 COMPLETE ✅
+Plan: 1/1 complete (29-01 ✅)
+Status: Phase complete - FINAL UI HARMONIZATION COMPLETE - ALL 12 RESOURCES HARMONIZED
+Last activity: 2026-01-22 - Completed 29-01 (4 min, ServiceCreate page + ServiceEditForm accordion, Dialog removed, all resources now use dedicated /resource/new pattern)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 119
-- Average duration: 28.8 min
-- Total execution time: 57.1 hours
+- Total plans completed: 120
+- Average duration: 28.6 min
+- Total execution time: 57.2 hours
 
 **By Phase:**
 
@@ -91,10 +91,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26.2 | 1/1 | 2 min | 2 min |
 | 27 | 2/2 | 4 min | 2 min |
 | 28 | 5/5 | 18 min | 3.6 min |
+| 29 | 1/1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: [2 min, 9 min, 4 min, 2 min, 4 min]
-- Trend: Phase 28 COMPLETE ✅ (5/5 plans, 18 min total). Plan 28-05 (4 min): Created TalentEditForm accordion component (299 lines) with 5 sections (Identité, Contact, Profil Musical, Streaming, Notes). Integrated into TalentDetailTabs edit mode. Refactored TalentCreate.tsx (58% reduction: 258→107 lines). Wizard pattern eliminated. All accordions open by default with localStorage persistence. Alt+Click toggle all. DRY principle: single form for create+edit. TypeScript 0 errors, build successful (6.19s). Gap closure complete: Talents UI fully harmonized with Clients (Phases 22-27). Pattern reference: ClientEditForm from Phase 26.
+- Last 5 plans: [9 min, 4 min, 2 min, 4 min, 4 min]
+- Trend: Phase 29 COMPLETE ✅ (1/1 plan, 4 min total). Plan 29-01 (4 min): Created ServiceCreate page (117 lines) + ServiceEditForm accordion component (222 lines) with 2 sections (Identity, Pricing). Updated Services.tsx: Dialog create code removed, Link navigation added. Route registered /services/new in App.tsx. All 12 resources now harmonized (clients, sessions, invoices, equipment, rooms, projects, quotes, contracts, expenses, talents, tracks, services). Pattern consistency complete: dedicated /resource/new pages, accordion forms, localStorage persistence, Alt+Click toggle. TypeScript 0 errors, build successful (6.47s). Zero technical debt: no Dialog modal create code remains. Final UI harmonization milestone achieved.
 
 ## Accumulated Context
 
@@ -281,6 +282,13 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 ### Roadmap Evolution
 
 - **2026-01-21:** Phase 27 added after Phase 26.2: "Masquer Champs Musicaux pour Entreprises - Formulaire Édition" (ADDED)
+- **2026-01-22:** Phase 29 added after Phase 28: "Harmonisation Services - Routing Cohérent" (ADDED)
+  - Reason: Services est la SEULE ressource utilisant Dialog modal au lieu de pages dédiées /new
+  - Impact: Incohérence UX - 11 ressources utilisent routing cohérent, 1 ressource (Services) utilise pattern différent
+  - Discovery: User noticed during manual testing - Services doesn't follow same navigation pattern as clients/sessions/invoices/equipment/rooms/projects/quotes/contracts/expenses/talents/tracks
+  - Solution: Créer ServiceCreate.tsx et routes /services/new + /services/:id/edit pour cohérence
+  - Benefits: URLs partageables, back button fonctionnel, separation of concerns, pattern familier
+  - Priority: UX consistency - Harmonize last resource with established routing pattern
   - Reason: Entreprises (type="company") voient actuellement tous les champs musicaux inutiles (Profil Artistique, Streaming, artistName)
   - Impact: Bruit visuel et confusion pour utilisateurs créant/éditant des clients entreprise (labels, studios de production, management)
   - Solution: Masquage conditionnel des accordéons "Profil Artistique" et "Streaming" + champs individual dans Identité quand type="company"
