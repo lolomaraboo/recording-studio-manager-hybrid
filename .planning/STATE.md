@@ -26,18 +26,18 @@
 ## Current Position
 
 Phase: 39 of 45 (Gestion TVA Multi-Taux)
-Plan: 3/4 complete (39-01 ✅, 39-02 ✅, 39-03 ✅)
-Status: In progress - Data migration complete, backend API ready, frontend UI pending
-Last activity: 2026-01-22 - Completed 39-02 (8 min, data migration, tenant deployment, schema resilience, idempotent execution)
+Plan: 4/4 complete (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
+Status: Phase complete - VAT rate management fully functional (frontend + backend + data migration)
+Last activity: 2026-01-22 - Completed 39-04 (18.5 min, Settings Finance tab UI, CRUD dialogs, archived toggle, unarchive functionality)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 39: 3/4 plans (39-01 ✅, 39-02 ✅, 39-03 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 39: 4/4 plans (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 123
-- Average duration: 28.0 min
-- Total execution time: 57.5 hours
+- Total plans completed: 124
+- Average duration: 27.8 min
+- Total execution time: 57.8 hours
 
 **By Phase:**
 
@@ -92,11 +92,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 27 | 2/2 | 4 min | 2 min |
 | 28 | 5/5 | 18 min | 3.6 min |
 | 29 | 1/1 | 4 min | 4 min |
-| 39 | 3/4 | 23 min | 7.7 min |
+| 39 | 4/4 | 41 min | 10.3 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 4 min, 7 min, 7.5 min, 8 min]
-- Trend: Phase 39 IN PROGRESS (3/4 plans, 7.7 min avg). Plan 39-02 (8 min): Created migrate-vat-data.ts for header→line-item VAT migration across all tenants. Implemented schema-resilient pattern using explicit select() fields and raw SQL for service_catalog (avoids Drizzle schema mismatch issues). Created apply-tenant-migrations.ts utility for production tenant schema deployments. Deployed 0014_add_vat_rates.sql to 5 tenants (3, 9, 10, 23, 24). Seeded 4 French VAT rates per tenant (20 total rates). Ran idempotent data migration with 0 unmigrated items remaining. Fixed schema version compatibility issues (tenant_3 has older quotes schema). 2 atomic commits. 389 lines added. Historical invoice totals preserved. Ready for Plan 39-04 (frontend UI for VAT rate management in Settings).
+- Last 5 plans: [4 min, 7 min, 7.5 min, 8 min, 18.5 min]
+- Trend: Phase 39 COMPLETE (4/4 plans, 10.3 min avg). Plan 39-04 (18.5 min): Created complete VAT rate management UI in Settings Finance tab. Built VatRatesSection component with table, dropdown actions, and mutations. Implemented Create/Edit dialogs with form validation. Added default rate badge with star icon. Implemented archive prevention for rates in use. Added archived rates visibility toggle. Implemented unarchive functionality for restoring archived rates. Fixed toast import to use sonner instead of shadcn useToast for consistency. 7 atomic commits (2 core tasks + 1 integration + 4 orchestrator corrections). 520 lines of React/TypeScript code. Ready for Phase 40 (Invoices/Quotes VAT Integration).
 
 ## Accumulated Context
 
@@ -248,6 +248,10 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 25-02 | HTML5 datalist over Popover/Command for autocomplete | Rationale: Simpler implementation, native browser support, no additional library dependencies. Popover/Command would add ~200 lines of UI code, datalist requires 4 lines. Trade-off: Less visual customization but fully functional autocomplete with keyboard navigation. Lightweight solution for simple use case. |
 | 25-02 | Distinct query on company_members.role | Rationale: Returns unique roles only, prevents duplicate suggestions, SQL-level filtering for performance. Implementation: selectDistinct({ role }) with WHERE role IS NOT NULL AND role != '' filter. Clean autocomplete list with no duplicates or empty entries. |
 | 25-02 | Conditional query enable based on modal open | Rationale: Avoid unnecessary API calls when modal closed (performance optimization). Implementation: { enabled: open } in useQuery options. Query only runs when modal is actually being used. |
+| 39-04 | sonner toast instead of shadcn useToast | Rationale: Codebase standardized on sonner throughout application, shadcn useToast pattern was outdated. Consistency across UI notification system. Impact: All 3 VAT components (VatRatesSection, CreateVatRateDialog, EditVatRateDialog) use toast() from sonner for success/error notifications. |
+| 39-04 | Archived rates visibility toggle | Rationale: Users may need to view archived VAT rates without cluttering main table. Pattern established for soft-deleted entities. Impact: "Show archived" switch added to Settings Finance tab header, toggles visibility of archived rates. |
+| 39-04 | Unarchive functionality for VAT rates | Rationale: Users may accidentally archive rates or need to restore them later. Complete CRUD lifecycle management. Impact: Added unarchive mutation to backend + "Restaurer" action in UI for archived rates. Validation prevents duplicate rates with same percentage. |
+| 39-04 | Edit dialog only allows name changes | Rationale: Preserves historical invoice integrity - rates used in past invoices must remain immutable. Rate percentage is permanent after creation. Impact: Edit dialog shows current rate percentage as read-only, only allows name field modification. |
 | 26-01 | Accordion pattern over wizard for edit mode | Rationale: Eliminates cognitive friction when switching between view and edit modes by using the same visual structure. All fields accessible without navigation steps. Impact: 93% code reduction in informations tab, zero UX friction. Alternative (keep wizard) = maintains visual disconnect between view/edit. |
 | 26-01 | All accordions open by default | Rationale: Users can see and edit all sections immediately without clicking. Better UX for comprehensive client profiles with 50+ fields. defaultValue array includes all 7 accordion values. Alternative (collapsed) = requires clicks to discover sections. |
 | 26-01 | Comma-separated input for genres/instruments | Rationale: Simpler implementation than tag input components. Sufficient for editing existing data. Pattern: "Rock, Jazz, Hip-Hop" → splits on comma. Alternative (tag component) = more complex but better UX for future. Trade-off: simplicity vs perfect UX. |
