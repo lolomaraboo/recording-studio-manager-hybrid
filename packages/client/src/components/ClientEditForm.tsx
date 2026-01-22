@@ -278,34 +278,38 @@ export function ClientEditForm({
                 </>
               )}
 
-              {/* Birthday */}
-              <div>
-                <label htmlFor="birthday" className="text-sm font-medium">Date de naissance</label>
-                <input
-                  id="birthday"
-                  type="date"
-                  className="w-full px-3 py-2 border rounded-md mt-1"
-                  value={formData.birthday || ""}
-                  onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-                />
-              </div>
+              {formData.type === "individual" && (
+                <>
+                  {/* Birthday */}
+                  <div>
+                    <label htmlFor="birthday" className="text-sm font-medium">Date de naissance</label>
+                    <input
+                      id="birthday"
+                      type="date"
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      value={formData.birthday || ""}
+                      onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
+                    />
+                  </div>
 
-              {/* Gender */}
-              <div>
-                <label htmlFor="gender" className="text-sm font-medium">Genre</label>
-                <select
-                  id="gender"
-                  value={formData.gender || ""}
-                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-md mt-1"
-                >
-                  <option value="">-</option>
-                  <option value="male">Homme</option>
-                  <option value="female">Femme</option>
-                  <option value="other">Autre</option>
-                  <option value="prefer_not_to_say">Préfère ne pas répondre</option>
-                </select>
-              </div>
+                  {/* Gender */}
+                  <div>
+                    <label htmlFor="gender" className="text-sm font-medium">Genre</label>
+                    <select
+                      id="gender"
+                      value={formData.gender || ""}
+                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                    >
+                      <option value="">-</option>
+                      <option value="male">Homme</option>
+                      <option value="female">Femme</option>
+                      <option value="other">Autre</option>
+                      <option value="prefer_not_to_say">Préfère ne pas répondre</option>
+                    </select>
+                  </div>
+                </>
+              )}
 
               {/* Avatar/Logo upload */}
               <div className="space-y-1">
