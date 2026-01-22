@@ -28,6 +28,10 @@ export interface ArchiveVatRateInput {
   id: number;
 }
 
+export interface UnarchiveVatRateInput {
+  id: number;
+}
+
 export interface CreateVatRateInput {
   name: string;
   rate: number;

@@ -229,4 +229,32 @@ export const vatRatesRouter = router({
 
       return archived;
     }),
+
+  /**
+   * Unarchive a VAT rate (restore from archive)
+   */
+  unarchive: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Unarchive the rate
+      const [unarchived] = await tenantDb
+        .update(vatRates)
+        .set({
+          isActive: true,
+          updatedAt: new Date(),
+        })
+        .where(eq(vatRates.id, input.id))
+        .returning();
+
+      if (!unarchived) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Taux de TVA introuvable',
+        });
+      }
+
+      return unarchived;
+    }),
 });
