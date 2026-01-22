@@ -2379,3 +2379,84 @@ Appliquer le pattern accordion établi à Expenses. Créer ExpenseEditForm avec 
 **Rationale**: ExpenseCreate existe mais utilise formulaire inline sans accordions. Expenses dernière ressource à harmoniser - complète la cohérence UI totale (12/12 ressources).
 
 ---
+### Phase 39: Gestion TVA Multi-Taux
+
+**Goal**: Implémenter système complet de gestion TVA avec taux configurables par organisation
+
+**Depends on**: Phase 38 (harmonisation UI complète)
+
+**Plans**: 5 plans
+
+Plans:
+- [ ] 39-01-PLAN.md — Database schema: vat_rates table + FK migrations
+- [ ] 39-02-PLAN.md — Data migration: header taxRate → line-item vatRateId
+- [ ] 39-03-PLAN.md — Backend API: tRPC router for VAT CRUD
+- [ ] 39-04-PLAN.md — Frontend UI: Settings Finance tab with VAT management
+- [ ] 39-05-PLAN.md — Forms update: Invoice/Quote line-item VAT selection
+
+**Status**: Planned (ready for execution)
+
+**Wave Structure**:
+- Wave 1: Plan 01 (schema)
+- Wave 2: Plan 02 (migration), Plan 03 (API) — parallel
+- Wave 3: Plan 04 (Settings UI)
+- Wave 4: Plan 05 (Forms)
+
+**Details**:
+
+**Contexte**: Actuellement, la TVA est gérée de manière simpliste avec un taux fixe (20%) au niveau facture/devis global. Besoin d'un système flexible pour:
+- Gérer plusieurs taux de TVA par organisation (20%, 10%, 5.5%, 2.1% en France)
+- Appliquer la TVA par ligne de facture/devis (pas seulement global)
+- Permettre aux organisations de configurer leurs propres taux
+- Migrer les données existantes sans perte
+
+**Scope**:
+
+1. **Database (Tenant DB)** (Plan 01):
+   - Table `vat_rates` avec champs: name, rate, is_default, is_active
+   - Seed automatique 4 taux français (20%/10%/5.5%/2.1%) à création tenant
+   - Ajouter `vatRateId` sur: rooms, invoiceItems, quoteItems, serviceCatalog
+
+2. **Migration données existantes** (Plan 02):
+   - Script transfert `invoices.taxRate` → `invoiceItems.vatRateId`
+   - Script transfert `quotes.taxRate` → `quoteItems.vatRateId`
+   - Migration serviceCatalog.taxRate → serviceCatalog.vatRateId
+   - Idempotent (safe to re-run)
+
+3. **Backend (tRPC)** (Plan 03):
+   - Router `vatRates` avec CRUD complet (list, create, update, archive, setDefault)
+   - Validation: empêcher archivage taux utilisé dans factures/devis actifs
+   - Atomic transaction for setDefault (prevents multiple defaults)
+
+4. **Frontend (Settings)** (Plan 04):
+   - Nouvel onglet "Finance" dans Settings
+   - Section "Gestion de la TVA" avec table
+   - Dialogs: CreateVatRateDialog, EditVatRateDialog
+   - Actions: Créer, modifier nom, archiver, définir par défaut
+   - UI harmonization: text-primary icons, pb-3 spacing
+
+5. **Impact autres pages** (Plan 05):
+   - InvoiceCreate/InvoiceDetail: Dropdown TVA par ligne
+   - QuoteCreate/QuoteDetail: Dropdown TVA par ligne
+   - Default rate auto-selected on new items
+   - Total calculation: sum per-line VAT amounts
+   - Backend validation: vatRateId required on all line items
+
+**Rationale**: 
+- TVA par ligne = norme facturation professionnelle (services différents = taux différents)
+- Configuration flexible = adaptable international (UK, Canada, etc.)
+- Tenant DB = chaque organisation gère ses propres taux
+- Seed français = onboarding rapide pour marché principal
+- Archive (soft delete) = préserve intégrité historique
+
+**Success Criteria**:
+- [ ] Table `vat_rates` créée avec seed 4 taux français
+- [ ] Migration données existantes sans perte (idempotent)
+- [ ] Onglet Finance dans Settings fonctionnel
+- [ ] CRUD taux TVA avec validation (archive prevented if in use)
+- [ ] Factures/Devis supportent TVA par ligne (dropdown per item)
+- [ ] Default rate auto-selected on new line items
+- [ ] Tests: création taux, facture mixte (20% + 10%), calculs corrects
+
+---
+
