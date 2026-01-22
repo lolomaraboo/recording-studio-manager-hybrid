@@ -141,7 +141,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
+            <div className="px-4 pb-3 space-y-2">
               {/* Type de client - TOP POSITION */}
               <div>
                 <label className="text-sm font-medium">Type de client</label>
@@ -347,11 +347,11 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-4">
+            <div className="px-4 pb-3 space-y-2">
               {/* Section 1: Contact */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Contact</h4>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {/* Téléphones - 3-column grid */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Téléphones</label>
@@ -730,7 +730,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
+            <div className="px-4 pb-3 space-y-2">
               {formData.id ? (
                 <CompanyMembersIndicator
                   clientId={formData.id}
@@ -758,11 +758,11 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
+            <div className="px-4 pb-3 space-y-2">
               {/* Subsection: Genres & Instruments */}
               <div>
                 <h4 className="text-sm font-semibold mb-2">Genres & Instruments</h4>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {/* Genres (array converted to comma-separated for simple editing) */}
                   <div>
                     <label htmlFor="genres" className="text-sm font-medium">Genres musicaux</label>
@@ -798,7 +798,7 @@ export function ClientEditForm({
               {/* Subsection: Informations Professionnelles */}
               <div className="border-t pt-3 mt-3">
                 <h4 className="text-sm font-semibold mb-2">Informations professionnelles</h4>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {/* Record label */}
                   <div>
                     <label htmlFor="recordLabel" className="text-sm font-medium">Label</label>
@@ -864,7 +864,7 @@ export function ClientEditForm({
               {/* Subsection: Carrière */}
               <div className="border-t pt-3 mt-3">
                 <h4 className="text-sm font-semibold mb-2">Carrière</h4>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {/* Years active */}
                   <div>
                     <label htmlFor="yearsActive" className="text-sm font-medium">Années d'activité</label>
@@ -932,7 +932,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
+            <div className="px-4 pb-3 space-y-2">
               <div className="grid gap-3 md:grid-cols-2">
                 {/* Spotify */}
                 <div>
@@ -1092,7 +1092,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-3">
+            <div className="px-4 pb-3 space-y-2">
               {/* Custom fields array */}
               <div>
                 <div className="flex items-center justify-between mb-2">
