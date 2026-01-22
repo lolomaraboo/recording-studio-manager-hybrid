@@ -2042,3 +2042,93 @@ Actuellement, le formulaire ClientEditForm affiche tous les champs pour tous les
 
 ---
 
+
+### Phase 28: Harmonisation UI Talents - Copier Améliorations Clients
+
+**Goal**: Appliquer toutes les améliorations UX de la page /clients à la page /talents (modes Table/Grid/Kanban, tri, copy-to-clipboard, stats, avatars, design moderne)
+
+**Depends on**: Phase 27 (conditional rendering complete)
+
+**Research**: Minimal (réutilisation patterns existants de Clients.tsx)
+
+
+**Plans**: 3 plans
+
+Plans:
+- [ ] 28-01-PLAN.md - Backend enhancements (musicians router with sorting/filtering/stats)
+- [ ] 28-02-PLAN.md - Core UI components (ViewMode toggle, stats cards, CopyButton, Avatar)
+- [ ] 28-03-PLAN.md - View implementations (Table/Grid/Kanban complete)
+**Status**: Ready for planning
+
+**Details**:
+
+**Current State:**
+- **Clients.tsx**: 1307 lignes - page complète avec modes d'affichage, tri, stats, avatars, copy-to-clipboard
+- **Talents.tsx**: 569 lignes - page basique avec table simple et filtres
+
+**Gap Analysis:**
+
+**Missing Features in Talents.tsx:**
+1. **Modes d'affichage**: Table/Grid/Kanban views (actuellement: table only)
+2. **Tri colonnes**: Sortable columns avec indicateurs visuels
+3. **Copy-to-clipboard**: Boutons pour copier email/phone avec toast feedback
+4. **Avatars**: Photos profil avec initiales fallback
+5. **Stats visuelles**: Cards avec totaux, moyennes, KPIs
+6. **Badges**: Type badges, status badges avec couleurs
+7. **Design moderne**: Consistent avec Clients (text-primary icons, pb-3 cards)
+8. **Préférences utilisateur**: localStorage pour viewMode, columnOrder, sortPreferences
+9. **Search amélioré**: Debounced search avec 300ms delay
+10. **Responsive**: Mobile-optimized layouts
+
+**Features to Copy from Clients.tsx:**
+
+**Phase 19 - Modes d'Affichage:**
+- Table view (dense, all data)
+- Grid view (cards avec avatars, stats visuelles)
+- Kanban view (max details, workflow context)
+- ViewMode toggle buttons avec localStorage persistence
+
+**Phase 20 - Display Enhancements:**
+- Copy-to-clipboard buttons (email, phone)
+- Toast notifications feedback
+- Contact visibility in all views
+
+**Phase 22 - Table Column Management:**
+- Sortable columns (name, type, sessions count, etc.)
+- Column reordering (drag & drop)
+- Visible columns toggle
+- Preferences persistence (localStorage)
+
+**Phase 24 - Visual Design:**
+- Avatar component avec initiales
+- Type badges (individual/company colors)
+- Stats cards avec icons text-primary
+- Consistent pb-3 spacing
+
+**Technical Approach:**
+1. Analyze Clients.tsx structure (1307 lines)
+2. Extract reusable components:
+   - CopyButton
+   - ViewMode toggle
+   - SortableTableHeader
+   - Stats cards
+3. Adapt to Talents schema (musicians table)
+4. Maintain existing TalentForm dialogs
+5. Add localStorage preferences
+6. Update tRPC queries for sorting/filtering
+
+**Schema Differences (Clients vs Talents):**
+- Clients: clients table (name, artistName, type, companyName, etc.)
+- Talents: musicians table (name, stageName, talentType, specialty, etc.)
+
+**Reusable Patterns:**
+- ViewMode state management
+- Copy-to-clipboard utility
+- Avatar/Initials generation
+- Badge color mapping
+- Stats aggregation
+- Sortable table headers
+
+**Rationale**: Page /clients a reçu 9 phases d'améliorations UI (Phases 19, 20, 22, 23, 24, 25, 26, 26.1, 27) transformant une simple liste en hub relationnel moderne avec 3 modes d'affichage, tri, stats, et UX professionnelle. Page /talents reste à l'état initial basique (table simple). Users managing talents (musicians, engineers, producers) méritent la même qualité UX que clients. Copier les améliorations garantit cohérence design à travers toute l'app et améliore productivité studio.
+
+---
