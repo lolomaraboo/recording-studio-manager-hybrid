@@ -2259,9 +2259,9 @@ Appliquer le pattern accordion établi à Projects. Créer ProjectEditForm avec 
 **Plans**: 1 plan
 
 Plans:
-- [ ] 33-01-PLAN.md — SessionEditForm component + update SessionCreate page
+- [x] 33-01-PLAN.md — SessionEditForm component + update SessionCreate page
 
-**Status**: Ready for planning
+**Status**: Ready for execution
 
 **Details**:
 Appliquer le pattern accordion établi à Sessions. Créer SessionEditForm avec accordions (Informations, Planning, Participants, Facturation), remplacer formulaire inline dans SessionCreate.
