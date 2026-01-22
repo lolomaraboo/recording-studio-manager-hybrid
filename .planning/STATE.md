@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 29 of 29 (Harmonisation Services Routing Cohérent) - Phase 29 COMPLETE ✅
-Plan: 1/1 complete (29-01 ✅)
-Status: Phase complete - FINAL UI HARMONIZATION COMPLETE - ALL 12 RESOURCES HARMONIZED
-Last activity: 2026-01-22 - Completed 29-01 (4 min, ServiceCreate page + ServiceEditForm accordion, Dialog removed, all resources now use dedicated /resource/new pattern)
+Phase: 39 of 45 (Gestion TVA Multi-Taux)
+Plan: 1/4 complete (39-01 ✅)
+Status: In progress - Multi-rate VAT schema created, migration ready
+Last activity: 2026-01-22 - Completed 39-01 (7 min, vat_rates table schema, FK additions to 4 tables, migration 0014, seed script for 4 French rates)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 39: 1/4 plans (39-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 120
-- Average duration: 28.6 min
-- Total execution time: 57.2 hours
+- Total plans completed: 121
+- Average duration: 28.4 min
+- Total execution time: 57.3 hours
 
 **By Phase:**
 
@@ -92,10 +92,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 27 | 2/2 | 4 min | 2 min |
 | 28 | 5/5 | 18 min | 3.6 min |
 | 29 | 1/1 | 4 min | 4 min |
+| 39 | 1/4 | 7 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: [9 min, 4 min, 2 min, 4 min, 4 min]
-- Trend: Phase 29 COMPLETE ✅ (1/1 plan, 4 min total). Plan 29-01 (4 min): Created ServiceCreate page (117 lines) + ServiceEditForm accordion component (222 lines) with 2 sections (Identity, Pricing). Updated Services.tsx: Dialog create code removed, Link navigation added. Route registered /services/new in App.tsx. All 12 resources now harmonized (clients, sessions, invoices, equipment, rooms, projects, quotes, contracts, expenses, talents, tracks, services). Pattern consistency complete: dedicated /resource/new pages, accordion forms, localStorage persistence, Alt+Click toggle. TypeScript 0 errors, build successful (6.47s). Zero technical debt: no Dialog modal create code remains. Final UI harmonization milestone achieved.
+- Last 5 plans: [4 min, 2 min, 4 min, 4 min, 7 min]
+- Trend: Phase 39 STARTED (1/4 plans, 7 min). Plan 39-01 (7 min): Created vat_rates table schema (7 fields), added vatRateId FK to 4 tables (invoice_items, quote_items, rooms, service_catalog), generated migration 0014_add_vat_rates.sql with ON DELETE RESTRICT constraints, created idempotent seed script for 4 French VAT rates (20%/10%/5.5%/2.1%). Fixed TypeScript forward reference error by moving vatRates definition before invoiceItems. Migration placed in tenant/ subdirectory. TypeScript 0 errors. 3 atomic commits. Ready for Plan 39-02 (data migration from taxRate to vatRateId).
 
 ## Accumulated Context
 
@@ -196,6 +197,10 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 20-01 | Scoped copy-to-clipboard Phase 20 | Copy icons only in Clients.tsx Kanban view. Rationale: Plan specified "Phase 20 scope only" - universal copy feature across all pages (ClientDetail, Sessions, Invoices) deferred to future enhancement. |
 | 20-01 | Primary contact sorting | Sort by isPrimary DESC, lastName ASC. Rationale: Primary contact always appears first (most important for workflows), others alphabetically for consistency and predictability. |
 | 20.1-01 | 🚨 CRITICAL: Increment tenant number vs fix migrations | **DEVELOPMENT ONLY**: When schema changes or tenant breaks, create NEW tenant (tenant_3, tenant_4...) instead of debugging migrations. Rationale: 30 seconds vs 2-3 hours debugging. Phases 18.1/18.2/18.3 wasted 80+ minutes on migration fixes. New pattern: increment tenant, apply current schema, seed data, continue building. Old tenants = ignore/delete later. Documented in `.planning/DEVELOPMENT-WORKFLOW.md`. Production still requires progressive migrations. |
+| 39-01 | Nullable FK during migration | Added vatRateId FK columns as nullable to invoice_items, quote_items, rooms, service_catalog. Rationale: Allows incremental migration - existing records don't break, Plan 02 will populate them via data migration script. Alternative (make NOT NULL immediately) would require complex single-step migration with data population. |
+| 39-01 | ON DELETE RESTRICT for VAT rates | All FK constraints use ON DELETE RESTRICT instead of CASCADE. Rationale: Prevents orphaning historical invoices/quotes if VAT rate accidentally deleted. User must archive rate (isActive=false) instead of deleting. |
+| 39-01 | vatRates table definition order | Moved vatRates table definition before invoiceItems in schema.ts. Rationale: Avoid TypeScript "used before declaration" error - Drizzle requires referenced tables defined first in file. |
+| 39-01 | Migration in tenant/ subdirectory | Created migration as tenant/0014_add_vat_rates.sql instead of root migrations/. Rationale: Project convention - tenant DB changes go in tenant/, master DB changes in master/. Root directory gitignored. |
 | 20.1-01 | Many-to-many company_members architecture | Replaced client_contacts (one-to-many) with company_members junction table (many-to-many). Rationale: Contacts can now belong to multiple companies, each contact is a full client record with their own page. Proper relational design enables contact reusability across organizations/groups. |
 | 20.1-01 | Copy-to-clipboard in all views (Table/Grid/Kanban) | Added CopyButton component with toast feedback to ALL client views. Rationale: Universal UX need for copying contact info (email/phone). Consistency across viewing modes. Toast confirms action ('Email copié!' / 'Téléphone copié!'). |
 | 20.1-02 | IIFE pattern for conditional hook usage | Used IIFE (Immediately Invoked Function Expression) to call hooks at top level while keeping rendering logic scoped and conditional. Rationale: React hooks can't be called conditionally, but we need conditional rendering based on hook data. Pattern: `{(() => { const { data } = useQuery(...); if (!data) return null; return <Component />; })()}`. Enables conditional display without violating Rules of Hooks. |
@@ -283,6 +288,12 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 - **2026-01-21:** Phase 27 added after Phase 26.2: "Masquer Champs Musicaux pour Entreprises - Formulaire Édition" (ADDED)
 - **2026-01-22:** Phase 29 added after Phase 28: "Harmonisation Services - Routing Cohérent" (ADDED)
+- **2026-01-21:** Phase 39 added after Phase 38: "Gestion TVA Multi-Taux" (ADDED)
+  - Reason: TVA actuellement gérée avec taux fixe 20% global par facture/devis, besoin système flexible multi-taux
+  - Impact: Impossible de facturer services avec taux différents (ex: 20% standard + 5.5% réduit sur même facture)
+  - Solution: Table vat_rates (tenant DB), seed 4 taux français (20%/10%/5.5%/2.1%), application par ligne (invoiceItems/quoteItems/rooms)
+  - Scope: Database schema + migration données existantes + UI Settings nouvel onglet Finance + impact autres pages
+  - Priority: Feature professionnelle - Norme facturation internationale (TVA par ligne)
   - Reason: Services est la SEULE ressource utilisant Dialog modal au lieu de pages dédiées /new
   - Impact: Incohérence UX - 11 ressources utilisent routing cohérent, 1 ressource (Services) utilise pattern différent
   - Discovery: User noticed during manual testing - Services doesn't follow same navigation pattern as clients/sessions/invoices/equipment/rooms/projects/quotes/contracts/expenses/talents/tracks
