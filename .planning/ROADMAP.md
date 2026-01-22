@@ -2239,7 +2239,7 @@ Appliquer le pattern accordion établi à Rooms. Créer RoomEditForm avec accord
 Plans:
 - [ ] 32-01-PLAN.md — ProjectEditForm component + update ProjectCreate page
 
-**Status**: Ready for planning
+**Status**: Ready for execution
 
 **Details**:
 Appliquer le pattern accordion établi à Projects. Créer ProjectEditForm avec accordions (Informations, Planning, Budget, Notes), remplacer formulaire inline dans ProjectCreate. Projects a plus de champs que Service (comme Talents), donc utiliser TalentEditForm comme template.
@@ -2371,12 +2371,11 @@ Appliquer le pattern accordion établi à Contracts. Créer ContractEditForm ave
 Plans:
 - [ ] 38-01-PLAN.md — ExpenseEditForm component + update ExpenseCreate page
 
-**Status**: Ready for planning
+**Status**: Planning complete
 
 **Details**:
-Appliquer le pattern accordion établi à Expenses. Créer ExpenseEditForm avec accordions (Informations, Montant, Catégorie, Reçu), remplacer formulaire inline dans ExpenseCreate.
+Appliquer le pattern accordion établi à Expenses. Créer ExpenseEditForm avec accordions (Identité, Informations Financières), remplacer formulaire inline dans ExpenseCreate. 12/12 ressources harmonisées - initiative terminée!
 
 **Rationale**: ExpenseCreate existe mais utilise formulaire inline sans accordions. Expenses dernière ressource à harmoniser - complète la cohérence UI totale (12/12 ressources).
 
 ---
-
