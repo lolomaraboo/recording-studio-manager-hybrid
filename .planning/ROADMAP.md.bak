@@ -897,6 +897,9 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 | 21. Audit Scripts Base de Données | v4.1 | 3/3 | ✅ Complete | 2026-01-17 |
 | 18.4. Music Profile for Artists | v4.1 | 3/3 | ✅ Complete | 2026-01-17 |
 | 22. Refonte UI Client | v4.1 | 9/9 | ✅ Complete | 2026-01-18 |
+| 23. Simplification Onglet Informations | v4.1 | 1/1 | ✅ Complete | 2026-01-19 |
+| 24. Seed Data Complet pour Tests | v4.1 | 2/2 | ✅ Complete | 2026-01-18 |
+| 25. Gestion Relations Client-Entreprise | v4.1 | 0/0 | Not planned | - |
 | **v1.0 - Marketing & Launch (DEFERRED)** | | | | |
 | 4. Marketing Foundation | v1.0 | 0/3 | Deferred | - |
 | 5. Onboarding & UX | v1.0 | 0/4 | Deferred | - |
@@ -906,7 +909,7 @@ v1.0: 4 → 5 → 6 → 7 → 8 (deferred after v4.0)
 
 **v3.0 Total**: 49/49 plans complete (100%) ✅ SHIPPED 2026-01-05
 **v4.0 Total**: 24/24 plans ✅ SHIPPED 2026-01-15 (Phases 10-17 finished)
-**v4.1 Total**: 17/19 plans (Phase 18: 1/3 ⏸️, Phase 20: 1/1 ✅, Phase 21: 3/3 ✅, Phase 18.4: 3/3 ✅, Phase 22: 9/9 ✅)
+**v4.1 Total**: 20/22 plans (Phase 18: 1/3 ⏸️, Phase 20: 1/1 ✅, Phase 21: 3/3 ✅, Phase 18.4: 3/3 ✅, Phase 22: 9/9 ✅, Phase 23: 1/1 ✅, Phase 24: 2/2 ✅)
 **v1.0 Total**: 0/17 plans (deferred after v4.1)
 
 ---
@@ -1731,3 +1734,401 @@ Plans:
 [To be added during planning]
 
 **Rationale**: Phase 22 a créé l'onglet "Informations" avec 3 sous-onglets pour organiser tous les champs client. L'utilisateur souhaite simplifier en affichant tous les champs dans une seule vue avec sections visuellement distinctes (informations de base, contacts enrichis, profil musical) plutôt que de naviguer entre sous-onglets. Améliore l'accessibilité et réduit les clics pour consulter le profil complet d'un client.
+
+---
+
+### Phase 24: Seed Data Complet pour Tests
+
+**Goal**: Create comprehensive seed script generating ~150-200 realistic records with complete music profiles, relationships, and data coverage for all 31 tenant tables
+
+**Depends on**: Phase 23 (UI simplification complete)
+
+**Research**: Unlikely (faker.js patterns, existing seed-realistic-data.ts structure)
+
+**Plans**: 2 plans
+
+Plans:
+- [x] 24-01: Enhance seed script with music profile fields (Completed 2026-01-18 - 6 min)
+- [x] 24-02: Expand data volume and complete relationships (Completed 2026-01-18 - 5 min)
+
+**Status**: ✅ Complete (All 2 plans finished - 11 min total)
+
+**Details**:
+Enhanced seed script populating ALL fields from Phase 18.4 music profile (22 fields: genres, instruments, streaming URLs, record label, distributor, manager, publisher, PRO, years active, notable works, bio) + complete relationships (projets → tracks → sessions → time entries → invoices/quotes). Volume: ~15-20 clients with enriched profiles, 12-15 projects, 25-30 tracks with artwork/metadata/versions, 20-25 sessions, 10-12 quotes/invoices, 30-40 time entries. Current seed-realistic-data.ts creates ~60-80 records but doesn't populate music fields.
+
+**Rationale**: Phase 18.4 added 22 music profile fields but seed script doesn't populate them - impossible to test search filters, streaming URL displays, industry info rendering, etc. Phase 22 added 5 tabs (Informations/Projets/Tracks/Sessions/Finances) requiring realistic relational data for proper testing. Current seed insufficient for validating complete user workflows across all tabs.
+---
+
+### Phase 25: Gestion Relations Client-Entreprise
+
+**Goal**: Implémenter l'UI complète pour gérer les relations many-to-many entre clients individuels et entreprises via la table companyMembers (add/remove/update members avec rôles)
+
+**Depends on**: Phase 24 (Seed data complete)
+
+**Research**: Unlikely (UI patterns établis, API endpoints existants partiel)
+
+**Plans**: 2 plans
+
+Plans:
+- [x] 25-01: Backend endpoints + Modal & Indicator components (Completed 2026-01-20 - 6 min)
+- [x] 25-02: Individual view + Role autocomplete (Completed 2026-01-20 - 2 min)
+
+**Status**: ✅ Complete (All 2 plans finished - 8 min total)
+
+**Details**:
+Phase 25 completes the many-to-many relationship UI between individual clients and company clients.
+
+**Plan 01 (Wave 1):**
+- Backend: Add 3 missing tRPC endpoints (addMember, updateMember, removeMember)
+- Frontend: Create CompanyMembersModal component (full CRUD, inline role editing)
+- Frontend: Create CompanyMembersIndicator component (clickable preview)
+- Integration: Add to ClientDetailTabs in Informations section (after contact details)
+
+**Plan 02 (Wave 2):**
+- Backend: Add getCompanies endpoint (reverse direction of getMembers)
+- Backend: Add getRoles endpoint (distinct roles for autocomplete)
+- Frontend: Update modal for individual view (companies list)
+- Frontend: Add role autocomplete to prevent typos
+
+**Key Features:**
+- Bidirectional UI (company → members, individual → companies)
+- Inline role editing (onChange + onBlur save)
+- Primary contact badge display
+- Searchable dropdown (filters individual/company correctly)
+- Role autocomplete (suggests existing roles, prevents duplicates)
+- Toast notifications for all actions
+
+**Rationale**: La table companyMembers existe en DB avec relations many-to-many (company_client_id, member_client_id, role, isPrimary) et API partiels (getMembers, getAllMembers), mais aucune UI pour créer/modifier/supprimer ces relations. Les studios doivent pouvoir lier contacts individuels aux entreprises clientes (ex: "Alexandre Grand - Ingénieur du son" membre de "Sound Production SARL"). Manque endpoints API (addMember, removeMember, updateMember) + UI complète (onglet Membres pour entreprises, section Entreprises pour individus).
+---
+
+### Phase 26: Formulaire Client avec Accordéons - Refonte UI Mode Édition
+
+**Goal**: Remplacer le wizard ClientFormWizard par des accordéons dans l'onglet Informations pour cohérence avec la page de visualisation
+
+**Depends on**: Phase 25 (Gestion relations client-entreprise complete)
+
+**Research**: Unlikely (UI patterns établis, composants shadcn/ui accordion déjà utilisés)
+
+**Plans**: 1 plan
+
+Plans:
+- [x] 26-01-PLAN.md — Complete accordion-based edit form + integrate into ClientDetailTabs (4 tasks: complete 7 accordions, remove wizard, integrate tabs, manual testing)
+
+**Status**: Complete (2026-01-20)
+
+**Details**:
+Phase 26 refactors the client edit form from a wizard pattern to accordion-based sections matching the view page design.
+
+**Current Issue:**
+- View page (http://localhost:5174/clients/4) uses tabs with clean sections
+- Edit mode (http://localhost:5174/clients/4?edit=true) uses ClientFormWizard with stepper navigation
+- Design inconsistency creates cognitive friction for users
+
+**Solution:**
+Replace ClientFormWizard with accordion-based ClientEditForm component:
+- Complete existing ClientEditForm.tsx with 7 accordion sections (currently only 2 complete)
+- Within "Informations" tab, use accordions for sections:
+  - Identité (type, nom complet, structured name, artistName, photo)
+  - Contact (emails multiples, téléphones multiples, sites web)
+  - Adresse (adresse structurée avec street/city/postalCode/region/country)
+  - Personnel (birthday, gender, customFields)
+  - Plateformes streaming (11 streaming platform URLs)
+  - Professionnel (recordLabel, distributor, managerContact, publisher, performanceRightsSociety)
+  - Carrière (yearsActive, notableWorks, awardsRecognition, biography, genres, instruments)
+- Integrate into ClientDetailTabs when isEditing=true
+- Remove ClientFormWizard references from ClientDetail.tsx
+
+**Key Benefits:**
+- Visual consistency between view and edit modes
+- All 40+ vCard fields accessible in organized sections
+- Reduced cognitive load (no stepper navigation)
+- Maintains existing formData/setFormData pattern
+- All tabs remain accessible in edit mode (Projets, Tracks, Sessions, Finances)
+
+**Technical Approach:**
+- Complete ClientEditForm.tsx with 5 missing accordions (Address, Personal, Streaming, Professional, Career)
+- Remove unused ClientFormWizard import from ClientDetail.tsx
+- Update ClientDetailTabs to conditionally render ClientEditForm when isEditing=true
+- Preserve all existing fields from ClientFormWizard (40+ vCard fields)
+- Reuse shadcn/ui Accordion component (already in project)
+
+**Implementation Status:**
+- ClientEditForm.tsx exists with partial implementation (2/7 accordions complete - Identity, Contact)
+- ClientFormWizard.tsx exists (796 lines) - will be deprecated after this phase
+- ClientDetailTabs.tsx (818 lines) - needs conditional rendering update
+
+**Rationale**: User reported design inconsistency between view and edit pages. Current wizard pattern (ClientFormWizard) creates 5-step navigation overhead. Accordion pattern matches the view page structure (tabs + sections), reduces clicks, improves UX consistency. All fields remain accessible but organized logically. ClientEditForm already exists with 2 accordions complete - just needs 5 more sections added to reach parity with wizard.
+
+### Phase 26.1: Réorganisation Accordéons - Logique Studio d'Enregistrement
+
+**Goal**: Réorganiser les 7 accordéons en 5 sections fusionnées suivant la logique métier d'un studio (Identité → Profil Artistique → Coordonnées → Relations Pro → Notes Studio)
+
+**Depends on**: Phase 26 (Accordion-based edit form complete)
+
+**Research**: Unlikely (regroupement de sections existantes, pas de nouvelles fonctionnalités)
+
+**Plans**: 1 plan
+
+Plans:
+- [x] 26.1-01-PLAN.md — Restructure ClientEditForm: 7 → 5 accordéons regroupés (3 tasks: refactor accordions, update labels, manual testing)
+
+**Status**: Ready for execution
+
+**Details**:
+Phase 26.1 réorganise les accordéons selon la logique workflow d'un studio d'enregistrement.
+
+**Current Issue:**
+- Structure actuelle: 7 accordéons séparés (base, contact, adresse, enrichies, profil musical, photo, entreprises)
+- Ordre non optimal: profil musical en 5e position alors que c'est le cœur du métier
+- Informations éparpillées: contact et adresse séparés, profil musical divisé
+
+**Solution (Option A - Structure Fusionnée):**
+
+**1. Identité** (fusionné: base + photo)
+- Type client, nom complet, nom d'artiste
+- Photo de profil
+- *Rationale: Identité visuelle immédiate en premier*
+
+**2. Profil Artistique** (fusionné: profil musical complet)
+- Artistique: Genres, instruments, label actuel
+- Streaming: Spotify, Apple Music, YouTube, SoundCloud, Bandcamp, etc.
+- Carrière: Biographie, représentation, réseaux sociaux, années actives, œuvres notables
+- *Rationale: Le cœur du métier studio en 2e position*
+
+**3. Coordonnées** (fusionné: contact + adresse)
+- Téléphones, emails, sites web
+- Adresses physiques complètes
+- *Rationale: Tout regroupé pour joindre le client*
+
+**4. Relations Professionnelles** (renommé: entreprises liées)
+- Membres d'entreprises / Entreprises liées
+- *Rationale: Terminologie plus professionnelle*
+
+**5. Notes Studio** (renommé: informations enrichies)
+- Notes internes, tags, champs personnalisés
+- *Rationale: Clarifier usage interne studio*
+
+**Key Benefits:**
+- ✅ 7 → 5 accordéons (moins de navigation)
+- ✅ Priorité métier (profil artistique en 2e, pas 5e)
+- ✅ Regroupement logique (tout le contact ensemble)
+- ✅ Terminologie studio ("Profil Artistique" > "Profil musical")
+- ✅ Workflow optimisé (identité → artistique → contact → relations → notes)
+
+**Technical Approach:**
+- Refactor ClientEditForm.tsx: fusionner accordéons existants
+- Pas de changements aux champs (juste réorganisation visuelle)
+- Mise à jour des titres et descriptions
+- Conservation de toute la logique formData existante
+
+**Rationale**: User feedback indique que l'organisation actuelle ne suit pas la logique métier d'un studio. Profil artistique devrait être prioritaire (position 2 vs 5 actuel). Regrouper contact+adresse réduit navigation. Terminologie "Profil Artistique" et "Notes Studio" plus claire que "Profil musical" et "Informations enrichies".
+
+### Phase 26.2: Restaurer Relations Professionnelles
+
+**Goal**: Restaurer la fonctionnalité Phase 25 (gestion relations client-entreprise) qui a été supprimée lors de la refonte UI Phase 26/26.1
+
+**Depends on**: Phase 26.1 (Accordion reorganization complete)
+
+**Research**: Complete (composants existent déjà, juste réintégration UI)
+
+**Plans**: 1 plan
+
+Plans:
+- [x] 26.2-01-PLAN.md — Restore Relations feature in EDIT mode only (add 6th accordion "Relations professionnelles" to ClientEditForm)
+
+**Status**: Complete
+
+**Details**:
+Phase 26.2 restores the company-individual relationship management that was accidentally removed during Phase 26/26.1 UI refactoring.
+
+**Problem:**
+- Phase 25 implemented CompanyMembersModal + CompanyMembersIndicator + 5 backend endpoints
+- Phase 26/26.1 refactored edit form (wizard → accordions) but removed accordion "Relations professionnelles"
+- Users can no longer edit relationships in EDIT mode (/clients/4?edit=true)
+
+**Solution (EDIT Mode Only):**
+
+**Single Task - EDIT Mode (ClientEditForm):**
+- Import CompanyMembersIndicator
+- Update Alt key accordion list (add "relations-professionnelles")
+- Add 6th accordion "Relations professionnelles"
+- Position: 3rd (after Coordonnées, before Profil Artistique)
+- Default state: Closed (only Identité open)
+- Conditional rendering: show indicator if formData.id exists, placeholder otherwise
+
+**Technical Details:**
+- Reuse existing Phase 25 components (CompanyMembersModal 374 lines, CompanyMembersIndicator 93 lines)
+- Backend already functional (5 endpoints: addMember, updateMember, removeMember, getCompanies, getRoles)
+- No schema changes needed (company_members table exists)
+- CompanyMembersIndicator handles all queries and modal logic internally
+
+**User Requirements (from discussion):**
+1. Phase number: 26.2
+2. Default state: Closed (Option A)
+3. Position: 3rd accordion after Coordonnées (Option C)
+4. Name: "Relations professionnelles"
+
+**Rationale**: Phase 25 functionality was lost during Phase 26/26.1 UI refactoring. Users reported inability to add/edit company relationships from individual client pages in EDIT mode. This phase restores full CRUD capability in EDIT mode only (VIEW mode remains unchanged per user request: "ne touche pas à l'UI de la page /clients/4") while maintaining the new accordion-based design from Phase 26.1.
+
+### Phase 27: Masquer Champs Musicaux pour Entreprises - Formulaire Édition
+
+**Goal**: Masquer les sections musicales (Profil Artistique, Streaming) et champs individual dans le formulaire d'édition quand type="company"
+
+**Depends on**: Phase 26.2 (accordion structure stabilisée avec 6 accordéons)
+
+**Research**: Minimal (logique conditionnelle React, state management existant)
+
+**Plans**: 1 plan
+
+Plans:
+- [x] 27-01-PLAN.md — Conditional rendering for music-related accordions (Completed 2026-01-22 - 2 min)
+- [x] 27-02-PLAN.md — Fix birthday and gender conditional rendering (gap closure) (Completed 2026-01-22 - 2 min)
+
+**Status**: ✅ Complete (All 2 plans finished - 4 min total)
+
+**Details**:
+
+**Problem:**
+Actuellement, le formulaire ClientEditForm affiche tous les champs pour tous les types. Quand type="company", les entreprises voient :
+- ❌ Accordéon "Profil Artistique" complet (genres, instruments, biography, représentation) - inutile pour entreprises
+- ❌ Accordéon "Streaming" complet (11 plateformes) - inutile pour entreprises
+- ❌ Champs "individual" dans Identité (artistName, structured name, birthday, gender) - inutiles pour entreprises
+
+**Solution (Masquage Conditionnel pour Entreprises Uniquement):**
+
+**Scope:**
+- ✅ Formulaire d'édition uniquement (ClientEditForm.tsx)
+- ✅ Modification UNIQUEMENT quand type="company"
+- ✅ Type="individual" reste **100% INCHANGÉ** (affichage actuel déjà correct)
+- ❌ Vue détail (ClientDetailTabs) - inchangée
+- ❌ Listes/cartes (Table/Grid/Kanban) - inchangées
+
+**Comportement:**
+- **Changement immédiat et dynamique** : Quand l'utilisateur bascule vers type="company", les accordéons non pertinents disparaissent
+- **Masquer complètement** les sections non pertinentes pour entreprises (pas de griser/désactiver)
+
+**Changements à implémenter:**
+
+**Pour Type = "individual" (particulier):**
+- ✅ **AUCUN CHANGEMENT** - Affichage actuel déjà correct
+- ✅ Tous les 6 accordéons restent visibles
+- ✅ Tous les champs restent visibles
+- ✅ Code existant préservé à 100%
+
+**Pour Type = "company" (entreprise) - UNIQUEMENT CES MODIFICATIONS:**
+- ✅ Identité : Masquer artistName, structured name (prefix/firstName/middleName/lastName/suffix), birthday, gender
+- ✅ Identité : Garder visible companyName, industry, registrationNumber
+- ✅ Coordonnées : Garder inchangé (tous champs visibles)
+- ❌ **Profil Artistique** : Masquer accordéon complètement (genres, instruments, biography, représentation inutiles)
+- ❌ **Streaming** : Masquer accordéon complètement (11 plateformes inutiles)
+- ✅ Relations Professionnelles : Garder inchangé (affiche "Membres")
+- ✅ Notes Studio : Garder inchangé (customFields)
+
+**Technical Approach:**
+1. Utiliser `formData.type === 'company'` comme condition pour masquer
+2. Rendu conditionnel accordéons : `{formData.type !== 'company' && <AccordionItem value="profil-artistique">...}`
+3. Rendu conditionnel champs Identité : `{formData.type !== 'company' && <Input name="artistName">...}`
+4. Aucun changement backend (schema déjà flexible)
+5. Validation form existante inchangée (required fields déjà gérés)
+6. **IMPORTANT** : Ne rien modifier pour type="individual" (déjà correct)
+
+**User Requirements:**
+- Portée : Formulaire édition uniquement, type="company" uniquement
+- Masquage : Complet (pas de griser) pour Profil Artistique et Streaming
+- Dynamisme : Changement immédiat quand type change vers "company"
+- Particuliers : 100% inchangés (affichage actuel déjà bon)
+
+**Rationale**: Les entreprises (labels, studios de production, management) n'ont pas de profil artistique ni de présence sur plateformes streaming. Afficher ces sections pour les entreprises crée de la confusion et du bruit visuel. Le formulaire particulier est déjà correct et ne nécessite aucune modification.
+
+---
+
+
+### Phase 28: Harmonisation UI Talents - Copier Améliorations Clients
+
+**Goal**: Appliquer toutes les améliorations UX de la page /clients à la page /talents (modes Table/Grid/Kanban, tri, copy-to-clipboard, stats, avatars, design moderne)
+
+**Depends on**: Phase 27 (conditional rendering complete)
+
+**Research**: Minimal (réutilisation patterns existants de Clients.tsx)
+
+
+**Plans**: 3 plans
+
+Plans:
+- [ ] 28-01-PLAN.md - Backend enhancements (musicians router with sorting/filtering/stats)
+- [ ] 28-02-PLAN.md - Core UI components (ViewMode toggle, stats cards, CopyButton, Avatar)
+- [ ] 28-03-PLAN.md - View implementations (Table/Grid/Kanban complete)
+**Status**: Ready for planning
+
+**Details**:
+
+**Current State:**
+- **Clients.tsx**: 1307 lignes - page complète avec modes d'affichage, tri, stats, avatars, copy-to-clipboard
+- **Talents.tsx**: 569 lignes - page basique avec table simple et filtres
+
+**Gap Analysis:**
+
+**Missing Features in Talents.tsx:**
+1. **Modes d'affichage**: Table/Grid/Kanban views (actuellement: table only)
+2. **Tri colonnes**: Sortable columns avec indicateurs visuels
+3. **Copy-to-clipboard**: Boutons pour copier email/phone avec toast feedback
+4. **Avatars**: Photos profil avec initiales fallback
+5. **Stats visuelles**: Cards avec totaux, moyennes, KPIs
+6. **Badges**: Type badges, status badges avec couleurs
+7. **Design moderne**: Consistent avec Clients (text-primary icons, pb-3 cards)
+8. **Préférences utilisateur**: localStorage pour viewMode, columnOrder, sortPreferences
+9. **Search amélioré**: Debounced search avec 300ms delay
+10. **Responsive**: Mobile-optimized layouts
+
+**Features to Copy from Clients.tsx:**
+
+**Phase 19 - Modes d'Affichage:**
+- Table view (dense, all data)
+- Grid view (cards avec avatars, stats visuelles)
+- Kanban view (max details, workflow context)
+- ViewMode toggle buttons avec localStorage persistence
+
+**Phase 20 - Display Enhancements:**
+- Copy-to-clipboard buttons (email, phone)
+- Toast notifications feedback
+- Contact visibility in all views
+
+**Phase 22 - Table Column Management:**
+- Sortable columns (name, type, sessions count, etc.)
+- Column reordering (drag & drop)
+- Visible columns toggle
+- Preferences persistence (localStorage)
+
+**Phase 24 - Visual Design:**
+- Avatar component avec initiales
+- Type badges (individual/company colors)
+- Stats cards avec icons text-primary
+- Consistent pb-3 spacing
+
+**Technical Approach:**
+1. Analyze Clients.tsx structure (1307 lines)
+2. Extract reusable components:
+   - CopyButton
+   - ViewMode toggle
+   - SortableTableHeader
+   - Stats cards
+3. Adapt to Talents schema (musicians table)
+4. Maintain existing TalentForm dialogs
+5. Add localStorage preferences
+6. Update tRPC queries for sorting/filtering
+
+**Schema Differences (Clients vs Talents):**
+- Clients: clients table (name, artistName, type, companyName, etc.)
+- Talents: musicians table (name, stageName, talentType, specialty, etc.)
+
+**Reusable Patterns:**
+- ViewMode state management
+- Copy-to-clipboard utility
+- Avatar/Initials generation
+- Badge color mapping
+- Stats aggregation
+- Sortable table headers
+
+**Rationale**: Page /clients a reçu 9 phases d'améliorations UI (Phases 19, 20, 22, 23, 24, 25, 26, 26.1, 27) transformant une simple liste en hub relationnel moderne avec 3 modes d'affichage, tri, stats, et UX professionnelle. Page /talents reste à l'état initial basique (table simple). Users managing talents (musicians, engineers, producers) méritent la même qualité UX que clients. Copier les améliorations garantit cohérence design à travers toute l'app et améliore productivité studio.
+
+---

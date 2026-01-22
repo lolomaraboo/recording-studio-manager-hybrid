@@ -87,11 +87,6 @@ const navSections: NavSection[] = [
         icon: <Users className="h-5 w-5" />,
       },
       {
-        title: "Services",
-        href: "/services",
-        icon: <Package className="h-5 w-5" />,
-      },
-      {
         title: "Talents",
         href: "/talents",
         icon: <Users className="h-5 w-5" />,
@@ -124,6 +119,11 @@ const navSections: NavSection[] = [
     icon: <DollarSign className="h-4 w-4" />,
     badgeKey: "finance",
     items: [
+      {
+        title: "Services",
+        href: "/services",
+        icon: <Package className="h-5 w-5" />,
+      },
       {
         title: "Factures",
         href: "/invoices",
