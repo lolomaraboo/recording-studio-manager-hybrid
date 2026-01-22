@@ -215,15 +215,16 @@ export default function QuoteDetail() {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges = {
+    const badges: Record<string, React.ReactNode> = {
       draft: <Badge variant="secondary">Brouillon</Badge>,
       sent: <Badge className="bg-blue-500">Envoyé</Badge>,
       accepted: <Badge className="bg-green-500">Accepté</Badge>,
       rejected: <Badge variant="destructive">Refusé</Badge>,
       expired: <Badge variant="outline" className="text-gray-500">Expiré</Badge>,
-      converted: <Badge className="bg-purple-500">Converti</Badge>,
+      cancelled: <Badge variant="secondary">Annulé</Badge>,
+      converted_to_project: <Badge className="bg-purple-500">Converti</Badge>,
     };
-    return badges[status as keyof typeof badges] || badges.draft;
+    return badges[status] || badges.draft;
   };
 
   if (isLoading) {

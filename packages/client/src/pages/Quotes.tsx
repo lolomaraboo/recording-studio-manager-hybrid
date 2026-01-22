@@ -77,18 +77,16 @@ export function Quotes() {
   }, [quotes]);
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
-      draft: { variant: "secondary", label: "Brouillon" },
-      sent: { variant: "outline", label: "Envoyé" },
-      accepted: { variant: "default", label: "Accepté" },
-      rejected: { variant: "destructive", label: "Refusé" },
-      expired: { variant: "destructive", label: "Expiré" },
-      cancelled: { variant: "secondary", label: "Annulé" },
-      converted_to_project: { variant: "default", label: "Converti" },
+    const badges: Record<string, React.ReactNode> = {
+      draft: <Badge variant="secondary">Brouillon</Badge>,
+      sent: <Badge className="bg-blue-500">Envoyé</Badge>,
+      accepted: <Badge className="bg-green-500">Accepté</Badge>,
+      rejected: <Badge variant="destructive">Refusé</Badge>,
+      expired: <Badge variant="outline" className="text-gray-500">Expiré</Badge>,
+      cancelled: <Badge variant="secondary">Annulé</Badge>,
+      converted_to_project: <Badge className="bg-purple-500">Converti</Badge>,
     };
-
-    const config = variants[status] || variants.draft;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    return badges[status] || badges.draft;
   };
 
   return (
