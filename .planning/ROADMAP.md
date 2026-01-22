@@ -1934,27 +1934,21 @@ Phase 26.1 réorganise les accordéons selon la logique workflow d'un studio d'e
 **Plans**: 1 plan
 
 Plans:
-- [ ] 26.2-01-PLAN.md — Restore Relations feature in VIEW and EDIT modes (integrate CompanyMembersIndicator + add 6th accordion)
+- [x] 26.2-01-PLAN.md — Restore Relations feature in EDIT mode only (add 6th accordion "Relations professionnelles" to ClientEditForm)
 
-**Status**: Ready for execution
+**Status**: Complete
 
 **Details**:
 Phase 26.2 restores the company-individual relationship management that was accidentally removed during Phase 26/26.1 UI refactoring.
 
 **Problem:**
 - Phase 25 implemented CompanyMembersModal + CompanyMembersIndicator + 5 backend endpoints
-- Phase 26/26.1 refactored edit form (wizard → accordions) but removed UI integration
-- Users can no longer see/edit relationships in VIEW or EDIT modes
+- Phase 26/26.1 refactored edit form (wizard → accordions) but removed accordion "Relations professionnelles"
+- Users can no longer edit relationships in EDIT mode (/clients/4?edit=true)
 
-**Solution:**
+**Solution (EDIT Mode Only):**
 
-**Task 1 - VIEW Mode (ClientDetailTabs):**
-- Import CompanyMembersIndicator
-- Integrate indicator after contact section
-- Add Separator for visual separation
-- Position: Between contact info and music profile (same as Phase 25)
-
-**Task 2 - EDIT Mode (ClientEditForm):**
+**Single Task - EDIT Mode (ClientEditForm):**
 - Import CompanyMembersIndicator
 - Update Alt key accordion list (add "relations-professionnelles")
 - Add 6th accordion "Relations professionnelles"
@@ -1974,7 +1968,7 @@ Phase 26.2 restores the company-individual relationship management that was acci
 3. Position: 3rd accordion after Coordonnées (Option C)
 4. Name: "Relations professionnelles"
 
-**Rationale**: Phase 25 functionality was lost during Phase 26/26.1 UI refactoring. Users reported inability to add/edit company relationships from individual client pages. This phase restores full CRUD capability in both VIEW and EDIT modes while maintaining the new accordion-based design from Phase 26.1.
+**Rationale**: Phase 25 functionality was lost during Phase 26/26.1 UI refactoring. Users reported inability to add/edit company relationships from individual client pages in EDIT mode. This phase restores full CRUD capability in EDIT mode only (VIEW mode remains unchanged per user request: "ne touche pas à l'UI de la page /clients/4") while maintaining the new accordion-based design from Phase 26.1.
 
 ---
 
