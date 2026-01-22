@@ -37,8 +37,24 @@ export function ClientEditForm({
   formData,
   setFormData,
 }: ClientEditFormProps) {
-  // State to manage open accordions for Alt key toggle
-  const [openItems, setOpenItems] = useState<string[]>(["identite"]);
+  // State to manage open accordions with localStorage persistence
+  const [openItems, setOpenItems] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('clientEditAccordions');
+      return saved ? JSON.parse(saved) : ["identite"];
+    } catch {
+      return ["identite"];
+    }
+  });
+
+  // Save accordion state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('clientEditAccordions', JSON.stringify(openItems));
+    } catch (error) {
+      console.error('Failed to save accordion state:', error);
+    }
+  }, [openItems]);
 
   // Auto-fill "Nom complet" from structured name fields
   useEffect(() => {
@@ -58,26 +74,22 @@ export function ClientEditForm({
     }
   }, [formData.prefix, formData.firstName, formData.middleName, formData.lastName, formData.suffix, formData.type, setFormData]);
 
-  // Handle Alt key to toggle all accordions
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-        event.preventDefault();
+  // Handle Alt+Click on accordion trigger to toggle all accordions
+  const handleAccordionTriggerClick = (event: React.MouseEvent) => {
+    if (event.altKey) {
+      event.preventDefault();
+      event.stopPropagation();
 
-        const allAccordions = ["identite", "coordonnees", "relations-professionnelles", "profil-artistique", "streaming", "notes-studio"];
+      const allAccordions = ["identite", "coordonnees", "relations-professionnelles", "profil-artistique", "streaming", "notes-studio"];
 
-        // If any closed, open all. If all open, close all.
-        if (openItems.length < allAccordions.length) {
-          setOpenItems(allAccordions);
-        } else {
-          setOpenItems([]);
-        }
+      // If any closed, open all. If all open, close all.
+      if (openItems.length < allAccordions.length) {
+        setOpenItems(allAccordions);
+      } else {
+        setOpenItems([]);
       }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [openItems]);
+    }
+  };
 
   // Avatar/Logo upload handlers
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +146,7 @@ export function ClientEditForm({
       {/* Accordéon 1: Identité */}
       <AccordionItem value="identite">
         <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline" onClick={handleAccordionTriggerClick}>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
               Identité
@@ -340,7 +352,7 @@ export function ClientEditForm({
       {/* Accordéon 2: Coordonnées (MOVED TO POSITION 2) */}
       <AccordionItem value="coordonnees">
         <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline" onClick={handleAccordionTriggerClick}>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
               Coordonnées
@@ -723,7 +735,7 @@ export function ClientEditForm({
       {/* Accordéon 3: Relations professionnelles */}
       <AccordionItem value="relations-professionnelles">
         <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline" onClick={handleAccordionTriggerClick}>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Users className="h-5 w-5 text-primary" />
               Relations professionnelles
@@ -751,7 +763,7 @@ export function ClientEditForm({
       {/* Accordéon 4: Profil Artistique (genres, instruments, professional, career) */}
       <AccordionItem value="profil-artistique">
         <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline" onClick={handleAccordionTriggerClick}>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Music className="h-5 w-5 text-primary" />
               Profil Artistique
@@ -925,7 +937,7 @@ export function ClientEditForm({
       {/* Accordéon 5: Plateformes de Streaming */}
       <AccordionItem value="streaming">
         <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline" onClick={handleAccordionTriggerClick}>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Radio className="h-5 w-5 text-primary" />
               Plateformes de Streaming
@@ -1085,7 +1097,7 @@ export function ClientEditForm({
       {/* Accordéon 6: Notes Studio (renamed from Personal Information) */}
       <AccordionItem value="notes-studio">
         <Card>
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline" onClick={handleAccordionTriggerClick}>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
               Champs Personnalisés
