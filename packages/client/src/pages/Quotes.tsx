@@ -173,50 +173,35 @@ export function Quotes() {
           </div>
         )}
 
-        {/* Filters */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Filtres</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Rechercher par numéro, titre ou client..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9"
-                    />
-                  </div>
-                </div>
-                <div className="w-full md:w-48">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Statut" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tous les statuts</SelectItem>
-                      <SelectItem value="draft">Brouillon</SelectItem>
-                      <SelectItem value="sent">Envoyé</SelectItem>
-                      <SelectItem value="accepted">Accepté</SelectItem>
-                      <SelectItem value="rejected">Refusé</SelectItem>
-                      <SelectItem value="expired">Expiré</SelectItem>
-                      <SelectItem value="cancelled">Annulé</SelectItem>
-                      <SelectItem value="converted_to_project">Converti</SelectItem>
-                    </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Quotes List */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">{filteredQuotes.length} devis</CardTitle>
-            <CardDescription className="text-sm">Gérez vos devis et propositions commerciales</CardDescription>
+            <div className="flex flex-col md:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-40 h-9">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="draft">Brouillon</SelectItem>
+                  <SelectItem value="sent">Envoyé</SelectItem>
+                  <SelectItem value="accepted">Accepté</SelectItem>
+                  <SelectItem value="rejected">Refusé</SelectItem>
+                  <SelectItem value="expired">Expiré</SelectItem>
+                  <SelectItem value="cancelled">Annulé</SelectItem>
+                  <SelectItem value="converted_to_project">Converti</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent className="pt-0">
               {quotesLoading ? (
