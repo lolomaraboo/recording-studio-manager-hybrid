@@ -199,9 +199,15 @@ export function ClientDetailTabs({
                       {(client.prefix || client.firstName || client.middleName || client.lastName || client.suffix) && (
                         <div className="text-sm">
                           <span className="font-semibold">
-                            {[client.prefix, client.firstName, client.middleName, client.lastName, client.suffix]
-                              .filter(Boolean)
-                              .join(" ")}
+                            {(() => {
+                              const parts = [];
+                              if (client.prefix) parts.push(client.prefix);
+                              if (client.firstName) parts.push(client.firstName);
+                              if (client.middleName) parts.push(`"${client.middleName}"`);
+                              if (client.lastName) parts.push(client.lastName);
+                              if (client.suffix) parts.push(client.suffix);
+                              return parts.join(" ");
+                            })()}
                           </span>
                         </div>
                       )}

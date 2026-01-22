@@ -218,7 +218,7 @@ export function ClientEditForm({
                     </div>
                   </div>
 
-                  {/* Row: Civilité + Nom du milieu */}
+                  {/* Row: Civilité + Surnom */}
                   <div className="grid gap-3 md:grid-cols-2">
                     <div>
                       <label htmlFor="prefix" className="text-sm font-medium">Civilité</label>
@@ -236,7 +236,7 @@ export function ClientEditForm({
                     </div>
 
                     <div>
-                      <label htmlFor="middleName" className="text-sm font-medium">Nom du milieu</label>
+                      <label htmlFor="middleName" className="text-sm font-medium">Surnom</label>
                       <input
                         id="middleName"
                         className="w-full px-3 py-2 border rounded-md mt-1"
