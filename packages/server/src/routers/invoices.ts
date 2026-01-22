@@ -221,6 +221,110 @@ export const invoicesRouter = router({
     }),
 
   /**
+   * Update invoice with items (replaces existing items and recalculates totals)
+   */
+  updateWithItems: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        data: z.object({
+          clientId: z.number().optional(),
+          invoiceNumber: z.string().optional(),
+          issueDate: z.string().optional(),
+          dueDate: z.string().optional(),
+          status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).optional(),
+          notes: z.string().optional(),
+          items: z.array(z.object({
+            description: z.string(),
+            quantity: z.number(),
+            unitPrice: z.number(),
+            amount: z.number(),
+            vatRateId: z.number(),
+          })).optional(),
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      // Build updateData object from provided optional fields
+      const updateData: any = {};
+      if (input.data.clientId !== undefined) updateData.clientId = input.data.clientId;
+      if (input.data.invoiceNumber !== undefined) updateData.invoiceNumber = input.data.invoiceNumber;
+      if (input.data.issueDate) updateData.issueDate = new Date(input.data.issueDate);
+      if (input.data.dueDate) updateData.dueDate = new Date(input.data.dueDate);
+      if (input.data.status !== undefined) updateData.status = input.data.status;
+      if (input.data.notes !== undefined) updateData.notes = input.data.notes;
+
+      // If items array is provided, recalculate totals and replace items
+      if (input.data.items) {
+        let subtotal = 0;
+        let totalTax = 0;
+
+        for (const item of input.data.items) {
+          subtotal += item.amount;
+
+          // Fetch VAT rate for this item
+          const vatRate = await tenantDb.query.vatRates.findFirst({
+            where: eq(vatRates.id, item.vatRateId),
+          });
+
+          if (!vatRate) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `Taux de TVA invalide (ID: ${item.vatRateId})`,
+            });
+          }
+
+          const itemTax = item.amount * (parseFloat(vatRate.rate) / 100);
+          totalTax += itemTax;
+        }
+
+        const total = subtotal + totalTax;
+
+        // Weighted average tax rate for header (legacy compatibility)
+        const averageTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : 0;
+
+        updateData.subtotal = subtotal.toFixed(2);
+        updateData.taxRate = averageTaxRate.toFixed(2);
+        updateData.taxAmount = totalTax.toFixed(2);
+        updateData.total = total.toFixed(2);
+
+        // Delete existing items
+        await tenantDb.delete(invoiceItems).where(eq(invoiceItems.invoiceId, input.id));
+
+        // Insert new items
+        for (const item of input.data.items) {
+          await tenantDb.insert(invoiceItems).values({
+            invoiceId: input.id,
+            description: item.description,
+            quantity: item.quantity.toString(),
+            unitPrice: item.unitPrice.toFixed(2),
+            amount: item.amount.toFixed(2),
+            vatRateId: item.vatRateId,
+          });
+        }
+      }
+
+      updateData.updatedAt = new Date();
+
+      const [updated] = await tenantDb
+        .update(invoices)
+        .set(updateData)
+        .where(eq(invoices.id, input.id))
+        .returning();
+
+      if (!updated) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Invoice not found',
+        });
+      }
+
+      return updated;
+    }),
+
+  /**
    * Delete invoice
    */
   delete: protectedProcedure
