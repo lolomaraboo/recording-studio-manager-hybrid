@@ -89,18 +89,6 @@ export default function Services() {
   });
 
   // Mutations
-  const createMutation = trpc.serviceCatalog.create.useMutation({
-    onSuccess: () => {
-      utils.serviceCatalog.list.invalidate();
-      toast.success("Service créé avec succès");
-      closeModal();
-    },
-    onError: (error) => {
-      toast.error("Erreur lors de la création du service");
-      console.error(error);
-    },
-  });
-
   const updateMutation = trpc.serviceCatalog.update.useMutation({
     onSuccess: () => {
       utils.serviceCatalog.list.invalidate();
@@ -168,16 +156,7 @@ export default function Services() {
 
     if (editingService !== null) {
       await updateMutation.mutateAsync({ id: editingService, ...data } as any);
-    } else {
-      await createMutation.mutateAsync(data as any);
     }
-  };
-
-  const openCreateModal = () => {
-    setFormData(INITIAL_FORM_DATA);
-    setEditingService(null);
-    setFormErrors({});
-    setIsCreateModalOpen(true);
   };
 
   const openEditModal = (service: any) => {
@@ -236,9 +215,11 @@ export default function Services() {
               Services
             </h2>
           </div>
-          <Button onClick={openCreateModal}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau service
+          <Button asChild>
+            <Link to="/services/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Nouveau service
+            </Link>
           </Button>
         </div>
 
@@ -347,17 +328,13 @@ export default function Services() {
         </Card>
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Edit Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={closeModal}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>
-              {editingService !== null ? "Modifier le service" : "Nouveau service"}
-            </DialogTitle>
+            <DialogTitle>Modifier le service</DialogTitle>
             <DialogDescription>
-              {editingService !== null
-                ? "Modifiez les informations du service"
-                : "Créez un nouveau service pour votre catalogue"}
+              Modifiez les informations du service
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -480,13 +457,9 @@ export default function Services() {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={createMutation.isPending || updateMutation.isPending}
+              disabled={updateMutation.isPending}
             >
-              {createMutation.isPending || updateMutation.isPending
-                ? "Enregistrement..."
-                : editingService !== null
-                ? "Mettre à jour"
-                : "Créer"}
+              {updateMutation.isPending ? "Enregistrement..." : "Mettre à jour"}
             </Button>
           </DialogFooter>
         </DialogContent>
