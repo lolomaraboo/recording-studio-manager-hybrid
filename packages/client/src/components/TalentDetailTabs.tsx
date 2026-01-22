@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { TALENT_TYPE_LABELS } from "@rsm/shared";
+import { TalentEditForm } from "./TalentEditForm";
 
 interface TalentDetailTabsProps {
   talentId: number;
@@ -74,13 +75,10 @@ export function TalentDetailTabs({
       {/* Informations Tab */}
       <TabsContent value="informations" className="mt-2 space-y-2">
         {isEditing ? (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">
-                Formulaire d'édition à venir dans la phase 28-05
-              </p>
-            </CardContent>
-          </Card>
+          <TalentEditForm
+            formData={formData}
+            setFormData={setFormData}
+          />
         ) : (
           <Card>
             <CardContent className="pt-3">
