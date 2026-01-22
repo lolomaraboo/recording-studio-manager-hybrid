@@ -26,17 +26,17 @@
 ## Current Position
 
 Phase: 28 of 28 (Harmonisation UI Talents) - Phase 28 COMPLETE ✅
-Plan: 3/3 complete (28-01 ✅, 28-02 ✅, 28-03 ✅)
+Plan: 4/4 complete (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅)
 Status: Phase complete
-Last activity: 2026-01-22 - Completed 28-03 (9 min, Table/Grid/Kanban views implemented, -245 lines net)
+Last activity: 2026-01-22 - Completed 28-04 (2 min, TalentDetail harmonized with ClientDetail pattern, tabbed interface)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 3/3 plans (28-01 ✅, 28-02 ✅, 28-03 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 4/4 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 117
-- Average duration: 29.2 min
+- Total plans completed: 118
+- Average duration: 29.0 min
 - Total execution time: 57.0 hours
 
 **By Phase:**
@@ -90,11 +90,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26.1 | 1/1 | 47 min | 47 min |
 | 26.2 | 1/1 | 2 min | 2 min |
 | 27 | 2/2 | 4 min | 2 min |
-| 28 | 3/3 | 12 min | 4 min |
+| 28 | 4/4 | 14 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: [2 min, 1 min, 2 min, 9 min, 4 min]
-- Trend: Phase 28 COMPLETE ✅ (3/3 plans, 12 min total). Plan 28-03 (9 min): Implemented Table/Grid/Kanban views matching Clients.tsx patterns. Table view: 7 columns (4 sortable), VIP stars, copy buttons, type badges. Grid view: 4-column responsive layout, h-12 avatars, stats badges. Kanban view: 2 type-based columns (Musicians/Actors), full contact display, JSONB parsing for instruments/genres, workflow indicators. Backend integration: switched to listWithStats endpoint, adapted to trackCredits metrics (creditsCount, updatedAt). Code cleanup: removed TalentFormDialog (-265 lines), unused imports, net -245 lines. Build successful (1.7MB), zero Talents.tsx errors.
+- Last 5 plans: [1 min, 2 min, 9 min, 4 min, 2 min]
+- Trend: Phase 28 COMPLETE ✅ (4/4 plans, 14 min total). Plan 28-04 (2 min): Harmonized TalentDetail with ClientDetail pattern using tabbed interface. Created TalentDetailTabs component (265 lines) with 4 tabs (Informations, Sessions, Projets, Finances). Refactored TalentDetail.tsx (59% reduction: 583→240 lines). View mode: organized sections (Identité, Contact, Profil Musical, Plateformes Streaming) with icons, separators, grid-cols-3 layouts. Edit mode: placeholder ready for TalentEditForm (28-05). Placeholder tabs for future session/project/finance integration. Visual consistency achieved with Phases 22-26 patterns. Build successful (1.7MB), zero errors. Gap closure plan 28-04 complete.
 
 ## Accumulated Context
 
@@ -545,10 +545,44 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-22T03:04:51Z
-Stopped at: Phase 28 COMPLETE ✅ - Completed 28-03, implemented Table/Grid/Kanban views
+Last session: 2026-01-22T03:24:54Z
+Stopped at: Phase 28 COMPLETE ✅ - Completed 28-04, harmonized TalentDetail with ClientDetail pattern
 Resume context:
-  - Phase 28 COMPLETE ✅: Harmonisation UI Talents (12 min total, 3/3 plans complete)
+  - Phase 28 COMPLETE ✅: Harmonisation UI Talents (14 min total, 4/4 plans complete)
+    - **Plan 28-04:** TalentDetail harmonization with tabbed interface (2 min, 3 tasks) - COMPLETE ✅
+      - **Task 1:** Created TalentDetailTabs component - `b31e6bb`
+        - 4 tabs: Informations, Sessions, Projets, Finances
+        - Organized view sections: Identité, Contact, Profil Musical, Plateformes Streaming
+        - Icons with text-primary color (User, Mail, Music, Globe)
+        - Separator components between sections
+        - Grid-cols-3 layouts for label/value pairs
+        - JSON parsing utility for instruments/genres arrays
+        - Placeholder tabs for future session/project/finance integration
+        - Edit mode placeholder ready for TalentEditForm (28-05)
+        - Component: 265 lines total
+      - **Task 2:** Refactored TalentDetail.tsx to use tabs pattern - `b31e6bb`
+        - 59% reduction: 583→240 lines
+        - Header with edit/save/cancel button workflow
+        - Active tab state management (activeTab, setActiveTab)
+        - handleUpdateField and handleSave functions
+        - Delete dialog preserved
+        - All inline card forms removed (moved to TalentDetailTabs)
+      - **Task 3:** Build verification and commit - `b31e6bb`
+        - TypeScript compilation successful
+        - Production build successful (1.7MB bundle)
+        - Zero TalentDetail-related errors
+        - Visual consistency with ClientDetail patterns verified
+    - **Key achievements (28-04):**
+      - TalentDetail page modernized with tabbed interface
+      - View mode organized sections match ClientDetail patterns
+      - Visual hierarchy consistent (icons, separators, grid layouts)
+      - Edit mode integration ready for 28-05
+      - Placeholder tabs for future phases prepared
+      - Zero deviations from plan
+      - Build successful, zero errors
+    - **Deviations (28-04):**
+      - None - plan executed exactly as written
+    - **Next:** Phase 28-05 - TalentEditForm component for edit mode
     - **Plan 28-02:** Talents UI foundation components (2 min, 3 tasks) - COMPLETE ✅
       - **Tasks 1-3:** ViewMode, Stats, and Components - `e8b8216`
         - **Task 1:** ViewMode state with localStorage persistence
