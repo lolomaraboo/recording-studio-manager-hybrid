@@ -27,7 +27,9 @@ import {
   Smartphone,
   Save,
   Upload,
+  DollarSign,
 } from "lucide-react";
+import { VatRatesSection } from "@/components/vat/VatRatesSection";
 
 /**
  * Billing Tab Content Component
@@ -360,6 +362,10 @@ export default function Settings() {
           <TabsTrigger value="billing">
             <CreditCard className="mr-2 h-4 w-4" />
             Facturation
+          </TabsTrigger>
+          <TabsTrigger value="finance">
+            <DollarSign className="mr-2 h-4 w-4" />
+            Finance
           </TabsTrigger>
         </TabsList>
 
@@ -910,6 +916,11 @@ export default function Settings() {
         {/* Billing Tab */}
         <TabsContent value="billing" className="space-y-2">
           <BillingTabContent />
+        </TabsContent>
+
+        {/* Finance Tab */}
+        <TabsContent value="finance" className="space-y-2">
+          <VatRatesSection />
         </TabsContent>
       </Tabs>
       </div>
