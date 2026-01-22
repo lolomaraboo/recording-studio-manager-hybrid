@@ -25,18 +25,18 @@
 
 ## Current Position
 
-Phase: 26.2 of 26.2 (Restaurer Relations Professionnelles) - Phase 26.2 COMPLETE ✅
-Plan: 1/1 complete (26.2-01 ✅)
+Phase: 27 of 27 (Affichage Conditionnel Selon Type Client) - Phase 27 COMPLETE ✅
+Plan: 1/1 complete (27-01 ✅)
 Status: Phase complete
-Last activity: 2026-01-21 - Phase 26.2 COMPLETE ✅ (2 min total, verification of pre-existing implementation)
+Last activity: 2026-01-22 - Phase 27 COMPLETE ✅ (2 min total, conditional rendering for client type)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 1/1 plans (27-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 112
-- Average duration: 30.3 min
+- Total plans completed: 113
+- Average duration: 30.1 min
 - Total execution time: 56.6 hours
 
 **By Phase:**
@@ -89,10 +89,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26 | 1/1 | 7 min | 7 min |
 | 26.1 | 1/1 | 47 min | 47 min |
 | 26.2 | 1/1 | 2 min | 2 min |
+| 27 | 1/1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: [2 min, 7 min, 47 min, 2 min]
-- Trend: Phase 26.2 COMPLETE ✅ (2 min total, 1/1 plans). Verification phase - implementation already complete from previous session. Plan 26.2-01 (2 min): Verified 6th accordion "Relations professionnelles" at position 3 in ClientEditForm.tsx. Phase 25 functionality fully restored in EDIT mode with CompanyMembersIndicator integration, conditional rendering for creation mode, Alt key toggle updated. Zero new code needed, all success criteria met.
+- Last 5 plans: [7 min, 47 min, 2 min, 2 min]
+- Trend: Phase 27 COMPLETE ✅ (2 min total, 1/1 plans). Conditional rendering implementation. Plan 27-01 (2 min): Wrapped Profil Artistique and Streaming accordions in formData.type === "individual" conditionals, updated Alt key handler to dynamic accordion list (4 for company, 6 for individual). Company clients now see clean 4-accordion form without music-related clutter. Individual clients unchanged (all 6 accordions). Zero deviations, straightforward implementation.
 
 ## Accumulated Context
 
@@ -257,6 +258,9 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26.2-01 | 6th accordion position 3 (after Coordonnées) | Rationale: Professional relationships are business context that comes after contact info but before artistic profile. Workflow logic: identity → contact → relations → creative profile. Impact: Intuitive navigation for studio managers managing client networks. |
 | 26.2-01 | Conditional rendering prevents creation mode crash | Rationale: In creation mode, formData.id is undefined (client not yet saved). CompanyMembersIndicator queries backend with clientId, would crash. Solution: Check formData.id existence, show placeholder if undefined. Impact: Graceful UX degradation, clear user guidance. |
 | 26.1-01 | Alt key accordion toggle | Rationale: Power user feature for batch operations. Alt key opens all accordions if any closed, closes all if all open. No Ctrl/Meta/Shift modifiers (avoids browser/OS conflicts). Impact: Efficiency for users editing many fields. |
+| 27-01 | Conditional rendering for music accordions | Rationale: Companies (labels, studios, management) don't have personal music profiles. Profil Artistique and Streaming sections create visual clutter and user confusion for company clients. Solution: Wrap both accordions in formData.type === "individual" conditional. Impact: Clean 4-accordion form for companies, unchanged 6-accordion form for individuals. |
+| 27-01 | Dynamic Alt key accordion list | Rationale: Alt+Click should toggle only VISIBLE accordions. Company clients see 4 accordions, individuals see 6. Dynamic allAccordions calculation based on formData.type ensures correct toggle behavior for each type. Impact: Keyboard shortcut adapts to client type context. |
+| 27-01 | artistName field remains unconditional | Rationale: Companies can use artistName for brand/trading name separate from legal companyName. Individual artists use it for stage name. Business requirement to keep this field visible for both types. Impact: Flexible naming support for both client types. |
 
 ### Deferred Issues
 
@@ -273,6 +277,12 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 
 ### Roadmap Evolution
 
+- **2026-01-21:** Phase 27 added after Phase 26.2: "Masquer Champs Musicaux pour Entreprises - Formulaire Édition" (ADDED)
+  - Reason: Entreprises (type="company") voient actuellement tous les champs musicaux inutiles (Profil Artistique, Streaming, artistName)
+  - Impact: Bruit visuel et confusion pour utilisateurs créant/éditant des clients entreprise (labels, studios de production, management)
+  - Solution: Masquage conditionnel des accordéons "Profil Artistique" et "Streaming" + champs individual dans Identité quand type="company"
+  - Scope: Formulaire édition uniquement (ClientEditForm.tsx), particuliers 100% inchangés (déjà correct)
+  - Priority: UX improvement - Adapter formulaire au contexte métier (entreprises n'ont pas de profil artistique)
 - **2026-01-20:** Phase 26.1 added after Phase 26: "Réorganisation Accordéons - Logique Studio d'Enregistrement" (ADDED)
   - Reason: User feedback that 7 accordion structure doesn't follow studio recording workflow logic
   - Impact: Musical profile (core business) positioned 5th instead of 2nd, contact info scattered across 2 sections
@@ -532,21 +542,22 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-21T23:42:40Z
-Stopped at: Phase 26.2 COMPLETE ✅ - Restored Relations professionnelles accordion in EDIT mode
+Last session: 2026-01-22T01:22:19Z
+Stopped at: Phase 27 COMPLETE ✅ - Conditional rendering for music-related accordions
 Resume context:
-  - Phase 26.2 COMPLETE ✅: Restaurer Relations Professionnelles (2 min total execution, 1/1 plans)
-    - **Plan 26.2-01:** Verification phase - implementation already complete (2 min, 1 task)
-      - **Task 1:** Verify 6th accordion "Relations professionnelles" - `f846eb8` (from previous session)
-        - Position 3 confirmed (after Coordonnées, before Profil Artistique)
-        - CompanyMembersIndicator integration verified
-        - Conditional rendering for creation mode (formData.id check)
-        - Alt key handler updated (6 accordions in allAccordions array)
-        - Users icon with text-primary color (Phase 26.1 consistency)
-        - Closed by default (Phase 26.1 pattern)
-    - **Key achievements (26.2-01):**
-      - Phase 25 professional relationship management fully restored in EDIT mode
-      - Zero new code needed (implementation from previous session correct)
+  - Phase 27 COMPLETE ✅: Affichage Conditionnel Selon Type Client (2 min total execution, 1/1 plans)
+    - **Plan 27-01:** Conditional accordion rendering based on client type (2 min, 1 task)
+      - **Task 1:** Conditional rendering for music-related accordions - `26611b8`
+        - Wrapped Profil Artistique accordion in formData.type === "individual" conditional
+        - Wrapped Streaming accordion in formData.type === "individual" conditional
+        - Updated Alt key handler to dynamic allAccordions array (4 for company, 6 for individual)
+        - Company clients now see 4 accordions: Identité, Coordonnées, Relations Pro, Champs Personnalisés
+        - Individual clients see all 6 accordions (unchanged experience)
+        - artistName field remains visible for both types (business requirement)
+    - **Key achievements (27-01):**
+      - Clean form UX for company clients without music-related clutter
+      - Dynamic keyboard shortcut behavior adapting to client type
+      - Zero deviations, straightforward implementation
       - All success criteria verified: position, integration, conditional rendering, Alt key
       - TypeScript 0 errors in ClientEditForm.tsx
       - Production build successful (1.7MB bundle)
