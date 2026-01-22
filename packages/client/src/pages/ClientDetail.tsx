@@ -83,7 +83,21 @@ export default function ClientDetail() {
 
   // Initialize formData when client loads
   if (client && !formData) {
-    setFormData(client);
+    // Map flat address fields to addresses array for the edit form
+    const addresses = [];
+    if (client.street || client.city || client.postalCode || client.region || client.country) {
+      addresses.push({
+        type: "home",
+        street: client.street || "",
+        city: client.city || "",
+        postalCode: client.postalCode || "",
+        country: client.country || ""
+      });
+    }
+    setFormData({
+      ...client,
+      addresses
+    });
   }
 
   // Mutations
@@ -132,7 +146,19 @@ export default function ClientDetail() {
 
   // Handle update from wizard
   const handleUpdate = (data: any) => {
-    const sanitizedData = sanitizeFormData(data);
+    // Map addresses array back to flat fields for database
+    const dataToSave = { ...data };
+    if (data.addresses && data.addresses.length > 0) {
+      const addr = data.addresses[0]; // Use first address
+      dataToSave.street = addr.street || "";
+      dataToSave.city = addr.city || "";
+      dataToSave.postalCode = addr.postalCode || "";
+      dataToSave.country = addr.country || "";
+      // Remove addresses array (not in DB schema)
+      delete dataToSave.addresses;
+    }
+
+    const sanitizedData = sanitizeFormData(dataToSave);
     updateMutation.mutate(
       { id: Number(id), data: sanitizedData },
       {
@@ -152,7 +178,19 @@ export default function ClientDetail() {
   const handleUpdateField = (updates: any) => {
     const updatedData = { ...formData, ...updates };
     setFormData(updatedData);
-    const sanitizedUpdates = sanitizeFormData(updates);
+
+    // Map addresses array back to flat fields for database
+    const updatesToSave = { ...updates };
+    if (updates.addresses && updates.addresses.length > 0) {
+      const addr = updates.addresses[0];
+      updatesToSave.street = addr.street || "";
+      updatesToSave.city = addr.city || "";
+      updatesToSave.postalCode = addr.postalCode || "";
+      updatesToSave.country = addr.country || "";
+      delete updatesToSave.addresses;
+    }
+
+    const sanitizedUpdates = sanitizeFormData(updatesToSave);
     updateMutation.mutate(
       { id: Number(id), data: sanitizedUpdates },
       {
