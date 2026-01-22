@@ -154,6 +154,7 @@ export const rooms = pgTable("rooms", {
   hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }).notNull(),
   halfDayRate: decimal("half_day_rate", { precision: 10, scale: 2 }),
   fullDayRate: decimal("full_day_rate", { precision: 10, scale: 2 }),
+  vatRateId: integer("vat_rate_id").references(() => vatRates.id), // Optional - some rooms may not have VAT
 
   // Capacity & Features
   capacity: integer("capacity").notNull().default(1), // Number of people
@@ -249,6 +250,23 @@ export type Invoice = typeof invoices.$inferSelect;
 export type InsertInvoice = typeof invoices.$inferInsert;
 
 /**
+ * VAT Rates table (Tenant DB)
+ * Configurable VAT/tax rates for line items, rooms, and services
+ */
+export const vatRates = pgTable("vat_rates", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(), // "TVA Standard 20%"
+  rate: decimal("rate", { precision: 5, scale: 2 }).notNull(), // 20.00
+  isDefault: boolean("is_default").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type VatRate = typeof vatRates.$inferSelect;
+export type InsertVatRate = typeof vatRates.$inferInsert;
+
+/**
  * Invoice Items table (Tenant DB)
  */
 export const invoiceItems = pgTable("invoice_items", {
@@ -258,6 +276,7 @@ export const invoiceItems = pgTable("invoice_items", {
   quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  vatRateId: integer("vat_rate_id").references(() => vatRates.id), // Nullable during migration
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -281,6 +300,20 @@ export const invoiceItemsRelations = relations(invoiceItems, ({ one }) => ({
     fields: [invoiceItems.invoiceId],
     references: [invoices.id],
   }),
+  vatRate: one(vatRates, {
+    fields: [invoiceItems.vatRateId],
+    references: [vatRates.id],
+  }),
+}));
+
+/**
+ * VAT Rates Relations
+ */
+export const vatRatesRelations = relations(vatRates, ({ many }) => ({
+  invoiceItems: many(invoiceItems),
+  quoteItems: many(quoteItems),
+  rooms: many(rooms),
+  serviceCatalogItems: many(serviceCatalog),
 }));
 
 /**
@@ -610,6 +643,7 @@ export const quoteItems = pgTable("quote_items", {
   quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  vatRateId: integer("vat_rate_id").references(() => vatRates.id), // Nullable during migration
 
   // Optional: Link to service templates (future feature)
   serviceTemplateId: integer("service_template_id"), // Nullable - for future templates
@@ -637,7 +671,7 @@ export const serviceCatalog = pgTable("service_catalog", {
 
   // Pricing
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
+  vatRateId: integer("vat_rate_id").references(() => vatRates.id), // Nullable during migration
 
   // Defaults for quote insertion
   defaultQuantity: decimal("default_quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
@@ -1090,6 +1124,10 @@ export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
   quote: one(quotes, {
     fields: [quoteItems.quoteId],
     references: [quotes.id],
+  }),
+  vatRate: one(vatRates, {
+    fields: [quoteItems.vatRateId],
+    references: [vatRates.id],
   }),
 }));
 
