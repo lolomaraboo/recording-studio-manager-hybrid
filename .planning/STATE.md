@@ -28,7 +28,7 @@
 Phase: 39 of 45 (Gestion TVA Multi-Taux)
 Plan: 4/4 complete (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
 Status: Phase complete - VAT rate management fully functional (frontend + backend + data migration)
-Last activity: 2026-01-22 - Completed quick-006: Harmonize quote badge colors between list and detail pages
+Last activity: 2026-01-22 - Completed quick-007: Editable validity days for quotes (creation + edit)
 
 Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 39: 4/4 plans (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
 
@@ -568,6 +568,7 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 | 004 | Fix conversion devis→projet + cache invalidation | 2026-01-22 | 747d604 | [004-teste-conversion-devis-projet](./quick/004-teste-conversion-devis-projet/) |
 | 005 | Fix quotes status display (cancelled, converted) | 2026-01-22 | fe50334 | [005-fix-quotes-status-display](./quick/005-fix-quotes-status-display/) |
 | 006 | Harmonize quote badge colors list/detail | 2026-01-22 | fce86f1 | [006-fix-quotes-status-badge-colors](./quick/006-fix-quotes-status-badge-colors/) |
+| 007 | Editable validity days for quotes | 2026-01-22 | 0db194c | [007-editable-validity-days](./quick/007-editable-validity-days/) |
 
 ## Project Alignment
 
