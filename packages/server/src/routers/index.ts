@@ -27,6 +27,7 @@ import { clientNotesRouter } from './clientNotes.js';
 import { serviceCatalogRouter } from './serviceCatalog.js';
 import { timeTrackingRouter } from './time-tracking.js';
 import { preferencesRouter } from './preferences.js';
+import { vatRatesRouter } from './vatRates.js';
 
 /**
  * Main App Router
@@ -50,6 +51,7 @@ import { preferencesRouter } from './preferences.js';
  * - expenses: Business expenses CRUD
  * - serviceCatalog: Service catalog for quick quote insertion CRUD
  * - preferences: User preferences for tab customization CRUD
+ * - vatRates: VAT rates management CRUD (Phase 39)
  * - ai: AI Chatbot (Phase 2 - P0 Priority)
  * - search: Global search across all entities
  * - clientPortalAuth: Client Portal Authentication (Phase 4.1)
@@ -89,6 +91,7 @@ export const appRouter = router({
   clientPortalStripe: clientPortalStripeRouter,
   timeTracking: timeTrackingRouter,
   preferences: preferencesRouter,
+  vatRates: vatRatesRouter,
 });
 
 /**
