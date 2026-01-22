@@ -1970,5 +1970,72 @@ Phase 26.2 restores the company-individual relationship management that was acci
 
 **Rationale**: Phase 25 functionality was lost during Phase 26/26.1 UI refactoring. Users reported inability to add/edit company relationships from individual client pages in EDIT mode. This phase restores full CRUD capability in EDIT mode only (VIEW mode remains unchanged per user request: "ne touche pas à l'UI de la page /clients/4") while maintaining the new accordion-based design from Phase 26.1.
 
+### Phase 27: Masquer Champs Musicaux pour Entreprises - Formulaire Édition
+
+**Goal**: Masquer les sections musicales (Profil Artistique, Streaming) et champs individual dans le formulaire d'édition quand type="company"
+
+**Depends on**: Phase 26.2 (accordion structure stabilisée avec 6 accordéons)
+
+**Research**: Minimal (logique conditionnelle React, state management existant)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 27-01-PLAN.md — Conditional rendering for music-related accordions
+
+**Details**:
+
+**Problem:**
+Actuellement, le formulaire ClientEditForm affiche tous les champs pour tous les types. Quand type="company", les entreprises voient :
+- ❌ Accordéon "Profil Artistique" complet (genres, instruments, biography, représentation) - inutile pour entreprises
+- ❌ Accordéon "Streaming" complet (11 plateformes) - inutile pour entreprises
+- ❌ Champs "individual" dans Identité (artistName, structured name, birthday, gender) - inutiles pour entreprises
+
+**Solution (Masquage Conditionnel pour Entreprises Uniquement):**
+
+**Scope:**
+- ✅ Formulaire d'édition uniquement (ClientEditForm.tsx)
+- ✅ Modification UNIQUEMENT quand type="company"
+- ✅ Type="individual" reste **100% INCHANGÉ** (affichage actuel déjà correct)
+- ❌ Vue détail (ClientDetailTabs) - inchangée
+- ❌ Listes/cartes (Table/Grid/Kanban) - inchangées
+
+**Comportement:**
+- **Changement immédiat et dynamique** : Quand l'utilisateur bascule vers type="company", les accordéons non pertinents disparaissent
+- **Masquer complètement** les sections non pertinentes pour entreprises (pas de griser/désactiver)
+
+**Changements à implémenter:**
+
+**Pour Type = "individual" (particulier):**
+- ✅ **AUCUN CHANGEMENT** - Affichage actuel déjà correct
+- ✅ Tous les 6 accordéons restent visibles
+- ✅ Tous les champs restent visibles
+- ✅ Code existant préservé à 100%
+
+**Pour Type = "company" (entreprise) - UNIQUEMENT CES MODIFICATIONS:**
+- ✅ Identité : Masquer artistName, structured name (prefix/firstName/middleName/lastName/suffix), birthday, gender
+- ✅ Identité : Garder visible companyName, industry, registrationNumber
+- ✅ Coordonnées : Garder inchangé (tous champs visibles)
+- ❌ **Profil Artistique** : Masquer accordéon complètement (genres, instruments, biography, représentation inutiles)
+- ❌ **Streaming** : Masquer accordéon complètement (11 plateformes inutiles)
+- ✅ Relations Professionnelles : Garder inchangé (affiche "Membres")
+- ✅ Notes Studio : Garder inchangé (customFields)
+
+**Technical Approach:**
+1. Utiliser `formData.type === 'company'` comme condition pour masquer
+2. Rendu conditionnel accordéons : `{formData.type !== 'company' && <AccordionItem value="profil-artistique">...}`
+3. Rendu conditionnel champs Identité : `{formData.type !== 'company' && <Input name="artistName">...}`
+4. Aucun changement backend (schema déjà flexible)
+5. Validation form existante inchangée (required fields déjà gérés)
+6. **IMPORTANT** : Ne rien modifier pour type="individual" (déjà correct)
+
+**User Requirements:**
+- Portée : Formulaire édition uniquement, type="company" uniquement
+- Masquage : Complet (pas de griser) pour Profil Artistique et Streaming
+- Dynamisme : Changement immédiat quand type change vers "company"
+- Particuliers : 100% inchangés (affichage actuel déjà bon)
+
+**Rationale**: Les entreprises (labels, studios de production, management) n'ont pas de profil artistique ni de présence sur plateformes streaming. Afficher ces sections pour les entreprises crée de la confusion et du bruit visuel. Le formulaire particulier est déjà correct et ne nécessite aucune modification.
+
 ---
 
