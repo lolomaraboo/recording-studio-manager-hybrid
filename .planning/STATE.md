@@ -572,6 +572,7 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 | 008 | Revert quote to draft (sent/cancelled) | 2026-01-22 | 32006de | [008-revert-quote-to-draft](./quick/008-revert-quote-to-draft/) |
 | 009 | Test creation facture (E2E Playwright) | 2026-01-22 | dbe817e | [009-test-creation-facture](./quick/009-test-creation-facture/) |
 | 010 | Invoice lines from services catalog (autocomplete + modal) | 2026-01-22 | 2f444a3 | [010-invoice-lines-from-services-catalog](./quick/010-invoice-lines-from-services-catalog/) |
+| 011 | Invoice edit lines with service catalog | 2026-01-22 | 44d2815 | [011-invoice-edit-lines-service-catalog](./quick/011-invoice-edit-lines-service-catalog/) |
 
 ## Project Alignment
 
