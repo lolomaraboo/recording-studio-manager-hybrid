@@ -37,6 +37,7 @@ import { toast } from "sonner";
 export default function QuoteDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const utils = trpc.useUtils();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -52,6 +53,7 @@ export default function QuoteDetail() {
   // Mutations
   const updateMutation = trpc.quotes.update.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis mis à jour");
       setIsEditing(false);
       refetch();
@@ -63,6 +65,7 @@ export default function QuoteDetail() {
 
   const deleteMutation = trpc.quotes.delete.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis supprimé");
       navigate("/quotes");
     },
@@ -100,6 +103,7 @@ export default function QuoteDetail() {
 
   const sendMutation = trpc.quotes.send.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis envoyé au client");
       refetch();
     },
@@ -110,6 +114,7 @@ export default function QuoteDetail() {
 
   const acceptMutation = trpc.quotes.accept.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis accepté");
       refetch();
     },
@@ -120,6 +125,7 @@ export default function QuoteDetail() {
 
   const rejectMutation = trpc.quotes.reject.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis refusé");
       refetch();
     },
@@ -130,6 +136,7 @@ export default function QuoteDetail() {
 
   const cancelMutation = trpc.quotes.cancel.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis annulé");
       refetch();
     },
@@ -139,9 +146,10 @@ export default function QuoteDetail() {
   });
 
   const convertMutation = trpc.quotes.convertToProject.useMutation({
-    onSuccess: (projectId) => {
+    onSuccess: (result) => {
+      utils.quotes.list.invalidate();
       toast.success("Projet créé à partir du devis");
-      navigate(`/projects/${projectId}`);
+      navigate(`/projects/${result.project.id}`);
     },
     onError: (error) => {
       toast.error(`Erreur: ${error.message}`);

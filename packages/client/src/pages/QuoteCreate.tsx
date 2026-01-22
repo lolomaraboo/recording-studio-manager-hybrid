@@ -26,6 +26,7 @@ type LineItem = {
 
 export default function QuoteCreate() {
   const navigate = useNavigate();
+  const utils = trpc.useUtils();
 
   // Fetch related data
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
@@ -36,6 +37,7 @@ export default function QuoteCreate() {
   // Create mutation
   const createMutation = trpc.quotes.create.useMutation({
     onSuccess: () => {
+      utils.quotes.list.invalidate();
       toast.success("Devis créé avec succès");
       navigate("/quotes");
     },
