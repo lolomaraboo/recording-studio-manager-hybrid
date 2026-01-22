@@ -570,6 +570,46 @@ export const quotesRouter = router({
     }),
 
   /**
+   * Revert a sent or cancelled quote back to draft
+   */
+  revertToDraft: protectedProcedure
+    .input(z.object({ quoteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const quote = await tenantDb.query.quotes.findFirst({
+        where: eq(quotes.id, input.quoteId),
+      });
+
+      if (!quote) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Quote not found',
+        });
+      }
+
+      if (quote.status !== 'sent' && quote.status !== 'cancelled') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Only sent or cancelled quotes can be reverted to draft',
+        });
+      }
+
+      const [updated] = await tenantDb
+        .update(quotes)
+        .set({
+          status: 'draft',
+          sentAt: null,
+          expiresAt: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(quotes.id, input.quoteId))
+        .returning();
+
+      return updated;
+    }),
+
+  /**
    * Convert accepted quote to project (atomic transaction)
    */
   convertToProject: protectedProcedure

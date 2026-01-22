@@ -29,6 +29,7 @@ import {
   Calendar,
   User,
   FileText,
+  Undo2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -145,6 +146,17 @@ export default function QuoteDetail() {
     },
   });
 
+  const revertToDraftMutation = trpc.quotes.revertToDraft.useMutation({
+    onSuccess: () => {
+      utils.quotes.list.invalidate();
+      toast.success("Devis remis en brouillon");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
   const convertMutation = trpc.quotes.convertToProject.useMutation({
     onSuccess: (result) => {
       utils.quotes.list.invalidate();
@@ -208,6 +220,11 @@ export default function QuoteDetail() {
   const handleCancel = () => {
     if (!quote) return;
     cancelMutation.mutate({ quoteId: quote.id });
+  };
+
+  const handleRevertToDraft = () => {
+    if (!quote) return;
+    revertToDraftMutation.mutate({ quoteId: quote.id });
   };
 
   const handleConvertToProject = () => {
@@ -470,7 +487,7 @@ export default function QuoteDetail() {
                     </>
                   )}
 
-                  {/* SENT: Can accept, reject, or cancel */}
+                  {/* SENT: Can accept, reject, cancel, or revert */}
                   {quote.status === "sent" && !quote.isExpired && (
                     <>
                       <Button onClick={handleAccept} disabled={acceptMutation.isPending}>
@@ -481,8 +498,9 @@ export default function QuoteDetail() {
                         <XCircle className="h-4 w-4 mr-2" />
                         Refuser
                       </Button>
-                      <Button variant="destructive" onClick={handleCancel} disabled={cancelMutation.isPending}>
-                        Annuler
+                      <Button variant="secondary" onClick={handleRevertToDraft} disabled={revertToDraftMutation.isPending}>
+                        <Undo2 className="h-4 w-4 mr-2" />
+                        Remettre en brouillon
                       </Button>
                     </>
                   )}
@@ -502,8 +520,16 @@ export default function QuoteDetail() {
                     </div>
                   )}
 
-                  {/* REJECTED/CANCELLED/CONVERTED: No actions */}
-                  {(quote.status === "rejected" || quote.status === "cancelled" || quote.status === "converted_to_project") && (
+                  {/* CANCELLED: Can revert to draft */}
+                  {quote.status === "cancelled" && (
+                    <Button variant="secondary" onClick={handleRevertToDraft} disabled={revertToDraftMutation.isPending}>
+                      <Undo2 className="h-4 w-4 mr-2" />
+                      Remettre en brouillon
+                    </Button>
+                  )}
+
+                  {/* REJECTED/CONVERTED: No actions */}
+                  {(quote.status === "rejected" || quote.status === "converted_to_project") && (
                     <div className="text-sm text-muted-foreground">
                       Aucune action disponible pour ce devis.
                     </div>
