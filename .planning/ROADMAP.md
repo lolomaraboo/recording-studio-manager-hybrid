@@ -2193,15 +2193,16 @@ After Phase 29, all 12 resources use dedicated `/resource/new` pages:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 30-01-PLAN.md — EquipmentEditForm component + update EquipmentCreate page
+- [ ] 30-01-PLAN.md — EquipmentEditForm component (4 accordions) + convert EquipmentCreate page
 
-**Status**: Ready for planning
+**Status**: Ready for execution
 
 **Details**:
-Appliquer le pattern accordion établi (Phases 22-29) à Equipment. Créer EquipmentEditForm avec accordions (Identité, Spécifications, Disponibilité), remplacer formulaire inline dans EquipmentCreate par composant réutilisable.
+Appliquer le pattern accordion établi (Phases 22-29) à Equipment. Créer EquipmentEditForm avec 4 accordions (Identité, Spécifications Techniques, Informations Financières, Maintenance & Statut) couvrant les 16 champs du schéma. Convertir EquipmentCreate.tsx de formulaire inline (220 lignes) en page accordion (~120 lignes) réutilisant EquipmentEditForm.
 
-**Rationale**: EquipmentCreate existe mais utilise formulaire inline sans accordions. Harmonisation améliore cohérence UX et maintenabilité.
+**Rationale**: EquipmentCreate existe mais utilise formulaire inline sans accordions. Harmonisation améliore cohérence UX (12/12 ressources), maintenabilité (form component réutilisable), et UX (localStorage persistence + Alt+Click toggle).
 
+---
 ---
 
 ### Phase 31: Harmonisation Rooms - Routing Cohérent
