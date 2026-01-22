@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
-import { musicians, type InsertMusician } from "@rsm/database/tenant/schema";
-import { eq, sql } from "drizzle-orm";
+import { musicians, trackCredits, tracks, type InsertMusician } from "@rsm/database/tenant/schema";
+import { eq, sql, or, and, isNotNull, desc, asc } from "drizzle-orm";
 
 /**
  * Musicians Router
@@ -10,13 +10,16 @@ import { eq, sql } from "drizzle-orm";
 export const musiciansRouter = router({
   /**
    * List all musicians for the organization
-   * Optional filter by talentType
+   * Enhanced with server-side search, sorting, and filtering
    */
   list: protectedProcedure
     .input(
       z
         .object({
           talentType: z.enum(["musician", "actor"]).optional(),
+          searchQuery: z.string().optional(),
+          sortField: z.enum(['name', 'talentType', 'credits', 'updatedAt']).optional(),
+          sortOrder: z.enum(['asc', 'desc']).optional(),
         })
         .optional()
     )
@@ -25,10 +28,161 @@ export const musiciansRouter = router({
         throw new Error("Tenant database not available");
       }
 
-      const where = input?.talentType ? eq(musicians.talentType, input.talentType) : undefined;
+      const { talentType, searchQuery, sortField = 'name', sortOrder = 'asc' } = input || {};
 
-      const musiciansList = await ctx.tenantDb.select().from(musicians).where(where);
+      // Build WHERE conditions
+      const conditions: any[] = [];
+
+      // Filter by talent type
+      if (talentType) {
+        conditions.push(eq(musicians.talentType, talentType));
+      }
+
+      // Search across multiple fields
+      if (searchQuery) {
+        const searchTerm = `%${searchQuery}%`;
+        conditions.push(
+          or(
+            sql`${musicians.name} ILIKE ${searchTerm}`,
+            sql`${musicians.stageName} ILIKE ${searchTerm}`,
+            sql`${musicians.email} ILIKE ${searchTerm}`,
+            sql`${musicians.bio} ILIKE ${searchTerm}`,
+            sql`${musicians.genres}::text ILIKE ${searchTerm}`,
+            sql`${musicians.instruments}::text ILIKE ${searchTerm}`,
+            sql`${musicians.notes} ILIKE ${searchTerm}`
+          )
+        );
+      }
+
+      // Combine conditions
+      const whereClause = conditions.length > 0
+        ? and(...conditions)
+        : undefined;
+
+      // Build ORDER BY clause
+      let orderByClause;
+      if (sortField === 'name') {
+        orderByClause = sortOrder === 'desc' ? desc(musicians.name) : asc(musicians.name);
+      } else if (sortField === 'talentType') {
+        orderByClause = sortOrder === 'desc' ? desc(musicians.talentType) : asc(musicians.talentType);
+      } else if (sortField === 'updatedAt') {
+        orderByClause = sortOrder === 'desc' ? desc(musicians.updatedAt) : asc(musicians.updatedAt);
+      } else {
+        // Default to name ascending
+        orderByClause = asc(musicians.name);
+      }
+
+      // Execute query with search and sorting
+      const musiciansList = await ctx.tenantDb
+        .select()
+        .from(musicians)
+        .where(whereClause)
+        .orderBy(orderByClause);
+
       return musiciansList;
+    }),
+
+  /**
+   * List musicians with enriched stats (credits count)
+   * Used by Talents.tsx for richer display with sorting
+   */
+  listWithStats: protectedProcedure
+    .input(
+      z
+        .object({
+          talentType: z.enum(["musician", "actor"]).optional(),
+          searchQuery: z.string().optional(),
+          sortField: z.enum(['name', 'talentType', 'credits', 'updatedAt']).optional(),
+          sortOrder: z.enum(['asc', 'desc']).optional(),
+        })
+        .optional()
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.tenantDb) {
+        throw new Error("Tenant database not available");
+      }
+
+      const { talentType, searchQuery, sortField = 'name', sortOrder = 'asc' } = input || {};
+
+      // Build WHERE conditions for search
+      const searchConditions: any[] = [];
+
+      // Filter by talent type
+      if (talentType) {
+        searchConditions.push(eq(musicians.talentType, talentType));
+      }
+
+      // Search across multiple fields
+      if (searchQuery) {
+        const searchTerm = `%${searchQuery}%`;
+        searchConditions.push(
+          or(
+            sql`${musicians.name} ILIKE ${searchTerm}`,
+            sql`${musicians.stageName} ILIKE ${searchTerm}`,
+            sql`${musicians.email} ILIKE ${searchTerm}`,
+            sql`${musicians.bio} ILIKE ${searchTerm}`,
+            sql`${musicians.genres}::text ILIKE ${searchTerm}`,
+            sql`${musicians.instruments}::text ILIKE ${searchTerm}`,
+            sql`${musicians.notes} ILIKE ${searchTerm}`
+          )
+        );
+      }
+
+      const whereClause = searchConditions.length > 0
+        ? and(...searchConditions)
+        : undefined;
+
+      // Query with LEFT JOIN to get credits count
+      let query = ctx.tenantDb
+        .select({
+          id: musicians.id,
+          name: musicians.name,
+          stageName: musicians.stageName,
+          email: musicians.email,
+          phone: musicians.phone,
+          bio: musicians.bio,
+          talentType: musicians.talentType,
+          primaryInstrument: musicians.primaryInstrument,
+          website: musicians.website,
+          spotifyUrl: musicians.spotifyUrl,
+          hourlyRate: musicians.hourlyRate,
+          instruments: musicians.instruments,
+          genres: musicians.genres,
+          photoUrl: musicians.photoUrl,
+          imageUrl: musicians.imageUrl,
+          isActive: musicians.isActive,
+          notes: musicians.notes,
+          createdAt: musicians.createdAt,
+          updatedAt: musicians.updatedAt,
+          creditsCount: sql<number>`CAST(COUNT(DISTINCT ${trackCredits.id}) AS INTEGER)`,
+        })
+        .from(musicians)
+        .leftJoin(trackCredits, eq(trackCredits.musicianId, musicians.id))
+        .where(whereClause)
+        .groupBy(musicians.id);
+
+      // Apply sorting
+      if (sortField === 'name') {
+        query = query.orderBy(sortOrder === 'desc' ? desc(musicians.name) : asc(musicians.name)) as typeof query;
+      } else if (sortField === 'talentType') {
+        query = query.orderBy(sortOrder === 'desc' ? desc(musicians.talentType) : asc(musicians.talentType)) as typeof query;
+      } else if (sortField === 'credits') {
+        // Sort by credits count (computed field)
+        query = query.orderBy(
+          sortOrder === 'desc'
+            ? desc(sql<number>`COUNT(DISTINCT ${trackCredits.id})`)
+            : asc(sql<number>`COUNT(DISTINCT ${trackCredits.id})`)
+        ) as typeof query;
+      } else if (sortField === 'updatedAt') {
+        query = query.orderBy(sortOrder === 'desc' ? desc(musicians.updatedAt) : asc(musicians.updatedAt)) as typeof query;
+      } else {
+        // Default to name ascending
+        query = query.orderBy(asc(musicians.name)) as typeof query;
+      }
+
+      const musiciansWithStats = await query;
+
+      return musiciansWithStats;
     }),
 
   /**
@@ -56,24 +210,46 @@ export const musiciansRouter = router({
 
   /**
    * Get statistics about musicians
+   * Enhanced with VIP performers and track credits metrics
    */
   getStats: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.tenantDb) {
       throw new Error("Tenant database not available");
     }
 
-    const musiciansList = await ctx.tenantDb.select().from(musicians);
+    // Total musicians count
+    const totalResult = await ctx.tenantDb
+      .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
+      .from(musicians);
+    const total = totalResult[0]?.count || 0;
 
-    const total = musiciansList.length;
-    const withEmail = musiciansList.filter((m) => m.email).length;
-    const withPhone = musiciansList.filter((m) => m.phone).length;
-    const withWebsite = musiciansList.filter((m) => m.website).length;
+    // Track credits stats (musicians with many credits are "VIP performers")
+    const creditStats = await ctx.tenantDb
+      .select({
+        musicianId: trackCredits.musicianId,
+        creditCount: sql<number>`CAST(COUNT(*) AS INTEGER)`,
+      })
+      .from(trackCredits)
+      .where(isNotNull(trackCredits.musicianId))
+      .groupBy(trackCredits.musicianId);
+
+    // VIP performers: musicians with >10 track credits
+    const vipPerformers = creditStats.filter(s => s.creditCount > 10).length;
+
+    // Total track credits across all musicians
+    const totalCredits = creditStats.reduce((sum, s) => sum + s.creditCount, 0);
+
+    // Most recent musician update (proxy for "last active")
+    const recentUpdate = await ctx.tenantDb
+      .select({ lastUpdate: sql<Date>`MAX(${musicians.updatedAt})` })
+      .from(musicians);
+    const lastActivityDate = recentUpdate[0]?.lastUpdate || null;
 
     return {
       total,
-      withEmail,
-      withPhone,
-      withWebsite,
+      vipPerformers,
+      totalCredits,
+      lastActivityDate,
     };
   }),
 
