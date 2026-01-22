@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import Stripe from 'stripe';
 import { router, protectedProcedure } from '../_core/trpc';
-import { invoices, timeEntries, clients } from '@rsm/database/tenant';
+import { invoices, timeEntries, clients, invoiceItems, vatRates } from '@rsm/database/tenant';
 import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
 import { getStripeClient, formatStripeAmount } from '../utils/stripe-client';
 import { getInvoicePDFUrl } from '../services/storage/s3-service';
@@ -85,8 +85,13 @@ export const invoicesRouter = router({
         invoiceNumber: z.string(),
         issueDate: z.string(), // ISO date string
         dueDate: z.string().optional(),
-        subtotal: z.string(), // Decimal as string
-        taxRate: z.string().optional(),
+        items: z.array(z.object({
+          description: z.string(),
+          quantity: z.number(),
+          unitPrice: z.number(),
+          amount: z.number(),
+          vatRateId: z.number(), // Required per line item
+        })),
         status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).default('draft'),
         notes: z.string().optional(),
       })
@@ -94,12 +99,35 @@ export const invoicesRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
 
-      // Calculate tax and total
-      const subtotal = parseFloat(input.subtotal);
-      const taxRate = input.taxRate ? parseFloat(input.taxRate) : 20.0;
-      const taxAmount = (subtotal * taxRate) / 100;
-      const total = subtotal + taxAmount;
+      // Calculate totals from line items (including their individual VAT rates)
+      let subtotal = 0;
+      let totalTax = 0;
 
+      for (const item of input.items) {
+        subtotal += item.amount;
+
+        // Fetch VAT rate for this item
+        const vatRate = await tenantDb.query.vatRates.findFirst({
+          where: eq(vatRates.id, item.vatRateId),
+        });
+
+        if (!vatRate) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Taux de TVA invalide (ID: ${item.vatRateId})`,
+          });
+        }
+
+        const itemTax = item.amount * (parseFloat(vatRate.rate) / 100);
+        totalTax += itemTax;
+      }
+
+      const total = subtotal + totalTax;
+
+      // Weighted average tax rate for header (legacy compatibility)
+      const averageTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : 0;
+
+      // Create invoice
       const [invoice] = await tenantDb
         .insert(invoices)
         .values({
@@ -107,14 +135,26 @@ export const invoicesRouter = router({
           invoiceNumber: input.invoiceNumber,
           issueDate: new Date(input.issueDate),
           dueDate: input.dueDate ? new Date(input.dueDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          subtotal: input.subtotal,
-          taxRate: input.taxRate || '20.00',
-          taxAmount: taxAmount.toFixed(2),
+          subtotal: subtotal.toFixed(2),
+          taxRate: averageTaxRate.toFixed(2), // Weighted average for backward compatibility
+          taxAmount: totalTax.toFixed(2),
           total: total.toFixed(2),
           status: input.status,
           notes: input.notes,
         })
         .returning();
+
+      // Insert invoice items with vatRateId
+      for (const item of input.items) {
+        await tenantDb.insert(invoiceItems).values({
+          invoiceId: invoice.id,
+          description: item.description,
+          quantity: item.quantity.toString(),
+          unitPrice: item.unitPrice.toString(),
+          amount: item.amount.toString(),
+          vatRateId: item.vatRateId,
+        });
+      }
 
       return invoice;
     }),
