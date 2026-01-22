@@ -165,6 +165,7 @@ export default function QuoteDetail() {
     taxRate: quote?.taxRate || "20.00",
     taxAmount: quote?.taxAmount || "",
     total: quote?.total || "",
+    validityDays: quote?.validityDays || 30,
     terms: quote?.terms || "",
     notes: quote?.notes || "",
   });
@@ -173,9 +174,9 @@ export default function QuoteDetail() {
     updateMutation.mutate({
       id: Number(id),
       data: {
+        validityDays: formData.validityDays,
         notes: formData.notes,
         terms: formData.terms,
-        taxRate: formData.taxRate,
       },
     });
   };
@@ -334,6 +335,10 @@ export default function QuoteDetail() {
                         {format(new Date(quote.createdAt), "PPP", { locale: fr })}
                       </p>
                     </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Validité</p>
+                      <p className="font-medium">{quote.validityDays || 30} jours</p>
+                    </div>
                     {quote.expiresAt && (
                       <div>
                         <p className="text-sm text-muted-foreground">Expire le</p>
@@ -375,13 +380,15 @@ export default function QuoteDetail() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="taxRate">Taux de TVA (%)</Label>
+                    <Label htmlFor="validityDays">Durée de validité (jours)</Label>
                     <Input
-                      id="taxRate"
+                      id="validityDays"
                       type="number"
-                      step="0.01"
-                      value={formData.taxRate}
-                      onChange={(e) => setFormData({ ...formData, taxRate: e.target.value })}
+                      min={1}
+                      max={365}
+                      value={formData.validityDays}
+                      onChange={(e) => setFormData({ ...formData, validityDays: parseInt(e.target.value) || 30 })}
+                      className="w-32"
                     />
                   </div>
                 </div>

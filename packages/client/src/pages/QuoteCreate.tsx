@@ -51,6 +51,7 @@ export default function QuoteCreate() {
     clientId: number | undefined;
     projectId: number | undefined;
     title: string;
+    validityDays: number;
     terms: string;
     notes: string;
     internalNotes: string;
@@ -58,6 +59,7 @@ export default function QuoteCreate() {
     clientId: undefined,
     projectId: undefined,
     title: "",
+    validityDays: 30,
     terms: "",
     notes: "",
     internalNotes: "",
@@ -213,7 +215,7 @@ export default function QuoteCreate() {
         vatRateId: item.vatRateId,
         displayOrder: index,
       })),
-      validityDays: 30, // 30 days default
+      validityDays: formData.validityDays,
       terms: formData.terms || undefined,
       notes: formData.notes || undefined,
       internalNotes: formData.internalNotes || undefined,
@@ -449,6 +451,20 @@ export default function QuoteCreate() {
                     <span>{total.toFixed(2)} €</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Validity Days */}
+              <div className="space-y-2">
+                <Label htmlFor="validityDays">Durée de validité (jours)</Label>
+                <Input
+                  id="validityDays"
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={formData.validityDays}
+                  onChange={(e) => setFormData({ ...formData, validityDays: parseInt(e.target.value) || 30 })}
+                  className="w-32"
+                />
               </div>
 
               {/* Row 3: Terms */}
