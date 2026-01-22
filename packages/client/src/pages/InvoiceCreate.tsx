@@ -352,27 +352,29 @@ export default function InvoiceCreate() {
                         <TableCell>
                           <Popover open={autocompleteOpen === index} onOpenChange={(open) => setAutocompleteOpen(open ? index : null)}>
                             <PopoverTrigger asChild>
-                              <Input
-                                value={item.description}
-                                onChange={(e) => {
-                                  handleItemChange(index, "description", e.target.value);
-                                  setSearchQuery({ ...searchQuery, [index]: e.target.value });
-                                  setCurrentSearchIndex(index);
-                                  if (e.target.value.length >= 2) {
-                                    setAutocompleteOpen(index);
-                                  } else {
-                                    setAutocompleteOpen(null);
-                                  }
-                                }}
-                                onFocus={() => {
-                                  setCurrentSearchIndex(index);
-                                  if (item.description.length >= 2) {
-                                    setAutocompleteOpen(index);
-                                  }
-                                }}
-                                onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
-                                placeholder="Tapez pour rechercher..."
-                              />
+                              <div>
+                                <Input
+                                  value={item.description}
+                                  onChange={(e) => {
+                                    handleItemChange(index, "description", e.target.value);
+                                    setSearchQuery({ ...searchQuery, [index]: e.target.value });
+                                    setCurrentSearchIndex(index);
+                                    if (e.target.value.length >= 2) {
+                                      setAutocompleteOpen(index);
+                                    } else {
+                                      setAutocompleteOpen(null);
+                                    }
+                                  }}
+                                  onFocus={() => {
+                                    setCurrentSearchIndex(index);
+                                    if (item.description.length >= 2) {
+                                      setAutocompleteOpen(index);
+                                    }
+                                  }}
+                                  onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
+                                  placeholder="Tapez pour rechercher..."
+                                />
+                              </div>
                             </PopoverTrigger>
                             <PopoverContent className="w-[400px] p-0" align="start">
                               <Command>

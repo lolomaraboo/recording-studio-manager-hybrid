@@ -627,30 +627,32 @@ export default function InvoiceDetail() {
                           <TableBody>
                             {editItems.map((item, index) => (
                               <TableRow key={index}>
-                                <TableCell>
+                                <TableCell className="text-left">
                                   <Popover open={autocompleteOpen === index} onOpenChange={(open) => setAutocompleteOpen(open ? index : null)}>
                                     <PopoverTrigger asChild>
-                                      <Input
-                                        value={item.description}
-                                        onChange={(e) => {
-                                          handleItemChange(index, "description", e.target.value);
-                                          setSearchQuery({ ...searchQuery, [index]: e.target.value });
-                                          setCurrentSearchIndex(index);
-                                          if (e.target.value.length >= 2) {
-                                            setAutocompleteOpen(index);
-                                          } else {
-                                            setAutocompleteOpen(null);
-                                          }
-                                        }}
-                                        onFocus={() => {
-                                          setCurrentSearchIndex(index);
-                                          if (item.description.length >= 2) {
-                                            setAutocompleteOpen(index);
-                                          }
-                                        }}
-                                        onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
-                                        placeholder="Tapez pour rechercher..."
-                                      />
+                                      <div>
+                                        <Input
+                                          value={item.description}
+                                          onChange={(e) => {
+                                            handleItemChange(index, "description", e.target.value);
+                                            setSearchQuery({ ...searchQuery, [index]: e.target.value });
+                                            setCurrentSearchIndex(index);
+                                            if (e.target.value.length >= 2) {
+                                              setAutocompleteOpen(index);
+                                            } else {
+                                              setAutocompleteOpen(null);
+                                            }
+                                          }}
+                                          onFocus={() => {
+                                            setCurrentSearchIndex(index);
+                                            if (item.description.length >= 2) {
+                                              setAutocompleteOpen(index);
+                                            }
+                                          }}
+                                          onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
+                                          placeholder="Tapez pour rechercher..."
+                                        />
+                                      </div>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[400px] p-0" align="start">
                                       <Command>
@@ -773,7 +775,7 @@ export default function InvoiceDetail() {
                           <TableBody>
                             {invoice.items.map((item, index) => (
                               <TableRow key={index}>
-                                <TableCell className="font-medium">{item.description}</TableCell>
+                                <TableCell className="font-medium text-left">{item.description}</TableCell>
                                 <TableCell>{item.quantity}</TableCell>
                                 <TableCell>{parseFloat(item.unitPrice).toFixed(2)} €</TableCell>
                                 <TableCell>{vatRates?.find(r => r.id === item.vatRateId)?.rate || "20"}%</TableCell>
