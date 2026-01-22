@@ -141,7 +141,7 @@ export function ClientEditForm({
       type="multiple"
       value={openItems}
       onValueChange={setOpenItems}
-      className="space-y-1"
+      className="space-y-2"
     >
       {/* Accordéon 1: Identité */}
       <AccordionItem value="identite">

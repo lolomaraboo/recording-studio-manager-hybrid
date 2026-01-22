@@ -271,6 +271,102 @@ Toujours avec traduction FR et couleur dynamique.
 - Pas d'espace mort (poignée en position absolute)
 - UX épurée (visible seulement au hover)
 
+### 7. Accordéons (Forms d'édition)
+
+**Pattern standard (ClientEditForm):**
+
+```tsx
+<Accordion
+  type="multiple"
+  value={openItems}
+  onValueChange={setOpenItems}
+  className="space-y-2"  // Espacement uniforme entre accordéons
+>
+  <AccordionItem value="identite">
+    <Card>
+      <AccordionTrigger
+        className="px-4 py-3 hover:no-underline"
+        onClick={handleAccordionTriggerClick}
+      >
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Icon className="h-5 w-5 text-primary" />
+          Titre Section
+        </h3>
+      </AccordionTrigger>
+      <AccordionContent>
+        <div className="px-4 pb-3 space-y-1">
+          {/* Contenu formulaire */}
+        </div>
+      </AccordionContent>
+    </Card>
+  </AccordionItem>
+</Accordion>
+```
+
+**Espacement:**
+- `space-y-2` : Gap uniforme (8px) entre tous les accordéons
+- `px-4 py-3` : Padding trigger (16px horizontal, 12px vertical)
+- `px-4 pb-3` : Padding contenu (16px horizontal, 12px bottom)
+- `space-y-1` : Gap interne entre champs (4px)
+
+**Fonctionnalités:**
+
+1. **Alt+Click Toggle All** : Maintenir Alt et cliquer sur n'importe quel triangle
+   - Si au moins un accordéon fermé → ouvre tous les accordéons
+   - Si tous ouverts → ferme tous les accordéons
+
+   ```tsx
+   const handleAccordionTriggerClick = (event: React.MouseEvent) => {
+     if (event.altKey) {
+       event.preventDefault();
+       event.stopPropagation();
+
+       const allAccordions = ["identite", "coordonnees", "relations-professionnelles", ...];
+
+       if (openItems.length < allAccordions.length) {
+         setOpenItems(allAccordions);  // Ouvre tout
+       } else {
+         setOpenItems([]);  // Ferme tout
+       }
+     }
+   };
+   ```
+
+2. **localStorage Persistence** : Sauvegarde automatique de l'état
+   - Chargement initial depuis `localStorage.getItem('clientEditAccordions')`
+   - Sauvegarde automatique à chaque changement de `openItems`
+   - Fallback: "identite" ouvert par défaut si aucun état sauvegardé
+
+   ```tsx
+   const [openItems, setOpenItems] = useState<string[]>(() => {
+     try {
+       const saved = localStorage.getItem('clientEditAccordions');
+       return saved ? JSON.parse(saved) : ["identite"];
+     } catch {
+       return ["identite"];
+     }
+   });
+
+   useEffect(() => {
+     try {
+       localStorage.setItem('clientEditAccordions', JSON.stringify(openItems));
+     } catch (error) {
+       console.error('Failed to save accordion state:', error);
+     }
+   }, [openItems]);
+   ```
+
+**Icônes de section:**
+- Toujours en `text-primary` (couleur thème)
+- Taille: `h-5 w-5` (20px × 20px)
+- Gap avec titre: `gap-2` (8px)
+
+**Rationale:**
+- **Alt+Click** = productivité (ouvrir/fermer tout rapidement)
+- **localStorage** = continuité UX (retrouver son état entre sessions)
+- **space-y-2** = cohérence avec espacement global page (cards, sections)
+- **Trigger cliquable** = accessible (ne pas forcer Alt pour usage normal)
+
 ## Changements par Page (Phase 3.14-01)
 
 ### ✅ Dashboard.tsx

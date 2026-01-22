@@ -185,7 +185,7 @@ export function ClientDetailTabs({
       </TabsList>
 
       {/* Informations Tab - Single view with 2 visual sections */}
-      <TabsContent value="informations" className="mt-1 space-y-2">
+      <TabsContent value="informations" className="mt-2 space-y-2">
         {isEditing ? (
           <ClientEditForm
             formData={formData}
