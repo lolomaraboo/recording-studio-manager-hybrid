@@ -83,6 +83,8 @@ export function Quotes() {
       accepted: { variant: "default", label: "Accepté" },
       rejected: { variant: "destructive", label: "Refusé" },
       expired: { variant: "destructive", label: "Expiré" },
+      cancelled: { variant: "secondary", label: "Annulé" },
+      converted_to_project: { variant: "default", label: "Converti" },
     };
 
     const config = variants[status] || variants.draft;
@@ -203,6 +205,8 @@ export function Quotes() {
                       <SelectItem value="accepted">Accepté</SelectItem>
                       <SelectItem value="rejected">Refusé</SelectItem>
                       <SelectItem value="expired">Expiré</SelectItem>
+                      <SelectItem value="cancelled">Annulé</SelectItem>
+                      <SelectItem value="converted_to_project">Converti</SelectItem>
                     </SelectContent>
                 </Select>
               </div>
