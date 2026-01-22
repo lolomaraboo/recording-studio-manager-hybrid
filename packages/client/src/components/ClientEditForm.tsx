@@ -44,13 +44,12 @@ export function ClientEditForm({
   useEffect(() => {
     // Only auto-fill for individual clients
     if (formData.type === "individual") {
-      const parts = [
-        formData.prefix,
-        formData.firstName,
-        formData.middleName,
-        formData.lastName,
-        formData.suffix
-      ].filter(Boolean);
+      const parts = [];
+      if (formData.prefix) parts.push(formData.prefix);
+      if (formData.firstName) parts.push(formData.firstName);
+      if (formData.middleName) parts.push(`"${formData.middleName}"`);
+      if (formData.lastName) parts.push(formData.lastName);
+      if (formData.suffix) parts.push(formData.suffix);
 
       if (parts.length > 0) {
         const autoName = parts.join(' ');
