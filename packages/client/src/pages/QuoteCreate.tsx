@@ -21,7 +21,7 @@ type LineItem = {
   unitPrice: string;
   amount: string;
   displayOrder: number;
-  taxRate?: string; // Per-line tax rate override
+  vatRateId: number; // Required per-line VAT rate
 };
 
 export default function QuoteCreate() {
@@ -30,6 +30,8 @@ export default function QuoteCreate() {
   // Fetch related data
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: projects } = trpc.projects.list.useQuery();
+  const { data: vatRates } = trpc.vatRates.list.useQuery();
+  const defaultVatRate = vatRates?.find(r => r.isDefault);
 
   // Create mutation
   const createMutation = trpc.quotes.create.useMutation({
@@ -61,9 +63,8 @@ export default function QuoteCreate() {
 
   // Line items state
   const [items, setItems] = useState<LineItem[]>([
-    { description: "", quantity: "1.00", unitPrice: "0.00", amount: "0.00", displayOrder: 0 }
+    { description: "", quantity: "1.00", unitPrice: "0.00", amount: "0.00", displayOrder: 0, vatRateId: defaultVatRate?.id || 1 }
   ]);
-  const [taxRate, setTaxRate] = useState("20.00");
 
   // Autocomplete state
   const [autocompleteOpen, setAutocompleteOpen] = useState<number | null>(null);
@@ -107,7 +108,7 @@ export default function QuoteCreate() {
   const handleAddItem = () => {
     setItems([
       ...items,
-      { description: "", quantity: "1.00", unitPrice: "0.00", amount: "0.00", displayOrder: items.length }
+      { description: "", quantity: "1.00", unitPrice: "0.00", amount: "0.00", displayOrder: items.length, vatRateId: defaultVatRate?.id || 1 }
     ]);
   };
 
@@ -118,9 +119,15 @@ export default function QuoteCreate() {
     setItems(reorderedItems);
   };
 
-  const handleItemChange = (index: number, field: keyof LineItem, value: string) => {
+  const handleItemChange = (index: number, field: keyof LineItem, value: string | number) => {
     const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
+
+    // Handle different field types
+    if (field === "vatRateId") {
+      newItems[index] = { ...newItems[index], [field]: typeof value === 'string' ? parseInt(value) : value };
+    } else {
+      newItems[index] = { ...newItems[index], [field]: value };
+    }
 
     // Auto-calculate amount when quantity or unitPrice changes
     if (field === "quantity" || field === "unitPrice") {
@@ -130,7 +137,7 @@ export default function QuoteCreate() {
     }
 
     // Update search query for autocomplete
-    if (field === "description") {
+    if (field === "description" && typeof value === 'string') {
       setSearchQuery({ ...searchQuery, [index]: value });
       setCurrentSearchIndex(index);
     }
@@ -147,7 +154,7 @@ export default function QuoteCreate() {
       quantity: service.defaultQuantity.toString(),
       unitPrice: service.unitPrice.toString(),
       amount: (service.defaultQuantity * service.unitPrice).toFixed(2),
-      taxRate: service.taxRate.toString() !== taxRate ? service.taxRate.toString() : undefined,
+      vatRateId: service.vatRateId || defaultVatRate?.id || 1,
     };
     setItems(newItems);
     setAutocompleteOpen(null);
@@ -162,18 +169,21 @@ export default function QuoteCreate() {
       unitPrice: service.unitPrice.toString(),
       amount: (service.defaultQuantity * service.unitPrice).toFixed(2),
       displayOrder: items.length,
-      taxRate: service.taxRate.toString() !== taxRate ? service.taxRate.toString() : undefined,
+      vatRateId: service.vatRateId || defaultVatRate?.id || 1,
     };
     setItems([...items, newItem]);
     setCatalogModalOpen(false);
   };
 
-  // Calculate totals from items array with per-line tax rates
+  // Calculate totals from items array with per-line VAT rates
   const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   const taxAmount = items.reduce((sum, item) => {
     const itemAmount = parseFloat(item.amount) || 0;
-    const itemTaxRate = item.taxRate ? parseFloat(item.taxRate) : parseFloat(taxRate);
-    return sum + (itemAmount * itemTaxRate) / 100;
+    const rate = vatRates?.find(r => r.id === item.vatRateId);
+    if (rate) {
+      return sum + (itemAmount * parseFloat(rate.rate)) / 100;
+    }
+    return sum;
   }, 0);
   const total = subtotal + taxAmount;
 
@@ -198,13 +208,13 @@ export default function QuoteCreate() {
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         amount: item.amount,
+        vatRateId: item.vatRateId,
         displayOrder: index,
       })),
       validityDays: 30, // 30 days default
       terms: formData.terms || undefined,
       notes: formData.notes || undefined,
       internalNotes: formData.internalNotes || undefined,
-      taxRate: taxRate,
     });
   };
 
@@ -306,9 +316,9 @@ export default function QuoteCreate() {
                 </div>
 
                 {items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 items-start border p-3 rounded-md">
-                    {/* Description - 5 cols with autocomplete */}
-                    <div className="col-span-5 space-y-1">
+                  <div key={index} className="grid grid-cols-13 gap-2 items-start border p-3 rounded-md">
+                    {/* Description - 4 cols with autocomplete */}
+                    <div className="col-span-4 space-y-1">
                       <Label className="text-xs">Description</Label>
                       <Popover open={autocompleteOpen === index} onOpenChange={(open) => setAutocompleteOpen(open ? index : null)}>
                         <PopoverTrigger asChild>
@@ -379,17 +389,30 @@ export default function QuoteCreate() {
                       />
                     </div>
 
+                    {/* VAT Rate - 2 cols */}
+                    <div className="col-span-2 space-y-1">
+                      <Label className="text-xs">TVA</Label>
+                      <Select
+                        value={item.vatRateId.toString()}
+                        onValueChange={(value) => handleItemChange(index, "vatRateId", value)}
+                      >
+                        <SelectTrigger className="h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {vatRates?.map((rate) => (
+                            <SelectItem key={rate.id} value={rate.id.toString()}>
+                              {rate.rate}%
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     {/* Amount - 2 cols (read-only calculated) */}
                     <div className="col-span-2 space-y-1">
                       <Label className="text-xs">Montant (€)</Label>
-                      <div className="flex flex-col gap-1">
-                        <Input value={item.amount} readOnly className="bg-muted" />
-                        {item.taxRate && item.taxRate !== taxRate && (
-                          <Badge variant="secondary" className="text-xs px-1 py-0">
-                            TVA {item.taxRate}%
-                          </Badge>
-                        )}
-                      </div>
+                      <Input value={item.amount} readOnly className="bg-muted" />
                     </div>
 
                     {/* Remove button - 1 col */}
@@ -414,17 +437,6 @@ export default function QuoteCreate() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Sous-total:</span>
                     <span className="font-medium">{subtotal.toFixed(2)} €</span>
-                  </div>
-                  <div className="flex justify-between text-sm items-center gap-2">
-                    <Label htmlFor="taxRate" className="text-muted-foreground">TVA (%):</Label>
-                    <Input
-                      id="taxRate"
-                      type="number"
-                      step="0.01"
-                      value={taxRate}
-                      onChange={(e) => setTaxRate(e.target.value)}
-                      className="w-20 h-8"
-                    />
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">TVA:</span>
