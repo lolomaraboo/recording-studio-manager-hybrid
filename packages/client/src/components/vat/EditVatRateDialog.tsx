@@ -35,6 +35,7 @@ export function EditVatRateDialog({
   const updateMutation = trpc.vatRates.update.useMutation({
     onSuccess: () => {
       utils.vatRates.list.invalidate();
+      utils.vatRates.listAll.invalidate();
       toast.success('Taux de TVA modifié avec succès');
       onOpenChange(false);
     },

@@ -32,6 +32,7 @@ export function CreateVatRateDialog({
   const createMutation = trpc.vatRates.create.useMutation({
     onSuccess: () => {
       utils.vatRates.list.invalidate();
+      utils.vatRates.listAll.invalidate();
       toast.success('Nouveau taux de TVA créé avec succès');
       onOpenChange(false);
       // Reset form
