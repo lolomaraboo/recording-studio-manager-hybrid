@@ -6,15 +6,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Save, FileText } from "lucide-react";
+import { ArrowLeft, Save, FileText, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
+type InvoiceItem = {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+  vatRateId: number;
+};
 
 export default function InvoiceCreate() {
   const navigate = useNavigate();
 
   // Fetch related data
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
+  const { data: vatRates } = trpc.vatRates.list.useQuery();
+  const defaultVatRate = vatRates?.find(r => r.isDefault);
 
   // Create mutation
   const createMutation = trpc.invoices.create.useMutation({
@@ -33,11 +44,74 @@ export default function InvoiceCreate() {
     invoiceNumber: "",
     issueDate: "",
     dueDate: "",
-    subtotal: "",
-    taxRate: "20",
     status: "draft" as const,
     notes: "",
   });
+
+  // Line items state
+  const [items, setItems] = useState<InvoiceItem[]>([
+    {
+      description: "",
+      quantity: 1,
+      unitPrice: 0,
+      amount: 0,
+      vatRateId: defaultVatRate?.id || 1
+    }
+  ]);
+
+  const handleAddItem = () => {
+    setItems([
+      ...items,
+      {
+        description: "",
+        quantity: 1,
+        unitPrice: 0,
+        amount: 0,
+        vatRateId: defaultVatRate?.id || 1
+      }
+    ]);
+  };
+
+  const handleRemoveItem = (index: number) => {
+    if (items.length === 1) return;
+    setItems(items.filter((_, i) => i !== index));
+  };
+
+  const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [field]: value };
+
+    // Auto-calculate amount when quantity or unitPrice changes
+    if (field === "quantity" || field === "unitPrice") {
+      const quantity = Number(newItems[index].quantity) || 0;
+      const unitPrice = Number(newItems[index].unitPrice) || 0;
+      newItems[index].amount = quantity * unitPrice;
+    }
+
+    setItems(newItems);
+  };
+
+  // Calculate totals from line items
+  const calculateTotal = () => {
+    let subtotal = 0;
+    let totalTax = 0;
+
+    items.forEach(item => {
+      subtotal += item.amount;
+      const rate = vatRates?.find(r => r.id === item.vatRateId);
+      if (rate) {
+        totalTax += item.amount * (parseFloat(rate.rate) / 100);
+      }
+    });
+
+    return {
+      subtotal,
+      taxAmount: totalTax,
+      total: subtotal + totalTax,
+    };
+  };
+
+  const totals = calculateTotal();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +129,8 @@ export default function InvoiceCreate() {
       toast.error("La date d'émission est requise");
       return;
     }
-    if (!formData.subtotal) {
-      toast.error("Le sous-total est requis");
+    if (items.length === 0 || !items[0].description.trim()) {
+      toast.error("Au moins une ligne d'article est requise");
       return;
     }
 
@@ -66,8 +140,13 @@ export default function InvoiceCreate() {
       invoiceNumber: formData.invoiceNumber,
       issueDate: new Date(formData.issueDate).toISOString(),
       dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
-      subtotal: formData.subtotal,
-      taxRate: formData.taxRate || undefined,
+      items: items.map(item => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        amount: item.amount,
+        vatRateId: item.vatRateId,
+      })),
       status: formData.status,
       notes: formData.notes || undefined,
     });
@@ -165,33 +244,115 @@ export default function InvoiceCreate() {
               </div>
             </div>
 
-            {/* Row 3: Subtotal & Tax Rate */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="subtotal">
-                  Sous-total (€) <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="subtotal"
-                  value={formData.subtotal}
-                  onChange={(e) => setFormData({ ...formData, subtotal: e.target.value })}
-                  placeholder="Ex: 1000.00"
-                  required
-                />
+            {/* Line Items */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold">Articles</Label>
+                <Button type="button" size="sm" variant="outline" onClick={handleAddItem}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter une ligne
+                </Button>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="taxRate">Taux de TVA (%)</Label>
-                <Input
-                  id="taxRate"
-                  value={formData.taxRate}
-                  onChange={(e) => setFormData({ ...formData, taxRate: e.target.value })}
-                  placeholder="Ex: 20"
-                />
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="w-24">Quantité</TableHead>
+                      <TableHead className="w-32">Prix unit. (€)</TableHead>
+                      <TableHead className="w-32">TVA</TableHead>
+                      <TableHead className="w-32">Montant (€)</TableHead>
+                      <TableHead className="w-16"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Input
+                            value={item.description}
+                            onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                            placeholder="Description de l'article"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={item.quantity}
+                            onChange={(e) => handleItemChange(index, "quantity", parseFloat(e.target.value) || 0)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={item.unitPrice}
+                            onChange={(e) => handleItemChange(index, "unitPrice", parseFloat(e.target.value) || 0)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={item.vatRateId.toString()}
+                            onValueChange={(value) => handleItemChange(index, "vatRateId", parseInt(value))}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {vatRates?.map((rate) => (
+                                <SelectItem key={rate.id} value={rate.id.toString()}>
+                                  {rate.rate}%
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            value={item.amount.toFixed(2)}
+                            readOnly
+                            className="bg-muted"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveItem(index)}
+                            disabled={items.length === 1}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </div>
 
-            {/* Row 4: Status */}
+            {/* Totals Display */}
+            <div className="flex justify-end">
+              <div className="w-64 space-y-2 border-t pt-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Sous-total:</span>
+                  <span className="font-medium">{totals.subtotal.toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">TVA:</span>
+                  <span className="font-medium">{totals.taxAmount.toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold border-t pt-2">
+                  <span>Total TTC:</span>
+                  <span>{totals.total.toFixed(2)} €</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: Status */}
             <div className="space-y-2">
               <Label htmlFor="status">Statut</Label>
               <Select
@@ -213,7 +374,7 @@ export default function InvoiceCreate() {
               </Select>
             </div>
 
-            {/* Row 5: Notes */}
+            {/* Row 4: Notes */}
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
               <Textarea
