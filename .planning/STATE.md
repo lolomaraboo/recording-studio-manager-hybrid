@@ -25,18 +25,18 @@
 
 ## Current Position
 
-Phase: 27 of 27 (Affichage Conditionnel Selon Type Client) - Phase 27 COMPLETE ✅
-Plan: 2/2 complete (27-01 ✅, 27-02 ✅)
-Status: Phase complete
-Last activity: 2026-01-22 - Phase 27 COMPLETE ✅ (4 min total, conditional rendering for client type including birthday/gender fields)
+Phase: 28 of 28 (Harmonisation UI Talents) - Phase 28 IN PROGRESS 🔄
+Plan: 1/3 complete (28-01 ✅)
+Status: In progress
+Last activity: 2026-01-21 - Completed 28-01 (1 min, enhanced musicians backend with search/sorting/stats)
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 1/3 plans (28-01 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 114
-- Average duration: 29.9 min
+- Total plans completed: 115
+- Average duration: 29.6 min
 - Total execution time: 56.7 hours
 
 **By Phase:**
@@ -90,10 +90,11 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 26.1 | 1/1 | 47 min | 47 min |
 | 26.2 | 1/1 | 2 min | 2 min |
 | 27 | 2/2 | 4 min | 2 min |
+| 28 | 1/3 | 1 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: [47 min, 2 min, 2 min, 2 min]
-- Trend: Phase 27 COMPLETE ✅ (4 min total, 2/2 plans). Full conditional rendering implementation. Plan 27-01 (2 min): Wrapped Profil Artistique and Streaming accordions in formData.type === "individual" conditionals, dynamic Alt key handler (4 for company, 6 for individual). Plan 27-02 (2 min): Gap closure - wrapped birthday and gender fields in same conditional pattern. Company clients now see clean 4-field Identité section, individuals unchanged. Zero deviations, straightforward implementation.
+- Last 5 plans: [2 min, 2 min, 2 min, 2 min, 1 min]
+- Trend: Phase 28 IN PROGRESS 🔄 (1/3 plans, 1 min so far). Plan 28-01 (1 min): Enhanced musicians backend router - server-side search across 7 fields (JSONB text casting for genres/instruments), sorting by 4 fields, new listWithStats with LEFT JOIN trackCredits, enhanced getStats with VIP performers (>10 credits) and totalCredits metrics. Schema adaptation: used trackCredits instead of sessions (no direct relationship). Zero TypeScript errors, production-ready endpoints.
 
 ## Accumulated Context
 
@@ -544,9 +545,69 @@ Drift notes: None - baseline alignment at project start.
 
 ## Session Continuity
 
-Last session: 2026-01-22T01:40:08Z
-Stopped at: Phase 27 COMPLETE ✅ - Full conditional rendering for client type (accordions + birthday/gender)
+Last session: 2026-01-21T23:55:29Z
+Stopped at: Phase 28 IN PROGRESS 🔄 - Completed 28-01, enhanced musicians backend router
 Resume context:
+  - Phase 28 IN PROGRESS 🔄: Harmonisation UI Talents (1 min so far, 1/3 plans complete)
+    - **Plan 28-01:** Enhanced musicians backend router (1 min, 3 tasks) - COMPLETE ✅
+      - **Task 1:** Add server-side search with debounced filtering - `5d26c94`
+        - Added searchQuery, sortField, sortOrder parameters to list endpoint
+        - Search across 7 fields: name, stageName, email, bio, genres, instruments, notes
+        - JSONB text casting for genres/instruments: `genres::text ILIKE '%keyword%'`
+        - Sorting support: name, talentType, credits, updatedAt (ASC/DESC)
+        - Conditional WHERE clause builder with and()/or() combinators
+      - **Task 2:** Enhanced stats endpoint with VIP performers - `5d26c94`
+        - Replaced basic stats (withEmail, withPhone, withWebsite) with meaningful metrics
+        - New metrics: total, vipPerformers (>10 track credits), totalCredits, lastActivityDate
+        - LEFT JOIN trackCredits, GROUP BY musicianId, COUNT(*) aggregation
+      - **Task 3:** Add listWithStats endpoint for enriched data - `5d26c94`
+        - New endpoint with creditsCount computed field
+        - LEFT JOIN trackCredits with COUNT(DISTINCT trackCredits.id)
+        - Zero-credit musicians included (LEFT JOIN ensures all appear)
+        - Sorting by credits count: ORDER BY COUNT DESC shows most active first
+        - Same search/filter logic as list endpoint
+    - **Key achievements (28-01):**
+      - Schema adaptation: Used trackCredits instead of sessions (no direct relationship)
+      - JSONB search pattern: `::text` casting for array field searching
+      - Dual endpoint strategy: lightweight list + heavy listWithStats
+      - VIP threshold: >10 track credits = high-volume performers
+      - TypeScript 0 errors, production-ready endpoints
+    - **Deviations (28-01):**
+      - Changed metrics from sessions-based to trackCredits-based (schema has no musicianId in sessions)
+      - Sort fields adjusted: removed 'sessions'/'lastSession', added 'credits'/'updatedAt'
+      - All auto-fixed with Rule 1/2 (bug/missing critical functionality)
+    - **Next:** Phase 28-02 - Talents.tsx UI harmonization (frontend implementation with view modes)
+  - Phase 27 COMPLETE ✅: Affichage Conditionnel Selon Type Client (4 min total execution, 2/2 plans)
+    - **Plan 27-01:** Conditional accordion rendering based on client type (2 min, 1 task)
+      - **Task 1:** Conditional rendering for music-related accordions - `26611b8`
+        - Wrapped Profil Artistique accordion in formData.type === "individual" conditional
+        - Wrapped Streaming accordion in formData.type === "individual" conditional
+        - Updated Alt key handler to dynamic allAccordions array (4 for company, 6 for individual)
+        - Company clients now see 4 accordions: Identité, Coordonnées, Relations Pro, Champs Personnalisés
+        - Individual clients see all 6 accordions (unchanged experience)
+        - artistName field remains visible for both types (business requirement)
+    - **Plan 27-02:** Gap closure - Birthday and gender conditional rendering (2 min, 1 task)
+      - **Task 1:** Wrap birthday and gender fields in conditional rendering - `6da844e`
+        - Birthday field only renders when formData.type === "individual"
+        - Gender field only renders when formData.type === "individual"
+        - Both fields wrapped in same conditional block with Fragment wrapper
+        - Matched existing pattern from structured name fields (lines 214-279)
+        - Company clients now see clean 4-field Identité (Type, artistName, companyName, name)
+        - Individual clients unchanged (all identity fields visible)
+    - **Key achievements (Phase 27):**
+      - Complete type-specific UI adaptation for client forms
+      - Company clients see minimal, relevant fields only (no music-related sections or personal fields)
+      - Individual clients retain full form with all 6 accordions and personal fields
+      - Zero deviations across both plans
+      - Production build successful (1.7MB bundle)
+      - Gap closure verified - all must-haves from 27-VERIFICATION.md satisfied
+    - **Verification:** Phase 27 gaps CLOSED ✓
+      - Music accordions conditional (27-01) ✓
+      - Birthday/gender conditional (27-02) ✓
+      - Dynamic visibility complete ✓
+      - TypeScript passes (pre-existing errors unrelated) ✓
+      - Production build successful ✓
+  - **Previous context:**
   - Phase 27 COMPLETE ✅: Affichage Conditionnel Selon Type Client (4 min total execution, 2/2 plans)
     - **Plan 27-01:** Conditional accordion rendering based on client type (2 min, 1 task)
       - **Task 1:** Conditional rendering for music-related accordions - `26611b8`
