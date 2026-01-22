@@ -48,8 +48,13 @@ async function migrateInvoiceVat(tenantDb: any) {
   console.log('\n📋 Migrating invoice VAT data...\n');
 
   // Get all invoices with taxRate that have items without vatRateId
+  // Only select columns we need to avoid schema mismatch issues
   const invoicesWithTax = await tenantDb
-    .select()
+    .select({
+      id: invoices.id,
+      invoiceNumber: invoices.invoiceNumber,
+      taxRate: invoices.taxRate,
+    })
     .from(invoices)
     .where(isNotNull(invoices.taxRate));
 
@@ -60,7 +65,9 @@ async function migrateInvoiceVat(tenantDb: any) {
   for (const invoice of invoicesWithTax) {
     // Check if all items already have vatRateId
     const itemsWithoutVat = await tenantDb
-      .select()
+      .select({
+        id: invoiceItems.id,
+      })
       .from(invoiceItems)
       .where(and(
         eq(invoiceItems.invoiceId, invoice.id),
@@ -104,8 +111,13 @@ async function migrateInvoiceVat(tenantDb: any) {
 async function migrateQuoteVat(tenantDb: any) {
   console.log('\n📋 Migrating quote VAT data...\n');
 
+  // Only select columns we need to avoid schema mismatch issues
   const quotesWithTax = await tenantDb
-    .select()
+    .select({
+      id: quotes.id,
+      quoteNumber: quotes.quoteNumber,
+      taxRate: quotes.taxRate,
+    })
     .from(quotes)
     .where(isNotNull(quotes.taxRate));
 
@@ -115,7 +127,9 @@ async function migrateQuoteVat(tenantDb: any) {
 
   for (const quote of quotesWithTax) {
     const itemsWithoutVat = await tenantDb
-      .select()
+      .select({
+        id: quoteItems.id,
+      })
       .from(quoteItems)
       .where(and(
         eq(quoteItems.quoteId, quote.id),
@@ -157,48 +171,67 @@ async function migrateQuoteVat(tenantDb: any) {
 async function migrateServiceCatalogVat(tenantDb: any) {
   console.log('\n📋 Migrating service catalog VAT data...\n');
 
-  // Get unique tax rates from service catalog
-  const servicesWithoutVatId = await tenantDb
-    .select()
-    .from(serviceCatalog)
-    .where(isNull(serviceCatalog.vatRateId));
+  // Check if service_catalog table exists (not all tenants have it)
+  try {
+    const result: any = await tenantDb.execute(
+      `SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'service_catalog'`
+    );
 
-  if (servicesWithoutVatId.length === 0) {
-    console.log(`   ⏭️  All service catalog items already have vatRateId`);
+    const tableExists = parseInt(result.rows[0].count) > 0;
+
+    if (!tableExists) {
+      console.log(`   ⏭️  service_catalog table does not exist, skipping`);
+      return;
+    }
+  } catch (error) {
+    console.log(`   ⏭️  service_catalog table check failed, skipping`);
     return;
   }
 
+  // Use raw SQL to avoid schema mismatch issues with taxRate field
   let migratedServices = 0;
 
-  // Group by taxRate
-  const rateGroups = servicesWithoutVatId.reduce((acc: any, service: any) => {
-    const rate = service.taxRate || '20.00';
-    if (!acc[rate]) acc[rate] = [];
-    acc[rate].push(service);
-    return acc;
-  }, {});
-
-  for (const [rate, services] of Object.entries(rateGroups) as [string, any][]) {
-    const vatRate = await findOrCreateVatRate(
-      tenantDb,
-      rate,
-      `TVA ${rate}%`
+  try {
+    // Get unique tax rates from service catalog where vat_rate_id is NULL
+    const servicesResult: any = await tenantDb.execute(
+      `SELECT id, tax_rate FROM service_catalog WHERE vat_rate_id IS NULL`
     );
 
-    for (const service of services) {
-      await tenantDb
-        .update(serviceCatalog)
-        .set({ vatRateId: vatRate.id })
-        .where(eq(serviceCatalog.id, service.id));
-
-      migratedServices++;
+    if (servicesResult.rows.length === 0) {
+      console.log(`   ⏭️  All service catalog items already have vatRateId`);
+      return;
     }
 
-    console.log(`   ✓ Updated ${services.length} services to VAT ${rate}%`);
-  }
+    // Group by tax_rate
+    const rateGroups: Record<string, any[]> = {};
+    for (const service of servicesResult.rows) {
+      const rate = service.tax_rate || '20.00';
+      if (!rateGroups[rate]) rateGroups[rate] = [];
+      rateGroups[rate].push(service);
+    }
 
-  console.log(`\n   📊 Service Catalog Migration Summary:`);
-  console.log(`      Migrated services: ${migratedServices}`);
+    for (const [rate, services] of Object.entries(rateGroups)) {
+      const vatRate = await findOrCreateVatRate(
+        tenantDb,
+        rate,
+        `TVA ${rate}%`
+      );
+
+      for (const service of services) {
+        await tenantDb.execute(
+          `UPDATE service_catalog SET vat_rate_id = ${vatRate.id} WHERE id = ${service.id}`
+        );
+        migratedServices++;
+      }
+
+      console.log(`   ✓ Updated ${services.length} services to VAT ${rate}%`);
+    }
+
+    console.log(`\n   📊 Service Catalog Migration Summary:`);
+    console.log(`      Migrated services: ${migratedServices}`);
+  } catch (error) {
+    console.log(`   ⚠️  service_catalog migration skipped:`, error);
+  }
 }
 
 // Main migration
