@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { router, protectedProcedure } from '../_core/trpc';
-import { quotes, quoteItems, clients, projects } from '@rsm/database/tenant';
+import { quotes, quoteItems, clients, projects, vatRates } from '@rsm/database/tenant';
 import { generateQuotePDF } from '../utils/quote-pdf-service';
 
 /**
@@ -146,6 +146,7 @@ export const quotesRouter = router({
               quantity: z.string().default('1.00'),
               unitPrice: z.string(),
               amount: z.string(),
+              vatRateId: z.number(), // Required per line item
               serviceTemplateId: z.number().optional(),
               displayOrder: z.number().default(0),
             })
@@ -155,7 +156,6 @@ export const quotesRouter = router({
         terms: z.string().optional(),
         notes: z.string().optional(),
         internalNotes: z.string().optional(),
-        taxRate: z.string().default('20.00'),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -163,11 +163,34 @@ export const quotesRouter = router({
 
       // Use transaction for atomicity
       return await tenantDb.transaction(async (tx) => {
-        // Calculate totals from items
-        const subtotal = input.items.reduce((sum, item) => sum + parseFloat(item.amount), 0);
-        const taxRate = parseFloat(input.taxRate);
-        const taxAmount = (subtotal * taxRate) / 100;
-        const total = subtotal + taxAmount;
+        // Calculate totals from line items (including their individual VAT rates)
+        let subtotal = 0;
+        let totalTax = 0;
+
+        for (const item of input.items) {
+          const itemAmount = parseFloat(item.amount);
+          subtotal += itemAmount;
+
+          // Fetch VAT rate for this item
+          const vatRate = await tx.query.vatRates.findFirst({
+            where: eq(vatRates.id, item.vatRateId),
+          });
+
+          if (!vatRate) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `Taux de TVA invalide (ID: ${item.vatRateId})`,
+            });
+          }
+
+          const itemTax = itemAmount * (parseFloat(vatRate.rate) / 100);
+          totalTax += itemTax;
+        }
+
+        const total = subtotal + totalTax;
+
+        // Weighted average tax rate for header (legacy compatibility)
+        const averageTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : 0;
 
         // Generate quote number
         const quoteNumber = await generateQuoteNumber(tx);
@@ -181,8 +204,8 @@ export const quotesRouter = router({
             status: 'draft',
             validityDays: input.validityDays,
             subtotal: subtotal.toFixed(2),
-            taxRate: input.taxRate,
-            taxAmount: taxAmount.toFixed(2),
+            taxRate: averageTaxRate.toFixed(2), // Weighted average for backward compatibility
+            taxAmount: totalTax.toFixed(2),
             total: total.toFixed(2),
             terms: input.terms,
             notes: input.notes,
@@ -190,7 +213,7 @@ export const quotesRouter = router({
           })
           .returning();
 
-        // Create quote items
+        // Create quote items with vatRateId
         const items = await tx
           .insert(quoteItems)
           .values(
@@ -200,6 +223,7 @@ export const quotesRouter = router({
               quantity: item.quantity,
               unitPrice: item.unitPrice,
               amount: item.amount,
+              vatRateId: item.vatRateId,
               serviceTemplateId: item.serviceTemplateId,
               displayOrder: item.displayOrder !== undefined ? item.displayOrder : index,
             }))
@@ -223,7 +247,6 @@ export const quotesRouter = router({
           terms: z.string().optional(),
           notes: z.string().optional(),
           internalNotes: z.string().optional(),
-          taxRate: z.string().optional(),
           items: z
             .array(
               z.object({
@@ -232,6 +255,7 @@ export const quotesRouter = router({
                 quantity: z.string(),
                 unitPrice: z.string(),
                 amount: z.string(),
+                vatRateId: z.number(), // Required per line item
                 serviceTemplateId: z.number().optional(),
                 displayOrder: z.number().default(0),
               })
@@ -270,16 +294,41 @@ export const quotesRouter = router({
           // Delete existing items and create new ones
           await tx.delete(quoteItems).where(eq(quoteItems.quoteId, input.id));
 
-          const subtotal = input.data.items.reduce((sum, item) => sum + parseFloat(item.amount), 0);
-          const taxRate = input.data.taxRate ? parseFloat(input.data.taxRate) : parseFloat(existingQuote.taxRate);
-          const taxAmount = (subtotal * taxRate) / 100;
-          const total = subtotal + taxAmount;
+          // Calculate totals from line items (including their individual VAT rates)
+          let subtotal = 0;
+          let totalTax = 0;
+
+          for (const item of input.data.items) {
+            const itemAmount = parseFloat(item.amount);
+            subtotal += itemAmount;
+
+            // Fetch VAT rate for this item
+            const vatRate = await tx.query.vatRates.findFirst({
+              where: eq(vatRates.id, item.vatRateId),
+            });
+
+            if (!vatRate) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: `Taux de TVA invalide (ID: ${item.vatRateId})`,
+              });
+            }
+
+            const itemTax = itemAmount * (parseFloat(vatRate.rate) / 100);
+            totalTax += itemTax;
+          }
+
+          const total = subtotal + totalTax;
+
+          // Weighted average tax rate for header (legacy compatibility)
+          const averageTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : 0;
 
           updateData.subtotal = subtotal.toFixed(2);
-          updateData.taxAmount = taxAmount.toFixed(2);
+          updateData.taxRate = averageTaxRate.toFixed(2);
+          updateData.taxAmount = totalTax.toFixed(2);
           updateData.total = total.toFixed(2);
 
-          // Create new items
+          // Create new items with vatRateId
           await tx.insert(quoteItems).values(
             input.data.items.map((item, index) => ({
               quoteId: input.id,
@@ -287,6 +336,7 @@ export const quotesRouter = router({
               quantity: item.quantity,
               unitPrice: item.unitPrice,
               amount: item.amount,
+              vatRateId: item.vatRateId,
               serviceTemplateId: item.serviceTemplateId,
               displayOrder: item.displayOrder !== undefined ? item.displayOrder : index,
             }))
