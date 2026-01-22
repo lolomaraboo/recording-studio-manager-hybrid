@@ -2303,9 +2303,9 @@ Appliquer le pattern accordion établi à Tracks. Créer TrackEditForm avec acco
 **Plans**: 1 plan
 
 Plans:
-- [ ] 35-01-PLAN.md — InvoiceEditForm component + update InvoiceCreate page
+- [x] 35-01-PLAN.md — InvoiceEditForm component + update InvoiceCreate page
 
-**Status**: Ready for planning
+**Status**: Ready for execution
 
 **Details**:
 Appliquer le pattern accordion établi à Invoices. Créer InvoiceEditForm avec accordions (Informations, Line Items, Paiement, Notes), remplacer formulaire inline dans InvoiceCreate.
