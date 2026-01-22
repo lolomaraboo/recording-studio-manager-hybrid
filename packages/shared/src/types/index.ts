@@ -3,3 +3,4 @@
  */
 
 export * from "./talent";
+export * from "./vatRate";
