@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -10,6 +10,9 @@ type ServiceCategory = "Studio" | "Post-production" | "Location matériel" | "Au
 
 export default function ServiceCreate() {
   const navigate = useNavigate();
+
+  // Fetch default VAT rate
+  const { data: vatRates } = trpc.vatRates.list.useQuery();
 
   // Create mutation
   const createMutation = trpc.serviceCatalog.create.useMutation({
@@ -28,9 +31,19 @@ export default function ServiceCreate() {
     description: "",
     category: "Studio" as ServiceCategory,
     unitPrice: "",
-    taxRate: "20",
+    vatRateId: undefined as number | undefined,
     defaultQuantity: "1.00",
   });
+
+  // Set default VAT rate when loaded
+  useEffect(() => {
+    if (vatRates && !formData.vatRateId) {
+      const defaultVatRate = vatRates.find((rate) => rate.isDefault);
+      if (defaultVatRate) {
+        setFormData((prev) => ({ ...prev, vatRateId: defaultVatRate.id }));
+      }
+    }
+  }, [vatRates]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,9 +60,8 @@ export default function ServiceCreate() {
       return;
     }
 
-    const taxRate = parseFloat(formData.taxRate);
-    if (!formData.taxRate || isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
-      toast.error("Le taux de TVA doit être entre 0 et 100");
+    if (!formData.vatRateId) {
+      toast.error("Veuillez sélectionner un taux de TVA");
       return;
     }
 
@@ -65,7 +77,7 @@ export default function ServiceCreate() {
       description: formData.description.trim() || null,
       category: formData.category,
       unitPrice: formData.unitPrice,
-      taxRate: formData.taxRate,
+      vatRateId: formData.vatRateId,
       defaultQuantity: formData.defaultQuantity,
     } as any);
   };

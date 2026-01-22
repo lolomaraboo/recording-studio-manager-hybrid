@@ -23,6 +23,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Package, DollarSign } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 type ServiceCategory = "Studio" | "Post-production" | "Location matériel" | "Autre";
 
@@ -35,6 +36,8 @@ export function ServiceEditForm({
   formData,
   setFormData,
 }: ServiceEditFormProps) {
+  // Fetch VAT rates
+  const { data: vatRates, isLoading: vatRatesLoading } = trpc.vatRates.list.useQuery();
   // State to manage open accordions with localStorage persistence
   const [openItems, setOpenItems] = useState<string[]>(() => {
     try {
@@ -176,23 +179,23 @@ export function ServiceEditForm({
 
               {/* TVA */}
               <div>
-                <Label htmlFor="taxRate" className="text-sm font-medium">
-                  TVA (%) <span className="text-destructive">*</span>
+                <Label htmlFor="vatRateId" className="text-sm font-medium">
+                  TVA <span className="text-destructive">*</span>
                 </Label>
                 <Select
-                  value={formData.taxRate}
-                  onValueChange={(value) => setFormData({ ...formData, taxRate: value })}
+                  value={formData.vatRateId?.toString() || ""}
+                  onValueChange={(value) => setFormData({ ...formData, vatRateId: parseInt(value) })}
+                  disabled={vatRatesLoading}
                 >
-                  <SelectTrigger id="taxRate" className="mt-1">
-                    <SelectValue />
+                  <SelectTrigger id="vatRateId" className="mt-1">
+                    <SelectValue placeholder={vatRatesLoading ? "Chargement..." : "Sélectionner un taux"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="20">20% (Standard)</SelectItem>
-                    <SelectItem value="10">10% (Réduit)</SelectItem>
-                    <SelectItem value="5.5">5.5% (Réduit)</SelectItem>
-                    <SelectItem value="5">5% (Super réduit)</SelectItem>
-                    <SelectItem value="2.1">2.1% (Super réduit)</SelectItem>
-                    <SelectItem value="0">0% (Exonéré)</SelectItem>
+                    {vatRates?.map((rate) => (
+                      <SelectItem key={rate.id} value={rate.id.toString()}>
+                        {rate.name} ({rate.rate}%)
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

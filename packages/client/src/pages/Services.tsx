@@ -49,7 +49,7 @@ interface ServiceFormData {
   description: string;
   category: ServiceCategory;
   unitPrice: string;
-  taxRate: string;
+  vatRateId: number | undefined;
   defaultQuantity: string;
 }
 
@@ -58,7 +58,7 @@ const INITIAL_FORM_DATA: ServiceFormData = {
   description: "",
   category: "Studio",
   unitPrice: "",
-  taxRate: "20",
+  vatRateId: undefined,
   defaultQuantity: "1.00",
 };
 
@@ -73,6 +73,9 @@ export default function Services() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const utils = trpc.useUtils();
+
+  // Fetch VAT rates
+  const { data: vatRates } = trpc.vatRates.list.useQuery();
 
   // Debounced search
   useEffect(() => {
@@ -128,9 +131,8 @@ export default function Services() {
       errors.unitPrice = "Le prix unitaire doit être un nombre positif";
     }
 
-    const taxRate = parseFloat(formData.taxRate);
-    if (!formData.taxRate || isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
-      errors.taxRate = "Le taux de TVA doit être entre 0 et 100";
+    if (!formData.vatRateId) {
+      errors.vatRateId = "Veuillez sélectionner un taux de TVA";
     }
 
     const defaultQuantity = parseFloat(formData.defaultQuantity);
@@ -150,7 +152,7 @@ export default function Services() {
       description: formData.description.trim() || null,
       category: formData.category,
       unitPrice: formData.unitPrice,
-      taxRate: formData.taxRate,
+      vatRateId: formData.vatRateId!,
       defaultQuantity: formData.defaultQuantity,
     };
 
@@ -165,7 +167,7 @@ export default function Services() {
       description: service.description || "",
       category: service.category,
       unitPrice: service.unitPrice.toString(),
-      taxRate: service.taxRate.toString(),
+      vatRateId: service.vatRateId,
       defaultQuantity: service.defaultQuantity.toString(),
     });
     setEditingService(service.id);
@@ -193,8 +195,10 @@ export default function Services() {
     }).format(price);
   };
 
-  const formatTax = (taxRate: number) => {
-    return `${taxRate}%`;
+  const getVatRateDisplay = (vatRateId: number | null | undefined) => {
+    if (!vatRateId) return "—";
+    const rate = vatRates?.find((r) => r.id === vatRateId);
+    return rate ? `${rate.name} (${rate.rate}%)` : `${vatRateId}`;
   };
 
   const serviceToDelete = services?.find((s) => s.id === deleteConfirmId);
@@ -299,7 +303,7 @@ export default function Services() {
                       </TableCell>
                       <TableCell>{service.category}</TableCell>
                       <TableCell className="text-right">{formatPrice(parseFloat(service.unitPrice))}</TableCell>
-                      <TableCell className="text-right">{formatTax(parseFloat(service.taxRate))}</TableCell>
+                      <TableCell className="text-right">{getVatRateDisplay(service.vatRateId)}</TableCell>
                       <TableCell className="text-right">{service.defaultQuantity}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -408,27 +412,27 @@ export default function Services() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="taxRate">
-                  TVA (%) <span className="text-destructive">*</span>
+                <Label htmlFor="vatRateId">
+                  TVA <span className="text-destructive">*</span>
                 </Label>
                 <Select
-                  value={formData.taxRate}
-                  onValueChange={(value) => setFormData({ ...formData, taxRate: value })}
+                  value={formData.vatRateId?.toString() || ""}
+                  onValueChange={(value) => setFormData({ ...formData, vatRateId: parseInt(value) })}
+                  disabled={!vatRates}
                 >
-                  <SelectTrigger id="taxRate">
-                    <SelectValue />
+                  <SelectTrigger id="vatRateId">
+                    <SelectValue placeholder={!vatRates ? "Chargement..." : "Sélectionner un taux"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="20">20% (Standard)</SelectItem>
-                    <SelectItem value="10">10% (Réduit)</SelectItem>
-                    <SelectItem value="5.5">5.5% (Réduit)</SelectItem>
-                    <SelectItem value="5">5% (Super réduit)</SelectItem>
-                    <SelectItem value="2.1">2.1% (Super réduit)</SelectItem>
-                    <SelectItem value="0">0% (Exonéré)</SelectItem>
+                    {vatRates?.map((rate) => (
+                      <SelectItem key={rate.id} value={rate.id.toString()}>
+                        {rate.name} ({rate.rate}%)
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-                {formErrors.taxRate && (
-                  <p className="text-sm text-destructive">{formErrors.taxRate}</p>
+                {formErrors.vatRateId && (
+                  <p className="text-sm text-destructive">{formErrors.vatRateId}</p>
                 )}
               </div>
             </div>
