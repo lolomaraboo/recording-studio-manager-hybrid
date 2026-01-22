@@ -129,7 +129,7 @@ export function ClientEditForm({
       type="multiple"
       value={openItems}
       onValueChange={setOpenItems}
-      className="space-y-2"
+      className="space-y-1"
     >
       {/* Accordéon 1: Identité */}
       <AccordionItem value="identite">
@@ -141,7 +141,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1">
               {/* Type de client - TOP POSITION */}
               <div>
                 <label className="text-sm font-medium">Type de client</label>
@@ -290,7 +290,7 @@ export function ClientEditForm({
               </div>
 
               {/* Avatar/Logo upload */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <label className="text-sm font-medium">
                   {formData.type === "individual" ? "Photo de profil" : "Logo de l'entreprise"}
                 </label>
@@ -347,15 +347,15 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1">
               {/* Section 1: Contact */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Contact</h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {/* Téléphones - 3-column grid */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Téléphones</label>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {(() => {
                         const phones = (formData.phones || []).length > 0 ? formData.phones : [{ type: "mobile", number: "" }];
                         return phones.map((phone: any, index: number) => (
@@ -422,7 +422,7 @@ export function ClientEditForm({
                   {/* Emails - 3-column grid */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Emails</label>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {(() => {
                         const emails = (formData.emails || []).length > 0 ? formData.emails : [{ type: "work", email: "" }];
                         return emails.map((email: any, index: number) => (
@@ -490,7 +490,7 @@ export function ClientEditForm({
                   {/* Websites - 3-column grid */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Sites web</label>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {(() => {
                         const websites = (formData.websites || []).length > 0 ? formData.websites : [{ type: "website", url: "" }];
                         return websites.map((website: any, index: number) => (
@@ -564,7 +564,7 @@ export function ClientEditForm({
               {/* Section 2: Adresses */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Adresses</h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {(() => {
                     const addresses = (formData.addresses || []).length > 0 ? formData.addresses : [{
                       type: "home",
@@ -594,7 +594,7 @@ export function ClientEditForm({
                           <option value="work">Travail</option>
                           <option value="other">Autre</option>
                         </select>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           <input
                             value={addr.street || ""}
                             onChange={(e) => {
@@ -730,7 +730,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1">
               {formData.id ? (
                 <CompanyMembersIndicator
                   clientId={formData.id}
@@ -758,11 +758,11 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1">
               {/* Subsection: Genres & Instruments */}
               <div>
                 <h4 className="text-sm font-semibold mb-2">Genres & Instruments</h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {/* Genres (array converted to comma-separated for simple editing) */}
                   <div>
                     <label htmlFor="genres" className="text-sm font-medium">Genres musicaux</label>
@@ -798,7 +798,7 @@ export function ClientEditForm({
               {/* Subsection: Informations Professionnelles */}
               <div className="border-t pt-3 mt-3">
                 <h4 className="text-sm font-semibold mb-2">Informations professionnelles</h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {/* Record label */}
                   <div>
                     <label htmlFor="recordLabel" className="text-sm font-medium">Label</label>
@@ -864,7 +864,7 @@ export function ClientEditForm({
               {/* Subsection: Carrière */}
               <div className="border-t pt-3 mt-3">
                 <h4 className="text-sm font-semibold mb-2">Carrière</h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {/* Years active */}
                   <div>
                     <label htmlFor="yearsActive" className="text-sm font-medium">Années d'activité</label>
@@ -932,7 +932,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1">
               <div className="grid gap-3 md:grid-cols-2">
                 {/* Spotify */}
                 <div>
@@ -1092,7 +1092,7 @@ export function ClientEditForm({
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1">
               {/* Custom fields array */}
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -1114,7 +1114,7 @@ export function ClientEditForm({
                     Ajouter
                   </Button>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {(formData.customFields || []).map((field: any, index: number) => (
                     <div key={index} className="flex gap-2">
                       <input
