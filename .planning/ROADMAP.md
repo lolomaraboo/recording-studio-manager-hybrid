@@ -2182,3 +2182,201 @@ After Phase 29, all 12 resources use dedicated `/resource/new` pages:
 **Rationale**: Services est la SEULE ressource de l'application utilisant un Dialog modal au lieu de pages dédiées /new. Cette incohérence crée confusion UX (pourquoi Services se comporte différemment?) et problèmes navigation (URL non partageable, back button). Harmoniser Services avec le pattern établi par 11 autres ressources améliore cohérence globale, maintenabilité, et UX prévisible.
 
 ---
+### Phase 30: Harmonisation Equipment - Routing Cohérent
+
+**Goal**: Transformer EquipmentCreate en page avec formulaire accordion (EquipmentEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 29 (pattern Services établi)
+
+**Research**: Minimal (pattern réutilisé de ServiceEditForm)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 30-01-PLAN.md — EquipmentEditForm component + update EquipmentCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi (Phases 22-29) à Equipment. Créer EquipmentEditForm avec accordions (Identité, Spécifications, Disponibilité), remplacer formulaire inline dans EquipmentCreate par composant réutilisable.
+
+**Rationale**: EquipmentCreate existe mais utilise formulaire inline sans accordions. Harmonisation améliore cohérence UX et maintenabilité.
+
+---
+
+### Phase 31: Harmonisation Rooms - Routing Cohérent
+
+**Goal**: Transformer RoomCreate en page avec formulaire accordion (RoomEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 30 (pattern Equipment établi)
+
+**Research**: Minimal (pattern réutilisé de ServiceEditForm)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 31-01-PLAN.md — RoomEditForm component + update RoomCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Rooms. Créer RoomEditForm avec accordions (Identité, Caractéristiques, Équipement), remplacer formulaire inline dans RoomCreate.
+
+**Rationale**: RoomCreate existe mais utilise formulaire inline sans accordions. Harmonisation complète la cohérence UI pour toutes les ressources physiques (Equipment + Rooms).
+
+---
+
+### Phase 32: Harmonisation Projects - Routing Cohérent
+
+**Goal**: Transformer ProjectCreate en page avec formulaire accordion (ProjectEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 31 (pattern Rooms établi)
+
+**Research**: Minimal (pattern réutilisé de TalentEditForm - formulaire complexe)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 32-01-PLAN.md — ProjectEditForm component + update ProjectCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Projects. Créer ProjectEditForm avec accordions (Informations, Planning, Budget, Notes), remplacer formulaire inline dans ProjectCreate. Projects a plus de champs que Service (comme Talents), donc utiliser TalentEditForm comme template.
+
+**Rationale**: ProjectCreate existe mais utilise formulaire inline sans accordions. Projects est une ressource critique du workflow studio - harmonisation prioritaire.
+
+---
+
+### Phase 33: Harmonisation Sessions - Routing Cohérent
+
+**Goal**: Transformer SessionCreate en page avec formulaire accordion (SessionEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 32 (pattern Projects établi)
+
+**Research**: Minimal (pattern réutilisé de TalentEditForm)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 33-01-PLAN.md — SessionEditForm component + update SessionCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Sessions. Créer SessionEditForm avec accordions (Informations, Planning, Participants, Facturation), remplacer formulaire inline dans SessionCreate.
+
+**Rationale**: SessionCreate existe mais utilise formulaire inline sans accordions. Sessions est LA ressource centrale du studio - harmonisation critique pour UX cohérente.
+
+---
+
+### Phase 34: Harmonisation Tracks - Routing Cohérent
+
+**Goal**: Transformer TrackCreate en page avec formulaire accordion (TrackEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 33 (pattern Sessions établi)
+
+**Research**: Minimal (pattern réutilisé de ServiceEditForm)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 34-01-PLAN.md — TrackEditForm component + update TrackCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Tracks. Créer TrackEditForm avec accordions (Informations, Métadonnées Audio, Participants), remplacer formulaire inline dans TrackCreate.
+
+**Rationale**: TrackCreate existe mais utilise formulaire inline sans accordions. Tracks lié aux Sessions/Projects - harmonisation complète le workflow audio.
+
+---
+
+### Phase 35: Harmonisation Invoices - Routing Cohérent
+
+**Goal**: Transformer InvoiceCreate en page avec formulaire accordion (InvoiceEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 34 (pattern Tracks établi)
+
+**Research**: Minimal (pattern réutilisé de TalentEditForm - formulaire complexe)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 35-01-PLAN.md — InvoiceEditForm component + update InvoiceCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Invoices. Créer InvoiceEditForm avec accordions (Informations, Line Items, Paiement, Notes), remplacer formulaire inline dans InvoiceCreate.
+
+**Rationale**: InvoiceCreate existe mais utilise formulaire inline sans accordions. Invoices critique pour workflow commercial - harmonisation prioritaire.
+
+---
+
+### Phase 36: Harmonisation Quotes - Routing Cohérent
+
+**Goal**: Transformer QuoteCreate en page avec formulaire accordion (QuoteEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 35 (pattern Invoices établi)
+
+**Research**: Minimal (pattern réutilisé de InvoiceEditForm - structures similaires)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 36-01-PLAN.md — QuoteEditForm component + update QuoteCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Quotes. Créer QuoteEditForm avec accordions (Informations, Services, Conditions, Notes), remplacer formulaire inline dans QuoteCreate. Structure similaire à Invoices.
+
+**Rationale**: QuoteCreate existe mais utilise formulaire inline sans accordions. Quotes première étape du workflow commercial - harmonisation complète cohérence Quote→Invoice.
+
+---
+
+### Phase 37: Harmonisation Contracts - Routing Cohérent
+
+**Goal**: Transformer ContractCreate en page avec formulaire accordion (ContractEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 36 (pattern Quotes établi)
+
+**Research**: Minimal (pattern réutilisé de TalentEditForm)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 37-01-PLAN.md — ContractEditForm component + update ContractCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Contracts. Créer ContractEditForm avec accordions (Informations, Termes, Documents, Signatures), remplacer formulaire inline dans ContractCreate.
+
+**Rationale**: ContractCreate existe mais utilise formulaire inline sans accordions. Contracts partie du workflow légal/commercial - harmonisation complète la suite professionnelle.
+
+---
+
+### Phase 38: Harmonisation Expenses - Routing Cohérent
+
+**Goal**: Transformer ExpenseCreate en page avec formulaire accordion (ExpenseEditForm) pour cohérence avec Client/Talent/Service
+
+**Depends on**: Phase 37 (pattern Contracts établi)
+
+**Research**: Minimal (pattern réutilisé de ServiceEditForm - formulaire simple)
+
+**Plans**: 1 plan
+
+Plans:
+- [ ] 38-01-PLAN.md — ExpenseEditForm component + update ExpenseCreate page
+
+**Status**: Ready for planning
+
+**Details**:
+Appliquer le pattern accordion établi à Expenses. Créer ExpenseEditForm avec accordions (Informations, Montant, Catégorie, Reçu), remplacer formulaire inline dans ExpenseCreate.
+
+**Rationale**: ExpenseCreate existe mais utilise formulaire inline sans accordions. Expenses dernière ressource à harmoniser - complète la cohérence UI totale (12/12 ressources).
+
+---
+
