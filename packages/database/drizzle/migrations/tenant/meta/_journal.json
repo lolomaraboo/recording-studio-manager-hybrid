@@ -36,6 +36,76 @@
       "when": 1767221901846,
       "tag": "0004_certain_trish_tilby",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1736000000000,
+      "tag": "0005_add_service_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1736100000000,
+      "tag": "0006_add_task_types_time_entries",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1736200000000,
+      "tag": "0007_add_track_id_to_time_entries",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1736300000000,
+      "tag": "0008_add_project_id_to_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1736400000000,
+      "tag": "0009_add_stripe_webhook_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1736500000000,
+      "tag": "0010_add_invoices_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1736600000000,
+      "tag": "0011_add_company_members",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1736700000000,
+      "tag": "0012_add_music_profile_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1736800000000,
+      "tag": "0013_add_user_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1737520045000,
+      "tag": "0014_add_vat_rates",
+      "breakpoints": true
     }
   ]
 }
