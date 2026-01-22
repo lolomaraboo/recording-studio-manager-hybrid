@@ -368,7 +368,11 @@ export default function InvoiceDetail() {
                 <FileText className="h-8 w-8 text-primary" />
                 Facture {invoice.invoiceNumber}
               </h2>
-              <p className="text-sm text-muted-foreground">{client?.name || "Client inconnu"}</p>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <Link to={`/clients/${client?.id}`} className="hover:underline">{client?.name || "Client inconnu"}</Link>
+                {client?.email && <span>• {client.email}</span>}
+              </div>
             </div>
           </div>
           <div className="flex gap-2">
@@ -415,9 +419,7 @@ export default function InvoiceDetail() {
         </div>
 
         {/* Main Content */}
-        <div className="grid gap-6 md:grid-cols-3">
-          {/* Left Column - Invoice Details */}
-          <div className="md:col-span-2 space-y-6">
+        <div className="space-y-4">
             {/* Invoice Info Card */}
             <Card>
               <CardHeader className="pb-3">
@@ -552,6 +554,32 @@ export default function InvoiceDetail() {
                           <CheckCircle className="h-4 w-4" />
                           {format(new Date(invoice.paidAt), "dd MMMM yyyy à HH:mm", { locale: fr })}
                         </div>
+                      </div>
+                    )}
+
+                    {/* Dates & Alerts */}
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-3 border-t mt-4">
+                      <span>Créée le {format(new Date(invoice.createdAt), "dd MMM yyyy", { locale: fr })}</span>
+                      <span>•</span>
+                      <span>Mise à jour le {format(new Date(invoice.updatedAt), "dd MMM yyyy", { locale: fr })}</span>
+                    </div>
+
+                    {isOverdue && (
+                      <div className="bg-red-50 dark:bg-red-950 p-3 rounded-md mt-2">
+                        <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                          Facture en retard
+                        </p>
+                        <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                          Échéance dépassée depuis le {format(new Date(invoice.dueDate), "dd MMM yyyy", { locale: fr })}
+                        </p>
+                      </div>
+                    )}
+
+                    {invoice.status === "paid" && invoice.paidAt && (
+                      <div className="bg-green-50 dark:bg-green-950 p-3 rounded-md mt-2">
+                        <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                          Facture payée le {format(new Date(invoice.paidAt), "dd MMM yyyy", { locale: fr })}
+                        </p>
                       </div>
                     )}
                   </>
@@ -815,122 +843,6 @@ export default function InvoiceDetail() {
                 )}
               </CardContent>
             </Card>
-          </div>
-
-          {/* Right Column - Meta Info */}
-          <div className="space-y-6">
-            {/* Summary Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Résumé</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Statut</p>
-                  {getStatusBadge(invoice.status)}
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Montant total</p>
-                  <p className="text-2xl font-semibold">
-                    {parseFloat(invoice.total).toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </p>
-                </div>
-
-                {isOverdue && (
-                  <div className="bg-red-50 dark:bg-red-950 p-3 rounded-md">
-                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-                      ⚠️ Facture en retard
-                    </p>
-                    <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-                      Échéance dépassée depuis le{" "}
-                      {format(new Date(invoice.dueDate), "dd MMM yyyy", { locale: fr })}
-                    </p>
-                  </div>
-                )}
-
-                {invoice.status === "paid" && invoice.paidAt && (
-                  <div className="bg-green-50 dark:bg-green-950 p-3 rounded-md">
-                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                      ✓ Facture payée
-                    </p>
-                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                      Le {format(new Date(invoice.paidAt), "dd MMM yyyy", { locale: fr })}
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Créée le</p>
-                  <p className="text-sm">
-                    {format(new Date(invoice.createdAt), "dd MMM yyyy", { locale: fr })}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Mise à jour</p>
-                  <p className="text-sm">
-                    {format(new Date(invoice.updatedAt), "dd MMM yyyy", { locale: fr })}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Actions rapides</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button variant="outline" className="w-full" onClick={handleDownloadPDF}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Télécharger PDF
-                </Button>
-                {invoice.status === "draft" && (
-                  <Button variant="outline" className="w-full" onClick={handleSendEmail}>
-                    <Send className="mr-2 h-4 w-4" />
-                    Envoyer au client
-                  </Button>
-                )}
-                {(invoice.status === "sent" || invoice.status === "overdue") && (
-                  <Button variant="default" className="w-full" onClick={handleMarkAsPaid}>
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Marquer comme payée
-                  </Button>
-                )}
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to={`/clients/${client?.id}`}>Voir le client</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Client Info Card */}
-            {client && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Client</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <p className="font-medium">{client.name}</p>
-                    {client.artistName && (
-                      <p className="text-sm text-muted-foreground">{client.artistName}</p>
-                    )}
-                  </div>
-                  {client.email && (
-                    <p className="text-sm text-muted-foreground">{client.email}</p>
-                  )}
-                  {client.phone && (
-                    <p className="text-sm text-muted-foreground">{client.phone}</p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
         </div>
       </div>
     </div>
