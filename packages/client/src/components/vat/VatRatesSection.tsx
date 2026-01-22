@@ -35,7 +35,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Plus, Star, Archive, Edit } from 'lucide-react';
+import { MoreHorizontal, Plus, Star, Archive, Edit, ArchiveRestore } from 'lucide-react';
 import { CreateVatRateDialog } from './CreateVatRateDialog';
 import { EditVatRateDialog } from './EditVatRateDialog';
 import { toast } from 'sonner';
@@ -75,6 +75,17 @@ export function VatRatesSection() {
     },
   });
 
+  const unarchiveMutation = trpc.vatRates.unarchive.useMutation({
+    onSuccess: () => {
+      utils.vatRates.list.invalidate();
+      utils.vatRates.listAll.invalidate();
+      toast.success('Taux de TVA désarchivé avec succès');
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+
   const handleSetDefault = (id: number) => {
     setDefaultMutation.mutate({ id });
   };
@@ -82,6 +93,12 @@ export function VatRatesSection() {
   const handleArchive = (id: number, name: string) => {
     if (window.confirm(`Êtes-vous sûr de vouloir archiver le taux "${name}" ?`)) {
       archiveMutation.mutate({ id });
+    }
+  };
+
+  const handleUnarchive = (id: number, name: string) => {
+    if (window.confirm(`Désarchiver le taux "${name}" ?`)) {
+      unarchiveMutation.mutate({ id });
     }
   };
 
@@ -164,38 +181,45 @@ export function VatRatesSection() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      {rate.isActive ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4 text-primary" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {!rate.isDefault && (
-                              <DropdownMenuItem
-                                onClick={() => handleSetDefault(rate.id)}
-                              >
-                                <Star className="mr-2 h-4 w-4 text-primary" />
-                                Définir par défaut
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4 text-primary" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {rate.isActive ? (
+                            <>
+                              {!rate.isDefault && (
+                                <DropdownMenuItem
+                                  onClick={() => handleSetDefault(rate.id)}
+                                >
+                                  <Star className="mr-2 h-4 w-4 text-primary" />
+                                  Définir par défaut
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => handleEdit(rate)}>
+                                <Edit className="mr-2 h-4 w-4 text-primary" />
+                                Modifier le nom
                               </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={() => handleEdit(rate)}>
-                              <Edit className="mr-2 h-4 w-4 text-primary" />
-                              Modifier le nom
-                            </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleArchive(rate.id, rate.name)}
+                                disabled={rate.isDefault}
+                              >
+                                <Archive className="mr-2 h-4 w-4 text-primary" />
+                                Archiver
+                              </DropdownMenuItem>
+                            </>
+                          ) : (
                             <DropdownMenuItem
-                              onClick={() => handleArchive(rate.id, rate.name)}
-                              disabled={rate.isDefault}
+                              onClick={() => handleUnarchive(rate.id, rate.name)}
                             >
-                              <Archive className="mr-2 h-4 w-4 text-primary" />
-                              Archiver
+                              <ArchiveRestore className="mr-2 h-4 w-4 text-primary" />
+                              Désarchiver
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : (
-                        <span className="text-sm text-muted-foreground">—</span>
-                      )}
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
