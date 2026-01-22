@@ -2281,7 +2281,7 @@ Appliquer le pattern accordion établi à Sessions. Créer SessionEditForm avec 
 **Plans**: 1 plan
 
 Plans:
-- [ ] 34-01-PLAN.md — TrackEditForm component + update TrackCreate page
+- [ ] 34-01-PLAN.md — TrackEditForm accordion component (3 sections: Basic Info, Musical Details, Notes) + update TrackCreate page — TrackEditForm component + update TrackCreate page
 
 **Status**: Ready for planning
 
