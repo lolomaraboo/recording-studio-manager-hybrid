@@ -34,17 +34,23 @@ test.describe('Invoice Creation (localhost)', () => {
     await clientOption.waitFor({ state: 'visible', timeout: 10000 });
     await clientOption.click();
 
-    // Step 2: Fill in the invoice number
-    await page.locator('#invoiceNumber').fill('INV-E2E-001');
+    // Step 2: Fill in the invoice number (unique per run)
+    const invoiceNumber = `INV-E2E-${Date.now()}`;
+    await page.locator('#invoiceNumber').fill(invoiceNumber);
 
     // Step 3: Fill in the issue date (YYYY-MM-DD format for type="date" input)
     const today = new Date().toISOString().split('T')[0];
     await page.locator('#issueDate').fill(today);
 
     // Step 4: Fill in the first line item
-    // Description input is a standard Input with placeholder - use .fill() directly
-    const descriptionInput = page.locator('[placeholder="Description de l\'article"]').first();
+    // Description input has autocomplete (Popover+Command) with placeholder "Tapez pour rechercher..."
+    // The Input is wrapped in a div inside PopoverTrigger
+    const descriptionInput = page.locator('[placeholder="Tapez pour rechercher..."]').first();
     await descriptionInput.fill('Enregistrement studio 2h');
+    // Dismiss autocomplete popover if it appeared
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(200);
 
     // Quantity input (type=number, step=0.01) - first number input in line item
     const quantityInput = page.locator('input[type="number"][step="0.01"]').first();
@@ -80,7 +86,7 @@ test.describe('Invoice Creation (localhost)', () => {
     await expect(page).toHaveURL(/\/invoices\/\d+/, { timeout: 15000 });
 
     // Verify detail page loaded - check for invoice content
-    await expect(page.locator('body')).toContainText('INV-E2E-001', { timeout: 10000 });
+    await expect(page.locator('body')).toContainText(invoiceNumber, { timeout: 10000 });
   });
 
 });
