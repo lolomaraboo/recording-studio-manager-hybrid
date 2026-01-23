@@ -28,7 +28,7 @@
 Phase: 32 of 45 (Harmonisation Projects - Routing Cohérent)
 Plan: 1/1 complete (32-01 ✅)
 Status: Phase complete - ProjectEditForm accordion harmonization complete
-Last activity: 2026-01-23 - Completed 32-01: Accordion-based ProjectEditForm matching TalentEditForm pattern
+Last activity: 2026-01-23 - Completed quick task 023: Renforcer tests E2E chatbot avec vérification données via tRPC API
 
 Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 32: 1/1 plans (32-01 ✅) + Phase 39: 4/4 plans (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
 
@@ -581,6 +581,7 @@ See `.planning/ISSUES.md` for full details and resolution steps.
 | 016 | Invoice filter inline like quotes + colored dots | 2026-01-22 | dd4beb6 | [016-invoice-filter-like-quotes](./quick/016-invoice-filter-like-quotes/) |
 | 017 | Quotes colored status badges + filter dots | 2026-01-22 | a08a886 | [017-quotes-colored-status](./quick/017-quotes-colored-status/) |
 | 022 | E2E test chatbot CRUD (devis, factures, clients, sessions) | 2026-01-22 | 01d9769 | [022-test-chatbot-crud-devis-factures-clients](./quick/022-test-chatbot-crud-devis-factures-clients/) |
+| 023 | Renforcer tests E2E chatbot avec vérification données via tRPC API | 2026-01-23 | 32478e2 | [023-renforcer-tests-e2e-chatbot-verif-data](./quick/023-renforcer-tests-e2e-chatbot-verif-data/) |
 
 ## Project Alignment
 
