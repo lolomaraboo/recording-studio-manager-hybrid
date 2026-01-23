@@ -269,7 +269,7 @@ export function AIAssistant() {
       className={cn(
         "bg-card border-l border-border flex flex-col transition-all duration-300",
         // Docked mode (default) - fixed to right
-        !isFloating && "fixed right-0 top-0 bottom-0",
+        !isFloating && "fixed right-0 top-0 bottom-0 z-40",
         !isFloating && (isMinimized ? "w-16" : "w-96"),
         // Floating mode - custom position
         isFloating && !isFullscreen && "fixed border rounded-lg shadow-2xl z-50",

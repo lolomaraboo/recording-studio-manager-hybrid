@@ -319,7 +319,7 @@ export default function InvoiceDetail() {
     <div className="container pt-2 pb-4 px-2">
       <div className="space-y-2">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/invoices">
@@ -338,7 +338,7 @@ export default function InvoiceDetail() {
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {!isEditing ? (
               <>
                 <Button variant="outline" onClick={handleDownloadPDF}>
