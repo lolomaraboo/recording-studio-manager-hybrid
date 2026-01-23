@@ -272,59 +272,59 @@ export default function QuoteDetail() {
     <div className="container pt-2 pb-4 px-2">
       <div className="space-y-2">
         {/* Header */}
-        <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/quotes">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Devis {quote.quoteNumber}</h1>
-            <p className="text-muted-foreground">
-              {client ? `${client.name}` : "Client non trouvé"}
-            </p>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-4">
+            <Link to="/quotes">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold">Devis {quote.quoteNumber}</h1>
+              <p className="text-muted-foreground">
+                {client ? `${client.name}` : "Client non trouvé"}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap ml-auto">
+            {!isEditing ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadPDF}
+                  disabled={generatePDFMutation.isPending}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  {generatePDFMutation.isPending ? "Génération..." : "Télécharger PDF"}
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Modifier
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Supprimer
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                  <X className="mr-2 h-4 w-4" />
+                  Annuler
+                </Button>
+                <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
+                  <Save className="mr-2 h-4 w-4" />
+                  Enregistrer
+                </Button>
+              </>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {!isEditing ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownloadPDF}
-                disabled={generatePDFMutation.isPending}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                {generatePDFMutation.isPending ? "Génération..." : "Télécharger PDF"}
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Modifier
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDeleteDialog(true)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Supprimer
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
-                <X className="mr-2 h-4 w-4" />
-                Annuler
-              </Button>
-              <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
-                <Save className="mr-2 h-4 w-4" />
-                Enregistrer
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}

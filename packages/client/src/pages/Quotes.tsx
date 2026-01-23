@@ -123,7 +123,7 @@ export function Quotes() {
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
               <Card>
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-3">
                   <CardDescription>Total devis</CardDescription>
                   <CardTitle className="text-3xl">
                     {stats.total.toLocaleString("fr-FR", {
@@ -138,7 +138,7 @@ export function Quotes() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-3">
                   <CardDescription>En attente</CardDescription>
                   <CardTitle className="text-3xl text-orange-600">
                     {stats.pending.toLocaleString("fr-FR", {
@@ -155,7 +155,7 @@ export function Quotes() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-3">
                   <CardDescription>Acceptés</CardDescription>
                   <CardTitle className="text-3xl text-green-600">
                     {stats.accepted.toLocaleString("fr-FR", {
@@ -175,8 +175,8 @@ export function Quotes() {
         )}
 
         {/* Quotes List */}
-        <Card>
-          <CardHeader className="pb-3">
+        <div>
+          <div className="pb-2">
             <div className="flex flex-col md:flex-row gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -203,17 +203,17 @@ export function Quotes() {
                 </SelectContent>
               </Select>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-              {quotesLoading ? (
-                <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
+          </div>
+          <div>
+            {quotesLoading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
                   <Skeleton key={i} className="h-20 w-full" />
                 ))}
               </div>
             ) : filteredQuotes.length > 0 ? (
-                <div className="rounded-md border">
-                  <Table>
+              <div className="rounded-md border">
+                <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Devis #</TableHead>
@@ -280,8 +280,8 @@ export function Quotes() {
                 </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
