@@ -183,8 +183,8 @@ export function Invoices() {
           )}
 
           {/* Invoices List */}
-          <Card>
-            <CardHeader className="p-2 pb-2">
+          <div>
+            <div className="pb-2">
               <div className="flex flex-col md:flex-row gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -209,8 +209,8 @@ export function Invoices() {
                   </SelectContent>
                 </Select>
               </div>
-            </CardHeader>
-            <CardContent className="p-2 pt-0">
+            </div>
+            <div>
               {invoicesLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
@@ -297,8 +297,8 @@ export function Invoices() {
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
       </div>
     </div>
   );
