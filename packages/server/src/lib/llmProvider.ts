@@ -188,7 +188,7 @@ export class LLMProvider {
 
     // Call OpenAI API
     const response = await this.openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4o-mini",
       max_tokens: maxTokens,
       temperature,
       messages: openaiMessages,

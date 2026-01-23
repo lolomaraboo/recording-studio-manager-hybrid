@@ -344,6 +344,30 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
     expect(response.toLowerCase()).toMatch(/modif|updat|mis à jour|statut|payé|paid|changé|succès|facture|erreur/);
   });
 
+  test('Update invoice issue date', async () => {
+    const response = await sendChatMessage(
+      page,
+      `Change la date d'émission de la facture ${TEST_INVOICE_NUMBER} au 15 janvier 2026`
+    );
+
+    console.log('  Update invoice issue_date response:', response.substring(0, 200));
+    await takeFullPageScreenshot(page, 'chatbot-crud-invoice-update-date');
+
+    expect(response.toLowerCase()).toMatch(/mis à jour|modif|updat|changé|succès|15.*janvier|2026-01-15|émission|facture|erreur/);
+  });
+
+  test('Verify invoice after update', async () => {
+    const response = await sendChatMessage(
+      page,
+      `Vérifie les détails de la facture ${TEST_INVOICE_NUMBER}`
+    );
+
+    console.log('  Verify invoice response:', response.substring(0, 200));
+    await takeFullPageScreenshot(page, 'chatbot-crud-invoice-verify');
+
+    expect(response.toLowerCase()).toMatch(/15.*janvier|2026-01-15|détail|facture|émission/);
+  });
+
   test('Delete invoice', async () => {
     const response = await sendChatMessage(
       page,

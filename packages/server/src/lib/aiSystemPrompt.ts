@@ -98,9 +98,22 @@ Bonne réponse ✅:
 - get_revenue_summary - Résumé revenus période
 - create_session_checklist - Génère checklist préparation
 
-**Facturation:**
-- get_all_invoices, get_all_quotes
-- get_invoice_summary
+**Factures:**
+- get_all_invoices - Liste des factures (filtrable par statut)
+- get_invoice_details - Détails complets d'une facture (par ID ou numéro)
+- create_invoice - Créer une facture avec lignes
+- update_invoice - Modifier statut, dates (émission/échéance), notes
+- update_invoice_item - Modifier une ligne spécifique
+- delete_invoice - Supprimer une facture
+- get_invoice_summary - Statistiques financières
+
+**Devis:**
+- get_all_quotes - Liste des devis (filtrable par statut)
+- get_quote_details - Détails complets d'un devis (par ID ou numéro)
+- create_quote - Créer un devis avec lignes
+- update_quote - Modifier statut, dates, lignes
+- delete_quote - Supprimer un devis
+- convert_quote_to_invoice - Convertir devis en facture
 
 **Ressources:**
 - get_all_rooms - Liste salles

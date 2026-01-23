@@ -6,7 +6,10 @@ import {
   clients,
   clientNotes,
   invoices,
+  invoiceItems,
   quotes,
+  quoteItems,
+  vatRates,
   rooms,
   equipment,
   projects,
@@ -121,11 +124,17 @@ export class AIActionExecutor {
         case "get_all_invoices":
           result = await this.get_all_invoices(params as any);
           break;
+        case "get_invoice_details":
+          result = await this.get_invoice_details(params as any);
+          break;
         case "create_invoice":
           result = await this.create_invoice(params as any);
           break;
         case "update_invoice":
           result = await this.update_invoice(params as any);
+          break;
+        case "update_invoice_item":
+          result = await this.update_invoice_item(params as any);
           break;
         case "delete_invoice":
           result = await this.delete_invoice(params as any);
@@ -137,6 +146,9 @@ export class AIActionExecutor {
         // Quotes
         case "get_all_quotes":
           result = await this.get_all_quotes(params as any);
+          break;
+        case "get_quote_details":
+          result = await this.get_quote_details(params as any);
           break;
         case "create_quote":
           result = await this.create_quote(params as any);
@@ -651,7 +663,46 @@ export class AIActionExecutor {
   }
 
   // ============================================================================
-  // INVOICES ACTIONS (5)
+  // HELPER: Calculate totals from items
+  // ============================================================================
+
+  private calculateTotalsFromItems(
+    items: Array<{ description: string; quantity?: number; unit_price: number; tax_rate?: number }>,
+    defaultTaxRate: number = 20.0
+  ) {
+    let subtotal = 0;
+    let totalTax = 0;
+
+    const processedItems = items.map((item) => {
+      const qty = item.quantity || 1;
+      const amount = qty * item.unit_price;
+      const itemTaxRate = item.tax_rate ?? defaultTaxRate;
+      const itemTax = (amount * itemTaxRate) / 100;
+      subtotal += amount;
+      totalTax += itemTax;
+      return {
+        description: item.description,
+        quantity: qty,
+        unitPrice: item.unit_price,
+        amount,
+        taxRate: itemTaxRate,
+      };
+    });
+
+    // Weighted average tax rate
+    const weightedTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : defaultTaxRate;
+
+    return {
+      processedItems,
+      subtotal,
+      taxAmount: totalTax,
+      total: subtotal + totalTax,
+      taxRate: weightedTaxRate,
+    };
+  }
+
+  // ============================================================================
+  // INVOICES ACTIONS (6)
   // ============================================================================
 
   async get_all_invoices(params: { status?: string; limit?: number } = {}) {
@@ -669,30 +720,102 @@ export class AIActionExecutor {
     };
   }
 
+  async get_invoice_details(params: { invoice_id?: number; invoice_number?: string }) {
+    const { invoice_id, invoice_number } = params;
+
+    if (!invoice_id && !invoice_number) {
+      throw new Error("Veuillez fournir invoice_id ou invoice_number");
+    }
+
+    // Find invoice
+    let invoiceResult;
+    if (invoice_id) {
+      invoiceResult = await this.db
+        .select()
+        .from(invoices)
+        .where(eq(invoices.id, invoice_id))
+        .limit(1);
+    } else {
+      invoiceResult = await this.db
+        .select()
+        .from(invoices)
+        .where(eq(invoices.invoiceNumber, invoice_number!))
+        .limit(1);
+    }
+
+    if (invoiceResult.length === 0) {
+      throw new Error(`Facture ${invoice_id || invoice_number} introuvable`);
+    }
+
+    const invoice = invoiceResult[0];
+
+    // Get items
+    const items = await this.db
+      .select()
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, invoice.id));
+
+    // Get client info
+    const clientResult = await this.db
+      .select({ id: clients.id, name: clients.name, email: clients.email })
+      .from(clients)
+      .where(eq(clients.id, invoice.clientId))
+      .limit(1);
+
+    return {
+      invoice,
+      items: items.map((item) => ({
+        id: item.id,
+        description: item.description,
+        quantity: parseFloat(item.quantity || "1"),
+        unit_price: parseFloat(item.unitPrice || "0"),
+        amount: parseFloat(item.amount || "0"),
+        vat_rate_id: item.vatRateId,
+      })),
+      client: clientResult[0] || null,
+      items_count: items.length,
+    };
+  }
+
   async create_invoice(params: {
     client_id: number;
     invoice_number: string;
     issue_date: string;
     due_date: string;
-    subtotal: number;
+    subtotal?: number;
     tax_rate?: number;
     notes?: string;
-    items?: Array<{ description: string; quantity: number; unit_price: number }>;
+    items?: Array<{ description: string; quantity?: number; unit_price: number; tax_rate?: number }>;
   }) {
     const {
       client_id,
       invoice_number,
       issue_date,
       due_date,
-      subtotal,
       tax_rate = 20.0,
       notes,
       items = [],
     } = params;
 
-    // Calculate tax and total
-    const taxAmount = (subtotal * tax_rate) / 100;
-    const total = subtotal + taxAmount;
+    let finalSubtotal: number;
+    let finalTaxAmount: number;
+    let finalTotal: number;
+    let finalTaxRate: number;
+
+    if (items.length > 0) {
+      // Calculate from items
+      const calc = this.calculateTotalsFromItems(items, tax_rate);
+      finalSubtotal = calc.subtotal;
+      finalTaxAmount = calc.taxAmount;
+      finalTotal = calc.total;
+      finalTaxRate = calc.taxRate;
+    } else {
+      // Use provided subtotal
+      finalSubtotal = params.subtotal || 0;
+      finalTaxRate = tax_rate;
+      finalTaxAmount = (finalSubtotal * finalTaxRate) / 100;
+      finalTotal = finalSubtotal + finalTaxAmount;
+    }
 
     // Create invoice
     const [invoice] = await this.db
@@ -703,51 +826,274 @@ export class AIActionExecutor {
         issueDate: new Date(issue_date),
         dueDate: new Date(due_date),
         status: "draft",
-        subtotal: subtotal.toString(),
-        taxRate: tax_rate.toString(),
-        taxAmount: taxAmount.toString(),
-        total: total.toString(),
+        subtotal: finalSubtotal.toFixed(2),
+        taxRate: finalTaxRate.toFixed(2),
+        taxAmount: finalTaxAmount.toFixed(2),
+        total: finalTotal.toFixed(2),
         notes,
       })
       .returning();
 
+    // Create items if provided
+    let createdItems: any[] = [];
+    if (items.length > 0) {
+      const itemValues = items.map((item) => {
+        const qty = item.quantity || 1;
+        const amount = qty * item.unit_price;
+        return {
+          invoiceId: invoice.id,
+          description: item.description,
+          quantity: qty.toFixed(2),
+          unitPrice: item.unit_price.toFixed(2),
+          amount: amount.toFixed(2),
+        };
+      });
+
+      createdItems = await this.db
+        .insert(invoiceItems)
+        .values(itemValues)
+        .returning();
+    }
+
     return {
       invoice,
-      message: `Facture ${invoice_number} créée avec succès`,
+      items: createdItems,
+      message: `Facture ${invoice_number} créée avec ${createdItems.length} ligne(s)`,
     };
   }
 
   async update_invoice(params: {
-    invoice_id: number;
+    invoice_id?: number;
+    invoice_number?: string;
     status?: string;
+    issue_date?: string;
     due_date?: string;
     notes?: string;
     paid_at?: string;
+    items?: Array<{ description: string; quantity?: number; unit_price: number; tax_rate?: number }>;
   }) {
-    const { invoice_id, status, due_date, notes, paid_at } = params;
+    const { invoice_id, invoice_number, status, issue_date, due_date, notes, paid_at, items } = params;
 
-    const updateData: any = {};
+    if (!invoice_id && !invoice_number) {
+      throw new Error("Veuillez fournir invoice_id ou invoice_number");
+    }
+
+    // Resolve invoice ID from invoice_number if needed
+    let resolvedInvoiceId = invoice_id;
+    if (!resolvedInvoiceId && invoice_number) {
+      const found = await this.db
+        .select({ id: invoices.id })
+        .from(invoices)
+        .where(eq(invoices.invoiceNumber, invoice_number))
+        .limit(1);
+      if (found.length === 0) {
+        throw new Error(`Facture "${invoice_number}" introuvable`);
+      }
+      resolvedInvoiceId = found[0].id;
+    }
+
+    const updateData: any = { updatedAt: new Date() };
     if (status) updateData.status = status;
+    if (issue_date) updateData.issueDate = new Date(issue_date);
     if (due_date) updateData.dueDate = new Date(due_date);
     if (notes !== undefined) updateData.notes = notes;
     if (paid_at) updateData.paidAt = new Date(paid_at);
-    updateData.updatedAt = new Date();
+
+
+    // If items provided, replace all existing items and recalculate totals
+    if (items && items.length > 0) {
+      // Delete existing items
+      await this.db
+        .delete(invoiceItems)
+        .where(eq(invoiceItems.invoiceId, resolvedInvoiceId!));
+
+      // Calculate new totals
+      const calc = this.calculateTotalsFromItems(items);
+      updateData.subtotal = calc.subtotal.toFixed(2);
+      updateData.taxRate = calc.taxRate.toFixed(2);
+      updateData.taxAmount = calc.taxAmount.toFixed(2);
+      updateData.total = calc.total.toFixed(2);
+
+      // Insert new items
+      const itemValues = items.map((item) => {
+        const qty = item.quantity || 1;
+        const amount = qty * item.unit_price;
+        return {
+          invoiceId: resolvedInvoiceId!,
+          description: item.description,
+          quantity: qty.toFixed(2),
+          unitPrice: item.unit_price.toFixed(2),
+          amount: amount.toFixed(2),
+        };
+      });
+
+      await this.db.insert(invoiceItems).values(itemValues);
+    }
 
     const [updated] = await this.db
       .update(invoices)
       .set(updateData)
-      .where(eq(invoices.id, invoice_id))
+      .where(eq(invoices.id, resolvedInvoiceId!))
       .returning();
+
+    if (!updated) {
+      throw new Error(`Facture #${resolvedInvoiceId} introuvable`);
+    }
 
     return {
       invoice: updated,
-      message: `Facture #${invoice_id} mise à jour`,
+      items_updated: items ? items.length : 0,
+      message: items
+        ? `Facture #${resolvedInvoiceId} mise à jour avec ${items.length} ligne(s)`
+        : `Facture #${resolvedInvoiceId} mise à jour`,
+    };
+  }
+
+  async update_invoice_item(params: {
+    invoice_id?: number;
+    invoice_number?: string;
+    item_id?: number;
+    item_description?: string;
+    quantity?: number;
+    unit_price?: number;
+    tax_rate?: number;
+    description?: string;
+  }) {
+    const { invoice_id, invoice_number, item_id, item_description, quantity, unit_price, tax_rate, description } = params;
+
+    if (!invoice_id && !invoice_number) {
+      throw new Error("Veuillez fournir invoice_id ou invoice_number");
+    }
+
+    // Resolve invoice ID
+    let resolvedInvoiceId = invoice_id;
+    if (!resolvedInvoiceId && invoice_number) {
+      const found = await this.db
+        .select({ id: invoices.id })
+        .from(invoices)
+        .where(eq(invoices.invoiceNumber, invoice_number))
+        .limit(1);
+      if (found.length === 0) {
+        throw new Error(`Facture "${invoice_number}" introuvable`);
+      }
+      resolvedInvoiceId = found[0].id;
+    }
+
+    // Find the item to update
+    const existingItems = await this.db
+      .select()
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, resolvedInvoiceId!));
+
+    if (existingItems.length === 0) {
+      throw new Error(`Aucune ligne trouvée pour la facture #${resolvedInvoiceId}`);
+    }
+
+    // Find target item by ID or description match
+    let targetItem;
+    if (item_id) {
+      targetItem = existingItems.find((i) => i.id === item_id);
+    } else if (item_description) {
+      targetItem = existingItems.find((i) =>
+        i.description.toLowerCase().includes(item_description.toLowerCase())
+      );
+    }
+
+    if (!targetItem) {
+      const itemNames = existingItems.map((i) => `"${i.description}"`).join(", ");
+      throw new Error(
+        `Ligne introuvable. Lignes disponibles: ${itemNames}`
+      );
+    }
+
+    // Build update for the item
+    const itemUpdate: any = {};
+    if (quantity !== undefined) {
+      itemUpdate.quantity = quantity.toFixed(2);
+      itemUpdate.amount = (quantity * parseFloat(targetItem.unitPrice)).toFixed(2);
+    }
+    if (unit_price !== undefined) {
+      itemUpdate.unitPrice = unit_price.toFixed(2);
+      const qty = quantity !== undefined ? quantity : parseFloat(targetItem.quantity);
+      itemUpdate.amount = (qty * unit_price).toFixed(2);
+    }
+    if (description !== undefined) {
+      itemUpdate.description = description;
+    }
+
+    if (Object.keys(itemUpdate).length === 0) {
+      throw new Error("Aucune modification spécifiée (quantity, unit_price, ou description requis)");
+    }
+
+    // Update the item
+    await this.db
+      .update(invoiceItems)
+      .set(itemUpdate)
+      .where(eq(invoiceItems.id, targetItem.id));
+
+    // Recalculate invoice totals from all items
+    const updatedItems = await this.db
+      .select()
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, resolvedInvoiceId!));
+
+    let subtotal = 0;
+    let totalTax = 0;
+    for (const item of updatedItems) {
+      const amount = parseFloat(item.amount);
+      subtotal += amount;
+      // Get vat rate for item if available
+      if (item.vatRateId) {
+        const vr = await this.db
+          .select()
+          .from(vatRates)
+          .where(eq(vatRates.id, item.vatRateId))
+          .limit(1);
+        if (vr.length > 0) {
+          totalTax += (amount * parseFloat(vr[0].rate)) / 100;
+        }
+      } else {
+        // Default 20% if no vat rate specified
+        totalTax += (amount * (tax_rate || 20)) / 100;
+      }
+    }
+
+    const total = subtotal + totalTax;
+    const weightedTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : 20;
+
+    await this.db
+      .update(invoices)
+      .set({
+        subtotal: subtotal.toFixed(2),
+        taxRate: weightedTaxRate.toFixed(2),
+        taxAmount: totalTax.toFixed(2),
+        total: total.toFixed(2),
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, resolvedInvoiceId!));
+
+    return {
+      message: `Ligne "${targetItem.description}" mise à jour sur la facture #${resolvedInvoiceId}`,
+      item: {
+        id: targetItem.id,
+        description: description || targetItem.description,
+        quantity: quantity !== undefined ? quantity : parseFloat(targetItem.quantity),
+        unit_price: unit_price !== undefined ? unit_price : parseFloat(targetItem.unitPrice),
+        amount: parseFloat(itemUpdate.amount || targetItem.amount),
+      },
+      invoice_totals: {
+        subtotal,
+        tax_amount: totalTax,
+        total,
+      },
     };
   }
 
   async delete_invoice(params: { invoice_id: number }) {
     const { invoice_id } = params;
 
+    // Items are deleted by CASCADE, but let's be explicit
+    await this.db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, invoice_id));
     await this.db.delete(invoices).where(eq(invoices.id, invoice_id));
 
     return {
@@ -797,7 +1143,7 @@ export class AIActionExecutor {
   }
 
   // ============================================================================
-  // QUOTES ACTIONS (5)
+  // QUOTES ACTIONS (6)
   // ============================================================================
 
   async get_all_quotes(params: { status?: string; limit?: number } = {}) {
@@ -815,30 +1161,103 @@ export class AIActionExecutor {
     };
   }
 
+  async get_quote_details(params: { quote_id?: number; quote_number?: string }) {
+    const { quote_id, quote_number } = params;
+
+    if (!quote_id && !quote_number) {
+      throw new Error("Veuillez fournir quote_id ou quote_number");
+    }
+
+    // Find quote
+    let quoteResult;
+    if (quote_id) {
+      quoteResult = await this.db
+        .select()
+        .from(quotes)
+        .where(eq(quotes.id, quote_id))
+        .limit(1);
+    } else {
+      quoteResult = await this.db
+        .select()
+        .from(quotes)
+        .where(eq(quotes.quoteNumber, quote_number!))
+        .limit(1);
+    }
+
+    if (quoteResult.length === 0) {
+      throw new Error(`Devis ${quote_id || quote_number} introuvable`);
+    }
+
+    const quote = quoteResult[0];
+
+    // Get items
+    const items = await this.db
+      .select()
+      .from(quoteItems)
+      .where(eq(quoteItems.quoteId, quote.id));
+
+    // Get client info
+    const clientResult = await this.db
+      .select({ id: clients.id, name: clients.name, email: clients.email })
+      .from(clients)
+      .where(eq(clients.id, quote.clientId))
+      .limit(1);
+
+    return {
+      quote,
+      items: items.map((item) => ({
+        id: item.id,
+        description: item.description,
+        quantity: parseFloat(item.quantity || "1"),
+        unit_price: parseFloat(item.unitPrice || "0"),
+        amount: parseFloat(item.amount || "0"),
+        vat_rate_id: item.vatRateId,
+        display_order: item.displayOrder,
+      })),
+      client: clientResult[0] || null,
+      items_count: items.length,
+    };
+  }
+
   async create_quote(params: {
     client_id: number;
     quote_number: string;
     valid_until: string;
-    subtotal: number;
+    subtotal?: number;
     tax_rate?: number;
     title?: string;
     description?: string;
     project_id?: number;
+    items?: Array<{ description: string; quantity?: number; unit_price: number; tax_rate?: number }>;
   }) {
     const {
       client_id,
       quote_number,
       valid_until,
-      subtotal,
       tax_rate = 20.0,
       title,
       description,
       project_id,
+      items = [],
     } = params;
 
-    // Calculate tax and total
-    const taxAmount = (subtotal * tax_rate) / 100;
-    const total = subtotal + taxAmount;
+    let finalSubtotal: number;
+    let finalTaxAmount: number;
+    let finalTotal: number;
+    let finalTaxRate: number;
+
+    if (items.length > 0) {
+      const calc = this.calculateTotalsFromItems(items, tax_rate);
+      finalSubtotal = calc.subtotal;
+      finalTaxAmount = calc.taxAmount;
+      finalTotal = calc.total;
+      finalTaxRate = calc.taxRate;
+    } else {
+      finalSubtotal = params.subtotal || 0;
+      finalTaxRate = tax_rate;
+      finalTaxAmount = (finalSubtotal * finalTaxRate) / 100;
+      finalTotal = finalSubtotal + finalTaxAmount;
+    }
 
     const [quote] = await this.db
       .insert(quotes)
@@ -847,17 +1266,40 @@ export class AIActionExecutor {
         quoteNumber: quote_number,
         expiresAt: new Date(valid_until),
         status: "draft",
-        subtotal: subtotal.toString(),
-        taxRate: tax_rate.toString(),
-        taxAmount: taxAmount.toString(),
-        total: total.toString(),
+        subtotal: finalSubtotal.toFixed(2),
+        taxRate: finalTaxRate.toFixed(2),
+        taxAmount: finalTaxAmount.toFixed(2),
+        total: finalTotal.toFixed(2),
         notes: description,
       })
       .returning();
 
+    // Create items if provided
+    let createdItems: any[] = [];
+    if (items.length > 0) {
+      const itemValues = items.map((item, index) => {
+        const qty = item.quantity || 1;
+        const amount = qty * item.unit_price;
+        return {
+          quoteId: quote.id,
+          description: item.description,
+          quantity: qty.toFixed(2),
+          unitPrice: item.unit_price.toFixed(2),
+          amount: amount.toFixed(2),
+          displayOrder: index,
+        };
+      });
+
+      createdItems = await this.db
+        .insert(quoteItems)
+        .values(itemValues)
+        .returning();
+    }
+
     return {
       quote,
-      message: `Devis ${quote_number} créé avec succès`,
+      items: createdItems,
+      message: `Devis ${quote_number} créé avec ${createdItems.length} ligne(s)`,
     };
   }
 
@@ -867,14 +1309,48 @@ export class AIActionExecutor {
     valid_until?: string;
     title?: string;
     description?: string;
+    notes?: string;
+    items?: Array<{ description: string; quantity?: number; unit_price: number; tax_rate?: number }>;
   }) {
-    const { quote_id, status, valid_until, title, description } = params;
+    const { quote_id, status, valid_until, title, description, notes, items } = params;
 
     const updateData: any = { updatedAt: new Date() };
     if (status) updateData.status = status;
-    if (valid_until) updateData.validUntil = new Date(valid_until);
+    if (valid_until) updateData.expiresAt = new Date(valid_until);
     if (title !== undefined) updateData.title = title;
-    if (description !== undefined) updateData.description = description;
+    if (description !== undefined) updateData.notes = description;
+    if (notes !== undefined) updateData.notes = notes;
+
+    // If items provided, replace all existing items and recalculate totals
+    if (items && items.length > 0) {
+      // Delete existing items
+      await this.db
+        .delete(quoteItems)
+        .where(eq(quoteItems.quoteId, quote_id));
+
+      // Calculate new totals
+      const calc = this.calculateTotalsFromItems(items);
+      updateData.subtotal = calc.subtotal.toFixed(2);
+      updateData.taxRate = calc.taxRate.toFixed(2);
+      updateData.taxAmount = calc.taxAmount.toFixed(2);
+      updateData.total = calc.total.toFixed(2);
+
+      // Insert new items
+      const itemValues = items.map((item, index) => {
+        const qty = item.quantity || 1;
+        const amount = qty * item.unit_price;
+        return {
+          quoteId: quote_id,
+          description: item.description,
+          quantity: qty.toFixed(2),
+          unitPrice: item.unit_price.toFixed(2),
+          amount: amount.toFixed(2),
+          displayOrder: index,
+        };
+      });
+
+      await this.db.insert(quoteItems).values(itemValues);
+    }
 
     const [updated] = await this.db
       .update(quotes)
@@ -882,15 +1358,24 @@ export class AIActionExecutor {
       .where(eq(quotes.id, quote_id))
       .returning();
 
+    if (!updated) {
+      throw new Error(`Devis #${quote_id} introuvable`);
+    }
+
     return {
       quote: updated,
-      message: `Devis #${quote_id} mis à jour`,
+      items_updated: items ? items.length : 0,
+      message: items
+        ? `Devis #${quote_id} mis à jour avec ${items.length} ligne(s)`
+        : `Devis #${quote_id} mis à jour`,
     };
   }
 
   async delete_quote(params: { quote_id: number }) {
     const { quote_id } = params;
 
+    // Items are deleted by CASCADE, but be explicit
+    await this.db.delete(quoteItems).where(eq(quoteItems.quoteId, quote_id));
     await this.db.delete(quotes).where(eq(quotes.id, quote_id));
 
     return {
@@ -912,7 +1397,7 @@ export class AIActionExecutor {
       throw new Error(`Devis #${quote_id} introuvable`);
     }
 
-    if (quote.status === "converted") {
+    if (quote.status === "converted_to_project") {
       throw new Error(`Devis #${quote_id} déjà converti`);
     }
 
@@ -936,8 +1421,26 @@ export class AIActionExecutor {
       })
       .returning();
 
-    // Update quote status (note: quotes convert to projects in the schema, not invoices)
-    // This marks the quote as converted_to_project status
+    // Copy quote items to invoice items
+    const existingItems = await this.db
+      .select()
+      .from(quoteItems)
+      .where(eq(quoteItems.quoteId, quote_id));
+
+    if (existingItems.length > 0) {
+      const invoiceItemValues = existingItems.map((item) => ({
+        invoiceId: invoice.id,
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        amount: item.amount,
+        vatRateId: item.vatRateId,
+      }));
+
+      await this.db.insert(invoiceItems).values(invoiceItemValues);
+    }
+
+    // Update quote status
     await this.db
       .update(quotes)
       .set({
@@ -949,7 +1452,8 @@ export class AIActionExecutor {
     return {
       invoice,
       quote,
-      message: `Devis ${quote.quoteNumber} converti en facture ${invoiceNumber}`,
+      items_copied: existingItems.length,
+      message: `Devis ${quote.quoteNumber} converti en facture ${invoiceNumber} avec ${existingItems.length} ligne(s)`,
     };
   }
 

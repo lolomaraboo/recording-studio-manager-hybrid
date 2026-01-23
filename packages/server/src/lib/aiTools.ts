@@ -361,7 +361,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
 
   // ============================================================================
-  // INVOICES TOOLS (5)
+  // INVOICES TOOLS (6)
   // ============================================================================
   {
     name: "get_all_invoices",
@@ -376,6 +376,23 @@ export const AI_TOOLS: ToolDefinition[] = [
         limit: {
           type: "number",
           description: "Nombre maximum de résultats (défaut: 50)",
+        },
+      },
+    },
+  },
+  {
+    name: "get_invoice_details",
+    description: "Récupère les détails complets d'une facture spécifique, y compris toutes ses lignes (items) et le client associé.",
+    input_schema: {
+      type: "object",
+      properties: {
+        invoice_id: {
+          type: "number",
+          description: "ID de la facture",
+        },
+        invoice_number: {
+          type: "string",
+          description: "Numéro de facture (ex: INV-2025-001). Utilisé si invoice_id n'est pas fourni.",
         },
       },
     },
@@ -416,14 +433,28 @@ export const AI_TOOLS: ToolDefinition[] = [
         },
         items: {
           type: "array",
-          description: "Lignes de facturation (optionnel)",
+          description: "Lignes de facturation (optionnel). Si fourni, le subtotal est calculé automatiquement depuis les lignes.",
           items: {
             type: "object",
             properties: {
-              description: { type: "string" },
-              quantity: { type: "number" },
-              unit_price: { type: "number" },
+              description: {
+                type: "string",
+                description: "Description de la ligne",
+              },
+              quantity: {
+                type: "number",
+                description: "Quantité (défaut: 1)",
+              },
+              unit_price: {
+                type: "number",
+                description: "Prix unitaire HT en euros",
+              },
+              tax_rate: {
+                type: "number",
+                description: "Taux de TVA pour cette ligne en % (défaut: 20)",
+              },
             },
+            required: ["description", "unit_price"],
           },
         },
       },
@@ -432,17 +463,25 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "update_invoice",
-    description: "Met à jour une facture existante (statut, date d'échéance, paiement).",
+    description: "Met à jour une facture existante (statut, dates, notes). Pour modifier les lignes, utiliser update_invoice_item. Si 'items' est fourni, TOUTES les anciennes lignes sont remplacées par les nouvelles.",
     input_schema: {
       type: "object",
       properties: {
         invoice_id: {
           type: "number",
-          description: "ID de la facture à modifier",
+          description: "ID numérique de la facture",
+        },
+        invoice_number: {
+          type: "string",
+          description: "Numéro de facture (ex: INV-xxx). Alternative à invoice_id.",
         },
         status: {
           type: "string",
           description: "Nouveau statut: draft, sent, paid, overdue, cancelled",
+        },
+        issue_date: {
+          type: "string",
+          description: "Nouvelle date d'émission (ISO 8601: YYYY-MM-DD)",
         },
         due_date: {
           type: "string",
@@ -456,8 +495,72 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "string",
           description: "Date de paiement (ISO 8601: YYYY-MM-DD) - marque comme payée",
         },
+        items: {
+          type: "array",
+          description: "ATTENTION: REMPLACE toutes les lignes existantes. Pour modifier une seule ligne, utiliser update_invoice_item à la place.",
+          items: {
+            type: "object",
+            properties: {
+              description: {
+                type: "string",
+                description: "Description de la ligne",
+              },
+              quantity: {
+                type: "number",
+                description: "Quantité (défaut: 1)",
+              },
+              unit_price: {
+                type: "number",
+                description: "Prix unitaire HT en euros",
+              },
+              tax_rate: {
+                type: "number",
+                description: "Taux de TVA pour cette ligne en % (défaut: 20)",
+              },
+            },
+            required: ["description", "unit_price"],
+          },
+        },
       },
-      required: ["invoice_id"],
+      required: [],
+    },
+  },
+  {
+    name: "update_invoice_item",
+    description: "Modifie une ligne spécifique d'une facture (quantité, prix unitaire, description). Recalcule automatiquement les totaux de la facture. Utiliser ce tool pour modifier une seule ligne sans toucher aux autres.",
+    input_schema: {
+      type: "object",
+      properties: {
+        invoice_id: {
+          type: "number",
+          description: "ID numérique de la facture",
+        },
+        invoice_number: {
+          type: "string",
+          description: "Numéro de facture (ex: INV-xxx). Alternative à invoice_id.",
+        },
+        item_id: {
+          type: "number",
+          description: "ID de la ligne à modifier (obtenu via get_invoice_details)",
+        },
+        item_description: {
+          type: "string",
+          description: "Texte de description de la ligne à modifier (recherche partielle). Alternative à item_id.",
+        },
+        quantity: {
+          type: "number",
+          description: "Nouvelle quantité",
+        },
+        unit_price: {
+          type: "number",
+          description: "Nouveau prix unitaire HT",
+        },
+        description: {
+          type: "string",
+          description: "Nouvelle description de la ligne",
+        },
+      },
+      required: [],
     },
   },
   {
@@ -489,7 +592,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
 
   // ============================================================================
-  // QUOTES TOOLS (5)
+  // QUOTES TOOLS (6)
   // ============================================================================
   {
     name: "get_all_quotes",
@@ -509,8 +612,25 @@ export const AI_TOOLS: ToolDefinition[] = [
     },
   },
   {
+    name: "get_quote_details",
+    description: "Récupère les détails complets d'un devis spécifique, y compris toutes ses lignes (items) et le client associé.",
+    input_schema: {
+      type: "object",
+      properties: {
+        quote_id: {
+          type: "number",
+          description: "ID du devis",
+        },
+        quote_number: {
+          type: "string",
+          description: "Numéro de devis (ex: QT-2025-001). Utilisé si quote_id n'est pas fourni.",
+        },
+      },
+    },
+  },
+  {
     name: "create_quote",
-    description: "Crée un nouveau devis avec calcul automatique des taxes et date de validité.",
+    description: "Crée un nouveau devis avec calcul automatique des taxes et date de validité. Si des items sont fournis, le subtotal est calculé automatiquement.",
     input_schema: {
       type: "object",
       properties: {
@@ -528,11 +648,11 @@ export const AI_TOOLS: ToolDefinition[] = [
         },
         subtotal: {
           type: "number",
-          description: "Montant HT en euros",
+          description: "Montant HT en euros (ignoré si items fournis, car calculé automatiquement)",
         },
         tax_rate: {
           type: "number",
-          description: "Taux de TVA en pourcentage (défaut: 20.0)",
+          description: "Taux de TVA en pourcentage (défaut: 20.0). Utilisé uniquement si pas d'items avec tax_rate individuel.",
         },
         title: {
           type: "string",
@@ -546,13 +666,39 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du projet associé (optionnel)",
         },
+        items: {
+          type: "array",
+          description: "Lignes du devis. Si fourni, les totaux sont calculés automatiquement.",
+          items: {
+            type: "object",
+            properties: {
+              description: {
+                type: "string",
+                description: "Description de la prestation",
+              },
+              quantity: {
+                type: "number",
+                description: "Quantité (défaut: 1)",
+              },
+              unit_price: {
+                type: "number",
+                description: "Prix unitaire HT en euros",
+              },
+              tax_rate: {
+                type: "number",
+                description: "Taux de TVA pour cette ligne en % (défaut: 20)",
+              },
+            },
+            required: ["description", "unit_price"],
+          },
+        },
       },
-      required: ["client_id", "quote_number", "valid_until", "subtotal"],
+      required: ["client_id", "quote_number", "valid_until"],
     },
   },
   {
     name: "update_quote",
-    description: "Met à jour un devis existant (statut, date de validité, description).",
+    description: "Met à jour un devis existant. Peut modifier le statut, les dates, les notes, ET les lignes (items). Si 'items' est fourni, les anciennes lignes sont remplacées et les totaux recalculés.",
     input_schema: {
       type: "object",
       properties: {
@@ -575,6 +721,36 @@ export const AI_TOOLS: ToolDefinition[] = [
         description: {
           type: "string",
           description: "Nouvelle description",
+        },
+        notes: {
+          type: "string",
+          description: "Notes client",
+        },
+        items: {
+          type: "array",
+          description: "Nouvelles lignes du devis. REMPLACE toutes les lignes existantes. Les totaux sont recalculés automatiquement.",
+          items: {
+            type: "object",
+            properties: {
+              description: {
+                type: "string",
+                description: "Description de la prestation",
+              },
+              quantity: {
+                type: "number",
+                description: "Quantité (défaut: 1)",
+              },
+              unit_price: {
+                type: "number",
+                description: "Prix unitaire HT en euros",
+              },
+              tax_rate: {
+                type: "number",
+                description: "Taux de TVA pour cette ligne en % (défaut: 20)",
+              },
+            },
+            required: ["description", "unit_price"],
+          },
         },
       },
       required: ["quote_id"],
