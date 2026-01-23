@@ -338,7 +338,7 @@ export default function InvoiceDetail() {
               </div>
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap ml-auto">
             {!isEditing ? (
               <>
                 <Button variant="outline" onClick={handleDownloadPDF}>
