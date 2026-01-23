@@ -94,6 +94,36 @@ async function getLastAssistantMessage(page: Page): Promise<string> {
   return (await assistantMessages.nth(count - 1).textContent()) || '';
 }
 
+// ============================================================
+// tRPC API Verification Helpers
+// ============================================================
+
+const TRPC_URL = 'http://localhost:3001/api/trpc';
+const TEST_HEADERS = {
+  'content-type': 'application/json',
+  'x-test-user-id': '18',
+  'x-test-org-id': '24',
+};
+
+/**
+ * Call a tRPC query endpoint directly via HTTP to verify database state.
+ * For queries: GET with encoded input.
+ */
+async function trpcQuery(procedure: string, input?: Record<string, unknown>): Promise<any> {
+  const url = input
+    ? `${TRPC_URL}/${procedure}?input=${encodeURIComponent(JSON.stringify(input))}`
+    : `${TRPC_URL}/${procedure}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: TEST_HEADERS,
+  });
+  if (!response.ok) {
+    throw new Error(`tRPC query ${procedure} failed: ${response.status} ${await response.text()}`);
+  }
+  const json = await response.json();
+  return json.result?.data;
+}
+
 /**
  * Login and navigate to chat page, handling both local dev and production modes.
  * In local dev mode, the app uses test headers (x-test-user-id) so no login is needed.
@@ -130,6 +160,7 @@ test.describe('Chatbot CRUD - Clients', () => {
   test.describe.configure({ mode: 'serial' });
 
   let page: Page;
+  let createdClientId: number;
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -150,6 +181,25 @@ test.describe('Chatbot CRUD - Clients', () => {
     await takeFullPageScreenshot(page, 'chatbot-crud-client-create');
 
     expect(response.toLowerCase()).toMatch(/cré|créé|created|client|succès|ajouté/);
+
+    // Verify via tRPC API
+    await test.step('Verify client exists via tRPC API', async () => {
+      const clients = await trpcQuery('clients.list', { search: TEST_CLIENT_NAME, limit: 10, offset: 0 });
+      expect(clients).toBeDefined();
+      expect(Array.isArray(clients)).toBe(true);
+
+      const createdClient = clients.find((c: any) =>
+        c.name?.includes(TEST_CLIENT_NAME) && c.email === TEST_CLIENT_EMAIL
+      );
+
+      expect(createdClient).toBeDefined();
+      expect(createdClient.name).toBe(TEST_CLIENT_NAME);
+      expect(createdClient.email).toBe(TEST_CLIENT_EMAIL);
+      expect(createdClient.phone).toBe('0612345678');
+
+      createdClientId = createdClient.id;
+      console.log(`  ✓ Client verified via API: ID ${createdClientId}`);
+    });
   });
 
   test('List clients', async () => {
@@ -166,6 +216,8 @@ test.describe('Chatbot CRUD - Clients', () => {
   });
 
   test('Update client', async () => {
+    expect(createdClientId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Mets à jour le client ${TEST_CLIENT_NAME} en changeant son email à e2e-updated-${RUN_ID}@test.com. Utilise son ID que tu as obtenu lors de la création.`
@@ -176,9 +228,19 @@ test.describe('Chatbot CRUD - Clients', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/modif|updat|mis à jour|changé|succès|client|email|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify client email updated via tRPC API', async () => {
+      const client = await trpcQuery('clients.get', { id: createdClientId });
+      expect(client).toBeDefined();
+      expect(client.email).toBe(`e2e-updated-${RUN_ID}@test.com`);
+      console.log(`  ✓ Client email verified via API: ${client.email}`);
+    });
   });
 
   test('Delete client', async () => {
+    expect(createdClientId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Supprime le client ${TEST_CLIENT_NAME}. Utilise son ID.`
@@ -189,6 +251,14 @@ test.describe('Chatbot CRUD - Clients', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/supprim|delet|retir|succès|client|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify client deleted via tRPC API', async () => {
+      const clients = await trpcQuery('clients.list', { search: TEST_CLIENT_NAME, limit: 10, offset: 0 });
+      const deletedClient = clients.find((c: any) => c.id === createdClientId);
+      expect(deletedClient).toBeUndefined();
+      console.log(`  ✓ Client deletion verified via API: ID ${createdClientId} not found`);
+    });
   });
 });
 
@@ -200,6 +270,7 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
   test.describe.configure({ mode: 'serial' });
 
   let page: Page;
+  let createdQuoteId: number;
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -220,6 +291,22 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
     await takeFullPageScreenshot(page, 'chatbot-crud-quote-create');
 
     expect(response.toLowerCase()).toMatch(/cré|devis|créé|succès|quote/);
+
+    // Verify via tRPC API
+    await test.step('Verify quote exists via tRPC API', async () => {
+      const quotes = await trpcQuery('quotes.list', { limit: 100, offset: 0 });
+      expect(quotes).toBeDefined();
+      expect(Array.isArray(quotes)).toBe(true);
+
+      const createdQuote = quotes.find((q: any) => q.quoteNumber === TEST_QUOTE_NUMBER);
+
+      expect(createdQuote).toBeDefined();
+      expect(createdQuote.quoteNumber).toBe(TEST_QUOTE_NUMBER);
+      expect(createdQuote.title).toBe('Session Enregistrement E2E');
+
+      createdQuoteId = createdQuote.id;
+      console.log(`  ✓ Quote verified via API: ID ${createdQuoteId}`);
+    });
   });
 
   test('List quotes', async () => {
@@ -249,6 +336,8 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
   });
 
   test('Update quote status', async () => {
+    expect(createdQuoteId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Mets à jour le statut du devis ${TEST_QUOTE_NUMBER} en "sent". Utilise son ID.`
@@ -259,9 +348,19 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/modif|updat|mis à jour|statut|sent|envoyé|changé|succès|devis|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify quote status updated via tRPC API', async () => {
+      const quote = await trpcQuery('quotes.get', { id: createdQuoteId });
+      expect(quote).toBeDefined();
+      expect(quote.status).toBe('sent');
+      console.log(`  ✓ Quote status verified via API: ${quote.status}`);
+    });
   });
 
   test('Delete quote', async () => {
+    expect(createdQuoteId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Supprime le devis ${TEST_QUOTE_NUMBER}. Utilise son ID.`
@@ -272,6 +371,14 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/supprim|delet|retir|succès|devis|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify quote deleted via tRPC API', async () => {
+      const quotes = await trpcQuery('quotes.list', { limit: 100, offset: 0 });
+      const deletedQuote = quotes.find((q: any) => q.id === createdQuoteId);
+      expect(deletedQuote).toBeUndefined();
+      console.log(`  ✓ Quote deletion verified via API: ID ${createdQuoteId} not found`);
+    });
   });
 });
 
@@ -283,6 +390,7 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
   test.describe.configure({ mode: 'serial' });
 
   let page: Page;
+  let createdInvoiceId: number;
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -303,6 +411,21 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
     await takeFullPageScreenshot(page, 'chatbot-crud-invoice-create');
 
     expect(response.toLowerCase()).toMatch(/cré|facture|créé|succès|invoice/);
+
+    // Verify via tRPC API
+    await test.step('Verify invoice exists via tRPC API', async () => {
+      const invoices = await trpcQuery('invoices.list', { limit: 100, offset: 0 });
+      expect(invoices).toBeDefined();
+      expect(Array.isArray(invoices)).toBe(true);
+
+      const createdInvoice = invoices.find((inv: any) => inv.invoiceNumber === TEST_INVOICE_NUMBER);
+
+      expect(createdInvoice).toBeDefined();
+      expect(createdInvoice.invoiceNumber).toBe(TEST_INVOICE_NUMBER);
+
+      createdInvoiceId = createdInvoice.id;
+      console.log(`  ✓ Invoice verified via API: ID ${createdInvoiceId}`);
+    });
   });
 
   test('List invoices', async () => {
@@ -332,6 +455,8 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
   });
 
   test('Update invoice status', async () => {
+    expect(createdInvoiceId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Change le statut de la facture ${TEST_INVOICE_NUMBER} en paid. Utilise son ID.`
@@ -342,9 +467,19 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/modif|updat|mis à jour|statut|payé|paid|changé|succès|facture|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify invoice status updated via tRPC API', async () => {
+      const invoice = await trpcQuery('invoices.get', { id: createdInvoiceId });
+      expect(invoice).toBeDefined();
+      expect(invoice.status).toBe('paid');
+      console.log(`  ✓ Invoice status verified via API: ${invoice.status}`);
+    });
   });
 
   test('Update invoice issue date', async () => {
+    expect(createdInvoiceId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Change la date d'émission de la facture ${TEST_INVOICE_NUMBER} au 15 janvier 2026`
@@ -354,6 +489,14 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
     await takeFullPageScreenshot(page, 'chatbot-crud-invoice-update-date');
 
     expect(response.toLowerCase()).toMatch(/mis à jour|modif|updat|changé|succès|15.*janvier|2026-01-15|émission|facture|erreur/);
+
+    // Verify via tRPC API - This catches if chatbot says "updated" but didn't actually change it
+    await test.step('Verify invoice issue date updated via tRPC API', async () => {
+      const invoice = await trpcQuery('invoices.get', { id: createdInvoiceId });
+      expect(invoice).toBeDefined();
+      expect(invoice.issueDate).toContain('2026-01-15');
+      console.log(`  ✓ Invoice issue date verified via API: ${invoice.issueDate}`);
+    });
   });
 
   test('Verify invoice after update', async () => {
@@ -369,6 +512,8 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
   });
 
   test('Delete invoice', async () => {
+    expect(createdInvoiceId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Supprime la facture ${TEST_INVOICE_NUMBER}. Utilise son ID.`
@@ -379,6 +524,14 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/supprim|delet|retir|succès|facture|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify invoice deleted via tRPC API', async () => {
+      const invoices = await trpcQuery('invoices.list', { limit: 100, offset: 0 });
+      const deletedInvoice = invoices.find((inv: any) => inv.id === createdInvoiceId);
+      expect(deletedInvoice).toBeUndefined();
+      console.log(`  ✓ Invoice deletion verified via API: ID ${createdInvoiceId} not found`);
+    });
   });
 });
 
@@ -390,6 +543,7 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
   test.describe.configure({ mode: 'serial' });
 
   let page: Page;
+  let createdSessionId: number;
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -410,6 +564,21 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
     await takeFullPageScreenshot(page, 'chatbot-crud-session-create');
 
     expect(response.toLowerCase()).toMatch(/cré|session|créé|succès|planifié/);
+
+    // Verify via tRPC API
+    await test.step('Verify session exists via tRPC API', async () => {
+      const sessions = await trpcQuery('sessions.list', { limit: 100, offset: 0 });
+      expect(sessions).toBeDefined();
+      expect(Array.isArray(sessions)).toBe(true);
+
+      const createdSession = sessions.find((s: any) => s.title === TEST_SESSION_TITLE);
+
+      expect(createdSession).toBeDefined();
+      expect(createdSession.title).toBe(TEST_SESSION_TITLE);
+
+      createdSessionId = createdSession.id;
+      console.log(`  ✓ Session verified via API: ID ${createdSessionId}`);
+    });
   });
 
   test('List sessions', async () => {
@@ -426,6 +595,8 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
   });
 
   test('Update session', async () => {
+    expect(createdSessionId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Mets à jour la session "${TEST_SESSION_TITLE}" créée précédemment et change son statut en completed. Utilise son ID.`
@@ -436,9 +607,19 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/modif|updat|mis à jour|statut|completed|terminé|changé|succès|session|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify session status updated via tRPC API', async () => {
+      const session = await trpcQuery('sessions.get', { id: createdSessionId });
+      expect(session).toBeDefined();
+      expect(session.status).toBe('completed');
+      console.log(`  ✓ Session status verified via API: ${session.status}`);
+    });
   });
 
   test('Delete session', async () => {
+    expect(createdSessionId).toBeDefined();
+
     const response = await sendChatMessage(
       page,
       `Supprime la session "${TEST_SESSION_TITLE}". Utilise son ID.`
@@ -449,5 +630,13 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
 
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/supprim|delet|retir|succès|session|erreur/);
+
+    // Verify via tRPC API
+    await test.step('Verify session deleted via tRPC API', async () => {
+      const sessions = await trpcQuery('sessions.list', { limit: 100, offset: 0 });
+      const deletedSession = sessions.find((s: any) => s.id === createdSessionId);
+      expect(deletedSession).toBeUndefined();
+      console.log(`  ✓ Session deletion verified via API: ID ${createdSessionId} not found`);
+    });
   });
 });
