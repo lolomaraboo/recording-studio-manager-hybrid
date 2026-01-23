@@ -16,15 +16,15 @@ export default function ClientInvoices() {
   const invoices = invoicesData?.invoices || [];
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { variant: 'secondary' | 'default' | 'destructive' | 'outline'; className?: string }> = {
-      DRAFT: { variant: 'secondary' },
-      SENT: { variant: 'default' },
-      PAID: { variant: 'default', className: 'bg-green-500 text-white hover:bg-green-600' },
-      PARTIALLY_PAID: { variant: 'default', className: 'bg-orange-500 text-white hover:bg-orange-600' },
-      PAYMENT_FAILED: { variant: 'destructive' },
+    const config: Record<string, { label: string; className: string }> = {
+      draft: { label: "Brouillon", className: "bg-gray-100 text-gray-700 border-gray-200" },
+      sent: { label: "Envoyée", className: "bg-blue-100 text-blue-700 border-blue-200" },
+      paid: { label: "Payée", className: "bg-green-100 text-green-700 border-green-200" },
+      overdue: { label: "En retard", className: "bg-amber-100 text-amber-700 border-amber-200" },
+      cancelled: { label: "Annulée", className: "bg-red-100 text-red-700 border-red-200" },
     };
-    const { variant, className } = config[status] || { variant: 'default' as const };
-    return <Badge variant={variant} className={className}>{status}</Badge>;
+    const entry = config[status] || config.draft;
+    return <Badge variant="outline" className={entry.className}>{entry.label}</Badge>;
   };
 
   return (

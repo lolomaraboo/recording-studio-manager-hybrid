@@ -250,16 +250,16 @@ export default function InvoiceDetail() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string; color: string }> = {
-      draft: { variant: "secondary", label: "Brouillon", color: "text-gray-600" },
-      sent: { variant: "outline", label: "Envoyée", color: "text-blue-600" },
-      paid: { variant: "default", label: "Payée", color: "text-green-600" },
-      cancelled: { variant: "destructive", label: "Annulée", color: "text-red-600" },
-      overdue: { variant: "destructive", label: "En retard", color: "text-red-600" },
+    const variants: Record<string, { label: string; className: string }> = {
+      draft: { label: "Brouillon", className: "bg-gray-100 text-gray-700 border-gray-200" },
+      sent: { label: "Envoyée", className: "bg-blue-100 text-blue-700 border-blue-200" },
+      paid: { label: "Payée", className: "bg-green-100 text-green-700 border-green-200" },
+      overdue: { label: "En retard", className: "bg-amber-100 text-amber-700 border-amber-200" },
+      cancelled: { label: "Annulée", className: "bg-red-100 text-red-700 border-red-200" },
     };
 
     const config = variants[status] || variants.draft;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
 
   const client = clients?.find((c) => c.id === invoice?.clientId);
