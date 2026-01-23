@@ -48,6 +48,7 @@ type InvoiceItem = {
 export default function InvoiceDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const utils = trpc.useUtils();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -77,6 +78,7 @@ export default function InvoiceDetail() {
   // Mutations
   const updateMutation = trpc.invoices.update.useMutation({
     onSuccess: () => {
+      utils.invoices.list.invalidate();
       toast.success("Facture mise à jour");
       setIsEditing(false);
       refetch();
@@ -88,6 +90,7 @@ export default function InvoiceDetail() {
 
   const updateWithItemsMutation = trpc.invoices.updateWithItems.useMutation({
     onSuccess: () => {
+      utils.invoices.list.invalidate();
       toast.success("Facture mise à jour");
       setIsEditing(false);
       refetch();
@@ -99,6 +102,7 @@ export default function InvoiceDetail() {
 
   const deleteMutation = trpc.invoices.delete.useMutation({
     onSuccess: () => {
+      utils.invoices.list.invalidate();
       toast.success("Facture supprimée");
       navigate("/invoices");
     },
