@@ -25,19 +25,19 @@
 
 ## Current Position
 
-Phase: 39 of 45 (Gestion TVA Multi-Taux)
-Plan: 4/4 complete (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
-Status: Phase complete - VAT rate management fully functional (frontend + backend + data migration)
-Last activity: 2026-01-22 - Completed quick-022: E2E test chatbot CRUD (devis, factures, clients, sessions)
+Phase: 32 of 45 (Harmonisation Projects - Routing Cohérent)
+Plan: 1/1 complete (32-01 ✅)
+Status: Phase complete - ProjectEditForm accordion harmonization complete
+Last activity: 2026-01-23 - Completed 32-01: Accordion-based ProjectEditForm matching TalentEditForm pattern
 
-Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 39: 4/4 plans (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
+Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) + Phase 18: 2/3 plans (18-01 ✅, 18-02 ⏸️) + Phase 18.1: 1/3 plans (18.1-01 ✅) + Phase 18.2: 1/3 plans (18.2-01 ✅) + Phase 18.3: 1/1 plans (18.3-01 ✅) + Phase 18.4: 3/3 plans (18.4-01 ✅, 18.4-02 ✅, 18.4-03 ✅) + Phase 19: 4/4 plans (19-01 ✅, 19-02 ✅, 19-03 ✅, 19-04 ✅) + Phase 20: 1/1 plans (20-01 ✅) + Phase 20.1: 2/2 plans (20.1-01 ✅, 20.1-02 ✅) + Phase 21: 3/3 plans (21-01 ✅, 21-02 ✅, 21-03 ✅) + Phase 21.1: 1/1 plans (21.1-01 ✅) + Phase 22: 10/10 plans (22-01 ✅, 22-02 ✅, 22-03 ✅, 22-04 ✅, 22-05 ✅, 22-06 ✅, 22-07 ✅, 22-08 ✅, 22-09 ✅, 22-10 ✅) + Phase 23: 1/1 plans (23-01 ✅) + Phase 24: 2/2 plans (24-01 ✅, 24-02 ✅) + Phase 25: 2/2 plans (25-01 ✅, 25-02 ✅) + Phase 26: 1/1 plans (26-01 ✅) + Phase 26.1: 1/1 plans (26.1-01 ✅) + Phase 26.2: 1/1 plans (26.2-01 ✅) + Phase 27: 2/2 plans (27-01 ✅, 27-02 ✅) + Phase 28: 5/5 plans (28-01 ✅, 28-02 ✅, 28-03 ✅, 28-04 ✅, 28-05 ✅) + Phase 29: 1/1 plans (29-01 ✅) + Phase 32: 1/1 plans (32-01 ✅) + Phase 39: 4/4 plans (39-01 ✅, 39-02 ✅, 39-03 ✅, 39-04 ✅)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 124
-- Average duration: 27.8 min
-- Total execution time: 57.8 hours
+- Total plans completed: 125
+- Average duration: 27.7 min
+- Total execution time: 58.0 hours
 
 **By Phase:**
 
@@ -92,11 +92,12 @@ Progress: ██████████ 100% (v4.0: 24/24 plans complete ✅) +
 | 27 | 2/2 | 4 min | 2 min |
 | 28 | 5/5 | 18 min | 3.6 min |
 | 29 | 1/1 | 4 min | 4 min |
+| 32 | 1/1 | 6 min | 6 min |
 | 39 | 4/4 | 41 min | 10.3 min |
 
 **Recent Trend:**
-- Last 5 plans: [4 min, 7 min, 7.5 min, 8 min, 18.5 min]
-- Trend: Phase 39 COMPLETE (4/4 plans, 10.3 min avg). Plan 39-04 (18.5 min): Created complete VAT rate management UI in Settings Finance tab. Built VatRatesSection component with table, dropdown actions, and mutations. Implemented Create/Edit dialogs with form validation. Added default rate badge with star icon. Implemented archive prevention for rates in use. Added archived rates visibility toggle. Implemented unarchive functionality for restoring archived rates. Fixed toast import to use sonner instead of shadcn useToast for consistency. 7 atomic commits (2 core tasks + 1 integration + 4 orchestrator corrections). 520 lines of React/TypeScript code. Ready for Phase 40 (Invoices/Quotes VAT Integration).
+- Last 5 plans: [7 min, 7.5 min, 8 min, 18.5 min, 6 min]
+- Trend: Phase 32 COMPLETE (1/1 plans, 6 min). Plan 32-01 (6 min): Created ProjectEditForm accordion component (600+ lines) matching TalentEditForm pattern. 5 accordions covering 20+ fields: Informations de Base, Description & Genre, Calendrier, Production & Stockage, Plateformes & Notes. All accordions open by default with localStorage persistence. Alt+Click to toggle all. Refactored ProjectCreate.tsx (279→145 lines) and ProjectDetail.tsx edit mode. Auto-fixed 2 issues: Select imports and router field limitations. 1 atomic commit. UI harmonization complete - consistent accordion pattern across Client/Talent/Project forms.
 
 ## Accumulated Context
 
