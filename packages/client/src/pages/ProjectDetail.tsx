@@ -53,15 +53,15 @@ const projectTypeLabels: Record<string, string> = {
   podcast: "Podcast",
 };
 
-const statusLabels: Record<string, { label: string; variant: any }> = {
-  pre_production: { label: "Pré-production", variant: "outline" },
-  recording: { label: "Enregistrement", variant: "default" },
-  editing: { label: "Édition", variant: "default" },
-  mixing: { label: "Mixage", variant: "secondary" },
-  mastering: { label: "Mastering", variant: "secondary" },
-  completed: { label: "Terminé", variant: "default" },
-  delivered: { label: "Livré", variant: "default" },
-  archived: { label: "Archivé", variant: "outline" },
+const statusLabels: Record<string, { label: string; className: string }> = {
+  pre_production: { label: "Pre-production", className: "bg-gray-100 text-gray-700 border-gray-200" },
+  recording: { label: "Enregistrement", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  editing: { label: "Edition", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  mixing: { label: "Mixage", className: "bg-purple-100 text-purple-700 border-purple-200" },
+  mastering: { label: "Mastering", className: "bg-purple-100 text-purple-700 border-purple-200" },
+  completed: { label: "Termine", className: "bg-green-100 text-green-700 border-green-200" },
+  delivered: { label: "Livre", className: "bg-green-100 text-green-700 border-green-200" },
+  archived: { label: "Archive", className: "bg-gray-100 text-gray-500 border-gray-200" },
 };
 
 export default function ProjectDetail() {
@@ -525,7 +525,19 @@ export default function ProjectDetail() {
                             {track.duration || "—"}
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline">{track.status || "pending"}</Badge>
+                            {(() => {
+                              const trackStatus = track.status || "pending";
+                              const trackStatusConfig: Record<string, { label: string; className: string }> = {
+                                recording: { label: "Enregistrement", className: "bg-blue-100 text-blue-700 border-blue-200" },
+                                editing: { label: "Edition", className: "bg-blue-100 text-blue-700 border-blue-200" },
+                                mixing: { label: "Mixage", className: "bg-purple-100 text-purple-700 border-purple-200" },
+                                mastering: { label: "Mastering", className: "bg-purple-100 text-purple-700 border-purple-200" },
+                                completed: { label: "Termine", className: "bg-green-100 text-green-700 border-green-200" },
+                                pending: { label: "En attente", className: "bg-gray-100 text-gray-700 border-gray-200" },
+                              };
+                              const config = trackStatusConfig[trackStatus] || trackStatusConfig.pending;
+                              return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
+                            })()}
                           </TableCell>
                           <TableCell className="text-right">
                             <Button variant="ghost" size="sm" asChild>
@@ -591,7 +603,15 @@ export default function ProjectDetail() {
                       <SelectContent>
                         {Object.entries(statusLabels).map(([value, { label }]) => (
                           <SelectItem key={value} value={value}>
-                            {label}
+                            <span className="flex items-center gap-2">
+                              <span className={`h-2 w-2 rounded-full ${
+                                value === "pre_production" || value === "archived" ? "bg-gray-400" :
+                                value === "recording" || value === "editing" ? "bg-blue-500" :
+                                value === "mixing" || value === "mastering" ? "bg-purple-500" :
+                                "bg-green-500"
+                              }`} />
+                              {label}
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -599,7 +619,7 @@ export default function ProjectDetail() {
                   </div>
                 ) : (
                   <div>
-                    <Badge variant={statusLabels[project.status].variant}>
+                    <Badge variant="outline" className={statusLabels[project.status].className}>
                       {statusLabels[project.status].label}
                     </Badge>
                   </div>
