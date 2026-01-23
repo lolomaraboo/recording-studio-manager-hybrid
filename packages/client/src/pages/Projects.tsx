@@ -10,7 +10,7 @@
  * - Gestion des tracks (NOUVEAU)
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,21 +20,16 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link } from "react-router-dom";
 import {
   Music,
   Plus,
   Search,
-  Filter,
-  Calendar,
-  DollarSign,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  Edit,
   Trash2,
   ArrowLeft,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -76,13 +71,48 @@ export default function Projects() {
   });
 
   // Filtrer les projets
-  const filteredProjects = projects?.filter((project: any) => {
-    const matchesSearch =
-      project.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.artistName?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || project.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredProjects = useMemo(() => {
+    let result = projects?.slice() || [];
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (project: any) =>
+          project.name?.toLowerCase().includes(query) ||
+          project.artistName?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      result = result.filter((project: any) => project.status === statusFilter);
+    }
+
+    // Sort by start date (most recent first)
+    result.sort((a: any, b: any) => {
+      const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+      const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    return result;
+  }, [projects, searchQuery, statusFilter]);
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    if (!projects) return { total: 0, inProgress: 0, completed: 0 };
+
+    const total = projects.length;
+    const inProgress = projects.filter((p: any) =>
+      ["pre_production", "recording", "editing", "mixing", "mastering"].includes(p.status)
+    ).length;
+    const completed = projects.filter((p: any) =>
+      ["completed", "delivered"].includes(p.status)
+    ).length;
+
+    return { total, inProgress, completed };
+  }, [projects]);
 
   const handleCreateProject = (formData: any) => {
     createProjectMutation.mutate(formData);
@@ -92,6 +122,22 @@ export default function Projects() {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
       deleteProjectMutation.mutate({ id: projectId });
     }
+  };
+
+  const getStatusBadge = (status: ProjectStatus) => {
+    const config: Record<ProjectStatus, { label: string; className: string }> = {
+      pre_production: { label: "Pre-production", className: "bg-gray-100 text-gray-700 border-gray-200" },
+      recording: { label: "Enregistrement", className: "bg-blue-100 text-blue-700 border-blue-200" },
+      editing: { label: "Edition", className: "bg-blue-100 text-blue-700 border-blue-200" },
+      mixing: { label: "Mixage", className: "bg-purple-100 text-purple-700 border-purple-200" },
+      mastering: { label: "Mastering", className: "bg-purple-100 text-purple-700 border-purple-200" },
+      completed: { label: "Termine", className: "bg-green-100 text-green-700 border-green-200" },
+      delivered: { label: "Livre", className: "bg-green-100 text-green-700 border-green-200" },
+      archived: { label: "Archive", className: "bg-gray-100 text-gray-500 border-gray-200" },
+    };
+
+    const statusConfig = config[status] || config.archived;
+    return <Badge variant="outline" className={statusConfig.className}>{statusConfig.label}</Badge>;
   };
 
   return (
@@ -115,144 +161,201 @@ export default function Projects() {
             Nouveau Projet
           </Button>
         </div>
-        {/* Filtres */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Filtres</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="flex-1 relative">
+
+        {/* Stats */}
+        {isLoading ? (
+          <div className="grid gap-6 md:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardDescription>Total projets</CardDescription>
+                <CardTitle className="text-3xl">{stats.total}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">Tous statuts</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardDescription>En cours</CardDescription>
+                <CardTitle className="text-3xl text-blue-600">{stats.inProgress}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  {stats.inProgress === 1 ? "projet" : "projets"}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardDescription>Termines</CardDescription>
+                <CardTitle className="text-3xl text-green-600">{stats.completed}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  {stats.completed === 1 ? "projet" : "projets"}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Projects List */}
+        <div>
+          <div className="pb-2">
+            <div className="flex flex-col md:flex-row gap-2">
+              <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Rechercher par titre ou artiste..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-9 h-9"
                 />
               </div>
               <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-                <SelectTrigger className="w-[200px]">
-                  <Filter className="mr-2 h-4 w-4" />
+                <SelectTrigger className="w-full md:w-40 h-9">
                   <SelectValue placeholder="Statut" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="pre_production">Pré-production</SelectItem>
-                  <SelectItem value="recording">Enregistrement</SelectItem>
-                  <SelectItem value="editing">Édition</SelectItem>
-                  <SelectItem value="mixing">Mixage</SelectItem>
-                  <SelectItem value="mastering">Mastering</SelectItem>
-                  <SelectItem value="completed">Terminé</SelectItem>
-                  <SelectItem value="delivered">Livré</SelectItem>
-                  <SelectItem value="archived">Archivé</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="pre_production">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-gray-400" />
+                      Pre-production
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="recording">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-blue-500" />
+                      Enregistrement
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="editing">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-blue-500" />
+                      Edition
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="mixing">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-purple-500" />
+                      Mixage
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="mastering">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-purple-500" />
+                      Mastering
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="completed">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-green-500" />
+                      Termine
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="delivered">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-green-500" />
+                      Livre
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="archived">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-gray-400" />
+                      Archive
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Liste des projets */}
-        {isLoading ? (
-          <div className="flex justify-center py-6">
-            <Clock className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : filteredProjects && filteredProjects.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredProjects.map((project: any) => (
-              <Card key={project.id} className="hover:border-primary/50 transition-colors cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base truncate">{project.name}</CardTitle>
-                      {project.artistName && (
-                        <CardDescription className="text-sm truncate">{project.artistName}</CardDescription>
-                      )}
-                    </div>
-                    {getStatusBadge(project.status as ProjectStatus)}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Informations principales */}
-                  <div className="space-y-2 text-sm">
-                    {project.genre && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Music className="h-4 w-4" />
-                        <span>{project.genre}</span>
-                      </div>
-                    )}
-                    {project.startDate && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>{format(new Date(project.startDate), "dd MMM yyyy", { locale: fr })}</span>
-                      </div>
-                    )}
-                    {project.budget && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <DollarSign className="h-4 w-4" />
-                        <span>{(project.budget / 100).toFixed(2)} €</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Progression */}
-                  {project.status !== "cancelled" && project.status !== "completed" && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Progression</span>
-                        <span className="font-medium">45%</span>
-                      </div>
-                      <Progress value={45} className="h-2" />
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      asChild
-                    >
-                      <Link to={`/projects/${project.id}`}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Détails
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteProject(project.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-6">
-              <Music className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <h3 className="text-sm font-medium mb-1">Aucun projet trouvé</h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                {searchQuery || statusFilter !== "all"
-                  ? "Aucun projet ne correspond à vos critères de recherche"
-                  : "Créez votre premier projet musical pour commencer"}
-              </p>
-              {!searchQuery && statusFilter === "all" && (
-                <Button onClick={() => setShowCreateDialog(true)} size="sm">
+          <div>
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="h-20 w-full" />
+                ))}
+              </div>
+            ) : filteredProjects.length > 0 ? (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Projet</TableHead>
+                      <TableHead>Artiste</TableHead>
+                      <TableHead>Genre</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Date debut</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredProjects.map((project: any) => (
+                      <TableRow key={project.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="font-medium">{project.name}</TableCell>
+                        <TableCell>{project.artistName || "-"}</TableCell>
+                        <TableCell>{project.genre || "-"}</TableCell>
+                        <TableCell>
+                          {project.type === "album" && "Album"}
+                          {project.type === "ep" && "EP"}
+                          {project.type === "single" && "Single"}
+                          {project.type === "demo" && "Demo"}
+                          {project.type === "soundtrack" && "Bande originale"}
+                          {project.type === "podcast" && "Podcast"}
+                        </TableCell>
+                        <TableCell>
+                          {project.startDate
+                            ? format(new Date(project.startDate), "dd MMM yyyy", { locale: fr })
+                            : "-"}
+                        </TableCell>
+                        <TableCell>{getStatusBadge(project.status as ProjectStatus)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link to={`/projects/${project.id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteProject(project.id);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <Music className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <h3 className="text-sm font-medium mb-1">Aucun projet</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Commencez par créer votre premier projet
+                </p>
+                <Button size="sm" onClick={() => setShowCreateDialog(true)}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Créer un projet
+                  Nouveau Projet
                 </Button>
-              )}
-          </CardContent>
-        </Card>
-        )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Dialog Création de Projet */}
@@ -439,28 +542,5 @@ function CreateProjectDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-
-// Helper pour obtenir le badge de statut
-function getStatusBadge(status: ProjectStatus) {
-  const config: Record<ProjectStatus, { variant: "default" | "secondary" | "destructive" | "outline", label: string, icon: any }> = {
-    pre_production: { variant: "outline", label: "Pré-production", icon: Clock },
-    recording: { variant: "default", label: "Enregistrement", icon: Music },
-    editing: { variant: "default", label: "Édition", icon: Music },
-    mixing: { variant: "secondary", label: "Mixage", icon: Music },
-    mastering: { variant: "secondary", label: "Mastering", icon: Music },
-    completed: { variant: "default", label: "Terminé", icon: CheckCircle2 },
-    delivered: { variant: "default", label: "Livré", icon: CheckCircle2 },
-    archived: { variant: "outline", label: "Archivé", icon: XCircle },
-  };
-
-  const { variant, label, icon: Icon } = config[status];
-  return (
-    <Badge variant={variant} className="gap-1">
-      <Icon className="h-3 w-3" />
-      {label}
-    </Badge>
   );
 }
