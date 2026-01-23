@@ -20,7 +20,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
 import {
@@ -30,13 +29,11 @@ import {
   Filter,
   Calendar,
   DollarSign,
-  FileAudio,
   CheckCircle2,
   Clock,
   XCircle,
   Edit,
   Trash2,
-  Upload,
   ArrowLeft,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -49,7 +46,6 @@ export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | "all">("all");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
   // Récupérer la liste des projets
   const { data: projects, isLoading, refetch } = trpc.projects.list.useQuery();
@@ -216,10 +212,12 @@ export default function Projects() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => setSelectedProjectId(project.id)}
+                      asChild
                     >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Détails
+                      <Link to={`/projects/${project.id}`}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Détails
+                      </Link>
                     </Button>
                     <Button
                       variant="ghost"
@@ -266,14 +264,6 @@ export default function Projects() {
         isLoading={createProjectMutation.isPending}
       />
 
-      {/* Dialog Détails du Projet */}
-      {selectedProjectId && (
-        <ProjectDetailsDialog
-          projectId={selectedProjectId}
-          onClose={() => setSelectedProjectId(null)}
-          onUpdate={refetch}
-        />
-      )}
     </div>
   );
 }
@@ -452,263 +442,6 @@ function CreateProjectDialog({
   );
 }
 
-/**
- * Dialog des détails du projet (avec onglet Tracks ajouté)
- */
-function ProjectDetailsDialog({
-  projectId,
-  onClose,
-  onUpdate: _onUpdate,
-}: {
-  projectId: number;
-  onClose: () => void;
-  onUpdate: () => void;
-}) {
-  const { data: project, isLoading } = trpc.projects.get.useQuery({ id: projectId });
-
-  if (isLoading || !project) {
-    return (
-      <Dialog open onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
-          <div className="flex justify-center py-12">
-            <Clock className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <DialogTitle className="text-2xl">{project.name}</DialogTitle>
-              {project.artistName && (
-                <DialogDescription className="text-base">{project.artistName}</DialogDescription>
-              )}
-            </div>
-            {getStatusBadge(project.status as ProjectStatus)}
-          </div>
-        </DialogHeader>
-
-        <Tabs defaultValue="overview" className="mt-4">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-            <TabsTrigger value="tracks">Tracks</TabsTrigger>
-            <TabsTrigger value="credits">Crédits (0)</TabsTrigger>
-            <TabsTrigger value="milestones">Étapes (0)</TabsTrigger>
-            <TabsTrigger value="files">Fichiers (0)</TabsTrigger>
-          </TabsList>
-
-          {/* Vue d'ensemble */}
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Informations du projet</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {project.genre && (
-                    <div>
-                      <Label className="text-muted-foreground">Genre</Label>
-                      <p className="font-medium">{project.genre}</p>
-                    </div>
-                  )}
-                  {project.startDate && (
-                    <div>
-                      <Label className="text-muted-foreground">Date de début</Label>
-                      <p className="font-medium">
-                        {format(new Date(project.startDate), "dd MMMM yyyy", { locale: fr })}
-                      </p>
-                    </div>
-                  )}
-                  {project.budget && (
-                    <div>
-                      <Label className="text-muted-foreground">Budget</Label>
-                      <p className="font-medium">{(parseFloat(project.budget) / 100).toFixed(2)} €</p>
-                    </div>
-                  )}
-                  {project.totalCost && (
-                    <div>
-                      <Label className="text-muted-foreground">Coût total</Label>
-                      <p className="font-medium">{(parseFloat(project.totalCost) / 100).toFixed(2)} €</p>
-                    </div>
-                  )}
-                </div>
-
-                {project.description && (
-                  <div>
-                    <Label className="text-muted-foreground">Description</Label>
-                    <p className="text-sm mt-1">{project.description}</p>
-                  </div>
-                )}
-
-                {project.notes && (
-                  <div>
-                    <Label className="text-muted-foreground">Notes</Label>
-                    <p className="text-sm mt-1 whitespace-pre-wrap">{project.notes}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Tracks (NOUVEAU) */}
-          <TabsContent value="tracks" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Tracks du projet</CardTitle>
-                  <Button size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Ajouter Track
-                  </Button>
-                </div>
-                <CardDescription className="text-sm">
-                  TODO: Implémenter liste tracks avec drag&drop
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center text-muted-foreground py-8">
-                  Composant Tracks à implémenter (cf. TRACKS_ARCHITECTURE.md)
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Crédits */}
-          <TabsContent value="credits" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Musiciens & Crédits</CardTitle>
-                  <Button size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Ajouter
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {false ? (
-                  <div className="space-y-3">
-                    {[].map((credit: any) => (
-                      <div key={credit.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <p className="font-medium">{credit.name}</p>
-                          <p className="text-sm text-muted-foreground">{credit.role}</p>
-                        </div>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    Aucun crédit ajouté
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Étapes */}
-          <TabsContent value="milestones" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Étapes de Production</CardTitle>
-                  <Button size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Ajouter
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {false ? (
-                  <div className="space-y-3">
-                    {[].map((milestone: any) => (
-                      <div key={milestone.id} className="flex items-start justify-between p-3 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium">{milestone.title}</p>
-                            <Badge variant={milestone.status === "completed" ? "default" : "outline"}>
-                              {milestone.status}
-                            </Badge>
-                          </div>
-                          {milestone.description && (
-                            <p className="text-sm text-muted-foreground">{milestone.description}</p>
-                          )}
-                        </div>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    Aucune étape définie
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Fichiers */}
-          <TabsContent value="files" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Fichiers Audio & Documents</CardTitle>
-                  <Button size="sm">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {false ? (
-                  <div className="space-y-3">
-                    {[].map((file: any) => (
-                      <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <FileAudio className="h-8 w-8 text-muted-foreground" />
-                          <div>
-                            <p className="font-medium">{file.filename}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {(file.fileSize / 1024 / 1024).toFixed(2)} MB • {file.category}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" asChild>
-                            <a href={file.fileUrl} target="_blank" rel="noopener noreferrer">
-                              Télécharger
-                            </a>
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    Aucun fichier uploadé
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 // Helper pour obtenir le badge de statut
 function getStatusBadge(status: ProjectStatus) {
