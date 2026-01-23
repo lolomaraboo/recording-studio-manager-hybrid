@@ -220,7 +220,7 @@ test.describe('Chatbot CRUD - Clients', () => {
 
     const response = await sendChatMessage(
       page,
-      `Mets à jour le client ${TEST_CLIENT_NAME} en changeant son email à e2e-updated-${RUN_ID}@test.com. Utilise son ID que tu as obtenu lors de la création.`
+      `Mets à jour le client "${TEST_CLIENT_NAME}" en changeant son email à e2e-updated-${RUN_ID}@test.com`
     );
 
     console.log('  Update client response:', response.substring(0, 200));
@@ -243,7 +243,7 @@ test.describe('Chatbot CRUD - Clients', () => {
 
     const response = await sendChatMessage(
       page,
-      `Supprime le client ${TEST_CLIENT_NAME}. Utilise son ID.`
+      `Supprime le client "${TEST_CLIENT_NAME}"`
     );
 
     console.log('  Delete client response:', response.substring(0, 200));
@@ -252,12 +252,12 @@ test.describe('Chatbot CRUD - Clients', () => {
     expect(response.length).toBeGreaterThan(10);
     expect(response.toLowerCase()).toMatch(/supprim|delet|retir|succès|client|erreur/);
 
-    // Verify via tRPC API
-    await test.step('Verify client deleted via tRPC API', async () => {
-      const clients = await trpcQuery('clients.list', { search: TEST_CLIENT_NAME, limit: 10, offset: 0 });
-      const deletedClient = clients.find((c: any) => c.id === createdClientId);
-      expect(deletedClient).toBeUndefined();
-      console.log(`  ✓ Client deletion verified via API: ID ${createdClientId} not found`);
+    // Verify via tRPC API (delete_client does soft-delete: isActive=false)
+    await test.step('Verify client soft-deleted via tRPC API', async () => {
+      const client = await trpcQuery('clients.get', { id: createdClientId });
+      expect(client).toBeDefined();
+      expect(client.isActive).toBe(false);
+      console.log(`  ✓ Client soft-deletion verified via API: ID ${createdClientId} isActive=${client.isActive}`);
     });
   });
 });
@@ -340,7 +340,7 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
 
     const response = await sendChatMessage(
       page,
-      `Mets à jour le statut du devis ${TEST_QUOTE_NUMBER} en "sent". Utilise son ID.`
+      `Mets à jour le statut du devis numéro ${TEST_QUOTE_NUMBER} en "envoyé" (sent)`
     );
 
     console.log('  Update quote response:', response.substring(0, 200));
@@ -363,7 +363,7 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
 
     const response = await sendChatMessage(
       page,
-      `Supprime le devis ${TEST_QUOTE_NUMBER}. Utilise son ID.`
+      `Supprime le devis numéro ${TEST_QUOTE_NUMBER}`
     );
 
     console.log('  Delete quote response:', response.substring(0, 200));
@@ -459,7 +459,7 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
 
     const response = await sendChatMessage(
       page,
-      `Change le statut de la facture ${TEST_INVOICE_NUMBER} en paid. Utilise son ID.`
+      `Mets à jour le statut de la facture numéro ${TEST_INVOICE_NUMBER} en "payée" (paid)`
     );
 
     console.log('  Update invoice response:', response.substring(0, 200));
@@ -516,7 +516,7 @@ test.describe('Chatbot CRUD - Invoices (Factures)', () => {
 
     const response = await sendChatMessage(
       page,
-      `Supprime la facture ${TEST_INVOICE_NUMBER}. Utilise son ID.`
+      `Supprime la facture numéro ${TEST_INVOICE_NUMBER}`
     );
 
     console.log('  Delete invoice response:', response.substring(0, 200));
@@ -599,7 +599,7 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
 
     const response = await sendChatMessage(
       page,
-      `Mets à jour la session "${TEST_SESSION_TITLE}" créée précédemment et change son statut en completed. Utilise son ID.`
+      `Mets à jour la session "${TEST_SESSION_TITLE}" et change son statut en completed`
     );
 
     console.log('  Update session response:', response.substring(0, 200));
@@ -622,7 +622,7 @@ test.describe('Chatbot CRUD - Sessions (Services)', () => {
 
     const response = await sendChatMessage(
       page,
-      `Supprime la session "${TEST_SESSION_TITLE}". Utilise son ID.`
+      `Supprime la session "${TEST_SESSION_TITLE}"`
     );
 
     console.log('  Delete session response:', response.substring(0, 200));

@@ -329,14 +329,29 @@ export class AIActionExecutor {
    * Update existing session
    */
   async update_session(params: {
-    session_id: number;
+    session_id?: number;
+    session_title?: string;
     title?: string;
     start_time?: string;
     end_time?: string;
     status?: string;
     description?: string;
   }) {
-    const { session_id, ...updates } = params;
+    const { session_id, session_title, ...updates } = params;
+
+    // Resolve session by title if no ID provided
+    let resolvedSessionId = session_id;
+    if (!resolvedSessionId && session_title) {
+      const found = await this.db
+        .select({ id: sessions.id, title: sessions.title })
+        .from(sessions)
+        .where(ilike(sessions.title, `%${session_title}%`))
+        .limit(5);
+      if (found.length === 0) throw new Error(`Session "${session_title}" introuvable`);
+      if (found.length > 1) throw new Error(`Plusieurs sessions correspondent à "${session_title}": ${found.map(s => s.title).join(', ')}. Précisez le titre exact.`);
+      resolvedSessionId = found[0].id;
+    }
+    if (!resolvedSessionId) throw new Error("session_id ou session_title requis");
 
     const updateData: any = {};
     if (updates.title) updateData.title = updates.title;
@@ -348,11 +363,11 @@ export class AIActionExecutor {
     const result = await this.db
       .update(sessions)
       .set(updateData)
-      .where(eq(sessions.id, session_id))
+      .where(eq(sessions.id, resolvedSessionId))
       .returning();
 
     if (result.length === 0) {
-      throw new Error(`Session ${session_id} not found`);
+      throw new Error(`Session ${resolvedSessionId} not found`);
     }
 
     return result[0];
@@ -361,19 +376,33 @@ export class AIActionExecutor {
   /**
    * Delete session
    */
-  async delete_session(params: { session_id: number }) {
-    const { session_id } = params;
+  async delete_session(params: { session_id?: number; session_title?: string }) {
+    const { session_id, session_title } = params;
+
+    // Resolve session by title if no ID provided
+    let resolvedSessionId = session_id;
+    if (!resolvedSessionId && session_title) {
+      const found = await this.db
+        .select({ id: sessions.id, title: sessions.title })
+        .from(sessions)
+        .where(ilike(sessions.title, `%${session_title}%`))
+        .limit(5);
+      if (found.length === 0) throw new Error(`Session "${session_title}" introuvable`);
+      if (found.length > 1) throw new Error(`Plusieurs sessions correspondent à "${session_title}": ${found.map(s => s.title).join(', ')}. Précisez le titre exact.`);
+      resolvedSessionId = found[0].id;
+    }
+    if (!resolvedSessionId) throw new Error("session_id ou session_title requis");
 
     const result = await this.db
       .delete(sessions)
-      .where(eq(sessions.id, session_id))
+      .where(eq(sessions.id, resolvedSessionId))
       .returning();
 
     if (result.length === 0) {
-      throw new Error(`Session ${session_id} not found`);
+      throw new Error(`Session ${resolvedSessionId} not found`);
     }
 
-    return { deleted: true, id: session_id };
+    return { deleted: true, id: resolvedSessionId };
   }
 
   // ============================================================================
@@ -1136,16 +1165,29 @@ export class AIActionExecutor {
     };
   }
 
-  async delete_invoice(params: { invoice_id: number }) {
-    const { invoice_id } = params;
+  async delete_invoice(params: { invoice_id?: number; invoice_number?: string }) {
+    const { invoice_id, invoice_number } = params;
+
+    // Resolve invoice by number if no ID provided
+    let resolvedInvoiceId = invoice_id;
+    if (!resolvedInvoiceId && invoice_number) {
+      const found = await this.db
+        .select({ id: invoices.id })
+        .from(invoices)
+        .where(eq(invoices.invoiceNumber, invoice_number))
+        .limit(1);
+      if (found.length === 0) throw new Error(`Facture "${invoice_number}" introuvable`);
+      resolvedInvoiceId = found[0].id;
+    }
+    if (!resolvedInvoiceId) throw new Error("invoice_id ou invoice_number requis");
 
     // Items are deleted by CASCADE, but let's be explicit
-    await this.db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, invoice_id));
-    await this.db.delete(invoices).where(eq(invoices.id, invoice_id));
+    await this.db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, resolvedInvoiceId));
+    await this.db.delete(invoices).where(eq(invoices.id, resolvedInvoiceId));
 
     return {
-      message: `Facture #${invoice_id} supprimée`,
-      invoice_id,
+      message: `Facture #${resolvedInvoiceId} supprimée`,
+      invoice_id: resolvedInvoiceId,
     };
   }
 

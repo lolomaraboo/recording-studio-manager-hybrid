@@ -85,13 +85,17 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "update_session",
-    description: "Met à jour une session existante (titre, horaires, statut).",
+    description: "Met à jour une session existante (titre, horaires, statut). Peut résoudre la session par son titre.",
     input_schema: {
       type: "object",
       properties: {
         session_id: {
           type: "number",
-          description: "ID de la session à modifier",
+          description: "ID de la session à modifier (optionnel si session_title fourni)",
+        },
+        session_title: {
+          type: "string",
+          description: "Titre de la session à modifier (recherche partielle). Alternative à session_id.",
         },
         title: {
           type: "string",
@@ -110,21 +114,25 @@ export const AI_TOOLS: ToolDefinition[] = [
           description: "Nouveau statut: scheduled, in_progress, completed, cancelled (optionnel)",
         },
       },
-      required: ["session_id"],
+      required: [],
     },
   },
   {
     name: "delete_session",
-    description: "Supprime une session d'enregistrement.",
+    description: "Supprime une session d'enregistrement. Peut résoudre la session par son titre.",
     input_schema: {
       type: "object",
       properties: {
         session_id: {
           type: "number",
-          description: "ID de la session à supprimer",
+          description: "ID de la session à supprimer (optionnel si session_title fourni)",
+        },
+        session_title: {
+          type: "string",
+          description: "Titre de la session à supprimer (recherche partielle). Alternative à session_id.",
         },
       },
-      required: ["session_id"],
+      required: [],
     },
   },
 
@@ -573,16 +581,20 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "delete_invoice",
-    description: "Supprime une facture.",
+    description: "Supprime une facture. Peut résoudre la facture par son numéro.",
     input_schema: {
       type: "object",
       properties: {
         invoice_id: {
           type: "number",
-          description: "ID de la facture",
+          description: "ID de la facture (optionnel si invoice_number fourni)",
+        },
+        invoice_number: {
+          type: "string",
+          description: "Numéro de facture (ex: INV-xxx). Alternative à invoice_id.",
         },
       },
-      required: ["invoice_id"],
+      required: [],
     },
   },
   {
