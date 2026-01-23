@@ -9,8 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
@@ -67,21 +65,10 @@ export default function InvoiceDetail() {
   // Editable items state
   const [editItems, setEditItems] = useState<InvoiceItem[]>([]);
 
-  // Service catalog autocomplete state
-  const [autocompleteOpen, setAutocompleteOpen] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState<{ [index: number]: string }>({});
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [currentSearchIndex, setCurrentSearchIndex] = useState<number | null>(null);
-
   // Catalog modal state
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [catalogCategory, setCatalogCategory] = useState<string>("all");
 
-  // Service catalog queries
-  const { data: autocompleteServices } = trpc.serviceCatalog.list.useQuery(
-    { search: debouncedSearch, activeOnly: true },
-    { enabled: debouncedSearch.length >= 2 }
-  );
   const { data: catalogServices } = trpc.serviceCatalog.list.useQuery({
     category: catalogCategory === "all" ? undefined : (catalogCategory as any),
     activeOnly: true,
@@ -152,18 +139,6 @@ export default function InvoiceDetail() {
     }
   }, [invoice]);
 
-  // Debounce for autocomplete search
-  useEffect(() => {
-    if (currentSearchIndex !== null && searchQuery[currentSearchIndex]) {
-      const timer = setTimeout(() => {
-        setDebouncedSearch(searchQuery[currentSearchIndex]);
-      }, 200);
-      return () => clearTimeout(timer);
-    } else {
-      setDebouncedSearch("");
-    }
-  }, [searchQuery, currentSearchIndex]);
-
   // Initialize editItems when entering edit mode
   const startEditing = () => {
     if (invoice?.items && invoice.items.length > 0) {
@@ -200,22 +175,6 @@ export default function InvoiceDetail() {
     setEditItems(editItems.filter((_, i) => i !== index));
   };
 
-  const handleServiceSelect = (index: number, service: any) => {
-    const newItems = [...editItems];
-    const qty = parseFloat(service.defaultQuantity) || 1;
-    const price = parseFloat(service.unitPrice) || 0;
-    newItems[index] = {
-      ...newItems[index],
-      description: service.name,
-      quantity: qty,
-      unitPrice: price,
-      amount: qty * price,
-      vatRateId: service.vatRateId || defaultVatRate?.id || 1,
-    };
-    setEditItems(newItems);
-    setAutocompleteOpen(null);
-    setSearchQuery({ ...searchQuery, [index]: service.name });
-  };
 
   const handleCatalogServiceSelect = (service: any) => {
     const qty = parseFloat(service.defaultQuantity) || 1;
@@ -628,58 +587,11 @@ export default function InvoiceDetail() {
                             {editItems.map((item, index) => (
                               <TableRow key={index}>
                                 <TableCell className="text-left">
-                                  <Popover open={autocompleteOpen === index} onOpenChange={(open) => setAutocompleteOpen(open ? index : null)}>
-                                    <PopoverAnchor asChild>
-                                      <Input
-                                        value={item.description}
-                                        onChange={(e) => {
-                                          handleItemChange(index, "description", e.target.value);
-                                          setSearchQuery({ ...searchQuery, [index]: e.target.value });
-                                          setCurrentSearchIndex(index);
-                                          if (e.target.value.length >= 2) {
-                                            setAutocompleteOpen(index);
-                                          } else {
-                                            setAutocompleteOpen(null);
-                                          }
-                                        }}
-                                        onFocus={() => {
-                                          setCurrentSearchIndex(index);
-                                          if (item.description.length >= 2) {
-                                            setAutocompleteOpen(index);
-                                          }
-                                        }}
-                                        onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
-                                        placeholder="Tapez pour rechercher..."
-                                      />
-                                    </PopoverAnchor>
-                                    <PopoverContent className="w-[400px] p-0" align="start">
-                                      <Command>
-                                        <CommandList>
-                                          {!autocompleteServices || autocompleteServices.length === 0 ? (
-                                            <CommandEmpty>
-                                              {searchQuery[index]?.length >= 2 ? "Aucun service trouve" : "Tapez au moins 2 caracteres"}
-                                            </CommandEmpty>
-                                          ) : (
-                                            <CommandGroup>
-                                              {autocompleteServices.slice(0, 10).map((service) => (
-                                                <CommandItem
-                                                  key={service.id}
-                                                  onSelect={() => handleServiceSelect(index, service)}
-                                                  className="flex items-center justify-between cursor-pointer"
-                                                >
-                                                  <div className="flex-1">
-                                                    <div className="font-medium">{service.name}</div>
-                                                    <div className="text-xs text-muted-foreground">{service.category}</div>
-                                                  </div>
-                                                  <div className="text-sm font-medium">{parseFloat(service.unitPrice).toFixed(2)} €</div>
-                                                </CommandItem>
-                                              ))}
-                                            </CommandGroup>
-                                          )}
-                                        </CommandList>
-                                      </Command>
-                                    </PopoverContent>
-                                  </Popover>
+                                  <Input
+                                    value={item.description}
+                                    onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                                    placeholder="Description"
+                                  />
                                 </TableCell>
                                 <TableCell>
                                   <Input
