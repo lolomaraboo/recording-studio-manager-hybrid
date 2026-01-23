@@ -457,11 +457,11 @@ export default function InvoiceDetail() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="draft">Brouillon</SelectItem>
-                          <SelectItem value="sent">Envoyée</SelectItem>
-                          <SelectItem value="paid">Payée</SelectItem>
-                          <SelectItem value="overdue">En retard</SelectItem>
-                          <SelectItem value="cancelled">Annulée</SelectItem>
+                          <SelectItem value="draft"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-gray-400" />Brouillon</span></SelectItem>
+                          <SelectItem value="sent"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-blue-500" />Envoyée</span></SelectItem>
+                          <SelectItem value="paid"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" />Payée</span></SelectItem>
+                          <SelectItem value="overdue"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-amber-500" />En retard</span></SelectItem>
+                          <SelectItem value="cancelled"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-red-500" />Annulée</span></SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
