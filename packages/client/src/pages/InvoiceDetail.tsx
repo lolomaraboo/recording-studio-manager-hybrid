@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Dialog,
@@ -629,31 +629,29 @@ export default function InvoiceDetail() {
                               <TableRow key={index}>
                                 <TableCell className="text-left">
                                   <Popover open={autocompleteOpen === index} onOpenChange={(open) => setAutocompleteOpen(open ? index : null)}>
-                                    <PopoverTrigger asChild>
-                                      <div>
-                                        <Input
-                                          value={item.description}
-                                          onChange={(e) => {
-                                            handleItemChange(index, "description", e.target.value);
-                                            setSearchQuery({ ...searchQuery, [index]: e.target.value });
-                                            setCurrentSearchIndex(index);
-                                            if (e.target.value.length >= 2) {
-                                              setAutocompleteOpen(index);
-                                            } else {
-                                              setAutocompleteOpen(null);
-                                            }
-                                          }}
-                                          onFocus={() => {
-                                            setCurrentSearchIndex(index);
-                                            if (item.description.length >= 2) {
-                                              setAutocompleteOpen(index);
-                                            }
-                                          }}
-                                          onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
-                                          placeholder="Tapez pour rechercher..."
-                                        />
-                                      </div>
-                                    </PopoverTrigger>
+                                    <PopoverAnchor asChild>
+                                      <Input
+                                        value={item.description}
+                                        onChange={(e) => {
+                                          handleItemChange(index, "description", e.target.value);
+                                          setSearchQuery({ ...searchQuery, [index]: e.target.value });
+                                          setCurrentSearchIndex(index);
+                                          if (e.target.value.length >= 2) {
+                                            setAutocompleteOpen(index);
+                                          } else {
+                                            setAutocompleteOpen(null);
+                                          }
+                                        }}
+                                        onFocus={() => {
+                                          setCurrentSearchIndex(index);
+                                          if (item.description.length >= 2) {
+                                            setAutocompleteOpen(index);
+                                          }
+                                        }}
+                                        onBlur={() => setTimeout(() => setAutocompleteOpen(null), 200)}
+                                        placeholder="Tapez pour rechercher..."
+                                      />
+                                    </PopoverAnchor>
                                     <PopoverContent className="w-[400px] p-0" align="start">
                                       <Command>
                                         <CommandList>
