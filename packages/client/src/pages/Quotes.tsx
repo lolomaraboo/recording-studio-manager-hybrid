@@ -77,16 +77,17 @@ export function Quotes() {
   }, [quotes]);
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, React.ReactNode> = {
-      draft: <Badge variant="secondary">Brouillon</Badge>,
-      sent: <Badge className="bg-blue-500">Envoyé</Badge>,
-      accepted: <Badge className="bg-green-500">Accepté</Badge>,
-      rejected: <Badge variant="destructive">Refusé</Badge>,
-      expired: <Badge variant="outline" className="text-gray-500">Expiré</Badge>,
-      cancelled: <Badge variant="secondary">Annulé</Badge>,
-      converted_to_project: <Badge className="bg-purple-500">Converti</Badge>,
+    const variants: Record<string, { label: string; className: string }> = {
+      draft: { label: "Brouillon", className: "bg-gray-100 text-gray-700 border-gray-200" },
+      sent: { label: "Envoyé", className: "bg-blue-100 text-blue-700 border-blue-200" },
+      accepted: { label: "Accepté", className: "bg-green-100 text-green-700 border-green-200" },
+      rejected: { label: "Refusé", className: "bg-red-100 text-red-700 border-red-200" },
+      expired: { label: "Expiré", className: "bg-amber-100 text-amber-700 border-amber-200" },
+      cancelled: { label: "Annulé", className: "bg-gray-100 text-gray-500 border-gray-200" },
+      converted_to_project: { label: "Converti", className: "bg-purple-100 text-purple-700 border-purple-200" },
     };
-    return badges[status] || badges.draft;
+    const config = variants[status] || variants.draft;
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
 
   return (
@@ -192,13 +193,13 @@ export function Quotes() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="draft">Brouillon</SelectItem>
-                  <SelectItem value="sent">Envoyé</SelectItem>
-                  <SelectItem value="accepted">Accepté</SelectItem>
-                  <SelectItem value="rejected">Refusé</SelectItem>
-                  <SelectItem value="expired">Expiré</SelectItem>
-                  <SelectItem value="cancelled">Annulé</SelectItem>
-                  <SelectItem value="converted_to_project">Converti</SelectItem>
+                  <SelectItem value="draft"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-gray-400" />Brouillon</span></SelectItem>
+                  <SelectItem value="sent"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-blue-500" />Envoyé</span></SelectItem>
+                  <SelectItem value="accepted"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" />Accepté</span></SelectItem>
+                  <SelectItem value="rejected"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-red-500" />Refusé</span></SelectItem>
+                  <SelectItem value="expired"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-amber-500" />Expiré</span></SelectItem>
+                  <SelectItem value="cancelled"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-gray-400" />Annulé</span></SelectItem>
+                  <SelectItem value="converted_to_project"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-purple-500" />Converti</span></SelectItem>
                 </SelectContent>
               </Select>
             </div>
