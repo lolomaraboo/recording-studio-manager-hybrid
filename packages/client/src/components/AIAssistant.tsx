@@ -214,27 +214,35 @@ export function AIAssistant() {
         for (const action of response.actionsCalled) {
           // Client actions
           if (action.includes('client')) {
-            utils.clients.list.invalidate();
+            utils.clients.invalidate();
           }
           // Session actions
           if (action.includes('session')) {
-            utils.sessions.list.invalidate();
+            utils.sessions.invalidate();
           }
           // Invoice actions
           if (action.includes('invoice')) {
-            utils.invoices.list.invalidate();
+            utils.invoices.invalidate();
           }
           // Room actions
           if (action.includes('room')) {
-            utils.rooms.list.invalidate();
+            utils.rooms.invalidate();
           }
           // Equipment actions
           if (action.includes('equipment')) {
-            utils.equipment.list.invalidate();
+            utils.equipment.invalidate();
+          }
+          // Quote actions
+          if (action.includes('quote')) {
+            utils.quotes.invalidate();
           }
           // Project actions
           if (action.includes('project')) {
-            utils.projects.list.invalidate();
+            utils.projects.invalidate();
+          }
+          // Musician actions
+          if (action.includes('musician')) {
+            utils.musicians.invalidate();
           }
         }
       }
