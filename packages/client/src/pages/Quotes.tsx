@@ -91,7 +91,7 @@ export function Quotes() {
   };
 
   return (
-    <div className="pt-2 pb-4 px-2">
+    <div className="container pt-2 pb-4 px-2">
       <div className="space-y-2">
         {/* Header Section */}
         <div className="flex items-center justify-between">
