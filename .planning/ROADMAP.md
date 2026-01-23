@@ -2237,9 +2237,9 @@ Appliquer le pattern accordion établi à Rooms. Créer RoomEditForm avec accord
 **Plans**: 1 plan
 
 Plans:
-- [ ] 32-01-PLAN.md — ProjectEditForm component + update ProjectCreate page
+- [x] 32-01-PLAN.md — ProjectEditForm component + update ProjectCreate & ProjectDetail pages
 
-**Status**: Ready for execution
+**Status**: Complete (2026-01-22)
 
 **Details**:
 Appliquer le pattern accordion établi à Projects. Créer ProjectEditForm avec accordions (Informations, Planning, Budget, Notes), remplacer formulaire inline dans ProjectCreate. Projects a plus de champs que Service (comme Talents), donc utiliser TalentEditForm comme template.
