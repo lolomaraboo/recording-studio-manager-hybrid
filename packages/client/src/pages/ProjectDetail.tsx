@@ -42,6 +42,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { FileUploadButton } from "@/components/FileUploadButton";
+import { ProjectEditForm } from "@/components/ProjectEditForm";
 
 const projectTypeLabels: Record<string, string> = {
   album: "Album",
@@ -141,8 +142,9 @@ export default function ProjectDetail() {
     },
   });
 
-  // Form state
+  // Form state with ALL 20+ fields
   const [formData, setFormData] = useState({
+    clientId: 0,
     name: "",
     artistName: "",
     description: "",
@@ -157,12 +159,22 @@ export default function ProjectDetail() {
       | "completed"
       | "delivered"
       | "archived",
+    startDate: "",
     targetDeliveryDate: "",
     actualDeliveryDate: "",
+    endDate: "",
     budget: "",
     totalCost: "",
+    trackCount: 0,
     label: "",
+    catalogNumber: "",
+    coverArtUrl: "",
+    spotifyUrl: "",
+    appleMusicUrl: "",
+    storageLocation: "",
+    storageSize: 0,
     notes: "",
+    technicalNotes: "",
   });
 
   // Track form state
@@ -199,40 +211,66 @@ export default function ProjectDetail() {
     technicalNotes: "",
   });
 
-  // Update form when project loads
+  // Update form when project loads (with ALL 20+ fields)
   useEffect(() => {
     if (project) {
       setFormData({
+        clientId: project.clientId,
         name: project.name,
         artistName: project.artistName || "",
         description: project.description || "",
         genre: project.genre || "",
         type: project.type as "single" | "album" | "ep" | "demo" | "soundtrack" | "podcast",
         status: project.status as "pre_production" | "recording" | "mixing" | "mastering" | "editing" | "delivered" | "archived" | "completed",
+        startDate: project.startDate
+          ? new Date(project.startDate).toISOString().split("T")[0]
+          : "",
         targetDeliveryDate: project.targetDeliveryDate
           ? new Date(project.targetDeliveryDate).toISOString().split("T")[0]
           : "",
         actualDeliveryDate: project.actualDeliveryDate
           ? new Date(project.actualDeliveryDate).toISOString().split("T")[0]
           : "",
+        endDate: project.endDate
+          ? new Date(project.endDate).toISOString().split("T")[0]
+          : "",
         budget: project.budget || "",
         totalCost: project.totalCost || "",
+        trackCount: project.trackCount || 0,
         label: project.label || "",
+        catalogNumber: project.catalogNumber || "",
+        coverArtUrl: project.coverArtUrl || "",
+        spotifyUrl: project.spotifyUrl || "",
+        appleMusicUrl: project.appleMusicUrl || "",
+        storageLocation: project.storageLocation || "",
+        storageSize: project.storageSize || 0,
         notes: project.notes || "",
+        technicalNotes: project.technicalNotes || "",
       });
     }
   }, [project]);
 
   const handleSave = () => {
+    // Note: Only sending fields supported by projects.update router (Phase 32)
     updateMutation.mutate({
       id: Number(id),
-      ...formData,
+      name: formData.name,
+      artistName: formData.artistName || undefined,
+      description: formData.description || undefined,
+      genre: formData.genre || undefined,
+      type: formData.type,
+      status: formData.status,
       targetDeliveryDate: formData.targetDeliveryDate
         ? new Date(formData.targetDeliveryDate)
         : undefined,
       actualDeliveryDate: formData.actualDeliveryDate
         ? new Date(formData.actualDeliveryDate)
         : undefined,
+      budget: formData.budget || undefined,
+      totalCost: formData.totalCost || undefined,
+      label: formData.label || undefined,
+      coverArtUrl: formData.coverArtUrl || undefined,
+      notes: formData.notes || undefined,
     });
   };
 
@@ -351,127 +389,7 @@ export default function ProjectDetail() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
-                  <>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Nom du projet</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="artistName">Artiste</Label>
-                        <Input
-                          id="artistName"
-                          value={formData.artistName}
-                          onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <div className="space-y-2">
-                        <Label htmlFor="type">Type</Label>
-                        <Select
-                          value={formData.type}
-                          onValueChange={(value: any) => setFormData({ ...formData, type: value })}
-                        >
-                          <SelectTrigger id="type">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(projectTypeLabels).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="genre">Genre</Label>
-                        <Input
-                          id="genre"
-                          value={formData.genre}
-                          onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                          placeholder="Rock, Pop, Jazz..."
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="label">Label</Label>
-                        <Input
-                          id="label"
-                          value={formData.label}
-                          onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="targetDeliveryDate">Date de livraison prévue</Label>
-                        <Input
-                          id="targetDeliveryDate"
-                          type="date"
-                          value={formData.targetDeliveryDate}
-                          onChange={(e) =>
-                            setFormData({ ...formData, targetDeliveryDate: e.target.value })
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="actualDeliveryDate">Date de livraison réelle</Label>
-                        <Input
-                          id="actualDeliveryDate"
-                          type="date"
-                          value={formData.actualDeliveryDate}
-                          onChange={(e) =>
-                            setFormData({ ...formData, actualDeliveryDate: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="budget">Budget (€)</Label>
-                        <Input
-                          id="budget"
-                          type="number"
-                          step="0.01"
-                          value={formData.budget}
-                          onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="totalCost">Coût total (€)</Label>
-                        <Input
-                          id="totalCost"
-                          type="number"
-                          step="0.01"
-                          value={formData.totalCost}
-                          onChange={(e) => setFormData({ ...formData, totalCost: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                  </>
+                  <ProjectEditForm formData={formData} setFormData={setFormData} />
                 ) : (
                   <>
                     <div>
