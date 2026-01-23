@@ -302,7 +302,7 @@ test.describe('Chatbot CRUD - Quotes (Devis)', () => {
 
       expect(createdQuote).toBeDefined();
       expect(createdQuote.quoteNumber).toBe(TEST_QUOTE_NUMBER);
-      expect(createdQuote.title).toBe('Session Enregistrement E2E');
+      expect(createdQuote.clientId).toBe(1);
 
       createdQuoteId = createdQuote.id;
       console.log(`  ✓ Quote verified via API: ID ${createdQuoteId}`);
