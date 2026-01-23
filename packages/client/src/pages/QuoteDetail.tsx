@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import {
   ArrowLeft,
@@ -50,6 +51,7 @@ export default function QuoteDetail() {
 
   // Fetch related data
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
+  const { data: vatRates } = trpc.vatRates.list.useQuery();
 
   // Mutations
   const updateMutation = trpc.quotes.update.useMutation({
@@ -233,16 +235,17 @@ export default function QuoteDetail() {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, React.ReactNode> = {
-      draft: <Badge variant="secondary">Brouillon</Badge>,
-      sent: <Badge className="bg-blue-500">Envoyé</Badge>,
-      accepted: <Badge className="bg-green-500">Accepté</Badge>,
-      rejected: <Badge variant="destructive">Refusé</Badge>,
-      expired: <Badge variant="outline" className="text-gray-500">Expiré</Badge>,
-      cancelled: <Badge variant="secondary">Annulé</Badge>,
-      converted_to_project: <Badge className="bg-purple-500">Converti</Badge>,
+    const variants: Record<string, { label: string; className: string }> = {
+      draft: { label: "Brouillon", className: "bg-gray-100 text-gray-700 border-gray-200" },
+      sent: { label: "Envoyé", className: "bg-blue-100 text-blue-700 border-blue-200" },
+      accepted: { label: "Accepté", className: "bg-green-100 text-green-700 border-green-200" },
+      rejected: { label: "Refusé", className: "bg-red-100 text-red-700 border-red-200" },
+      expired: { label: "Expiré", className: "bg-amber-100 text-amber-700 border-amber-200" },
+      cancelled: { label: "Annulé", className: "bg-gray-100 text-gray-500 border-gray-200" },
+      converted_to_project: { label: "Converti", className: "bg-purple-100 text-purple-700 border-purple-200" },
     };
-    return badges[status] || badges.draft;
+    const config = variants[status] || variants.draft;
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
 
   if (isLoading) {
@@ -269,55 +272,64 @@ export default function QuoteDetail() {
   const client = clients?.find((c: any) => c.id === quote.clientId);
 
   return (
+    <>
     <div className="container pt-2 pb-4 px-2">
       <div className="space-y-2">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-4">
-            <Link to="/quotes">
-              <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/quotes">
                 <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             <div>
-              <h1 className="text-3xl font-bold">Devis {quote.quoteNumber}</h1>
-              <p className="text-muted-foreground">
-                {client ? `${client.name}` : "Client non trouvé"}
-              </p>
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <FileText className="h-8 w-8 text-primary" />
+                Devis {quote.quoteNumber}
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <Link to={`/clients/${client?.id}`} className="hover:underline">{client?.name || "Client inconnu"}</Link>
+                {client?.email && <span>• {client.email}</span>}
+              </div>
             </div>
           </div>
           <div className="flex gap-2 flex-wrap ml-auto">
             {!isEditing ? (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownloadPDF}
-                  disabled={generatePDFMutation.isPending}
-                >
+                <Button variant="outline" onClick={handleDownloadPDF} disabled={generatePDFMutation.isPending}>
                   <Download className="mr-2 h-4 w-4" />
-                  {generatePDFMutation.isPending ? "Génération..." : "Télécharger PDF"}
+                  PDF
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                {quote.status === "draft" && (
+                  <Button variant="outline" onClick={handleSend} disabled={sendMutation.isPending}>
+                    <Send className="mr-2 h-4 w-4" />
+                    Envoyer
+                  </Button>
+                )}
+                {quote.status === "sent" && !quote.isExpired && (
+                  <Button variant="default" onClick={handleAccept} disabled={acceptMutation.isPending}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Accepter
+                  </Button>
+                )}
+                <Button variant="outline" onClick={() => setIsEditing(true)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Modifier
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowDeleteDialog(true)}
-                >
+                <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Supprimer
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
                   <X className="mr-2 h-4 w-4" />
                   Annuler
                 </Button>
-                <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
+                <Button onClick={handleSave} disabled={updateMutation.isPending}>
                   <Save className="mr-2 h-4 w-4" />
                   Enregistrer
                 </Button>
@@ -326,53 +338,19 @@ export default function QuoteDetail() {
           </div>
         </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Quote Info */}
+        <div className="space-y-4">
+          {/* Quote Info Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Informations du devis</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Informations du devis</CardTitle>
+                {getStatusBadge(quote.displayStatus || quote.status)}
+              </div>
+              <CardDescription className="text-sm">Détails et paramètres du devis</CardDescription>
             </CardHeader>
-            <CardContent className="pt-0 space-y-4">
-              {!isEditing ? (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">N° Devis</p>
-                      <p className="font-medium">{quote.quoteNumber}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Statut</p>
-                      <div className="mt-1">{getStatusBadge(quote.status)}</div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Date de création</p>
-                      <p className="font-medium">
-                        {format(new Date(quote.createdAt), "PPP", { locale: fr })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Validité</p>
-                      <p className="font-medium">{quote.validityDays || 30} jours</p>
-                    </div>
-                    {quote.expiresAt && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Expire le</p>
-                        <p className="font-medium">
-                          {format(new Date(quote.expiresAt), "PPP", { locale: fr })}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  {quote.notes && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Notes</p>
-                      <p className="whitespace-pre-wrap">{quote.notes}</p>
-                    </div>
-                  )}
-                </>
-              ) : (
+            <CardContent className="space-y-4">
+              {isEditing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="notes">Notes</Label>
@@ -409,69 +387,196 @@ export default function QuoteDetail() {
                     />
                   </div>
                 </div>
+              ) : (
+                <>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Client</p>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        <Link to={`/clients/${client?.id}`} className="text-sm hover:underline">
+                          {client?.name || "N/A"}
+                        </Link>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Numéro</p>
+                      <p className="text-sm font-medium">{quote.quoteNumber}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Date de création</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" />
+                        {format(new Date(quote.createdAt), "dd MMMM yyyy", { locale: fr })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Validité</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" />
+                        {quote.validityDays || 30} jours
+                        {quote.expiresAt && (
+                          <span className="text-muted-foreground">
+                            (expire le {format(new Date(quote.expiresAt), "dd MMM yyyy", { locale: fr })})
+                          </span>
+                        )}
+                      </div>
+                      {quote.isExpired && (
+                        <p className="text-xs text-amber-600 mt-1">⚠️ Expiré</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {quote.convertedAt && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Converti le</p>
+                      <div className="flex items-center gap-2 text-sm text-purple-600">
+                        <CheckCircle className="h-4 w-4" />
+                        {format(new Date(quote.convertedAt), "dd MMMM yyyy", { locale: fr })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Footer dates */}
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-3 border-t mt-4">
+                    <span>Créé le {format(new Date(quote.createdAt), "dd MMM yyyy", { locale: fr })}</span>
+                    <span>•</span>
+                    <span>Mise à jour le {format(new Date(quote.updatedAt), "dd MMM yyyy", { locale: fr })}</span>
+                  </div>
+
+                  {quote.isExpired && (
+                    <div className="bg-amber-50 dark:bg-amber-950 p-3 rounded-md mt-2">
+                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">
+                        Devis expiré
+                      </p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        Créez un nouveau devis si nécessaire.
+                      </p>
+                    </div>
+                  )}
+
+                  {quote.status === "accepted" && (
+                    <div className="bg-green-50 dark:bg-green-950 p-3 rounded-md mt-2">
+                      <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                        Devis accepté par le client
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
 
-          {/* Pricing */}
+          {/* Items & Pricing Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Montants</CardTitle>
+              <CardTitle className="text-base">Détails du devis</CardTitle>
+              <CardDescription className="text-sm">Lignes et montants du devis</CardDescription>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3">
+            <CardContent className="space-y-4">
+              {/* Items table */}
+              {quote.items && quote.items.length > 0 ? (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="w-24">Quantité</TableHead>
+                        <TableHead className="w-32">Prix unit.</TableHead>
+                        <TableHead className="w-24">TVA</TableHead>
+                        <TableHead className="w-32 text-right">Montant</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {quote.items.map((item: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium text-left">{item.description}</TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>{parseFloat(item.unitPrice).toFixed(2)} €</TableCell>
+                          <TableCell>{vatRates?.find((r: any) => r.id === item.vatRateId)?.rate || "20"}%</TableCell>
+                          <TableCell className="text-right">{parseFloat(item.amount).toFixed(2)} €</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Aucune ligne de détail</p>
+              )}
+
+              {/* Totals */}
+              <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Sous-total</span>
-                  <span className="font-medium">{quote.subtotal} €</span>
+                  <span className="text-muted-foreground">Sous-total HT</span>
+                  <span className="font-medium">
+                    {parseFloat(quote.subtotal || "0").toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}€
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
-                    TVA ({quote.taxRate}%)
+                    TVA ({parseFloat(quote.taxRate || "20").toFixed(0)}%)
                   </span>
-                  <span className="font-medium">{quote.taxAmount} €</span>
+                  <span className="font-medium">
+                    {parseFloat(quote.taxAmount || "0").toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}€
+                  </span>
                 </div>
-                <div className="border-t pt-2 flex justify-between">
-                  <span className="font-semibold">Total</span>
-                  <span className="text-2xl font-bold">{quote.total} €</span>
+                <div className="flex justify-between text-lg font-semibold border-t pt-2">
+                  <span>Total TTC</span>
+                  <span className="text-primary">
+                    {parseFloat(quote.total || "0").toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}€
+                  </span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Terms & Notes */}
-          {(quote.terms || quote.notes) && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Conditions et notes</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0 space-y-4">
-                {quote.terms && (
-                  <div>
-                    <p className="text-sm font-medium mb-2">Conditions</p>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {quote.terms}
-                    </p>
-                  </div>
-                )}
-                {quote.notes && (
-                  <div>
-                    <p className="text-sm font-medium mb-2">Notes</p>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {quote.notes}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+          {/* Notes Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Notes et conditions</CardTitle>
+              <CardDescription className="text-sm">Notes et conditions du devis</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {quote.notes ? (
+                <div>
+                  <p className="text-sm font-medium mb-1">Notes</p>
+                  <p className="text-sm whitespace-pre-wrap">{quote.notes}</p>
+                </div>
+              ) : null}
+              {quote.terms ? (
+                <div>
+                  <p className="text-sm font-medium mb-1">Conditions</p>
+                  <p className="text-sm whitespace-pre-wrap">{quote.terms}</p>
+                </div>
+              ) : null}
+              {!quote.notes && !quote.terms && (
+                <p className="text-sm text-muted-foreground">Aucune note</p>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Actions Section - State Transitions */}
+          {/* Actions Card - State Transitions */}
           {!isEditing && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">Actions</CardTitle>
+                <CardDescription className="text-sm">Transitions de statut du devis</CardDescription>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {/* DRAFT: Can send or cancel */}
                   {quote.status === "draft" && (
@@ -482,12 +587,12 @@ export default function QuoteDetail() {
                       </Button>
                       <Button variant="destructive" onClick={handleCancel} disabled={cancelMutation.isPending}>
                         <XCircle className="h-4 w-4 mr-2" />
-                        Annuler
+                        Annuler le devis
                       </Button>
                     </>
                   )}
 
-                  {/* SENT: Can accept, reject, cancel, or revert */}
+                  {/* SENT: Can accept, reject, or revert */}
                   {quote.status === "sent" && !quote.isExpired && (
                     <>
                       <Button onClick={handleAccept} disabled={acceptMutation.isPending}>
@@ -515,9 +620,9 @@ export default function QuoteDetail() {
 
                   {/* EXPIRED: Show message */}
                   {quote.isExpired && (
-                    <div className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Ce devis a expiré. Créez un nouveau devis si nécessaire.
-                    </div>
+                    </p>
                   )}
 
                   {/* CANCELLED/REJECTED: Can revert to draft */}
@@ -530,106 +635,41 @@ export default function QuoteDetail() {
 
                   {/* CONVERTED: No actions */}
                   {quote.status === "converted_to_project" && (
-                    <div className="text-sm text-muted-foreground">
-                      Aucune action disponible pour ce devis.
-                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Ce devis a été converti en projet.
+                    </p>
                   )}
                 </div>
               </CardContent>
             </Card>
           )}
         </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Client Card */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Client
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {client ? (
-                <div className="space-y-2">
-                  <p className="font-medium">{client.name}</p>
-                  {client.email && (
-                    <p className="text-sm text-muted-foreground">{client.email}</p>
-                  )}
-                  {client.phone && (
-                    <p className="text-sm text-muted-foreground">{client.phone}</p>
-                  )}
-                  <Link to={`/clients/${client.id}`}>
-                    <Button variant="outline" size="sm" className="w-full mt-2">
-                      Voir le profil
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Client non trouvé</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Metadata */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Métadonnées
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-3">
-              <div>
-                <p className="text-sm text-muted-foreground">Créé le</p>
-                <p className="text-sm font-medium">
-                  {format(new Date(quote.createdAt), "PPP", { locale: fr })}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Modifié le</p>
-                <p className="text-sm font-medium">
-                  {format(new Date(quote.updatedAt), "PPP", { locale: fr })}
-                </p>
-              </div>
-              {quote.convertedAt && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Converti le</p>
-                  <p className="text-sm font-medium">
-                    {format(new Date(quote.convertedAt), "PPP", { locale: fr })}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Delete Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Supprimer le devis</DialogTitle>
-            <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Annuler
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
-            >
-              Supprimer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       </div>
     </div>
+
+    {/* Delete Dialog */}
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Supprimer le devis</DialogTitle>
+          <DialogDescription>
+            Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+            Annuler
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending}
+          >
+            Supprimer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
