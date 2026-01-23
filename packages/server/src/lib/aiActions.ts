@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { eq, gte, lte, and, desc, sql } from "drizzle-orm";
+import { eq, gte, lte, and, desc, sql, ilike } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import {
   sessions,
@@ -458,13 +458,37 @@ export class AIActionExecutor {
    * Update client
    */
   async update_client(params: {
-    client_id: number;
+    client_id?: number;
+    client_name?: string;
     name?: string;
     email?: string;
     phone?: string;
     is_vip?: boolean;
   }) {
-    const { client_id, ...updates } = params;
+    const { client_id, client_name, ...updates } = params;
+
+    // Resolve client ID from name if needed
+    let resolvedClientId = client_id;
+    if (!resolvedClientId && client_name) {
+      const found = await this.db
+        .select({ id: clients.id, name: clients.name })
+        .from(clients)
+        .where(and(
+          ilike(clients.name, `%${client_name}%`),
+          eq(clients.isActive, true)
+        ))
+        .limit(2);
+      if (found.length === 0) {
+        throw new Error(`Client "${client_name}" introuvable`);
+      }
+      if (found.length > 1) {
+        throw new Error(`Plusieurs clients correspondent a "${client_name}": ${found.map(c => c.name).join(', ')}. Precisez le nom complet ou utilisez l'ID.`);
+      }
+      resolvedClientId = found[0].id;
+    }
+    if (!resolvedClientId) {
+      throw new Error("Veuillez fournir client_id ou client_name");
+    }
 
     const updateData: any = {};
     if (updates.name) updateData.name = updates.name;
@@ -475,11 +499,11 @@ export class AIActionExecutor {
     const result = await this.db
       .update(clients)
       .set(updateData)
-      .where(eq(clients.id, client_id))
+      .where(eq(clients.id, resolvedClientId))
       .returning();
 
     if (result.length === 0) {
-      throw new Error(`Client ${client_id} not found`);
+      throw new Error(`Client ${resolvedClientId} not found`);
     }
 
     return result[0];
@@ -488,21 +512,44 @@ export class AIActionExecutor {
   /**
    * Delete client
    */
-  async delete_client(params: { client_id: number }) {
-    const { client_id } = params;
+  async delete_client(params: { client_id?: number; client_name?: string }) {
+    const { client_id, client_name } = params;
+
+    // Resolve client ID from name if needed
+    let resolvedClientId = client_id;
+    if (!resolvedClientId && client_name) {
+      const found = await this.db
+        .select({ id: clients.id, name: clients.name })
+        .from(clients)
+        .where(and(
+          ilike(clients.name, `%${client_name}%`),
+          eq(clients.isActive, true)
+        ))
+        .limit(2);
+      if (found.length === 0) {
+        throw new Error(`Client "${client_name}" introuvable`);
+      }
+      if (found.length > 1) {
+        throw new Error(`Plusieurs clients correspondent a "${client_name}": ${found.map(c => c.name).join(', ')}. Precisez le nom complet ou utilisez l'ID.`);
+      }
+      resolvedClientId = found[0].id;
+    }
+    if (!resolvedClientId) {
+      throw new Error("Veuillez fournir client_id ou client_name");
+    }
 
     // Soft delete (set isActive = false)
     const result = await this.db
       .update(clients)
       .set({ isActive: false })
-      .where(eq(clients.id, client_id))
+      .where(eq(clients.id, resolvedClientId))
       .returning();
 
     if (result.length === 0) {
-      throw new Error(`Client ${client_id} not found`);
+      throw new Error(`Client ${resolvedClientId} not found`);
     }
 
-    return { deleted: true, id: client_id };
+    return { deleted: true, id: resolvedClientId };
   }
 
   /**
@@ -1304,7 +1351,8 @@ export class AIActionExecutor {
   }
 
   async update_quote(params: {
-    quote_id: number;
+    quote_id?: number;
+    quote_number?: string;
     status?: string;
     valid_until?: string;
     title?: string;
@@ -1312,7 +1360,24 @@ export class AIActionExecutor {
     notes?: string;
     items?: Array<{ description: string; quantity?: number; unit_price: number; tax_rate?: number }>;
   }) {
-    const { quote_id, status, valid_until, title, description, notes, items } = params;
+    const { quote_id, quote_number, status, valid_until, title, description, notes, items } = params;
+
+    // Resolve quote ID from quote_number if needed
+    let resolvedQuoteId = quote_id;
+    if (!resolvedQuoteId && quote_number) {
+      const found = await this.db
+        .select({ id: quotes.id })
+        .from(quotes)
+        .where(eq(quotes.quoteNumber, quote_number))
+        .limit(1);
+      if (found.length === 0) {
+        throw new Error(`Devis "${quote_number}" introuvable`);
+      }
+      resolvedQuoteId = found[0].id;
+    }
+    if (!resolvedQuoteId) {
+      throw new Error("Veuillez fournir quote_id ou quote_number");
+    }
 
     const updateData: any = { updatedAt: new Date() };
     if (status) updateData.status = status;
@@ -1326,7 +1391,7 @@ export class AIActionExecutor {
       // Delete existing items
       await this.db
         .delete(quoteItems)
-        .where(eq(quoteItems.quoteId, quote_id));
+        .where(eq(quoteItems.quoteId, resolvedQuoteId));
 
       // Calculate new totals
       const calc = this.calculateTotalsFromItems(items);
@@ -1340,7 +1405,7 @@ export class AIActionExecutor {
         const qty = item.quantity || 1;
         const amount = qty * item.unit_price;
         return {
-          quoteId: quote_id,
+          quoteId: resolvedQuoteId,
           description: item.description,
           quantity: qty.toFixed(2),
           unitPrice: item.unit_price.toFixed(2),
@@ -1355,32 +1420,49 @@ export class AIActionExecutor {
     const [updated] = await this.db
       .update(quotes)
       .set(updateData)
-      .where(eq(quotes.id, quote_id))
+      .where(eq(quotes.id, resolvedQuoteId))
       .returning();
 
     if (!updated) {
-      throw new Error(`Devis #${quote_id} introuvable`);
+      throw new Error(`Devis #${resolvedQuoteId} introuvable`);
     }
 
     return {
       quote: updated,
       items_updated: items ? items.length : 0,
       message: items
-        ? `Devis #${quote_id} mis à jour avec ${items.length} ligne(s)`
-        : `Devis #${quote_id} mis à jour`,
+        ? `Devis #${resolvedQuoteId} mis à jour avec ${items.length} ligne(s)`
+        : `Devis #${resolvedQuoteId} mis à jour`,
     };
   }
 
-  async delete_quote(params: { quote_id: number }) {
-    const { quote_id } = params;
+  async delete_quote(params: { quote_id?: number; quote_number?: string }) {
+    const { quote_id, quote_number } = params;
+
+    // Resolve quote ID from quote_number if needed
+    let resolvedQuoteId = quote_id;
+    if (!resolvedQuoteId && quote_number) {
+      const found = await this.db
+        .select({ id: quotes.id })
+        .from(quotes)
+        .where(eq(quotes.quoteNumber, quote_number))
+        .limit(1);
+      if (found.length === 0) {
+        throw new Error(`Devis "${quote_number}" introuvable`);
+      }
+      resolvedQuoteId = found[0].id;
+    }
+    if (!resolvedQuoteId) {
+      throw new Error("Veuillez fournir quote_id ou quote_number");
+    }
 
     // Items are deleted by CASCADE, but be explicit
-    await this.db.delete(quoteItems).where(eq(quoteItems.quoteId, quote_id));
-    await this.db.delete(quotes).where(eq(quotes.id, quote_id));
+    await this.db.delete(quoteItems).where(eq(quoteItems.quoteId, resolvedQuoteId));
+    await this.db.delete(quotes).where(eq(quotes.id, resolvedQuoteId));
 
     return {
-      message: `Devis #${quote_id} supprimé`,
-      quote_id,
+      message: `Devis #${resolvedQuoteId} supprimé`,
+      quote_id: resolvedQuoteId,
     };
   }
 
