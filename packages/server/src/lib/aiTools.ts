@@ -202,6 +202,10 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du client à modifier",
         },
+        client_name: {
+          type: "string",
+          description: "Nom du client. Alternative à client_id pour identifier le client par son nom.",
+        },
         name: {
           type: "string",
           description: "Nouveau nom (optionnel)",
@@ -219,7 +223,7 @@ export const AI_TOOLS: ToolDefinition[] = [
           description: "Nouveau statut VIP (optionnel)",
         },
       },
-      required: ["client_id"],
+      required: [],
     },
   },
   {
@@ -232,8 +236,12 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du client à supprimer",
         },
+        client_name: {
+          type: "string",
+          description: "Nom du client. Alternative à client_id pour identifier le client par son nom.",
+        },
       },
-      required: ["client_id"],
+      required: [],
     },
   },
   {
@@ -706,6 +714,10 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du devis à modifier",
         },
+        quote_number: {
+          type: "string",
+          description: "Numéro du devis (ex: QT-2025-001). Alternative à quote_id.",
+        },
         status: {
           type: "string",
           description: "Nouveau statut: draft, sent, accepted, rejected, expired, converted",
@@ -753,7 +765,7 @@ export const AI_TOOLS: ToolDefinition[] = [
           },
         },
       },
-      required: ["quote_id"],
+      required: [],
     },
   },
   {
@@ -766,8 +778,12 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID du devis",
         },
+        quote_number: {
+          type: "string",
+          description: "Numéro du devis (ex: QT-2025-001). Alternative à quote_id.",
+        },
       },
-      required: ["quote_id"],
+      required: [],
     },
   },
   {
