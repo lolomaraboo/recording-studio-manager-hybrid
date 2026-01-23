@@ -303,13 +303,13 @@ export default function QuoteDetail() {
                   PDF
                 </Button>
                 {quote.status === "draft" && (
-                  <Button variant="outline" onClick={handleSend} disabled={sendMutation.isPending}>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSend} disabled={sendMutation.isPending}>
                     <Send className="mr-2 h-4 w-4" />
                     Envoyer
                   </Button>
                 )}
                 {quote.status === "sent" && !quote.isExpired && (
-                  <Button variant="default" onClick={handleAccept} disabled={acceptMutation.isPending}>
+                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleAccept} disabled={acceptMutation.isPending}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Accepter
                   </Button>
@@ -581,7 +581,7 @@ export default function QuoteDetail() {
                   {/* DRAFT: Can send or cancel */}
                   {quote.status === "draft" && (
                     <>
-                      <Button onClick={handleSend} disabled={sendMutation.isPending}>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSend} disabled={sendMutation.isPending}>
                         <Send className="h-4 w-4 mr-2" />
                         {sendMutation.isPending ? "Envoi..." : "Envoyer au client"}
                       </Button>
@@ -595,11 +595,11 @@ export default function QuoteDetail() {
                   {/* SENT: Can accept, reject, or revert */}
                   {quote.status === "sent" && !quote.isExpired && (
                     <>
-                      <Button onClick={handleAccept} disabled={acceptMutation.isPending}>
+                      <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleAccept} disabled={acceptMutation.isPending}>
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Accepter
                       </Button>
-                      <Button variant="outline" onClick={handleReject} disabled={rejectMutation.isPending}>
+                      <Button variant="destructive" onClick={handleReject} disabled={rejectMutation.isPending}>
                         <XCircle className="h-4 w-4 mr-2" />
                         Refuser
                       </Button>
@@ -612,7 +612,7 @@ export default function QuoteDetail() {
 
                   {/* ACCEPTED: Can convert to project */}
                   {quote.status === "accepted" && (
-                    <Button onClick={handleConvertToProject} disabled={convertMutation.isPending}>
+                    <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={handleConvertToProject} disabled={convertMutation.isPending}>
                       <FileText className="h-4 w-4 mr-2" />
                       {convertMutation.isPending ? "Conversion..." : "Convertir en projet"}
                     </Button>
