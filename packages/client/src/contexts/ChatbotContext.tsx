@@ -16,13 +16,27 @@ const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
 export function ChatbotProvider({ children }: { children: ReactNode }) {
   const { isOpen: assistantIsOpen } = useAssistant();
   const [isOpen, setIsOpen] = useState(assistantIsOpen);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isFloating, setIsFloating] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(() => {
+    return localStorage.getItem('chatbot_minimized') === 'true';
+  });
+  const [isFloating, setIsFloating] = useState(() => {
+    return localStorage.getItem('chatbot_floating') === 'true';
+  });
 
   // Synchroniser avec AssistantContext
   useEffect(() => {
     setIsOpen(assistantIsOpen);
   }, [assistantIsOpen]);
+
+  // Persister isMinimized dans localStorage
+  useEffect(() => {
+    localStorage.setItem('chatbot_minimized', String(isMinimized));
+  }, [isMinimized]);
+
+  // Persister isFloating dans localStorage
+  useEffect(() => {
+    localStorage.setItem('chatbot_floating', String(isFloating));
+  }, [isFloating]);
 
   const getChatbotWidth = () => {
     if (!isOpen) return 0; // Fermé: 0px
