@@ -53,6 +53,10 @@ Thumbs.db
 tmp/
 temp/
 
+# GSD (Get Shit Done)
+# Symlink to global GSD installation (machine-specific path)
+.claude/commands/gsd
+
 # Database
 *.db
 *.sqlite
