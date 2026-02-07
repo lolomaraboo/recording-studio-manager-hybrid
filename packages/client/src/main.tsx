@@ -48,14 +48,6 @@ const trpcClient = trpc.createClient({
         return fetch(url, {
           ...options,
           credentials: 'include',
-          headers: {
-            ...options?.headers,
-            // Dev mode: bypass auth with test headers
-            ...(import.meta.env.DEV && {
-              'x-test-user-id': '18',  // test@org24.com
-              'x-test-org-id': '24',  // Test Org Phase 18.4 (tenant_24 - Phase 24 data)
-            }),
-          },
         })
       },
     }),
