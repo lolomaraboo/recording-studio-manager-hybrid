@@ -1,15 +1,18 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { Moon, Sun } from 'lucide-react';
 
 export default function Register() {
   const navigate = useNavigate();
   const { register, isLoading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -50,6 +53,22 @@ export default function Register() {
 
   return (
     <div className="container pt-6 pb-4 px-2">
+      {/* Theme toggle - top right */}
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Mode clair" : "Mode sombre"}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+        </Button>
+      </div>
+
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Register</CardTitle>
@@ -130,9 +149,9 @@ export default function Register() {
             >
               {isSubmitting ? 'Creating account...' : 'Create Account'}
             </Button>
-            <p className="text-sm text-center text-gray-600">
+            <p className="text-sm text-center text-muted-foreground">
               Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:underline">
+              <Link to="/login" className="text-primary hover:underline">
                 Login
               </Link>
             </p>
