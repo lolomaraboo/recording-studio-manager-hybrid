@@ -10,13 +10,29 @@
  * - projects: Projects and tracks
  */
 
-import { pgTable, serial, varchar, text, timestamp, integer, boolean, decimal, date, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean, decimal, date, jsonb, uuid, bigserial } from "drizzle-orm/pg-core";
+
+/**
+ * SYNC COLUMNS (Phase M0 - macOS native app)
+ *
+ * Shared by every business table to support offline-first sync:
+ * - syncUuid: global row identity (serial ids collide across offline devices)
+ * - syncVersion: optimistic concurrency, bumped by DB trigger on every UPDATE
+ *
+ * See: .planning/macos-native/00-ARCHITECTURE-PLAN.md (§4)
+ * Triggers: src/tenant/sync-upgrade.sql
+ */
+const syncColumns = {
+  syncUuid: uuid("sync_uuid").notNull().defaultRandom().unique(),
+  syncVersion: integer("sync_version").notNull().default(1),
+};
 
 /**
  * Clients table (Tenant DB)
  */
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   userId: integer("user_id"), // Optional link to Master DB user
   name: varchar("name", { length: 255 }).notNull(),
   artistName: varchar("artist_name", { length: 255 }),
@@ -74,6 +90,9 @@ export const clients = pgTable("clients", {
   performanceRightsSociety: varchar("performance_rights_society", { length: 100 }), // SACEM, SOCAN, BMI, ASCAP, PRS
 
   // Career Information
+  // Default deposit policy (Phase M0 - workflow review): null = studio default, 0 = no deposit
+  defaultDepositPercent: decimal("default_deposit_percent", { precision: 5, scale: 2 }),
+
   yearsActive: varchar("years_active", { length: 100 }), // e.g., "2015-present" or "2010-2018"
   notableWorks: text("notable_works"),
   awardsRecognition: text("awards_recognition"),
@@ -92,6 +111,7 @@ export type InsertClient = typeof clients.$inferInsert;
  */
 export const clientNotes = pgTable("client_notes", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   clientId: integer("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
   note: text("note").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -107,6 +127,7 @@ export type InsertClientNote = typeof clientNotes.$inferInsert;
  */
 export const clientContacts = pgTable("client_contacts", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   clientId: integer("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
   firstName: varchar("first_name", { length: 100 }).notNull(),
   lastName: varchar("last_name", { length: 100 }).notNull(),
@@ -127,6 +148,7 @@ export type InsertClientContact = typeof clientContacts.$inferInsert;
  */
 export const companyMembers = pgTable("company_members", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   companyClientId: integer("company_client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
   memberClientId: integer("member_client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
   role: varchar("role", { length: 255 }), // e.g., "Directeur Général", "Lead Vocalist"
@@ -144,6 +166,7 @@ export type InsertCompanyMember = typeof companyMembers.$inferInsert;
  */
 export const rooms = pgTable("rooms", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Basic Info
   name: varchar("name", { length: 255 }).notNull(),
@@ -187,6 +210,7 @@ export type InsertRoom = typeof rooms.$inferInsert;
  */
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   clientId: integer("client_id").notNull().references(() => clients.id),
   roomId: integer("room_id").notNull().references(() => rooms.id),
   projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
@@ -194,7 +218,12 @@ export const sessions = pgTable("sessions", {
   description: text("description"),
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time").notNull(),
-  status: varchar("status", { length: 50 }).notNull().default("scheduled"), // "scheduled" | "in_progress" | "completed" | "cancelled"
+  status: varchar("status", { length: 50 }).notNull().default("scheduled"), // "scheduled" | "in_progress" | "completed" | "cancelled" | "conflict"
+
+  // Booking type & recurrence (Phase M0 - GAP-2, see 01-WORKFLOW-GAPS.md)
+  bookingType: varchar("booking_type", { length: 50 }).notNull().default("hourly"), // "hourly" | "daily" | "lockout" | "dry_hire"
+  seriesId: uuid("series_id"), // Groups occurrences of a recurring series (null = one-off)
+  recurrenceRule: text("recurrence_rule"), // iCal RRULE, set on the series master only
 
   // Payment fields
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
@@ -219,6 +248,7 @@ export type InsertSession = typeof sessions.$inferInsert;
  */
 export const invoices = pgTable("invoices", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
   clientId: integer("client_id").notNull().references(() => clients.id),
   issueDate: timestamp("issue_date").notNull().defaultNow(),
@@ -255,6 +285,7 @@ export type InsertInvoice = typeof invoices.$inferInsert;
  */
 export const vatRates = pgTable("vat_rates", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   name: varchar("name", { length: 100 }).notNull(), // "TVA Standard 20%"
   rate: decimal("rate", { precision: 5, scale: 2 }).notNull(), // 20.00
   isDefault: boolean("is_default").notNull().default(false),
@@ -271,6 +302,7 @@ export type InsertVatRate = typeof vatRates.$inferInsert;
  */
 export const invoiceItems = pgTable("invoice_items", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   invoiceId: integer("invoice_id").notNull().references(() => invoices.id),
   description: varchar("description", { length: 500 }).notNull(),
   quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1.00"),
@@ -322,6 +354,7 @@ export const vatRatesRelations = relations(vatRates, ({ many }) => ({
  */
 export const equipment = pgTable("equipment", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   roomId: integer("room_id").references(() => rooms.id), // Optional: equipment can be assigned to a room
 
   // Identity
@@ -374,6 +407,7 @@ export type InsertEquipment = typeof equipment.$inferInsert;
  */
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   clientId: integer("client_id").notNull().references(() => clients.id),
 
   // Basic Info
@@ -395,6 +429,9 @@ export const projects = pgTable("projects", {
   // Financial
   budget: decimal("budget", { precision: 10, scale: 2 }),
   totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+
+  // Revision policy (Phase M0 - GAP-3): revisions included in the quote; beyond = billable
+  includedRevisions: integer("included_revisions").notNull().default(2),
 
   // Details
   trackCount: integer("track_count").default(0),
@@ -427,6 +464,7 @@ export type InsertProject = typeof projects.$inferInsert;
  */
 export const tracks = pgTable("tracks", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   projectId: integer("project_id").notNull().references(() => projects.id),
 
   // Basic Info
@@ -491,6 +529,7 @@ export type InsertTrack = typeof tracks.$inferInsert;
  */
 export const trackComments = pgTable("track_comments", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   trackId: integer("track_id").notNull().references(() => tracks.id, { onDelete: "cascade" }),
 
   // Version-specific comments (demo, rough, final, master)
@@ -530,6 +569,7 @@ export type InsertTrackComment = typeof trackComments.$inferInsert;
  */
 export const musicians = pgTable("musicians", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Identity
   name: varchar("name", { length: 255 }).notNull(),
@@ -572,6 +612,7 @@ export type InsertMusician = typeof musicians.$inferInsert;
  */
 export const trackCredits = pgTable("track_credits", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   trackId: integer("track_id").notNull().references(() => tracks.id),
   musicianId: integer("musician_id").references(() => musicians.id),
 
@@ -596,6 +637,7 @@ export type InsertTrackCredit = typeof trackCredits.$inferInsert;
  */
 export const quotes = pgTable("quotes", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   quoteNumber: varchar("quote_number", { length: 100 }).notNull().unique(),
   clientId: integer("client_id").notNull().references(() => clients.id),
 
@@ -636,6 +678,7 @@ export type InsertQuote = typeof quotes.$inferInsert;
  */
 export const quoteItems = pgTable("quote_items", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   quoteId: integer("quote_id").notNull().references(() => quotes.id),
 
   // Service details
@@ -663,6 +706,7 @@ export type InsertQuoteItem = typeof quoteItems.$inferInsert;
  */
 export const serviceCatalog = pgTable("service_catalog", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Service details
   name: varchar("name", { length: 255 }).notNull(),
@@ -693,6 +737,7 @@ export type InsertServiceCatalog = typeof serviceCatalog.$inferInsert;
  */
 export const contracts = pgTable("contracts", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   contractNumber: varchar("contract_number", { length: 100 }).notNull().unique(),
   clientId: integer("client_id").notNull().references(() => clients.id),
   projectId: integer("project_id").references(() => projects.id),
@@ -738,6 +783,7 @@ export type InsertContract = typeof contracts.$inferInsert;
  */
 export const expenses = pgTable("expenses", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Category & Type
   category: varchar("category", { length: 100 }).notNull(), // "rent" | "utilities" | "insurance" | "maintenance" | "salary" | "marketing" | "software" | "supplies" | "equipment" | "other"
@@ -786,6 +832,7 @@ export type InsertExpense = typeof expenses.$inferInsert;
  */
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Links
   clientId: integer("client_id").notNull().references(() => clients.id),
@@ -828,6 +875,7 @@ export type InsertPayment = typeof payments.$inferInsert;
  */
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Type & Priority
   type: varchar("type", { length: 50 }).notNull(), // "info" | "success" | "warning" | "error" | "reminder" | "system"
@@ -867,6 +915,7 @@ export type InsertNotification = typeof notifications.$inferInsert;
  */
 export const aiConversations = pgTable("ai_conversations", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Session ID for grouping messages
   sessionId: varchar("session_id", { length: 255 }).notNull(),
@@ -895,6 +944,7 @@ export type InsertAIConversation = typeof aiConversations.$inferInsert;
  */
 export const aiActionLogs = pgTable("ai_action_logs", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Conversation link
   sessionId: varchar("session_id", { length: 255 }).notNull(),
@@ -923,6 +973,7 @@ export type InsertAIActionLog = typeof aiActionLogs.$inferInsert;
  */
 export const clientPortalAccounts = pgTable("client_portal_accounts", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Link to client
   clientId: integer("client_id").notNull().references(() => clients.id),
@@ -960,6 +1011,7 @@ export type InsertClientPortalAccount = typeof clientPortalAccounts.$inferInsert
  */
 export const clientPortalMagicLinks = pgTable("client_portal_magic_links", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Link to client
   clientId: integer("client_id").notNull().references(() => clients.id),
@@ -988,6 +1040,7 @@ export type InsertClientPortalMagicLink = typeof clientPortalMagicLinks.$inferIn
  */
 export const clientPortalSessions = pgTable("client_portal_sessions", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Link to client
   clientId: integer("client_id").notNull().references(() => clients.id),
@@ -1019,6 +1072,7 @@ export type InsertClientPortalSession = typeof clientPortalSessions.$inferInsert
  */
 export const clientPortalActivityLogs = pgTable("client_portal_activity_logs", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Link to client
   clientId: integer("client_id").notNull().references(() => clients.id),
@@ -1052,6 +1106,7 @@ export type InsertClientPortalActivityLog = typeof clientPortalActivityLogs.$inf
  */
 export const paymentTransactions = pgTable("payment_transactions", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Links
   clientId: integer("client_id").notNull().references(() => clients.id),
@@ -1137,6 +1192,7 @@ export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
  */
 export const taskTypes = pgTable("task_types", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Task details
   name: varchar("name", { length: 100 }).notNull(), // "Setup", "Recording", "Mixing", "Mastering", "Break"
@@ -1168,6 +1224,7 @@ export type InsertTaskType = typeof taskTypes.$inferInsert;
  */
 export const timeEntries = pgTable("time_entries", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
 
   // Task type reference
   taskTypeId: integer("task_type_id").notNull().references(() => taskTypes.id),
@@ -1264,6 +1321,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
  */
 export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   eventId: varchar("event_id", { length: 255 }).notNull().unique(),
   eventType: varchar("event_type", { length: 100 }).notNull(),
   processedAt: timestamp("processed_at").notNull().defaultNow(),
@@ -1281,6 +1339,7 @@ export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
  */
 export const userPreferences = pgTable("user_preferences", {
   id: serial("id").primaryKey(),
+  ...syncColumns,
   userId: integer("user_id").notNull(),
   scope: varchar("scope", { length: 100 }).notNull(), // e.g., "client-detail-projects", "client-detail-tracks"
   preferences: jsonb("preferences").notNull().$type<{
@@ -1302,3 +1361,92 @@ export const userPreferences = pgTable("user_preferences", {
 
 export type UserPreference = typeof userPreferences.$inferSelect;
 export type InsertUserPreference = typeof userPreferences.$inferInsert;
+
+// ============================================================================
+// PHASE M0 — WORKFLOW TABLES (macOS native app, see 01-WORKFLOW-GAPS.md)
+// ============================================================================
+
+/**
+ * Session Staff table (Tenant DB) — GAP-1
+ * Assigns organization members (master.users) to sessions with a role.
+ * Overlap conflicts are validated server-side (same logic as rooms).
+ */
+export const sessionStaff = pgTable("session_staff", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  sessionId: integer("session_id").notNull().references(() => sessions.id, { onDelete: "cascade" }),
+  userId: integer("user_id").notNull(), // FK to master.users (cross-database, not enforced)
+  role: varchar("role", { length: 50 }).notNull().default("engineer"), // "engineer" | "assistant" | "producer" | "other"
+  status: varchar("status", { length: 50 }).notNull().default("assigned"), // "assigned" | "confirmed" | "declined"
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type SessionStaff = typeof sessionStaff.$inferSelect;
+export type InsertSessionStaff = typeof sessionStaff.$inferInsert;
+
+/**
+ * Session Equipment table (Tenant DB) — GAP-2 (dry hire)
+ * Equipment rented/reserved for a session (with or without engineer).
+ */
+export const sessionEquipment = pgTable("session_equipment", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  sessionId: integer("session_id").notNull().references(() => sessions.id, { onDelete: "cascade" }),
+  equipmentId: integer("equipment_id").notNull().references(() => equipment.id),
+  dailyRate: decimal("daily_rate", { precision: 10, scale: 2 }), // null = included in session price
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type SessionEquipment = typeof sessionEquipment.$inferSelect;
+export type InsertSessionEquipment = typeof sessionEquipment.$inferInsert;
+
+/**
+ * Track Revisions table (Tenant DB) — GAP-3
+ * Structured revision cycle: V1 → client feedback → V2 → … → approved.
+ * The legacy URL fields on tracks (demoUrl/roughMixUrl/finalMixUrl/masterUrl)
+ * remain as shortcuts to the latest approved version per stage.
+ */
+export const trackRevisions = pgTable("track_revisions", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  trackId: integer("track_id").notNull().references(() => tracks.id, { onDelete: "cascade" }),
+  versionNumber: integer("version_number").notNull(), // 1, 2, 3… per (trackId, stage)
+  stage: varchar("stage", { length: 50 }).notNull().default("mix"), // "demo" | "mix" | "master"
+  fileUrl: varchar("file_url", { length: 500 }),
+  status: varchar("status", { length: 50 }).notNull().default("submitted"), // "submitted" | "changes_requested" | "approved"
+  clientFeedback: text("client_feedback"),
+  internalNotes: text("internal_notes"),
+  isBillable: boolean("is_billable").notNull().default(false), // true when beyond projects.includedRevisions
+  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+  respondedAt: timestamp("responded_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type TrackRevision = typeof trackRevisions.$inferSelect;
+export type InsertTrackRevision = typeof trackRevisions.$inferInsert;
+
+// ============================================================================
+// PHASE M0 — SYNC LOG (offline-first sync changelog, populated by triggers)
+// ============================================================================
+
+/**
+ * Sync Log table (Tenant DB)
+ * Append-only changelog written by DB triggers (sync-upgrade.sql) on every
+ * INSERT/UPDATE/DELETE of synced tables. Pull cursor = last syncLog.id seen.
+ * DELETE entries double as tombstones (row data is gone, uuid remains here).
+ */
+export const syncLog = pgTable("sync_log", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  tableName: varchar("table_name", { length: 100 }).notNull(),
+  rowUuid: uuid("row_uuid").notNull(),
+  op: varchar("op", { length: 10 }).notNull(), // "insert" | "update" | "delete"
+  syncVersion: integer("sync_version").notNull().default(1),
+  at: timestamp("at").notNull().defaultNow(),
+});
+
+export type SyncLogEntry = typeof syncLog.$inferSelect;

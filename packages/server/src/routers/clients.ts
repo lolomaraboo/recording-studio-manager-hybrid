@@ -1022,7 +1022,7 @@ export const clientsRouter = router({
           technicalNotes: tracks.technicalNotes,
           createdAt: tracks.createdAt,
           updatedAt: tracks.updatedAt,
-          projectTitle: projects.title,
+          projectTitle: projects.name,
         })
         .from(tracks)
         .leftJoin(projects, eq(tracks.projectId, projects.id))

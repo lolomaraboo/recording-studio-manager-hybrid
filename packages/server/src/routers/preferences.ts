@@ -28,7 +28,7 @@ export const preferencesRouter = router({
 
       const pref = await tenantDb.query.userPreferences.findFirst({
         where: and(
-          eq(userPreferences.userId, ctx.userId),
+          eq(userPreferences.userId, ctx.user.id),
           eq(userPreferences.scope, input.scope)
         ),
       });
@@ -51,7 +51,7 @@ export const preferencesRouter = router({
       // Check if preference already exists
       const existing = await tenantDb.query.userPreferences.findFirst({
         where: and(
-          eq(userPreferences.userId, ctx.userId),
+          eq(userPreferences.userId, ctx.user.id),
           eq(userPreferences.scope, input.scope)
         ),
       });
@@ -68,7 +68,7 @@ export const preferencesRouter = router({
       } else {
         // Insert new preference
         await tenantDb.insert(userPreferences).values({
-          userId: ctx.userId,
+          userId: ctx.user.id,
           scope: input.scope,
           preferences: input.preferences,
         });
@@ -91,7 +91,7 @@ export const preferencesRouter = router({
       await tenantDb
         .delete(userPreferences)
         .where(and(
-          eq(userPreferences.userId, ctx.userId),
+          eq(userPreferences.userId, ctx.user.id),
           eq(userPreferences.scope, input.scope)
         ));
 

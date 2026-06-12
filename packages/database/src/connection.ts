@@ -128,6 +128,22 @@ export async function getTenantDb(organizationId: number): Promise<TenantDb> {
 }
 
 /**
+ * Get the underlying postgres.js instance for a tenant (Phase M5+ realtime).
+ * Used by the sync API to LISTEN on pg_notify('rsm_sync', ...) emitted by the
+ * sync triggers. Ensures the tenant connection exists first.
+ */
+export async function getTenantSql(organizationId: number): Promise<ReturnType<typeof postgres>> {
+  if (!_tenantSqlCache.has(organizationId)) {
+    await getTenantDb(organizationId);
+  }
+  const sql = _tenantSqlCache.get(organizationId);
+  if (!sql) {
+    throw new Error(`No tenant SQL connection for organization ${organizationId}`);
+  }
+  return sql;
+}
+
+/**
  * Create a new Tenant Database for an organization
  *
  * @param organizationId - Organization ID

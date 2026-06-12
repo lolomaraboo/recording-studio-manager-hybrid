@@ -15,7 +15,7 @@
 
 import { eq, isNull, isNotNull, and } from 'drizzle-orm';
 import { getTenantDb } from '../connection.js';
-import { invoices, invoiceItems, quotes, quoteItems, serviceCatalog, vatRates } from '../tenant/schema.js';
+import { invoices, invoiceItems, quotes, quoteItems, vatRates } from '../tenant/schema.js';
 
 // Helper: Find or create VAT rate
 async function findOrCreateVatRate(tenantDb: any, rate: string, name: string) {
