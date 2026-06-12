@@ -30,6 +30,24 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
+ * OAuth Accounts table (Master DB only)
+ * Links users to external OAuth providers (Google, Apple)
+ */
+export const oauthAccounts = pgTable("oauth_accounts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  provider: varchar("provider", { length: 50 }).notNull(), // "google" | "apple"
+  providerAccountId: varchar("provider_account_id", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }), // email reported by the provider
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  uniqueProviderAccount: unique().on(table.provider, table.providerAccountId),
+}));
+
+export type OAuthAccount = typeof oauthAccounts.$inferSelect;
+export type InsertOAuthAccount = typeof oauthAccounts.$inferInsert;
+
+/**
  * Organizations table (Master DB only)
  */
 export const organizations = pgTable("organizations", {

@@ -1,5 +1,5 @@
-import { useState, FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, FormEvent } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Moon, Sun } from 'lucide-react';
+import { OAuthButtons, oauthErrorMessage } from '@/components/auth/OAuthButtons';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,6 +17,17 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Show OAuth errors passed back by the server (?error=...)
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      toast.error(oauthErrorMessage(oauthError));
+      searchParams.delete('error');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -101,6 +113,9 @@ export default function Login() {
             >
               {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
+            <div className="w-full">
+              <OAuthButtons disabled={isSubmitting} />
+            </div>
             <p className="text-sm text-center text-muted-foreground">
               Don't have an account?{' '}
               <Link to="/register" className="text-primary hover:underline">

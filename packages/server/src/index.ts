@@ -14,6 +14,8 @@ import { createContext } from './_core/context.js';
 import { handleStripeWebhook } from './webhooks/stripe-webhook.js';
 import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
+import oauthRouter from './routes/oauth.js';
+import syncRouter from './routes/sync.js';
 import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
 import { socketAuthMiddleware } from './middleware/socket-auth.js';
 
@@ -186,6 +188,12 @@ async function main() {
 
   // Upload routes (before tRPC to handle multipart/form-data)
   app.use('/api/upload', uploadRouter);
+
+  // OAuth routes (Sign in with Google / Apple) — needs session middleware
+  app.use('/api/auth/oauth', oauthRouter);
+
+  // Sync routes for native macOS app (Phase M0 — offline-first sync)
+  app.use('/api/sync', syncRouter);
 
   // Debug logging for TRPC requests
   app.use('/api/trpc', (req, res, next) => {

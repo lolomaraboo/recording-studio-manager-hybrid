@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Moon, Sun } from 'lucide-react';
+import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -149,6 +150,9 @@ export default function Register() {
             >
               {isSubmitting ? 'Creating account...' : 'Create Account'}
             </Button>
+            <div className="w-full">
+              <OAuthButtons disabled={isSubmitting} />
+            </div>
             <p className="text-sm text-center text-muted-foreground">
               Already have an account?{' '}
               <Link to="/login" className="text-primary hover:underline">
