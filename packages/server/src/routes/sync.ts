@@ -584,4 +584,60 @@ router.post('/create-quote', async (req: SyncRequest, res: Response) => {
   }
 });
 
+// ----------------------------------------------------------------------------
+// POST /api/sync/invoice-from-time — online-only invoice generation from time
+// entries (Clockify-style billing). Body: { timeEntryUuids: string[],
+// clientId: number, taxRate?, notes? }. Entries are grouped by task type,
+// non-billable types are excluded, already-invoiced entries are rejected, and
+// the entries are marked with invoice_id atomically (no double billing).
+// Devices receive the updated rows through the normal pull.
+// ----------------------------------------------------------------------------
+router.post('/invoice-from-time', async (req: SyncRequest, res: Response) => {
+  try {
+    const db = await getTenantDb(req.syncOrgId!);
+    const clientId = Number(req.body?.clientId);
+    const taxRate = req.body?.taxRate != null ? Number(req.body.taxRate) : undefined;
+    const notes = typeof req.body?.notes === 'string' ? req.body.notes : undefined;
+    const uuidRe = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    const uuids: string[] = Array.isArray(req.body?.timeEntryUuids)
+      ? req.body.timeEntryUuids.filter((u: unknown): u is string => typeof u === 'string' && uuidRe.test(u))
+      : [];
+
+    if (!Number.isInteger(clientId) || uuids.length === 0) {
+      return res.status(400).json({ error: 'clientId and timeEntryUuids are required' });
+    }
+
+    // Resolve sync uuids (device identity) to server ids
+    const uuidList = sql.join(uuids.map((u) => sql`${u}::uuid`), sql`, `);
+    const rows = (await db.execute(sql`
+      SELECT id FROM time_entries WHERE sync_uuid IN (${uuidList})
+    `)) as unknown as Array<{ id: number }>;
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'No time entries found for provided uuids' });
+    }
+
+    const { generateInvoiceFromTimeEntries } = await import('../utils/invoice-generator');
+    const result = await generateInvoiceFromTimeEntries(db, {
+      timeEntryIds: rows.map((r) => r.id),
+      clientId,
+      mode: 'project',
+      taxRate,
+      notes,
+    });
+
+    res.json({
+      invoiceId: result.invoice.id,
+      invoiceNumber: result.invoice.invoiceNumber,
+      total: result.invoice.total,
+      itemCount: result.items.length,
+    });
+  } catch (error: any) {
+    console.error('[Sync] invoice-from-time failed:', error);
+    const message = typeof error?.message === 'string' ? error.message : 'Invoice generation failed';
+    // TRPCError BAD_REQUEST/NOT_FOUND from the generator → 400 with the reason
+    const status = error?.code === 'BAD_REQUEST' || error?.code === 'NOT_FOUND' ? 400 : 500;
+    res.status(status).json({ error: message });
+  }
+});
+
 export default router;

@@ -73,3 +73,11 @@ packages/database/drizzle/migrations/*
 # Temporary test files (root level only)
 /test-*.mjs
 /test-*.spec.ts
+
+# Swift / macOS native app (apps/macos)
+# SwiftPM build artifacts (~519M) — never commit
+.build/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+# Packaged .app output (already covered by dist/, explicit for clarity)
+apps/macos/dist/

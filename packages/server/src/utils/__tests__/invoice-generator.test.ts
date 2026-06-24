@@ -11,11 +11,17 @@ describe('generateInvoiceFromTimeEntries', () => {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
+      leftJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      set: vi.fn().mockReturnThis(),
       returning: vi.fn(),
     };
+    // The generator wraps invoice + items + marking in a transaction;
+    // the mock simply runs the callback against the same mock db.
+    mockDb.transaction = vi.fn(async (cb: any) => cb(mockDb));
   });
 
   it('should generate invoice from time entries with correct calculations', async () => {
@@ -26,6 +32,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Recording',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -37,6 +44,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 2,
         taskTypeName: 'Mixing',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -48,6 +56,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 3,
         taskTypeName: 'Break',
         taskTypeCategory: 'non-billable',
+        billable: false,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -59,7 +68,7 @@ describe('generateInvoiceFromTimeEntries', () => {
     // Mock created invoice
     const mockInvoice = {
       id: 1,
-      invoiceNumber: 'INV-2026-0001',
+      invoiceNumber: 'FAC-2026-0001',
       clientId: 5,
       status: 'draft',
       issueDate: new Date('2026-01-09'),
@@ -99,7 +108,9 @@ describe('generateInvoiceFromTimeEntries', () => {
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(mockTimeEntries),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(mockTimeEntries),
+          }),
         }),
       }),
     });
@@ -153,7 +164,7 @@ describe('generateInvoiceFromTimeEntries', () => {
     expect(result.invoice.total).toBe('192.00'); // 160 + 32
 
     // Check invoice number format
-    expect(result.invoice.invoiceNumber).toMatch(/^INV-\d{4}-\d{4}$/);
+    expect(result.invoice.invoiceNumber).toMatch(/^FAC-\d{4}-\d{4}$/);
 
     // Check line items
     expect(result.items[0].description).toContain('Recording - 2h00 @ 50.00€/h');
@@ -171,6 +182,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Break',
         taskTypeCategory: 'non-billable',
+        billable: false,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -182,7 +194,9 @@ describe('generateInvoiceFromTimeEntries', () => {
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(mockTimeEntries),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(mockTimeEntries),
+          }),
         }),
       }),
     });
@@ -213,6 +227,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Recording',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -224,6 +239,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Recording',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 200, // Different session!
         projectId: null,
         trackId: null,
@@ -235,7 +251,9 @@ describe('generateInvoiceFromTimeEntries', () => {
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(mockTimeEntries),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(mockTimeEntries),
+          }),
         }),
       }),
     });
@@ -257,6 +275,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Recording',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -268,6 +287,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 2,
         taskTypeName: 'Mixing',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -278,7 +298,7 @@ describe('generateInvoiceFromTimeEntries', () => {
 
     const mockInvoice = {
       id: 1,
-      invoiceNumber: 'INV-2026-0001',
+      invoiceNumber: 'FAC-2026-0001',
       clientId: 5,
       status: 'draft',
       issueDate: new Date('2026-01-09'),
@@ -317,7 +337,9 @@ describe('generateInvoiceFromTimeEntries', () => {
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(mockTimeEntries),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(mockTimeEntries),
+          }),
         }),
       }),
     });
@@ -376,6 +398,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Recording',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -386,7 +409,7 @@ describe('generateInvoiceFromTimeEntries', () => {
 
     const mockInvoice = {
       id: 1,
-      invoiceNumber: 'INV-2026-0001',
+      invoiceNumber: 'FAC-2026-0001',
       clientId: 5,
       status: 'draft',
       issueDate: new Date('2026-01-09'),
@@ -416,7 +439,9 @@ describe('generateInvoiceFromTimeEntries', () => {
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(mockTimeEntries),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(mockTimeEntries),
+          }),
         }),
       }),
     });
@@ -469,6 +494,7 @@ describe('generateInvoiceFromTimeEntries', () => {
         taskTypeId: 1,
         taskTypeName: 'Recording',
         taskTypeCategory: 'billable',
+        billable: true,
         sessionId: 100,
         projectId: null,
         trackId: null,
@@ -479,7 +505,7 @@ describe('generateInvoiceFromTimeEntries', () => {
 
     const mockInvoice = {
       id: 1,
-      invoiceNumber: 'INV-2026-0001',
+      invoiceNumber: 'FAC-2026-0001',
       clientId: 5,
       status: 'draft',
       issueDate: new Date('2026-01-09'),
@@ -509,7 +535,9 @@ describe('generateInvoiceFromTimeEntries', () => {
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(mockTimeEntries),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(mockTimeEntries),
+          }),
         }),
       }),
     });

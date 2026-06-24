@@ -1246,6 +1246,7 @@ export const timeEntries = pgTable("time_entries", {
   manuallyAdjusted: boolean("manually_adjusted").notNull().default(false), // True if user edited start/end times after auto-tracking
 
   // Invoicing
+  billable: boolean("billable").notNull().default(true), // Clockify-style per-entry flag — only billable entries are invoiced
   invoiceId: integer("invoice_id").references(() => invoices.id, { onDelete: "set null" }), // Links to invoice if time has been invoiced
 
   // Notes

@@ -6,6 +6,7 @@ import {
   invoiceItems,
   timeEntries,
   taskTypes,
+  tracks,
   type Invoice,
   type InvoiceItem,
 } from '@rsm/database/tenant';
@@ -64,15 +65,30 @@ export async function generateInvoiceFromTimeEntries(
       trackId: timeEntries.trackId,
       durationMinutes: timeEntries.durationMinutes,
       hourlyRateSnapshot: timeEntries.hourlyRateSnapshot,
+      invoiceId: timeEntries.invoiceId,
+      billable: timeEntries.billable,
+      // The DB CHECK is exclusive (track XOR session XOR project): an entry
+      // tracked on a track carries its project only through the track.
+      trackProjectId: tracks.projectId,
     })
     .from(timeEntries)
     .innerJoin(taskTypes, eq(timeEntries.taskTypeId, taskTypes.id))
+    .leftJoin(tracks, eq(timeEntries.trackId, tracks.id))
     .where(inArray(timeEntries.id, timeEntryIds));
 
   if (entries.length === 0) {
     throw new TRPCError({
       code: 'NOT_FOUND',
       message: 'No time entries found for provided IDs',
+    });
+  }
+
+  // 2b. Refuse entries already invoiced (prevents double billing)
+  const alreadyInvoiced = entries.filter((e) => e.invoiceId != null);
+  if (alreadyInvoiced.length > 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Time entries already invoiced: ${alreadyInvoiced.map((e) => e.id).join(', ')}`,
     });
   }
 
@@ -88,7 +104,10 @@ export async function generateInvoiceFromTimeEntries(
   }
 
   if (mode === 'project') {
-    const projectIds = new Set(entries.map((e) => e.projectId).filter(Boolean));
+    // Effective project = direct link OR the parent project of the linked track
+    const projectIds = new Set(
+      entries.map((e) => e.projectId ?? e.trackProjectId).filter(Boolean)
+    );
     if (projectIds.size !== 1) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
@@ -97,8 +116,9 @@ export async function generateInvoiceFromTimeEntries(
     }
   }
 
-  // 4. Filter out non-billable entries
-  const billableEntries = entries.filter((e) => e.taskTypeCategory === 'billable');
+  // 4. Filter out non-billable entries — the per-entry Clockify-style flag
+  // decides ($ toggle); it defaults from the task type category at creation.
+  const billableEntries = entries.filter((e) => e.billable !== false);
 
   if (billableEntries.length === 0) {
     throw new TRPCError({
@@ -159,55 +179,68 @@ export async function generateInvoiceFromTimeEntries(
   // Validate calculation
   validateTaxCalculation(taxResult);
 
-  // 8. Generate invoice number
+  // 8. Generate invoice number — same FAC-YYYY-NNNN series as the rest of the
+  // app (sync create-invoice route, existing tenant data).
   const currentYear = new Date().getFullYear();
   const maxInvoiceResult = await db
     .select({
-      maxNumber: sql<string>`COALESCE(MAX(CAST(SUBSTRING(${invoices.invoiceNumber} FROM 'INV-[0-9]+-([0-9]+)') AS INTEGER)), 0)`,
+      maxNumber: sql<string>`COALESCE(MAX(CAST(SUBSTRING(${invoices.invoiceNumber} FROM 'FAC-[0-9]+-([0-9]+)') AS INTEGER)), 0)`,
     })
     .from(invoices)
-    .where(sql`${invoices.invoiceNumber} LIKE ${`INV-${currentYear}-%`}`);
+    .where(sql`${invoices.invoiceNumber} LIKE ${`FAC-${currentYear}-%`}`);
 
   const nextSequential = (parseInt(maxInvoiceResult[0]?.maxNumber || '0') + 1)
     .toString()
     .padStart(4, '0');
-  const invoiceNumber = `INV-${currentYear}-${nextSequential}`;
+  const invoiceNumber = `FAC-${currentYear}-${nextSequential}`;
 
   // 9. Calculate dates
   const issueDate = new Date();
   const dueDate = new Date(issueDate);
   dueDate.setDate(dueDate.getDate() + 30);
 
-  // 10. Insert invoice
-  const [createdInvoice] = await db
-    .insert(invoices)
-    .values({
-      invoiceNumber,
-      clientId,
-      status: 'draft',
-      issueDate,
-      dueDate,
-      subtotal: taxResult.subtotal,
-      taxRate: taxResult.taxRate,
-      taxAmount: taxResult.taxAmount,
-      total: taxResult.total,
-      notes: notes || null,
-    })
-    .returning();
+  // 10-11b. Insert invoice + items and mark entries as invoiced — atomically,
+  // so a failure can't leave an invoice without its items or unmarked entries
+  // (which would allow double billing).
+  const billableIds = billableEntries.map((e) => e.id);
+  const { createdInvoice, createdItems } = await db.transaction(async (tx) => {
+    const [createdInvoice] = await tx
+      .insert(invoices)
+      .values({
+        invoiceNumber,
+        clientId,
+        status: 'draft',
+        issueDate,
+        dueDate,
+        subtotal: taxResult.subtotal,
+        taxRate: taxResult.taxRate,
+        taxAmount: taxResult.taxAmount,
+        total: taxResult.total,
+        notes: notes || null,
+      })
+      .returning();
 
-  // 11. Insert invoice items
-  const createdItems = await db
-    .insert(invoiceItems)
-    .values(
-      lineItems.map((item) => ({
-        invoiceId: createdInvoice.id,
-        description: item.description,
-        quantity: '1.00',
-        unitPrice: item.amount,
-        amount: item.amount,
-      }))
-    )
-    .returning();
+    const createdItems = await tx
+      .insert(invoiceItems)
+      .values(
+        lineItems.map((item) => ({
+          invoiceId: createdInvoice.id,
+          description: item.description,
+          quantity: '1.00',
+          unitPrice: item.amount,
+          amount: item.amount,
+        }))
+      )
+      .returning();
+
+    // Mark the billed time entries so they can't be invoiced twice
+    await tx
+      .update(timeEntries)
+      .set({ invoiceId: createdInvoice.id, updatedAt: new Date() })
+      .where(inArray(timeEntries.id, billableIds));
+
+    return { createdInvoice, createdItems };
+  });
 
   // 12. Final validation before returning
   validateTaxCalculation({

@@ -10,6 +10,7 @@ import {
   adjustTimeEntry,
   getTimeHistory,
 } from '../services/timer-service';
+import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
 
 /**
  * Time Tracking Router
@@ -326,6 +327,46 @@ export const timeTrackingRouter = router({
             startTime: result.startTime,
             endTime: result.endTime,
             durationMinutes: result.durationMinutes,
+            userId: ctx.user?.id,
+          });
+        }
+
+        return result;
+      }),
+
+    /**
+     * Generate a draft invoice from time entries.
+     * Entries already linked to an invoice are rejected (no double billing);
+     * non-billable entries are ignored by the generator.
+     */
+    generateInvoice: protectedProcedure
+      .input(
+        z.object({
+          timeEntryIds: z.array(z.number()).min(1),
+          clientId: z.number(),
+          mode: z.enum(['session', 'project']),
+          taxRate: z.number().min(0).max(100).optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const tenantDb = await ctx.getTenantDb();
+
+        const result = await generateInvoiceFromTimeEntries(tenantDb, {
+          timeEntryIds: input.timeEntryIds,
+          clientId: input.clientId,
+          mode: input.mode,
+          taxRate: input.taxRate,
+          notes: input.notes,
+        });
+
+        // Broadcast so open clients refresh invoices + time entries
+        const io = ctx.req.app.get('io');
+        if (io && ctx.organizationId) {
+          io.to(`org:${ctx.organizationId}`).emit('invoice:created', {
+            invoiceId: result.invoice.id,
+            invoiceNumber: result.invoice.invoiceNumber,
+            fromTimeEntries: input.timeEntryIds,
             userId: ctx.user?.id,
           });
         }
