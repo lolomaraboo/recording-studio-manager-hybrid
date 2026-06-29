@@ -64,7 +64,6 @@ struct RoomsView: View {
 }
 
 struct RoomCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let onCreate: ([String: Any]) -> Void
 
     @State private var name = ""
@@ -72,31 +71,21 @@ struct RoomCreateSheet: View {
     @State private var hourlyRate = 0.0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouvelle salle").font(.title3).bold().padding()
-            Form {
-                TextField("Nom", text: $name, prompt: Text("Studio A"))
-                TextField("Description", text: $description)
-                TextField("Tarif horaire €", value: $hourlyRate, format: .number)
+        StudioFormSheet(
+            title: "Nouvelle salle", confirmLabel: "Créer",
+            confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 300,
+            onConfirm: {
+                var payload: [String: Any] = ["name": name]
+                if !description.isEmpty { payload["description"] = description }
+                if hourlyRate > 0 { payload["hourly_rate"] = String(format: "%.2f", hourlyRate) }
+                onCreate(payload)
             }
-            .formStyle(.grouped)
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Créer") {
-                    var payload: [String: Any] = ["name": name]
-                    if !description.isEmpty { payload["description"] = description }
-                    if hourlyRate > 0 { payload["hourly_rate"] = String(format: "%.2f", hourlyRate) }
-                    onCreate(payload)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
-            .padding()
+        ) {
+            TextField("Nom", text: $name, prompt: Text("Studio A"))
+            TextField("Description", text: $description)
+            TextField("Tarif horaire €", value: $hourlyRate, format: .number)
         }
-        .frame(width: 400, height: 300)
     }
 }
 
@@ -114,8 +103,8 @@ struct ServicesView: View {
     var body: some View {
         Group {
             if services.isEmpty {
-                ContentUnavailableView("Catalogue vide", systemImage: "list.star",
-                                       description: Text("Tes prestations types, réutilisables dans les devis et factures."))
+                StudioEmptyState(title: "Catalogue vide", systemImage: "list.star",
+                                 message: "Tes prestations types, réutilisables dans les devis et factures.")
             } else {
                 List(services) { service in
                     HStack {
@@ -160,7 +149,6 @@ struct ServicesView: View {
 }
 
 struct ServiceCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let onCreate: ([String: Any]) -> Void
 
     @State private var name = ""
@@ -168,30 +156,20 @@ struct ServiceCreateSheet: View {
     @State private var unitPrice = 0.0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouveau service").font(.title3).bold().padding()
-            Form {
-                TextField("Nom", text: $name, prompt: Text("Heure de studio — enregistrement"))
-                TextField("Catégorie", text: $category, prompt: Text("Enregistrement, Mix, Mastering…"))
-                TextField("Prix unitaire €", value: $unitPrice, format: .number)
+        StudioFormSheet(
+            title: "Nouveau service", confirmLabel: "Créer",
+            confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty || unitPrice <= 0,
+            height: 300,
+            onConfirm: {
+                var payload: [String: Any] = ["name": name, "unit_price": String(format: "%.2f", unitPrice)]
+                if !category.isEmpty { payload["category"] = category }
+                onCreate(payload)
             }
-            .formStyle(.grouped)
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Créer") {
-                    var payload: [String: Any] = ["name": name, "unit_price": String(format: "%.2f", unitPrice)]
-                    if !category.isEmpty { payload["category"] = category }
-                    onCreate(payload)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || unitPrice <= 0)
-            }
-            .padding()
+        ) {
+            TextField("Nom", text: $name, prompt: Text("Heure de studio — enregistrement"))
+            TextField("Catégorie", text: $category, prompt: Text("Enregistrement, Mix, Mastering…"))
+            TextField("Prix unitaire €", value: $unitPrice, format: .number)
         }
-        .frame(width: 420, height: 300)
     }
 }
 
@@ -208,8 +186,8 @@ struct ContractsView: View {
     var body: some View {
         Group {
             if contracts.isEmpty {
-                ContentUnavailableView("Aucun contrat", systemImage: "signature",
-                                       description: Text("Les contrats créés côté web apparaîtront ici."))
+                StudioEmptyState(title: "Aucun contrat", systemImage: "signature",
+                                 message: "Les contrats créés côté web apparaîtront ici.")
             } else {
                 List(contracts) { contract in
                     HStack {
@@ -286,8 +264,8 @@ struct ExpensesView: View {
     var body: some View {
         Group {
             if expenses.isEmpty {
-                ContentUnavailableView("Aucune dépense", systemImage: "cart",
-                                       description: Text("Suis les achats et frais du studio."))
+                StudioEmptyState(title: "Aucune dépense", systemImage: "cart",
+                                 message: "Suis les achats et frais du studio.")
             } else {
                 List {
                     Section("Total : \(total.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR"))))") {
@@ -338,7 +316,6 @@ struct ExpensesView: View {
 }
 
 struct ExpenseCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     @Environment(AppModel.self) private var model
     let onCreate: ([String: Any]) -> Void
 
@@ -351,50 +328,40 @@ struct ExpenseCreateSheet: View {
     private static let isoFormatter = ISO8601DateFormatter()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouvelle dépense").font(.title3).bold().padding()
-            Form {
-                TextField("Description", text: $description)
-                Picker("Catégorie", selection: $category) {
-                    Text("Matériel").tag("equipment")
-                    Text("Logiciel").tag("software")
-                    Text("Maintenance").tag("maintenance")
-                    Text("Loyer/Charges").tag("rent")
-                    Text("Sous-traitance").tag("freelance")
-                    Text("Autre").tag("other")
-                }
-                TextField("Fournisseur", text: $vendor)
-                TextField("Montant €", value: $amount, format: .number)
-                Picker("Projet (optionnel)", selection: $projectServerId) {
-                    Text("Aucun").tag(nil as Int?)
-                    ForEach(model.store.projects().filter { $0.serverId != nil }) { project in
-                        Text(project.name).tag(project.serverId)
-                    }
+        StudioFormSheet(
+            title: "Nouvelle dépense", confirmLabel: "Créer",
+            confirmDisabled: description.trimmingCharacters(in: .whitespaces).isEmpty || amount <= 0,
+            height: 420,
+            onConfirm: {
+                var payload: [String: Any] = [
+                    "description": description,
+                    "category": category,
+                    "amount": String(format: "%.2f", amount),
+                    "expense_date": Self.isoFormatter.string(from: Date()),
+                ]
+                if !vendor.isEmpty { payload["vendor"] = vendor }
+                if let projectServerId { payload["project_id"] = projectServerId }
+                onCreate(payload)
+            }
+        ) {
+            TextField("Description", text: $description)
+            Picker("Catégorie", selection: $category) {
+                Text("Matériel").tag("equipment")
+                Text("Logiciel").tag("software")
+                Text("Maintenance").tag("maintenance")
+                Text("Loyer/Charges").tag("rent")
+                Text("Sous-traitance").tag("freelance")
+                Text("Autre").tag("other")
+            }
+            TextField("Fournisseur", text: $vendor)
+            TextField("Montant €", value: $amount, format: .number)
+            Picker("Projet (optionnel)", selection: $projectServerId) {
+                Text("Aucun").tag(nil as Int?)
+                ForEach(model.store.projects().filter { $0.serverId != nil }) { project in
+                    Text(project.name).tag(project.serverId)
                 }
             }
-            .formStyle(.grouped)
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Créer") {
-                    var payload: [String: Any] = [
-                        "description": description,
-                        "category": category,
-                        "amount": String(format: "%.2f", amount),
-                        "expense_date": Self.isoFormatter.string(from: Date()),
-                    ]
-                    if !vendor.isEmpty { payload["vendor"] = vendor }
-                    if let projectServerId { payload["project_id"] = projectServerId }
-                    onCreate(payload)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(description.trimmingCharacters(in: .whitespaces).isEmpty || amount <= 0)
-            }
-            .padding()
         }
-        .frame(width: 440, height: 400)
     }
 }
 
