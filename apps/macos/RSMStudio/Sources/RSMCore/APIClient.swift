@@ -231,6 +231,64 @@ public struct APIClient: Sendable {
         return (text, session)
     }
 
+    /// Uploads an audio file (multipart/form-data) to the server, which stores it
+    /// (Cloudinary) and returns the hosted URL. `versionType` ∈
+    /// {demo, roughMix, finalMix, master}. Endpoint: POST /api/upload/audio.
+    public func uploadAudio(fileURL: URL, versionType: String, trackServerId: Int?) async throws -> String {
+        guard let url = URL(string: "\(config.baseURL)/api/upload/audio") else { throw APIError.invalidURL }
+        let boundary = "rsm-\(UUID().uuidString)"
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        if !config.isAccountMode {
+            req.setValue(String(config.userId), forHTTPHeaderField: "x-test-user-id")
+            req.setValue(String(config.organizationId), forHTTPHeaderField: "x-test-org-id")
+        }
+        req.timeoutInterval = 300
+
+        let fileData = try Data(contentsOf: fileURL)
+        let filename = fileURL.lastPathComponent
+        var body = Data()
+        func field(_ name: String, _ value: String) {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(value)\r\n".data(using: .utf8)!)
+        }
+        field("versionType", versionType)
+        if let trackServerId { field("trackId", String(trackServerId)) }
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(Self.audioMime(for: fileURL))\r\n\r\n".data(using: .utf8)!)
+        body.append(fileData)
+        body.append("\r\n".data(using: .utf8)!)
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        req.httpBody = body
+
+        let (data, response) = try await URLSession.shared.data(for: req)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard (200..<300).contains(status) else {
+            throw APIError.http(status, String(data: data, encoding: .utf8) ?? "")
+        }
+        guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let payload = json["data"] as? [String: Any],
+              let secure = (payload["secureUrl"] as? String) ?? (payload["url"] as? String) else {
+            throw APIError.decoding("upload: réponse sans data.secureUrl")
+        }
+        return secure
+    }
+
+    private static func audioMime(for url: URL) -> String {
+        switch url.pathExtension.lowercased() {
+        case "mp3": return "audio/mpeg"
+        case "wav", "wave": return "audio/wav"
+        case "flac": return "audio/flac"
+        case "aac", "m4a", "mp4": return "audio/aac"
+        case "ogg", "oga": return "audio/ogg"
+        case "webm": return "audio/webm"
+        default: return "audio/mpeg"
+        }
+    }
+
     /// Health probe — true when the server answers.
     public func isReachable() async -> Bool {
         guard let url = URL(string: "\(config.baseURL)/api/health") else { return false }

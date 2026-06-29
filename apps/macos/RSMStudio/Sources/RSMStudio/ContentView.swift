@@ -11,6 +11,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case tracks = "Tracks"
     case quotes = "Devis"
     case invoices = "Factures"
+    case analytics = "Analyses"
     case services = "Services"
     case contracts = "Contrats"
     case expenses = "Dépenses"
@@ -19,6 +20,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case rooms = "Salles"
     case team = "Équipe"
     case time = "Temps"
+    case system = "Agenda Mac"
     case settings = "Réglages"
 
     var icon: String {
@@ -32,6 +34,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .tracks: return "waveform"
         case .quotes: return "doc.plaintext"
         case .invoices: return "doc.text"
+        case .analytics: return "chart.line.uptrend.xyaxis"
         case .services: return "list.star"
         case .contracts: return "signature"
         case .expenses: return "cart"
@@ -40,6 +43,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .rooms: return "door.left.hand.open"
         case .team: return "person.3"
         case .time: return "timer"
+        case .system: return "calendar.badge.clock"
         case .settings: return "gearshape"
         }
     }
@@ -58,8 +62,9 @@ struct ContentView: View {
     private let groups: [(String?, [SidebarItem])] = [
         (nil, [.assistant, .dashboard]),
         ("Activité", [.clients, .calendar, .sessions, .projects, .tracks]),
-        ("Ventes", [.quotes, .invoices, .services, .contracts, .expenses]),
+        ("Ventes", [.quotes, .invoices, .analytics, .services, .contracts, .expenses]),
         ("Ressources", [.equipment, .talents, .rooms, .time, .team]),
+        ("Mon Mac", [.system]),
         (nil, [.settings]),
     ]
 
@@ -123,6 +128,7 @@ struct ContentView: View {
                     case .tracks: TracksView()
                     case .quotes: QuotesView()
                     case .invoices: InvoicesView()
+                    case .analytics: AnalyticsView()
                     case .services: ServicesView()
                     case .contracts: ContractsView()
                     case .expenses: ExpensesView()
@@ -131,6 +137,7 @@ struct ContentView: View {
                     case .rooms: RoomsView()
                     case .team: TeamView()
                     case .time: TimeTrackingView()
+                    case .system: SystemView()
                     case .settings: SettingsView()
                     }
                 }

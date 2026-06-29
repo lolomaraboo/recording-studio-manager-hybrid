@@ -99,12 +99,28 @@ struct ProjectStatusBadge: View {
 struct ProjectDetailView: View {
     @Environment(AppModel.self) private var model
     let project: Project
+    @State private var showingEdit = false
 
     private var tracks: [Track] {
         _ = model.dataVersion
         guard let serverId = project.serverId else { return [] }
         return model.store.tracks(projectServerId: serverId)
     }
+
+    private var hasInfo: Bool {
+        !(project.description ?? "").isEmpty || !(project.genre ?? "").isEmpty
+            || project.startDate != nil || project.targetDeliveryDate != nil
+            || project.actualDeliveryDate != nil || !(project.budget ?? "").isEmpty
+            || !(project.totalCost ?? "").isEmpty || !(project.label ?? "").isEmpty
+            || !(project.catalogNumber ?? "").isEmpty || !(project.storageLocation ?? "").isEmpty
+            || project.storageSize != nil || !(project.technicalNotes ?? "").isEmpty
+    }
+
+    private static let dateFmt: DateFormatter = {
+        let f = DateFormatter(); f.dateStyle = .medium; f.timeStyle = .none
+        f.locale = Locale(identifier: "fr_FR"); return f
+    }()
+    private func d(_ date: Date?) -> String? { date.map { Self.dateFmt.string(from: $0) } }
 
     var body: some View {
         ScrollView {
@@ -122,7 +138,43 @@ struct ProjectDetailView: View {
                         }
                     }
                     Spacer()
+                    Button { showingEdit = true } label: { Label("Modifier", systemImage: "pencil") }
                     ProjectStatusBadge(status: project.status)
+                }
+
+                if let desc = project.description, !desc.isEmpty {
+                    GroupBox("Description") {
+                        Text(desc).frame(maxWidth: .infinity, alignment: .leading).textSelection(.enabled)
+                    }
+                }
+
+                if hasInfo {
+                    GroupBox("Infos") {
+                        InfoRow(label: "Genre", value: project.genre)
+                        InfoRow(label: "Début", value: d(project.startDate))
+                        InfoRow(label: "Livraison cible", value: d(project.targetDeliveryDate))
+                        InfoRow(label: "Livré le", value: d(project.actualDeliveryDate))
+                        InfoRow(label: "Budget", value: project.budget.map { "\($0) €" })
+                        InfoRow(label: "Coût total", value: project.totalCost.map { "\($0) €" })
+                        InfoRow(label: "Label", value: project.label)
+                        InfoRow(label: "N° catalogue", value: project.catalogNumber)
+                        InfoRow(label: "Stockage", value: project.storageLocation)
+                        InfoRow(label: "Taille", value: project.storageSize.map { "\($0) Mo" })
+                    }
+                }
+
+                let projectLinks: [(label: String, url: String)] =
+                    [("Spotify", project.spotifyUrl), ("Apple Music", project.appleMusicUrl),
+                     ("Cover art", project.coverArtUrl)]
+                    .compactMap { (l, u) in (u?.isEmpty == false) ? (l, u!) : nil }
+                if !projectLinks.isEmpty {
+                    GroupBox("Liens") { FlowLinks(links: projectLinks) }
+                }
+
+                if let tn = project.technicalNotes, !tn.isEmpty {
+                    GroupBox("Notes techniques") {
+                        Text(tn).frame(maxWidth: .infinity, alignment: .leading).textSelection(.enabled)
+                    }
                 }
 
                 GroupBox("Tracks (\(tracks.count))") {
@@ -170,6 +222,106 @@ struct ProjectDetailView: View {
             }
             .padding()
         }
+        .modalCard(isPresented: $showingEdit) {
+            ProjectEditSheet(project: project) { changes in
+                try? model.store.localUpdate(table: "projects", uuid: project.id, changes: changes)
+                Task { await model.syncNow() }
+            }
+        }
+    }
+}
+
+/// Edit sheet for a project's metadata (M4+ — parity with the web project form).
+struct ProjectEditSheet: View {
+    @Environment(\.modalDismiss) private var dismiss
+    let project: Project
+    let onSave: ([String: Any]) -> Void
+
+    @State private var f: [String: String] = [:]
+    @State private var status = "pre_production"
+    @State private var type = "album"
+
+    private let textKeys = [
+        "name", "artist_name", "description", "genre", "budget", "total_cost",
+        "label", "catalog_number", "cover_art_url", "spotify_url", "apple_music_url",
+        "storage_location", "storage_size", "technical_notes", "notes",
+    ]
+    private func b(_ key: String) -> Binding<String> {
+        Binding(get: { f[key] ?? "" }, set: { f[key] = $0 })
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Modifier \(project.name)").font(.title3).bold().padding()
+            Form {
+                Section("Identité") {
+                    TextField("Nom", text: b("name"))
+                    TextField("Artiste", text: b("artist_name"))
+                    Picker("Type", selection: $type) {
+                        Text("Album").tag("album"); Text("EP").tag("ep")
+                        Text("Single").tag("single"); Text("Démo").tag("demo")
+                        Text("BO").tag("soundtrack"); Text("Podcast").tag("podcast")
+                    }
+                    Picker("Statut", selection: $status) {
+                        Text("Pré-prod").tag("pre_production"); Text("Enregistrement").tag("recording")
+                        Text("Édition").tag("editing"); Text("Mixage").tag("mixing")
+                        Text("Mastering").tag("mastering"); Text("Terminé").tag("completed")
+                        Text("Livré").tag("delivered"); Text("Archivé").tag("archived")
+                    }
+                }
+                Section("Détails") {
+                    TextField("Description", text: b("description"), axis: .vertical).lineLimit(2...5)
+                    TextField("Genre", text: b("genre"))
+                    TextField("Budget €", text: b("budget"))
+                    TextField("Coût total €", text: b("total_cost"))
+                }
+                Section("Sortie / catalogue") {
+                    TextField("Label", text: b("label"))
+                    TextField("N° catalogue", text: b("catalog_number"))
+                    TextField("Cover art (URL)", text: b("cover_art_url"))
+                    TextField("Spotify", text: b("spotify_url"))
+                    TextField("Apple Music", text: b("apple_music_url"))
+                }
+                Section("Stockage") {
+                    TextField("Emplacement", text: b("storage_location"))
+                    TextField("Taille (Mo)", text: b("storage_size"))
+                }
+                Section("Notes") {
+                    TextField("Notes techniques", text: b("technical_notes"), axis: .vertical).lineLimit(2...5)
+                    TextField("Notes", text: b("notes"), axis: .vertical).lineLimit(2...5)
+                }
+            }
+            .formStyle(.grouped)
+
+            HStack {
+                Spacer()
+                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
+                Button("Enregistrer") { save(); dismiss() }
+                    .keyboardShortcut(.return).buttonStyle(.borderedProminent)
+                    .disabled((f["name"] ?? "").trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+            .padding()
+        }
+        .frame(width: 520, height: 640)
+        .onAppear(perform: load)
+    }
+
+    private func load() {
+        for k in textKeys { f[k] = project.string(k) ?? "" }
+        if let n = project.storageSize { f["storage_size"] = String(n) }
+        status = project.status
+        type = project.type
+    }
+
+    private func save() {
+        var c: [String: Any] = ["status": status, "type": type]
+        for k in textKeys where k != "storage_size" {
+            let v = (f[k] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if k == "name" { c[k] = v } else { c[k] = v.isEmpty ? NSNull() : v }
+        }
+        let size = (f["storage_size"] ?? "").trimmingCharacters(in: .whitespaces)
+        c["storage_size"] = Int(size).map { $0 as Any } ?? NSNull()
+        onSave(c)
     }
 }
 

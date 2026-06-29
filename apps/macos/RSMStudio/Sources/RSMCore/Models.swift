@@ -49,6 +49,25 @@ public extension RowBacked {
         if let i = raw[key] as? Int { return i != 0 }
         return false
     }
+    func double(_ key: String) -> Double? {
+        if let d = raw[key] as? Double { return d }
+        if let i = raw[key] as? Int { return Double(i) }
+        if let s = raw[key] as? String { return Double(s) }
+        return nil
+    }
+    /// Reads a JSON array of strings whether the column is real JSON/JSONB
+    /// (decoded to an array by the sync layer) or a TEXT column holding a
+    /// stringified JSON array (legacy `musicians.instruments/genres`).
+    func stringArray(_ key: String) -> [String] {
+        if let arr = raw[key] as? [String] { return arr }
+        if let arr = raw[key] as? [Any] { return arr.compactMap { $0 as? String } }
+        if let s = raw[key] as? String, !s.isEmpty,
+           let data = s.data(using: .utf8),
+           let arr = (try? JSONSerialization.jsonObject(with: data)) as? [Any] {
+            return arr.compactMap { $0 as? String }
+        }
+        return []
+    }
 }
 
 // MARK: - Client
@@ -68,6 +87,75 @@ public struct Client: RowBacked {
     public var isVip: Bool { bool("is_vip") }
     public var isActive: Bool { bool("is_active") }
     public var isCompany: Bool { type == "company" }
+
+    // Artist profile
+    public var biography: String? { string("biography") }
+    public var genres: [String] { stringArray("genres") }
+    public var instruments: [String] { stringArray("instruments") }
+    public var avatarUrl: String? { string("avatar_url") }
+    public var logoUrl: String? { string("logo_url") }
+    public var imageUrl: String? { logoUrl ?? avatarUrl }
+
+    // Streaming & web links (label, url) — only the ones that are filled
+    public var streamingLinks: [(label: String, url: String)] {
+        let defs: [(String, String)] = [
+            ("Spotify", "spotify_url"), ("Apple Music", "apple_music_url"),
+            ("YouTube", "youtube_url"), ("SoundCloud", "soundcloud_url"),
+            ("Bandcamp", "bandcamp_url"), ("Deezer", "deezer_url"),
+            ("Tidal", "tidal_url"), ("Amazon Music", "amazon_music_url"),
+            ("Audiomack", "audiomack_url"), ("Beatport", "beatport_url"),
+            ("Autres", "other_platforms_url"),
+        ]
+        return defs.compactMap { (label, key) in
+            guard let u = string(key), !u.isEmpty else { return nil }
+            return (label, u)
+        }
+    }
+
+    // Music industry
+    public var recordLabel: String? { string("record_label") }
+    public var distributor: String? { string("distributor") }
+    public var managerContact: String? { string("manager_contact") }
+    public var publisher: String? { string("publisher") }
+    public var performanceRightsSociety: String? { string("performance_rights_society") }
+    public var yearsActive: String? { string("years_active") }
+    public var notableWorks: String? { string("notable_works") }
+    public var awardsRecognition: String? { string("awards_recognition") }
+
+    // Extended contact / identity
+    public var address: String? { string("address") }
+    public var street: String? { string("street") }
+    public var postalCode: String? { string("postal_code") }
+    public var region: String? { string("region") }
+    public var birthday: String? { string("birthday") }
+    public var gender: String? { string("gender") }
+    public var firstName: String? { string("first_name") }
+    public var middleName: String? { string("middle_name") }
+    public var lastName: String? { string("last_name") }
+    public var prefix: String? { string("prefix") }
+    public var suffix: String? { string("suffix") }
+
+    // Commercial / portal
+    public var defaultDepositPercent: Double? { double("default_deposit_percent") }
+    public var portalAccess: Bool { bool("portal_access") }
+
+    /// Custom fields (jsonb array of {label, type, value}). Exposed as simple
+    /// (label, value) pairs for the macOS editor.
+    public var customFields: [(label: String, value: String)] {
+        let arr = (raw["custom_fields"] as? [Any]) ?? []
+        return arr.compactMap { item in
+            guard let d = item as? [String: Any] else { return nil }
+            let label = (d["label"] as? String) ?? ""
+            let value: String
+            if let s = d["value"] as? String { value = s }
+            else if let n = d["value"] as? Int { value = String(n) }
+            else if let n = d["value"] as? Double { value = String(n) }
+            else if let b = d["value"] as? Bool { value = b ? "Oui" : "Non" }
+            else { value = "" }
+            guard !label.isEmpty || !value.isEmpty else { return nil }
+            return (label, value)
+        }
+    }
 
     public var displayName: String {
         if let artist = artistName, !artist.isEmpty { return "\(name) (\(artist))" }
@@ -126,6 +214,34 @@ public struct Project: RowBacked {
     public var status: String { string("status") ?? "pre_production" }
     public var clientId: Int? { int("client_id") }
     public var includedRevisions: Int { int("included_revisions") ?? 2 }
+
+    // Details
+    public var description: String? { string("description") }
+    public var genre: String? { string("genre") }
+    public var notes: String? { string("notes") }
+    public var technicalNotes: String? { string("technical_notes") }
+
+    // Dates
+    public var startDate: Date? { RSMDate.parse(string("start_date")) }
+    public var targetDeliveryDate: Date? { RSMDate.parse(string("target_delivery_date")) }
+    public var actualDeliveryDate: Date? { RSMDate.parse(string("actual_delivery_date")) }
+    public var endDate: Date? { RSMDate.parse(string("end_date")) }
+
+    // Money
+    public var budget: String? { string("budget") }
+    public var totalCost: String? { string("total_cost") }
+
+    // Release / catalog
+    public var label: String? { string("label") }
+    public var catalogNumber: String? { string("catalog_number") }
+    public var coverArtUrl: String? { string("cover_art_url") }
+    public var spotifyUrl: String? { string("spotify_url") }
+    public var appleMusicUrl: String? { string("apple_music_url") }
+
+    // Storage
+    public var storageLocation: String? { string("storage_location") }
+    public var storageSize: Int? { int("storage_size") }
+    public var trackCount: Int? { int("track_count") }
 }
 
 public struct Track: RowBacked {
@@ -229,6 +345,15 @@ public struct Talent: RowBacked {
     public var primaryInstrument: String? { string("primary_instrument") }
     public var hourlyRate: String? { string("hourly_rate") }
     public var isActive: Bool { bool("is_active") }
+
+    // Profile
+    public var bio: String? { string("bio") }
+    public var website: String? { string("website") }
+    public var spotifyUrl: String? { string("spotify_url") }
+    public var notes: String? { string("notes") }
+    public var imageUrl: String? { string("image_url") ?? string("photo_url") }
+    public var instruments: [String] { stringArray("instruments") }
+    public var genres: [String] { stringArray("genres") }
 
     public var displayName: String {
         if let stage = stageName, !stage.isEmpty { return "\(name) (\(stage))" }
@@ -417,9 +542,32 @@ public struct TrackRevisionEntry: RowBacked {
     public var clientFeedback: String? { string("client_feedback") }
 }
 
+// MARK: - Share
+
+public struct Share: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+
+    public var token: String { string("share_token") ?? "" }
+    public var projectId: Int? { int("project_id") }
+    public var trackId: Int? { int("track_id") }
+    public var recipientEmail: String? { string("recipient_email") }
+    public var status: String { string("status") ?? "active" }
+    public var accessCount: Int { int("access_count") ?? 0 }
+}
+
 // MARK: - Repository helpers
 
 public extension LocalStore {
+    func shares(trackServerId: Int) -> [Share] {
+        ((try? rows(table: "shares")) ?? []).map(Share.init(raw:))
+            .filter { $0.trackId == trackServerId }
+    }
+    func shares(projectServerId: Int) -> [Share] {
+        ((try? rows(table: "shares")) ?? []).map(Share.init(raw:))
+            .filter { $0.projectId == projectServerId && $0.trackId == nil }
+    }
+
     func clients() -> [Client] {
         ((try? rows(table: "clients")) ?? []).map(Client.init(raw:))
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }

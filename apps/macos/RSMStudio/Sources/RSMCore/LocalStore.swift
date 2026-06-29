@@ -51,6 +51,15 @@ public final class LocalStore: @unchecked Sendable {
                 t.column("value", .text).notNull()
             }
         }
+        // v2: track per-mutation push failures so a single bad payload no longer
+        // forces us to drop the WHOLE batch (silent data loss). Errored mutations
+        // stay queued and are retried; only after `maxRetries` are they dropped.
+        migrator.registerMigration("v2_pending_retry") { db in
+            try db.alter(table: "rsm_pending") { t in
+                t.add(column: "retry_count", .integer).notNull().defaults(to: 0)
+                t.add(column: "last_error", .text)
+            }
+        }
         try migrator.migrate(dbQueue)
     }
 
@@ -158,14 +167,31 @@ public final class LocalStore: @unchecked Sendable {
         public let op: String
         public let payload: String?
         public let baseVersion: Int?
+        public let retryCount: Int
     }
 
     public func pendingMutations(limit: Int = 500) throws -> [PendingMutation] {
         try dbQueue.read { db in
-            let rows = try Row.fetchAll(db, sql: "SELECT id, table_name, uuid, op, payload, base_version FROM rsm_pending ORDER BY id ASC LIMIT ?", arguments: [limit])
+            let rows = try Row.fetchAll(db, sql: "SELECT id, table_name, uuid, op, payload, base_version, retry_count FROM rsm_pending ORDER BY id ASC LIMIT ?", arguments: [limit])
             return rows.map {
-                PendingMutation(id: $0["id"], table: $0["table_name"], uuid: $0["uuid"], op: $0["op"], payload: $0["payload"], baseVersion: $0["base_version"])
+                PendingMutation(id: $0["id"], table: $0["table_name"], uuid: $0["uuid"], op: $0["op"], payload: $0["payload"], baseVersion: $0["base_version"], retryCount: $0["retry_count"] ?? 0)
             }
+        }
+    }
+
+    /// Record a failed push for one mutation. Increments its retry counter and,
+    /// once `maxRetries` is reached, removes it from the queue (returns true so
+    /// the caller can surface the permanent failure instead of losing it silently).
+    @discardableResult
+    public func markPendingError(id: Int64, message: String, maxRetries: Int = 5) throws -> Bool {
+        try dbQueue.write { db in
+            let count = (try Int.fetchOne(db, sql: "SELECT retry_count FROM rsm_pending WHERE id = ?", arguments: [id]) ?? 0) + 1
+            if count >= maxRetries {
+                try db.execute(sql: "DELETE FROM rsm_pending WHERE id = ?", arguments: [id])
+                return true
+            }
+            try db.execute(sql: "UPDATE rsm_pending SET retry_count = ?, last_error = ? WHERE id = ?", arguments: [count, message, id])
+            return false
         }
     }
 

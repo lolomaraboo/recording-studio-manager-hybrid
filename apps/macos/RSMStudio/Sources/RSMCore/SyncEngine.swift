@@ -21,6 +21,10 @@ public struct SyncReport: Sendable {
     public var conflicts = 0
     public var pulled = 0
     public var cursor = 0
+    /// Mutations the server rejected this run (kept in the queue for retry).
+    public var failed = 0
+    /// Mutations dropped after exhausting their retries (surfaced, not silent).
+    public var dropped: [String] = []
 }
 
 public actor SyncEngine {
@@ -55,7 +59,11 @@ public actor SyncEngine {
         do {
             report.pushed = try await pushPending(report: &report)
             try await pullAll(report: &report)
-            notify(.idle)
+            if !report.dropped.isEmpty {
+                notify(.error("\(report.dropped.count) modification(s) non synchronisée(s)"))
+            } else {
+                notify(.idle)
+            }
         } catch {
             notify(.error(error.localizedDescription))
         }
@@ -66,11 +74,16 @@ public actor SyncEngine {
 
     private func pushPending(report: inout SyncReport) async throws -> Int {
         var totalPushed = 0
+        // Mutations that errored THIS run are skipped on re-fetch so the loop
+        // can't spin forever on them; they stay queued for the next sync pass.
+        var skipIds = Set<Int64>()
+
         while true {
             let pending = try store.pendingMutations(limit: 200)
-            guard !pending.isEmpty else { break }
+            let batch = pending.filter { !skipIds.contains($0.id) }
+            guard !batch.isEmpty else { break }
 
-            let mutations: [[String: Any]] = pending.map { m in
+            let mutations: [[String: Any]] = batch.map { m in
                 var dict: [String: Any] = ["table": m.table, "op": m.op, "uuid": m.uuid]
                 if let payloadText = m.payload,
                    let data = payloadText.data(using: .utf8),
@@ -83,21 +96,34 @@ public actor SyncEngine {
 
             let outcomes = try await api.push(mutations: mutations)
 
-            // Server wins on conflict: replace local cache with server row.
-            for outcome in outcomes where outcome.status == "conflict" || outcome.status == "not_found" {
-                report.conflicts += 1
-                if let mutation = pending.first(where: { $0.uuid == outcome.uuid }) {
-                    try store.applyServerWin(table: mutation.table, uuid: outcome.uuid, serverRow: outcome.serverRow, version: outcome.serverVersion)
+            // The server returns results in the same order as the mutations sent,
+            // so we pair positionally (robust even when two queued mutations share
+            // a uuid — e.g. insert then update of the same row before a sync).
+            for (i, m) in batch.enumerated() {
+                guard i < outcomes.count else { skipIds.insert(m.id); continue }
+                let outcome = outcomes[i]
+                switch outcome.status {
+                case "applied":
+                    try store.removePending(ids: [m.id])
+                    totalPushed += 1
+                case "conflict", "not_found":
+                    // Server wins: replace local cache with the server row, drop the mutation.
+                    report.conflicts += 1
+                    try store.applyServerWin(table: m.table, uuid: m.uuid,
+                                             serverRow: outcome.serverRow, version: outcome.serverVersion)
+                    try store.removePending(ids: [m.id])
+                default: // "error" — KEEP the mutation, retry next pass (no silent loss)
+                    report.failed += 1
+                    let droppedPermanently = try store.markPendingError(id: m.id, message: outcome.message ?? "unknown")
+                    if droppedPermanently {
+                        report.dropped.append("\(m.table)/\(m.uuid): \(outcome.message ?? "unknown")")
+                        NSLog("[Sync] DROPPED after max retries \(m.table)/\(m.uuid): \(outcome.message ?? "?")")
+                    } else {
+                        NSLog("[Sync] push error (will retry) \(m.table)/\(m.uuid): \(outcome.message ?? "?")")
+                    }
+                    skipIds.insert(m.id)
                 }
             }
-
-            // All processed mutations leave the queue (applied, conflict-resolved, or errored —
-            // errors are logged; retrying bad payloads forever would wedge the queue).
-            for outcome in outcomes where outcome.status == "error" {
-                NSLog("[Sync] push error for \(outcome.uuid): \(outcome.message ?? "?")")
-            }
-            try store.removePending(ids: pending.map(\.id))
-            totalPushed += outcomes.filter { $0.status == "applied" }.count
         }
         return totalPushed
     }

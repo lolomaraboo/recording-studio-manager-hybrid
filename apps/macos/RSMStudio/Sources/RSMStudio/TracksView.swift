@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import UniformTypeIdentifiers
 import RSMCore
 
 /// R2 — dedicated Tracks section: all tracks across projects, full metadata
@@ -88,8 +90,78 @@ struct TrackDetailView: View {
     @Environment(AppModel.self) private var model
     let track: Track
 
+    @State private var uploadStage = "demo"
+    @State private var uploading = false
+    @State private var uploadError: String?
+    @State private var shareNotice: String?
+
     private var project: Project? {
         track.projectId.flatMap { id in model.store.projects().first { $0.serverId == id } }
+    }
+
+    private let versionDefs: [(label: String, type: String, column: String)] = [
+        ("Démo", "demo", "demo_url"),
+        ("Rough mix", "roughMix", "rough_mix_url"),
+        ("Mix final", "finalMix", "final_mix_url"),
+        ("Master", "master", "master_url"),
+    ]
+
+    private func importAudio() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.audio]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        guard panel.runModal() == .OK, let fileURL = panel.url,
+              let def = versionDefs.first(where: { $0.type == uploadStage }) else { return }
+        let trackId = track.int("id")
+        let uuid = track.id
+        let stage = uploadStage
+        let api = APIClient(config: model.config)
+        let store = model.store
+        uploading = true
+        uploadError = nil
+        Task {
+            do {
+                let hosted = try await api.uploadAudio(fileURL: fileURL, versionType: stage, trackServerId: trackId)
+                try store.localUpdate(table: "tracks", uuid: uuid, changes: [def.column: hosted])
+                await model.syncNow()
+                await MainActor.run { uploading = false }
+            } catch {
+                await MainActor.run {
+                    uploading = false
+                    uploadError = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    private func shareLink(_ token: String) -> String {
+        "\(model.config.baseURL)/api/share/\(model.config.organizationId)/\(token)"
+    }
+
+    private func copyLink(_ token: String) {
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.setString(shareLink(token), forType: .string)
+        shareNotice = "Lien copié"
+    }
+
+    private func createShare() {
+        guard let trackId = track.int("id") else { return }
+        let token = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+        _ = try? model.store.localInsert(table: "shares", payload: [
+            "track_id": trackId,
+            "share_token": token,
+            "status": "active",
+            "access_count": 0,
+        ])
+        copyLink(token)
+        Task { await model.syncNow() }
+    }
+
+    private func revokeShare(_ share: Share) {
+        try? model.store.localUpdate(table: "shares", uuid: share.id, changes: ["status": "revoked"])
+        Task { await model.syncNow() }
     }
 
     var body: some View {
@@ -134,25 +206,76 @@ struct TrackDetailView: View {
                     }
                 }
 
-                // Production versions (legacy shortcuts)
-                let versions: [(String, String?)] = [
-                    ("Démo", track.string("demo_url")),
-                    ("Rough mix", track.string("rough_mix_url")),
-                    ("Mix final", track.string("final_mix_url")),
-                    ("Master", track.string("master_url")),
-                ]
-                if versions.contains(where: { $0.1 != nil }) {
-                    GroupBox("Versions") {
-                        VStack(alignment: .leading, spacing: 4) {
-                            ForEach(versions, id: \.0) { label, url in
-                                if let url {
+                // Production versions + upload to the server (Cloudinary)
+                GroupBox("Versions audio") {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(versionDefs, id: \.type) { def in
+                            if let url = track.string(def.column), !url.isEmpty {
+                                HStack {
+                                    Image(systemName: "waveform.circle").foregroundStyle(.tint)
+                                    Text(def.label)
+                                    Spacer()
+                                    Text(url).font(.caption).foregroundStyle(.secondary)
+                                        .lineLimit(1).truncationMode(.middle)
+                                }
+                            }
+                        }
+                        Divider()
+                        HStack {
+                            Picker("Version", selection: $uploadStage) {
+                                ForEach(versionDefs, id: \.type) { def in
+                                    Text(def.label).tag(def.type)
+                                }
+                            }
+                            .labelsHidden().frame(width: 150)
+                            Button {
+                                importAudio()
+                            } label: {
+                                Label(uploading ? "Envoi en cours…" : "Importer un fichier audio",
+                                      systemImage: "square.and.arrow.up")
+                            }
+                            .disabled(uploading || track.int("id") == nil)
+                            if uploading { ProgressView().controlSize(.small) }
+                        }
+                        if let uploadError {
+                            Text(uploadError).font(.caption).foregroundStyle(.red)
+                        }
+                        if track.int("id") == nil {
+                            Text("Synchronise d'abord cette track pour pouvoir importer un fichier.")
+                                .font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+
+                // Public share links
+                if let serverId = track.int("id") {
+                    let activeShares = model.store.shares(trackServerId: serverId).filter { $0.status == "active" }
+                    GroupBox("Partage public") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            if activeShares.isEmpty {
+                                Text("Aucun lien actif.").font(.caption).foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            } else {
+                                ForEach(activeShares) { share in
                                     HStack {
-                                        Image(systemName: "waveform.circle").foregroundStyle(.tint)
-                                        Text(label)
+                                        Image(systemName: "link").foregroundStyle(.tint)
+                                        Text(shareLink(share.token))
+                                            .font(.caption).lineLimit(1).truncationMode(.middle)
                                         Spacer()
-                                        Text(url).font(.caption).foregroundStyle(.secondary)
-                                            .lineLimit(1).truncationMode(.middle)
+                                        Text("\(share.accessCount) vues").font(.caption2).foregroundStyle(.secondary)
+                                        Button { copyLink(share.token) } label: { Image(systemName: "doc.on.doc") }
+                                            .buttonStyle(.borderless).help("Copier le lien")
+                                        Button(role: .destructive) { revokeShare(share) } label: { Image(systemName: "trash") }
+                                            .buttonStyle(.borderless).help("Révoquer")
                                     }
+                                }
+                            }
+                            HStack {
+                                Button { createShare() } label: {
+                                    Label("Créer un lien de partage", systemImage: "square.and.arrow.up.on.square")
+                                }
+                                if let shareNotice {
+                                    Text(shareNotice).font(.caption).foregroundStyle(.green)
                                 }
                             }
                         }

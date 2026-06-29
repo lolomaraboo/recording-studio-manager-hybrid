@@ -10,6 +10,23 @@ struct SettingsView: View {
     @State private var confirmReset = false
     @State private var showingLogin = false
 
+    // Inline editors (TVA / types de tâches)
+    @State private var newVatName = ""
+    @State private var newVatRate = ""
+    @State private var newTaskName = ""
+    @State private var newTaskRate = ""
+    @State private var newTaskCategory = "billable"
+
+    private var vatRows: [[String: Any]] {
+        _ = model.dataVersion
+        return ((try? model.store.rows(table: "vat_rates")) ?? [])
+            .sorted { (($0["name"] as? String) ?? "") < (($1["name"] as? String) ?? "") }
+    }
+    private var taskTypes: [TaskType] {
+        _ = model.dataVersion
+        return model.store.taskTypes()
+    }
+
     var body: some View {
         Form {
             Section("Compte") {
@@ -65,6 +82,63 @@ struct SettingsView: View {
                 }
             }
 
+            Section("TVA") {
+                ForEach(Array(vatRows.enumerated()), id: \.offset) { _, row in
+                    HStack {
+                        Text((row["name"] as? String) ?? "TVA")
+                        if isDefault(row["is_default"]) {
+                            Text("défaut").font(.caption2)
+                                .padding(.horizontal, 5).padding(.vertical, 1)
+                                .background(.blue.opacity(0.15), in: Capsule())
+                        }
+                        Spacer()
+                        Text(rateLabel(row["rate"])).foregroundStyle(.secondary)
+                        if let uuid = row["sync_uuid"] as? String {
+                            Button(role: .destructive) {
+                                try? model.store.localDelete(table: "vat_rates", uuid: uuid)
+                                Task { await model.syncNow() }
+                            } label: { Image(systemName: "trash") }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
+                HStack {
+                    TextField("Nom (ex. TVA 20%)", text: $newVatName)
+                    TextField("Taux %", text: $newVatRate).frame(width: 80)
+                    Button("Ajouter") { addVat() }
+                        .disabled(newVatName.isEmpty || newVatRate.isEmpty)
+                }
+            }
+
+            Section("Types de tâches") {
+                ForEach(taskTypes) { t in
+                    HStack {
+                        Text(t.name)
+                        Text(t.category == "billable" ? "facturable" : "non fact.").font(.caption2)
+                            .padding(.horizontal, 5).padding(.vertical, 1)
+                            .background((t.category == "billable" ? Color.green : Color.gray).opacity(0.15), in: Capsule())
+                        Spacer()
+                        Text("\(t.hourlyRate) €/h").foregroundStyle(.secondary)
+                        Button(role: .destructive) {
+                            try? model.store.localDelete(table: "task_types", uuid: t.id)
+                            Task { await model.syncNow() }
+                        } label: { Image(systemName: "trash") }
+                        .buttonStyle(.borderless)
+                    }
+                }
+                HStack {
+                    TextField("Nom", text: $newTaskName)
+                    TextField("€/h", text: $newTaskRate).frame(width: 70)
+                    Picker("", selection: $newTaskCategory) {
+                        Text("Facturable").tag("billable")
+                        Text("Non").tag("non_billable")
+                    }
+                    .labelsHidden().frame(width: 120)
+                    Button("Ajouter") { addTaskType() }
+                        .disabled(newTaskName.isEmpty)
+                }
+            }
+
             Section("Données locales") {
                 Button("Réinitialiser le cache local (re-télécharge tout)", role: .destructive) {
                     confirmReset = true
@@ -86,5 +160,43 @@ struct SettingsView: View {
         } message: {
             Text("Les modifications locales non synchronisées seront perdues.")
         }
+    }
+
+    private func isDefault(_ v: Any?) -> Bool {
+        if let b = v as? Bool { return b }
+        if let i = v as? Int { return i != 0 }
+        return false
+    }
+
+    private func rateLabel(_ v: Any?) -> String {
+        if let s = v as? String, let d = Double(s) { return "\(Int(d)) %" }
+        if let d = v as? Double { return "\(Int(d)) %" }
+        if let i = v as? Int { return "\(i) %" }
+        return "—"
+    }
+
+    private func addVat() {
+        let r = Double(newVatRate.replacingOccurrences(of: ",", with: "."))
+        guard !newVatName.isEmpty, let rate = r else { return }
+        _ = try? model.store.localInsert(table: "vat_rates", payload: [
+            "name": newVatName,
+            "rate": String(format: "%.2f", rate),
+            "is_default": false,
+            "is_active": true,
+        ])
+        newVatName = ""; newVatRate = ""
+        Task { await model.syncNow() }
+    }
+
+    private func addTaskType() {
+        guard !newTaskName.isEmpty else { return }
+        let rate = Double(newTaskRate.replacingOccurrences(of: ",", with: ".")) ?? 0
+        _ = try? model.store.localInsert(table: "task_types", payload: [
+            "name": newTaskName,
+            "category": newTaskCategory,
+            "hourly_rate": String(format: "%.2f", rate),
+        ])
+        newTaskName = ""; newTaskRate = ""
+        Task { await model.syncNow() }
     }
 }

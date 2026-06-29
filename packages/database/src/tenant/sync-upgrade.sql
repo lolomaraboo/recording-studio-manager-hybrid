@@ -129,6 +129,24 @@ CREATE TABLE IF NOT EXISTS track_revisions (
   CONSTRAINT track_revisions_sync_uuid_unique UNIQUE (sync_uuid)
 );
 
+CREATE TABLE IF NOT EXISTS shares (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  project_id integer REFERENCES projects(id),
+  track_id integer REFERENCES tracks(id),
+  share_token varchar(64) NOT NULL,
+  recipient_email varchar(255),
+  expires_at timestamp,
+  max_access integer,
+  access_count integer NOT NULL DEFAULT 0,
+  status varchar(20) NOT NULL DEFAULT 'active',
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT shares_sync_uuid_unique UNIQUE (sync_uuid),
+  CONSTRAINT shares_share_token_unique UNIQUE (share_token)
+);
+
 -- ----------------------------------------------------------------------------
 -- 3b. Schema catch-up for legacy tenants (created before the quotes FSM
 -- refactor) — additive, aligns the DB with the current schema.ts.
@@ -218,7 +236,7 @@ DECLARE
     'quotes', 'quote_items', 'invoices', 'invoice_items', 'vat_rates', 'payments',
     'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
     'user_preferences',
-    'session_staff', 'session_equipment', 'track_revisions'
+    'session_staff', 'session_equipment', 'track_revisions', 'shares'
   ];
 BEGIN
   FOREACH t IN ARRAY synced_tables LOOP

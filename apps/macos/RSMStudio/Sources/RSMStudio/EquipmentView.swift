@@ -309,6 +309,18 @@ struct TalentDetailSheet: View {
     @Environment(AppModel.self) private var model
     let talent: Talent
 
+    @State private var editing = false
+    @State private var f: [String: String] = [:]
+    @State private var talentType = "musician"
+
+    private let textKeys = [
+        "name", "stage_name", "primary_instrument", "email", "phone",
+        "website", "spotify_url", "bio", "notes", "image_url", "hourly_rate",
+    ]
+    private func b(_ key: String) -> Binding<String> {
+        Binding(get: { f[key] ?? "" }, set: { f[key] = $0 })
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -318,32 +330,132 @@ struct TalentDetailSheet: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
+                if !editing {
+                    Button { startEdit() } label: { Label("Modifier", systemImage: "pencil") }
+                }
             }
             .padding()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    if let serverId = talent.int("id") {
-                        RelatedSection("Projets crédités",
-                                       items: model.store.projects(talentServerId: serverId),
-                                       emptyText: "Aucun crédit sur un projet pour l'instant.") { project in
-                            RelatedRowContent(icon: "music.note.list", title: project.name, subtitle: project.artistName)
-                        } onTap: { project in
-                            dismiss()
-                            model.open(.projects, entity: project.id)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
+            if editing { editForm } else { detailScroll }
 
             HStack {
                 Spacer()
-                Button("Fermer") { dismiss() }.keyboardShortcut(.escape)
+                if editing {
+                    Button("Annuler") { editing = false }.keyboardShortcut(.escape)
+                    Button("Enregistrer") { save() }
+                        .keyboardShortcut(.return).buttonStyle(.borderedProminent)
+                        .disabled((f["name"] ?? "").trimmingCharacters(in: .whitespaces).isEmpty)
+                } else {
+                    Button("Fermer") { dismiss() }.keyboardShortcut(.escape)
+                }
             }
             .padding()
         }
-        .frame(width: 440, height: 340)
+        .frame(width: 460, height: editing ? 600 : 420)
+    }
+
+    private var detailScroll: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if let bio = talent.bio, !bio.isEmpty {
+                    GroupBox("Bio") {
+                        Text(bio).frame(maxWidth: .infinity, alignment: .leading).textSelection(.enabled)
+                    }
+                }
+                if !talent.instruments.isEmpty || !talent.genres.isEmpty
+                    || talent.hourlyRate != nil || talent.phone != nil {
+                    GroupBox("Profil") {
+                        if !talent.instruments.isEmpty {
+                            InfoRow(label: "Instruments", value: talent.instruments.joined(separator: ", "))
+                        }
+                        if !talent.genres.isEmpty {
+                            InfoRow(label: "Genres", value: talent.genres.joined(separator: ", "))
+                        }
+                        InfoRow(label: "Tarif horaire", value: talent.hourlyRate.map { "\($0) €" })
+                        InfoRow(label: "Téléphone", value: talent.phone)
+                    }
+                }
+                let links: [(label: String, url: String)] =
+                    [("Site web", talent.website), ("Spotify", talent.spotifyUrl)]
+                    .compactMap { (l, u) in (u?.isEmpty == false) ? (l, u!) : nil }
+                if !links.isEmpty {
+                    GroupBox("Liens") { FlowLinks(links: links) }
+                }
+                if let notes = talent.notes, !notes.isEmpty {
+                    GroupBox("Notes") {
+                        Text(notes).frame(maxWidth: .infinity, alignment: .leading).textSelection(.enabled)
+                    }
+                }
+                if let serverId = talent.int("id") {
+                    RelatedSection("Projets crédités",
+                                   items: model.store.projects(talentServerId: serverId),
+                                   emptyText: "Aucun crédit sur un projet pour l'instant.") { project in
+                        RelatedRowContent(icon: "music.note.list", title: project.name, subtitle: project.artistName)
+                    } onTap: { project in
+                        dismiss()
+                        model.open(.projects, entity: project.id)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private var editForm: some View {
+        Form {
+            Section("Identité") {
+                TextField("Nom", text: b("name"))
+                TextField("Nom de scène", text: b("stage_name"))
+                Picker("Type", selection: $talentType) {
+                    Text("Musicien").tag("musician")
+                    Text("Producteur").tag("producer")
+                    Text("Ingé son").tag("engineer")
+                    Text("Auteur").tag("songwriter")
+                    Text("Arrangeur").tag("arranger")
+                }
+            }
+            Section("Contact") {
+                TextField("Email", text: b("email"))
+                TextField("Téléphone", text: b("phone"))
+            }
+            Section("Profil") {
+                TextField("Instrument principal", text: b("primary_instrument"))
+                TextField("Instruments (séparés par des virgules)", text: b("instruments"))
+                TextField("Genres (séparés par des virgules)", text: b("genres"))
+                TextField("Tarif horaire €", text: b("hourly_rate"))
+                TextField("Bio", text: b("bio"), axis: .vertical).lineLimit(2...6)
+            }
+            Section("Liens & image") {
+                TextField("Site web", text: b("website"))
+                TextField("Spotify", text: b("spotify_url"))
+                TextField("URL image", text: b("image_url"))
+            }
+            Section("Notes") {
+                TextField("Notes", text: b("notes"), axis: .vertical).lineLimit(2...5)
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    private func startEdit() {
+        for k in textKeys { f[k] = talent.string(k) ?? "" }
+        f["instruments"] = talent.instruments.joined(separator: ", ")
+        f["genres"] = talent.genres.joined(separator: ", ")
+        talentType = talent.talentType
+        editing = true
+    }
+
+    private func save() {
+        var c: [String: Any] = ["talent_type": talentType]
+        for k in textKeys {
+            let v = (f[k] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if k == "name" { c[k] = v } else { c[k] = v.isEmpty ? NSNull() : v }
+        }
+        c["instruments"] = csvToArray(f["instruments"])
+        c["genres"] = csvToArray(f["genres"])
+        try? model.store.localUpdate(table: "musicians", uuid: talent.id, changes: c)
+        Task { await model.syncNow() }
+        editing = false
     }
 }
 
@@ -355,25 +467,45 @@ struct TalentCreateSheet: View {
     @State private var stageName = ""
     @State private var talentType = "musician"
     @State private var instrument = ""
+    @State private var instruments = ""
+    @State private var genres = ""
     @State private var email = ""
+    @State private var phone = ""
+    @State private var website = ""
+    @State private var spotifyUrl = ""
+    @State private var bio = ""
     @State private var hourlyRate = 0.0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Nouveau talent").font(.title3).bold().padding()
             Form {
-                TextField("Nom", text: $name)
-                TextField("Nom de scène", text: $stageName)
-                Picker("Type", selection: $talentType) {
-                    Text("Musicien").tag("musician")
-                    Text("Producteur").tag("producer")
-                    Text("Ingé son").tag("engineer")
-                    Text("Auteur").tag("songwriter")
-                    Text("Arrangeur").tag("arranger")
+                Section("Identité") {
+                    TextField("Nom", text: $name)
+                    TextField("Nom de scène", text: $stageName)
+                    Picker("Type", selection: $talentType) {
+                        Text("Musicien").tag("musician")
+                        Text("Producteur").tag("producer")
+                        Text("Ingé son").tag("engineer")
+                        Text("Auteur").tag("songwriter")
+                        Text("Arrangeur").tag("arranger")
+                    }
                 }
-                TextField("Instrument principal", text: $instrument)
-                TextField("Email", text: $email)
-                TextField("Tarif horaire €", value: $hourlyRate, format: .number)
+                Section("Contact") {
+                    TextField("Email", text: $email)
+                    TextField("Téléphone", text: $phone)
+                }
+                Section("Profil") {
+                    TextField("Instrument principal", text: $instrument)
+                    TextField("Instruments (séparés par des virgules)", text: $instruments)
+                    TextField("Genres (séparés par des virgules)", text: $genres)
+                    TextField("Tarif horaire €", value: $hourlyRate, format: .number)
+                    TextField("Bio", text: $bio, axis: .vertical).lineLimit(2...5)
+                }
+                Section("Liens") {
+                    TextField("Site web", text: $website)
+                    TextField("Spotify", text: $spotifyUrl)
+                }
             }
             .formStyle(.grouped)
             HStack {
@@ -384,7 +516,15 @@ struct TalentCreateSheet: View {
                     if !stageName.isEmpty { payload["stage_name"] = stageName }
                     if !instrument.isEmpty { payload["primary_instrument"] = instrument }
                     if !email.isEmpty { payload["email"] = email }
+                    if !phone.isEmpty { payload["phone"] = phone }
+                    if !website.isEmpty { payload["website"] = website }
+                    if !spotifyUrl.isEmpty { payload["spotify_url"] = spotifyUrl }
+                    if !bio.isEmpty { payload["bio"] = bio }
                     if hourlyRate > 0 { payload["hourly_rate"] = String(format: "%.2f", hourlyRate) }
+                    let ins = csvToArray(instruments)
+                    if !ins.isEmpty { payload["instruments"] = ins }
+                    let g = csvToArray(genres)
+                    if !g.isEmpty { payload["genres"] = g }
                     onCreate(payload)
                     dismiss()
                 }
@@ -394,6 +534,6 @@ struct TalentCreateSheet: View {
             }
             .padding()
         }
-        .frame(width: 420, height: 420)
+        .frame(width: 460, height: 600)
     }
 }

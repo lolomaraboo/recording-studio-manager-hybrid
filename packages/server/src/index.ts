@@ -16,6 +16,7 @@ import uploadRouter from './routes/upload.js';
 import healthRouter from './routes/health.js';
 import oauthRouter from './routes/oauth.js';
 import syncRouter from './routes/sync.js';
+import sharePublicRouter from './routes/share-public.js';
 import { notificationBroadcaster } from './lib/notificationBroadcaster.js';
 import { socketAuthMiddleware } from './middleware/socket-auth.js';
 
@@ -194,6 +195,9 @@ async function main() {
 
   // Sync routes for native macOS app (Phase M0 — offline-first sync)
   app.use('/api/sync', syncRouter);
+
+  // Public share pages (no auth) — /api/share/:orgId/:token
+  app.use('/api/share', sharePublicRouter);
 
   // Debug logging for TRPC requests
   app.use('/api/trpc', (req, res, next) => {

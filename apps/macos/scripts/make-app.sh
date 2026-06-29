@@ -52,6 +52,14 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <dict>
         <key>NSAllowsLocalNetworking</key><true/>
     </dict>
+    <key>NSContactsUsageDescription</key><string>RSM Studio importe vos contacts pour créer des fiches clients.</string>
+    <key>NSCalendarsUsageDescription</key><string>RSM Studio affiche vos événements de calendrier (lecture seule).</string>
+    <key>NSCalendarsFullAccessUsageDescription</key><string>RSM Studio affiche vos événements de calendrier (lecture seule).</string>
+    <key>NSRemindersUsageDescription</key><string>RSM Studio affiche vos rappels (lecture seule).</string>
+    <key>NSRemindersFullAccessUsageDescription</key><string>RSM Studio affiche vos rappels (lecture seule).</string>
+    <key>NSMicrophoneUsageDescription</key><string>RSM Studio enregistre l'audio pour transcrire vos conversations avec les clients.</string>
+    <key>NSSpeechRecognitionUsageDescription</key><string>RSM Studio transcrit vos enregistrements pour les envoyer à l'assistant.</string>
+    <key>NSAppleEventsUsageDescription</key><string>RSM Studio accède à l'app Notes pour récupérer vos enregistrements d'appels.</string>
     <key>NSHumanReadableCopyright</key><string>© 2026 Recording Studio Manager</string>
 </dict>
 </plist>

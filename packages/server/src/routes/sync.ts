@@ -69,7 +69,7 @@ const SYNCED_TABLES = new Set([
   'quotes', 'quote_items', 'invoices', 'invoice_items', 'vat_rates', 'payments',
   'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
   'user_preferences',
-  'session_staff', 'session_equipment', 'track_revisions',
+  'session_staff', 'session_equipment', 'track_revisions', 'shares',
 ]);
 
 /** Columns clients may never write directly */
@@ -145,20 +145,38 @@ router.get('/events', (req: SyncRequest, res: Response) => {
 // ----------------------------------------------------------------------------
 // Column whitelist cache (per table, per tenant org) from information_schema
 // ----------------------------------------------------------------------------
-const columnCache = new Map<string, Set<string>>();
+const columnCache = new Map<string, Map<string, string>>();
 
-async function getTableColumns(db: TenantDb, orgId: number, table: string): Promise<Set<string>> {
+/** Returns a map of column name → Postgres data_type (e.g. "jsonb", "text"). */
+async function getTableColumns(db: TenantDb, orgId: number, table: string): Promise<Map<string, string>> {
   const cacheKey = `${orgId}:${table}`;
   const cached = columnCache.get(cacheKey);
   if (cached) return cached;
 
   const result = await db.execute(sql`
-    SELECT column_name FROM information_schema.columns
+    SELECT column_name, data_type FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = ${table}
   `);
-  const columns = new Set((result as unknown as Array<{ column_name: string }>).map(r => r.column_name));
+  const columns = new Map(
+    (result as unknown as Array<{ column_name: string; data_type: string }>).map(r => [r.column_name, r.data_type])
+  );
   columnCache.set(cacheKey, columns);
   return columns;
+}
+
+/**
+ * Encode a payload value for SQL interpolation. Arrays/objects bound for JSON or
+ * JSONB columns are stringified and cast (so the Mac app can write `genres`,
+ * `instruments`, `websites`, etc.); text columns that store stringified JSON
+ * (legacy `musicians.instruments/genres`) get the JSON string as-is. Scalars
+ * pass through unchanged.
+ */
+function encodeVal(dataType: string | undefined, value: unknown) {
+  if (value !== null && value !== undefined && typeof value === 'object') {
+    const json = JSON.stringify(value);
+    return (dataType === 'jsonb' || dataType === 'json') ? sql`${json}::${sql.raw(dataType)}` : sql`${json}`;
+  }
+  return sql`${value ?? null}`;
 }
 
 function validTables(tables: unknown): string[] {
@@ -316,7 +334,7 @@ router.post('/push', async (req: SyncRequest, res: Response) => {
             sql.raw(', ')
           );
           const insertVals = sql.join(
-            [sql`${uuid}`, ...keys.map((k) => sql`${payload[k] ?? null}`)],
+            [sql`${uuid}`, ...keys.map((k) => encodeVal(columns.get(k), payload[k]))],
             sql.raw(', ')
           );
           // ON CONFLICT DO NOTHING → idempotent retries after network failures
@@ -340,7 +358,7 @@ router.post('/push', async (req: SyncRequest, res: Response) => {
             continue;
           }
           const assignments = sql.join(
-            keys.map((k) => sql`${sql.identifier(k)} = ${payload[k] ?? null}`),
+            keys.map((k) => sql`${sql.identifier(k)} = ${encodeVal(columns.get(k), payload[k])}`),
             sql.raw(', ')
           );
           const updated = (await db.execute(sql`

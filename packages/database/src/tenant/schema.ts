@@ -1451,3 +1451,30 @@ export const syncLog = pgTable("sync_log", {
 });
 
 export type SyncLogEntry = typeof syncLog.$inferSelect;
+
+/**
+ * Shares table (Tenant DB)
+ * Public share links for a track or a whole project. The public URL encodes the
+ * org id + token (database-per-tenant has no global token index):
+ *   /api/share/:orgId/:shareToken
+ */
+export const shares = pgTable("shares", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+
+  projectId: integer("project_id").references(() => projects.id),
+  trackId: integer("track_id").references(() => tracks.id),
+
+  shareToken: varchar("share_token", { length: 64 }).notNull().unique(),
+  recipientEmail: varchar("recipient_email", { length: 255 }),
+  expiresAt: timestamp("expires_at"),
+  maxAccess: integer("max_access"),
+  accessCount: integer("access_count").notNull().default(0),
+  status: varchar("status", { length: 20 }).notNull().default("active"), // active | revoked | expired
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Share = typeof shares.$inferSelect;
+export type InsertShare = typeof shares.$inferInsert;
