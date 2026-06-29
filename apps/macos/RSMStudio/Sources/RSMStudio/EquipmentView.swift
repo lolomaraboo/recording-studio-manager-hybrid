@@ -32,8 +32,8 @@ struct EquipmentView: View {
     var body: some View {
         Group {
             if items.isEmpty && search.isEmpty {
-                ContentUnavailableView("Aucun matériel", systemImage: "hifispeaker",
-                                       description: Text("Ajoute ton inventaire avec le bouton +."))
+                StudioEmptyState(title: "Aucun matériel", systemImage: "hifispeaker",
+                                 message: "Ajoute ton inventaire avec le bouton +.")
             } else {
                 List(items) { item in
                     HStack {
@@ -118,7 +118,6 @@ struct EquipmentView: View {
 }
 
 struct EquipmentCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let onCreate: ([String: Any]) -> Void
 
     @State private var name = ""
@@ -128,41 +127,31 @@ struct EquipmentCreateSheet: View {
     @State private var location = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouveau matériel").font(.title3).bold().padding()
-            Form {
-                TextField("Nom", text: $name, prompt: Text("Neumann U87 Ai"))
-                TextField("Marque", text: $brand)
-                TextField("Modèle", text: $modelName)
-                Picker("Catégorie", selection: $category) {
-                    Text("Micro").tag("microphone")
-                    Text("Console").tag("console")
-                    Text("Enceintes").tag("monitor")
-                    Text("Périphérique").tag("outboard")
-                    Text("Instrument").tag("instrument")
-                    Text("Autre").tag("other")
-                }
-                TextField("Emplacement", text: $location, prompt: Text("Studio A"))
+        StudioFormSheet(
+            title: "Nouveau matériel", confirmLabel: "Ajouter",
+            confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 360,
+            onConfirm: {
+                var payload: [String: Any] = ["name": name, "category": category]
+                if !brand.isEmpty { payload["brand"] = brand }
+                if !modelName.isEmpty { payload["model"] = modelName }
+                if !location.isEmpty { payload["location"] = location }
+                onCreate(payload)
             }
-            .formStyle(.grouped)
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Ajouter") {
-                    var payload: [String: Any] = ["name": name, "category": category]
-                    if !brand.isEmpty { payload["brand"] = brand }
-                    if !modelName.isEmpty { payload["model"] = modelName }
-                    if !location.isEmpty { payload["location"] = location }
-                    onCreate(payload)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+        ) {
+            TextField("Nom", text: $name, prompt: Text("Neumann U87 Ai"))
+            TextField("Marque", text: $brand)
+            TextField("Modèle", text: $modelName)
+            Picker("Catégorie", selection: $category) {
+                Text("Micro").tag("microphone")
+                Text("Console").tag("console")
+                Text("Enceintes").tag("monitor")
+                Text("Périphérique").tag("outboard")
+                Text("Instrument").tag("instrument")
+                Text("Autre").tag("other")
             }
-            .padding()
+            TextField("Emplacement", text: $location, prompt: Text("Studio A"))
         }
-        .frame(width: 420, height: 360)
     }
 }
 
@@ -240,8 +229,8 @@ struct TalentsView: View {
     var body: some View {
         Group {
             if talents.isEmpty {
-                ContentUnavailableView("Aucun talent", systemImage: "music.mic",
-                                       description: Text("Musiciens et intervenants de session."))
+                StudioEmptyState(title: "Aucun talent", systemImage: "music.mic",
+                                 message: "Musiciens et intervenants de session.")
             } else {
                 List(talents) { talent in
                     HStack {
@@ -460,7 +449,6 @@ struct TalentDetailSheet: View {
 }
 
 struct TalentCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let onCreate: ([String: Any]) -> Void
 
     @State private var name = ""
@@ -477,63 +465,53 @@ struct TalentCreateSheet: View {
     @State private var hourlyRate = 0.0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouveau talent").font(.title3).bold().padding()
-            Form {
-                Section("Identité") {
-                    TextField("Nom", text: $name)
-                    TextField("Nom de scène", text: $stageName)
-                    Picker("Type", selection: $talentType) {
-                        Text("Musicien").tag("musician")
-                        Text("Producteur").tag("producer")
-                        Text("Ingé son").tag("engineer")
-                        Text("Auteur").tag("songwriter")
-                        Text("Arrangeur").tag("arranger")
-                    }
-                }
-                Section("Contact") {
-                    TextField("Email", text: $email)
-                    TextField("Téléphone", text: $phone)
-                }
-                Section("Profil") {
-                    TextField("Instrument principal", text: $instrument)
-                    TextField("Instruments (séparés par des virgules)", text: $instruments)
-                    TextField("Genres (séparés par des virgules)", text: $genres)
-                    TextField("Tarif horaire €", value: $hourlyRate, format: .number)
-                    TextField("Bio", text: $bio, axis: .vertical).lineLimit(2...5)
-                }
-                Section("Liens") {
-                    TextField("Site web", text: $website)
-                    TextField("Spotify", text: $spotifyUrl)
+        StudioFormSheet(
+            title: "Nouveau talent", confirmLabel: "Ajouter",
+            confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 600,
+            onConfirm: {
+                var payload: [String: Any] = ["name": name, "talent_type": talentType]
+                if !stageName.isEmpty { payload["stage_name"] = stageName }
+                if !instrument.isEmpty { payload["primary_instrument"] = instrument }
+                if !email.isEmpty { payload["email"] = email }
+                if !phone.isEmpty { payload["phone"] = phone }
+                if !website.isEmpty { payload["website"] = website }
+                if !spotifyUrl.isEmpty { payload["spotify_url"] = spotifyUrl }
+                if !bio.isEmpty { payload["bio"] = bio }
+                let ins = csvToArray(instruments)
+                if !ins.isEmpty { payload["instruments"] = ins }
+                let g = csvToArray(genres)
+                if !g.isEmpty { payload["genres"] = g }
+                if hourlyRate > 0 { payload["hourly_rate"] = String(format: "%.2f", hourlyRate) }
+                onCreate(payload)
+            }
+        ) {
+            Section("Identité") {
+                TextField("Nom", text: $name)
+                TextField("Nom de scène", text: $stageName)
+                Picker("Type", selection: $talentType) {
+                    Text("Musicien").tag("musician")
+                    Text("Producteur").tag("producer")
+                    Text("Ingé son").tag("engineer")
+                    Text("Auteur").tag("songwriter")
+                    Text("Arrangeur").tag("arranger")
                 }
             }
-            .formStyle(.grouped)
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Ajouter") {
-                    var payload: [String: Any] = ["name": name, "talent_type": talentType]
-                    if !stageName.isEmpty { payload["stage_name"] = stageName }
-                    if !instrument.isEmpty { payload["primary_instrument"] = instrument }
-                    if !email.isEmpty { payload["email"] = email }
-                    if !phone.isEmpty { payload["phone"] = phone }
-                    if !website.isEmpty { payload["website"] = website }
-                    if !spotifyUrl.isEmpty { payload["spotify_url"] = spotifyUrl }
-                    if !bio.isEmpty { payload["bio"] = bio }
-                    if hourlyRate > 0 { payload["hourly_rate"] = String(format: "%.2f", hourlyRate) }
-                    let ins = csvToArray(instruments)
-                    if !ins.isEmpty { payload["instruments"] = ins }
-                    let g = csvToArray(genres)
-                    if !g.isEmpty { payload["genres"] = g }
-                    onCreate(payload)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+            Section("Contact") {
+                TextField("Email", text: $email)
+                TextField("Téléphone", text: $phone)
             }
-            .padding()
+            Section("Profil") {
+                TextField("Instrument principal", text: $instrument)
+                TextField("Instruments (séparés par des virgules)", text: $instruments)
+                TextField("Genres (séparés par des virgules)", text: $genres)
+                TextField("Tarif horaire €", value: $hourlyRate, format: .number)
+                TextField("Bio", text: $bio, axis: .vertical).lineLimit(2...5)
+            }
+            Section("Liens") {
+                TextField("Site web", text: $website)
+                TextField("Spotify", text: $spotifyUrl)
+            }
         }
-        .frame(width: 460, height: 600)
     }
 }
