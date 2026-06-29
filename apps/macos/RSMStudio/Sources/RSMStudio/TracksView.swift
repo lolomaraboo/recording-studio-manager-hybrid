@@ -338,7 +338,6 @@ struct TrackDetailView: View {
 // MARK: - Create sheet
 
 struct TrackCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     @Environment(AppModel.self) private var model
     var defaultProjectServerId: Int? = nil
     let onCreate: ([String: Any]) -> Void
@@ -352,47 +351,37 @@ struct TrackCreateSheet: View {
     private var projects: [Project] { model.store.projects().filter { $0.serverId != nil } }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouvelle track").font(.title3).bold().padding()
-            Form {
-                TextField("Titre", text: $title)
-                Picker("Projet", selection: $projectServerId) {
-                    Text("Choisir…").tag(nil as Int?)
-                    ForEach(projects) { project in
-                        Text(project.name).tag(project.serverId)
-                    }
-                }
-                Stepper("N° de piste : \(trackNumber)", value: $trackNumber, in: 1...99)
-                TextField("BPM", value: $bpm, format: .number)
-                TextField("Tonalité", text: $key, prompt: Text("Am, C, F#m…"))
-                if projects.isEmpty {
-                    Text("Crée d'abord un projet (synchronisé).")
-                        .font(.caption).foregroundStyle(.orange)
+        StudioFormSheet(
+            title: "Nouvelle track", confirmLabel: "Créer",
+            confirmDisabled: title.trimmingCharacters(in: .whitespaces).isEmpty || projectServerId == nil,
+            height: 400,
+            onConfirm: {
+                var payload: [String: Any] = [
+                    "title": title,
+                    "project_id": projectServerId ?? 0,
+                    "track_number": trackNumber,
+                    "status": "recording",
+                ]
+                if bpm > 0 { payload["bpm"] = bpm }
+                if !key.isEmpty { payload["key"] = key }
+                onCreate(payload)
+            }
+        ) {
+            TextField("Titre", text: $title)
+            Picker("Projet", selection: $projectServerId) {
+                Text("Choisir…").tag(nil as Int?)
+                ForEach(projects) { project in
+                    Text(project.name).tag(project.serverId)
                 }
             }
-            .formStyle(.grouped)
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Créer") {
-                    var payload: [String: Any] = [
-                        "title": title,
-                        "project_id": projectServerId ?? 0,
-                        "track_number": trackNumber,
-                        "status": "recording",
-                    ]
-                    if bpm > 0 { payload["bpm"] = bpm }
-                    if !key.isEmpty { payload["key"] = key }
-                    onCreate(payload)
-                    dismiss()
-                }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty || projectServerId == nil)
+            Stepper("N° de piste : \(trackNumber)", value: $trackNumber, in: 1...99)
+            TextField("BPM", value: $bpm, format: .number)
+            TextField("Tonalité", text: $key, prompt: Text("Am, C, F#m…"))
+            if projects.isEmpty {
+                Text("Crée d'abord un projet (synchronisé).")
+                    .font(.caption).foregroundStyle(.orange)
             }
-            .padding()
         }
-        .frame(width: 420, height: 400)
         .onAppear { projectServerId = projectServerId ?? defaultProjectServerId }
     }
 }

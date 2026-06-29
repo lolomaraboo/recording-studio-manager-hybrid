@@ -361,7 +361,6 @@ struct SessionRow: View {
 // MARK: - Create sheet
 
 struct SessionCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     @Environment(AppModel.self) private var model
     let onCreate: ([String: Any]) -> Void
 
@@ -383,68 +382,57 @@ struct SessionCreateSheet: View {
     }()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouvelle session").font(.title3).bold().padding()
-            Form {
-                TextField("Titre", text: $title, prompt: Text("Enregistrement voix — EP"))
-                Picker("Client", selection: $clientServerId) {
-                    Text("Choisir…").tag(nil as Int?)
-                    ForEach(clients) { client in
-                        Text(client.displayName).tag(client.serverId)
-                    }
-                }
-                Picker("Salle", selection: $roomServerId) {
-                    Text("Choisir…").tag(nil as Int?)
-                    ForEach(rooms) { room in
-                        Text(room.name).tag(room.serverId)
-                    }
-                }
-                Picker("Type", selection: $bookingType) {
-                    Text("Horaire").tag("hourly")
-                    Text("Journée").tag("daily")
-                    Text("Lockout").tag("lockout")
-                    Text("Location sèche").tag("dry_hire")
-                }
-                DatePicker("Début", selection: $start)
-                if bookingType == "hourly" {
-                    Stepper(value: $durationHours, in: 0.5...24, step: 0.5) {
-                        Text("Durée : \(durationHours.formatted()) h")
-                    }
-                }
-                TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...4)
-                if rooms.isEmpty {
-                    Text("Aucune salle synchronisée — crée les salles côté web d'abord.")
-                        .font(.caption).foregroundStyle(.orange)
+        StudioFormSheet(
+            title: "Nouvelle session", confirmLabel: "Créer",
+            confirmDisabled: title.isEmpty || clientServerId == nil || roomServerId == nil,
+            height: 480,
+            onConfirm: {
+                let end: Date = bookingType == "hourly"
+                    ? start.addingTimeInterval(durationHours * 3600)
+                    : Calendar.current.date(bySettingHour: 23, minute: 59, second: 0, of: start) ?? start
+                var payload: [String: Any] = [
+                    "title": title,
+                    "client_id": clientServerId ?? 0,
+                    "room_id": roomServerId ?? 0,
+                    "booking_type": bookingType,
+                    "start_time": Self.isoFormatter.string(from: start),
+                    "end_time": Self.isoFormatter.string(from: end),
+                    "status": "scheduled",
+                ]
+                if !notes.isEmpty { payload["notes"] = notes }
+                onCreate(payload)
+            }
+        ) {
+            TextField("Titre", text: $title, prompt: Text("Enregistrement voix — EP"))
+            Picker("Client", selection: $clientServerId) {
+                Text("Choisir…").tag(nil as Int?)
+                ForEach(clients) { client in
+                    Text(client.displayName).tag(client.serverId)
                 }
             }
-            .formStyle(.grouped)
-
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Créer") {
-                    let end: Date = bookingType == "hourly"
-                        ? start.addingTimeInterval(durationHours * 3600)
-                        : Calendar.current.date(bySettingHour: 23, minute: 59, second: 0, of: start) ?? start
-                    var payload: [String: Any] = [
-                        "title": title,
-                        "client_id": clientServerId ?? 0,
-                        "room_id": roomServerId ?? 0,
-                        "booking_type": bookingType,
-                        "start_time": Self.isoFormatter.string(from: start),
-                        "end_time": Self.isoFormatter.string(from: end),
-                        "status": "scheduled",
-                    ]
-                    if !notes.isEmpty { payload["notes"] = notes }
-                    onCreate(payload)
-                    dismiss()
+            Picker("Salle", selection: $roomServerId) {
+                Text("Choisir…").tag(nil as Int?)
+                ForEach(rooms) { room in
+                    Text(room.name).tag(room.serverId)
                 }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(title.isEmpty || clientServerId == nil || roomServerId == nil)
             }
-            .padding()
+            Picker("Type", selection: $bookingType) {
+                Text("Horaire").tag("hourly")
+                Text("Journée").tag("daily")
+                Text("Lockout").tag("lockout")
+                Text("Location sèche").tag("dry_hire")
+            }
+            DatePicker("Début", selection: $start)
+            if bookingType == "hourly" {
+                Stepper(value: $durationHours, in: 0.5...24, step: 0.5) {
+                    Text("Durée : \(durationHours.formatted()) h")
+                }
+            }
+            TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...4)
+            if rooms.isEmpty {
+                Text("Aucune salle synchronisée — crée les salles côté web d'abord.")
+                    .font(.caption).foregroundStyle(.orange)
+            }
         }
-        .frame(width: 460, height: 480)
     }
 }
