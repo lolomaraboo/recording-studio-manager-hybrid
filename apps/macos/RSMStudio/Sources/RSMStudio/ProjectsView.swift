@@ -233,7 +233,6 @@ struct ProjectDetailView: View {
 
 /// Edit sheet for a project's metadata (M4+ — parity with the web project form).
 struct ProjectEditSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let project: Project
     let onSave: ([String: Any]) -> Void
 
@@ -251,9 +250,12 @@ struct ProjectEditSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Modifier \(project.name)").font(.title3).bold().padding()
-            Form {
+        StudioFormSheet(
+            title: "Modifier \(project.name)", confirmLabel: "Enregistrer",
+            confirmDisabled: (f["name"] ?? "").trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 640,
+            onConfirm: { save() }
+        ) {
                 Section("Identité") {
                     TextField("Nom", text: b("name"))
                     TextField("Artiste", text: b("artist_name"))
@@ -290,19 +292,7 @@ struct ProjectEditSheet: View {
                     TextField("Notes techniques", text: b("technical_notes"), axis: .vertical).lineLimit(2...5)
                     TextField("Notes", text: b("notes"), axis: .vertical).lineLimit(2...5)
                 }
-            }
-            .formStyle(.grouped)
-
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Enregistrer") { save(); dismiss() }
-                    .keyboardShortcut(.return).buttonStyle(.borderedProminent)
-                    .disabled((f["name"] ?? "").trimmingCharacters(in: .whitespaces).isEmpty)
-            }
-            .padding()
         }
-        .frame(width: 520, height: 640)
         .onAppear(perform: load)
     }
 

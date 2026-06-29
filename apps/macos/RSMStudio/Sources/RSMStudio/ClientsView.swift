@@ -277,7 +277,6 @@ struct ClientDetailView: View {
 // MARK: - Edit sheet
 
 struct ClientEditSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let client: Client
     let onSave: ([String: Any]) -> Void
 
@@ -303,9 +302,12 @@ struct ClientEditSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Modifier \(client.name)").font(.title3).bold().padding()
-            Form {
+        StudioFormSheet(
+            title: "Modifier \(client.name)", confirmLabel: "Enregistrer",
+            confirmDisabled: (f["name"] ?? "").trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 640,
+            onConfirm: { save() }
+        ) {
                 Section("Identité") {
                     TextField("Nom", text: b("name"))
                     if !client.isCompany { TextField("Nom d'artiste", text: b("artist_name")) }
@@ -373,20 +375,7 @@ struct ClientEditSheet: View {
                 Section("Notes") {
                     TextField("Notes", text: b("notes"), axis: .vertical).lineLimit(2...6)
                 }
-            }
-            .formStyle(.grouped)
-
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Enregistrer") { save(); dismiss() }
-                    .keyboardShortcut(.return)
-                    .buttonStyle(.borderedProminent)
-                    .disabled((f["name"] ?? "").trimmingCharacters(in: .whitespaces).isEmpty)
-            }
-            .padding()
         }
-        .frame(width: 520, height: 640)
         .onAppear(perform: load)
     }
 
@@ -483,7 +472,6 @@ func csvToArray(_ s: String?) -> [String] {
 // MARK: - Create sheet
 
 struct ClientCreateSheet: View {
-    @Environment(\.modalDismiss) private var dismiss
     let onCreate: ([String: Any]) -> Void
 
     @State private var name = ""
@@ -499,63 +487,52 @@ struct ClientCreateSheet: View {
     @State private var isVip = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nouveau client").font(.title3).bold().padding()
-            Form {
-                Section {
-                    Picker("Type", selection: $isCompany) {
-                        Text("Individuel").tag(false)
-                        Text("Société").tag(true)
-                    }
-                    .pickerStyle(.segmented)
-                    TextField(isCompany ? "Raison sociale" : "Nom", text: $name)
-                    if !isCompany {
-                        TextField("Nom d'artiste", text: $artistName)
-                    }
-                    Toggle("Client VIP", isOn: $isVip)
-                }
-                Section("Contact") {
-                    TextField("Email", text: $email)
-                    TextField("Téléphone", text: $phone)
-                    TextField("Ville", text: $city)
-                    TextField("Pays", text: $country)
-                }
-                Section("Profil artiste") {
-                    TextField("Genres (séparés par des virgules)", text: $genres)
-                    TextField("Biographie", text: $biography, axis: .vertical).lineLimit(2...5)
-                    TextField("Spotify", text: $spotifyUrl)
-                }
+        StudioFormSheet(
+            title: "Nouveau client", confirmLabel: "Créer",
+            confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 560,
+            onConfirm: {
+                var payload: [String: Any] = [
+                    "name": name,
+                    "type": isCompany ? "company" : "individual",
+                    "is_vip": isVip,
+                ]
+                if !artistName.isEmpty { payload["artist_name"] = artistName }
+                if !email.isEmpty { payload["email"] = email }
+                if !phone.isEmpty { payload["phone"] = phone }
+                if !city.isEmpty { payload["city"] = city }
+                if !country.isEmpty { payload["country"] = country }
+                if !biography.isEmpty { payload["biography"] = biography }
+                if !spotifyUrl.isEmpty { payload["spotify_url"] = spotifyUrl }
+                let g = csvToArray(genres)
+                if !g.isEmpty { payload["genres"] = g }
+                onCreate(payload)
             }
-            .formStyle(.grouped)
-
-            HStack {
-                Spacer()
-                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
-                Button("Créer") {
-                    var payload: [String: Any] = [
-                        "name": name,
-                        "type": isCompany ? "company" : "individual",
-                        "is_vip": isVip,
-                    ]
-                    if !artistName.isEmpty { payload["artist_name"] = artistName }
-                    if !email.isEmpty { payload["email"] = email }
-                    if !phone.isEmpty { payload["phone"] = phone }
-                    if !city.isEmpty { payload["city"] = city }
-                    if !country.isEmpty { payload["country"] = country }
-                    if !biography.isEmpty { payload["biography"] = biography }
-                    if !spotifyUrl.isEmpty { payload["spotify_url"] = spotifyUrl }
-                    let g = csvToArray(genres)
-                    if !g.isEmpty { payload["genres"] = g }
-                    onCreate(payload)
-                    dismiss()
+        ) {
+            Section {
+                Picker("Type", selection: $isCompany) {
+                    Text("Individuel").tag(false)
+                    Text("Société").tag(true)
                 }
-                .keyboardShortcut(.return)
-                .buttonStyle(.borderedProminent)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                .pickerStyle(.segmented)
+                TextField(isCompany ? "Raison sociale" : "Nom", text: $name)
+                if !isCompany {
+                    TextField("Nom d'artiste", text: $artistName)
+                }
+                Toggle("Client VIP", isOn: $isVip)
             }
-            .padding()
+            Section("Contact") {
+                TextField("Email", text: $email)
+                TextField("Téléphone", text: $phone)
+                TextField("Ville", text: $city)
+                TextField("Pays", text: $country)
+            }
+            Section("Profil artiste") {
+                TextField("Genres (séparés par des virgules)", text: $genres)
+                TextField("Biographie", text: $biography, axis: .vertical).lineLimit(2...5)
+                TextField("Spotify", text: $spotifyUrl)
+            }
         }
-        .frame(width: 460, height: 560)
     }
 }
 
