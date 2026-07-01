@@ -190,6 +190,7 @@ public struct StudioSession: RowBacked {
 }
 
 public extension StudioSession {
+    var serverId: Int? { int("id") }
     var clientId: Int? { int("client_id") }
     var roomId: Int? { int("room_id") }
     var seriesId: String? { string("series_id") }
@@ -558,9 +559,59 @@ public struct Share: RowBacked {
     public var accessCount: Int { int("access_count") ?? 0 }
 }
 
+// MARK: - Lead / Task / Document
+
+public struct Lead: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var name: String { string("name") ?? "Prospect" }
+    public var email: String? { string("contact_email") }
+    public var phone: String? { string("contact_phone") }
+    public var source: String? { string("source") }
+    public var status: String { string("status") ?? "new" }
+    public var notes: String? { string("notes") }
+    public var convertedClientId: Int? { int("converted_client_id") }
+}
+
+public struct TaskItem: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var title: String { string("title") ?? "Tâche" }
+    public var status: String { string("status") ?? "todo" }
+    public var dueDate: Date? { RSMDate.parse(string("due_date")) }
+    public var assignee: String? { string("assignee") }
+    public var projectId: Int? { int("project_id") }
+    public var sessionId: Int? { int("session_id") }
+    public var clientId: Int? { int("client_id") }
+    public var notes: String? { string("notes") }
+}
+
+public struct StudioDocument: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var name: String { string("name") ?? "Document" }
+    public var url: String { string("url") ?? "" }
+    public var docType: String? { string("doc_type") }
+    public var clientId: Int? { int("client_id") }
+    public var projectId: Int? { int("project_id") }
+    public var notes: String? { string("notes") }
+}
+
 // MARK: - Repository helpers
 
 public extension LocalStore {
+    func leads() -> [Lead] {
+        ((try? rows(table: "leads")) ?? []).map(Lead.init(raw:))
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+    func tasksList() -> [TaskItem] {
+        ((try? rows(table: "tasks")) ?? []).map(TaskItem.init(raw:))
+            .sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+    }
+    func documents() -> [StudioDocument] {
+        ((try? rows(table: "documents")) ?? []).map(StudioDocument.init(raw:))
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
     func shares(trackServerId: Int) -> [Share] {
         ((try? rows(table: "shares")) ?? []).map(Share.init(raw:))
             .filter { $0.trackId == trackServerId }

@@ -1500,3 +1500,55 @@ export const sessionTalents = pgTable("session_talents", {
 
 export type SessionTalent = typeof sessionTalents.$inferSelect;
 export type InsertSessionTalent = typeof sessionTalents.$inferInsert;
+
+/** Leads / booking inquiries (CRM pipeline before a client exists). */
+export const leads = pgTable("leads", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  name: varchar("name", { length: 255 }).notNull(),
+  contactEmail: varchar("contact_email", { length: 255 }),
+  contactPhone: varchar("contact_phone", { length: 50 }),
+  source: varchar("source", { length: 100 }), // "appel" | "email" | "site" | "recommandation" ...
+  status: varchar("status", { length: 50 }).notNull().default("new"), // new | contacted | quoted | won | lost
+  notes: text("notes"),
+  convertedClientId: integer("converted_client_id").references(() => clients.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;
+
+/** Tasks / checklist items, linkable to a project / session / client. */
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  title: varchar("title", { length: 255 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull().default("todo"), // todo | doing | done
+  dueDate: timestamp("due_date"),
+  assignee: varchar("assignee", { length: 255 }),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "cascade" }),
+  sessionId: integer("session_id").references(() => sessions.id, { onDelete: "cascade" }),
+  clientId: integer("client_id").references(() => clients.id, { onDelete: "cascade" }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = typeof tasks.$inferInsert;
+
+/** Documents / assets library (briefs, references, riders, stems, contracts…). */
+export const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  name: varchar("name", { length: 255 }).notNull(),
+  url: varchar("url", { length: 1000 }).notNull(),
+  docType: varchar("doc_type", { length: 100 }), // "brief" | "reference" | "rider" | "stem" | "contrat" | "autre"
+  clientId: integer("client_id").references(() => clients.id, { onDelete: "cascade" }),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "cascade" }),
+  sessionId: integer("session_id").references(() => sessions.id, { onDelete: "set null" }),
+  trackId: integer("track_id").references(() => tracks.id, { onDelete: "set null" }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = typeof documents.$inferInsert;

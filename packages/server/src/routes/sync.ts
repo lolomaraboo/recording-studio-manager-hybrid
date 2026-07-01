@@ -70,6 +70,7 @@ const SYNCED_TABLES = new Set([
   'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
   'user_preferences',
   'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
+  'leads', 'tasks', 'documents',
 ]);
 
 /** Columns clients may never write directly */

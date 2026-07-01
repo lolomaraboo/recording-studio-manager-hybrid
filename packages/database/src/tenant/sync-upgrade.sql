@@ -168,6 +168,55 @@ CREATE TABLE IF NOT EXISTS session_talents (
   CONSTRAINT session_talents_sync_uuid_unique UNIQUE (sync_uuid)
 );
 
+CREATE TABLE IF NOT EXISTS leads (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  name varchar(255) NOT NULL,
+  contact_email varchar(255),
+  contact_phone varchar(50),
+  source varchar(100),
+  status varchar(50) NOT NULL DEFAULT 'new',
+  notes text,
+  converted_client_id integer REFERENCES clients(id),
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT leads_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  title varchar(255) NOT NULL,
+  status varchar(50) NOT NULL DEFAULT 'todo',
+  due_date timestamp,
+  assignee varchar(255),
+  project_id integer REFERENCES projects(id) ON DELETE CASCADE,
+  session_id integer REFERENCES sessions(id) ON DELETE CASCADE,
+  client_id integer REFERENCES clients(id) ON DELETE CASCADE,
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT tasks_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
+CREATE TABLE IF NOT EXISTS documents (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  name varchar(255) NOT NULL,
+  url varchar(1000) NOT NULL,
+  doc_type varchar(100),
+  client_id integer REFERENCES clients(id) ON DELETE CASCADE,
+  project_id integer REFERENCES projects(id) ON DELETE CASCADE,
+  session_id integer REFERENCES sessions(id) ON DELETE SET NULL,
+  track_id integer REFERENCES tracks(id) ON DELETE SET NULL,
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT documents_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
 -- ----------------------------------------------------------------------------
 -- 3b. Schema catch-up for legacy tenants (created before the quotes FSM
 -- refactor) — additive, aligns the DB with the current schema.ts.
@@ -257,7 +306,8 @@ DECLARE
     'quotes', 'quote_items', 'invoices', 'invoice_items', 'vat_rates', 'payments',
     'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
     'user_preferences',
-    'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents'
+    'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
+    'leads', 'tasks', 'documents'
   ];
 BEGIN
   FOREACH t IN ARRAY synced_tables LOOP

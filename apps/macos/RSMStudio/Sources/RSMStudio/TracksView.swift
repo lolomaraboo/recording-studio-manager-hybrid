@@ -344,6 +344,7 @@ struct TrackCreateSheet: View {
 
     @State private var title = ""
     @State private var projectServerId: Int?
+    @State private var sessionServerId: Int?
     @State private var trackNumber = 1
     @State private var bpm = 0
     @State private var key = ""
@@ -364,6 +365,7 @@ struct TrackCreateSheet: View {
                 ]
                 if bpm > 0 { payload["bpm"] = bpm }
                 if !key.isEmpty { payload["key"] = key }
+                if let sessionServerId { payload["session_id"] = sessionServerId }
                 onCreate(payload)
             }
         ) {
@@ -372,6 +374,14 @@ struct TrackCreateSheet: View {
                 Text("Choisir…").tag(nil as Int?)
                 ForEach(projects) { project in
                     Text(project.name).tag(project.serverId)
+                }
+            }
+            if let pid = projectServerId {
+                Picker("Session (optionnel)", selection: $sessionServerId) {
+                    Text("Aucune").tag(nil as Int?)
+                    ForEach(model.store.sessions(projectServerId: pid)) { s in
+                        Text(s.title).tag(s.serverId)
+                    }
                 }
             }
             Stepper("N° de piste : \(trackNumber)", value: $trackNumber, in: 1...99)

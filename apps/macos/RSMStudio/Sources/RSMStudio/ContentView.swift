@@ -20,6 +20,9 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case rooms = "Salles"
     case team = "Équipe"
     case time = "Temps"
+    case leads = "Prospects"
+    case tasks = "Tâches"
+    case documents = "Documents"
     case system = "Agenda Mac"
     case settings = "Réglages"
 
@@ -43,6 +46,9 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .rooms: return "door.left.hand.open"
         case .team: return "person.3"
         case .time: return "timer"
+        case .leads: return "person.crop.circle.badge.questionmark"
+        case .tasks: return "checklist"
+        case .documents: return "folder"
         case .system: return "calendar.badge.clock"
         case .settings: return "gearshape"
         }
@@ -64,6 +70,7 @@ struct ContentView: View {
         ("Activité", [.clients, .calendar, .sessions, .projects, .tracks]),
         ("Ventes", [.quotes, .invoices, .analytics, .services, .contracts, .expenses]),
         ("Ressources", [.equipment, .talents, .rooms, .time, .team]),
+        ("Pilotage", [.leads, .tasks, .documents]),
         ("Mon Mac", [.system]),
         (nil, [.settings]),
     ]
@@ -137,6 +144,9 @@ struct ContentView: View {
                     case .rooms: RoomsView()
                     case .team: TeamView()
                     case .time: TimeTrackingView()
+                    case .leads: LeadsView()
+                    case .tasks: TasksView()
+                    case .documents: DocumentsView()
                     case .system: SystemView()
                     case .settings: SettingsView()
                     }
