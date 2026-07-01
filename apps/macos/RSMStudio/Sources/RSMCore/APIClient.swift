@@ -163,10 +163,11 @@ public struct APIClient: Sendable {
     }
 
     /// Online-only invoice creation: the SERVER allocates the invoice number.
-    public func createInvoice(clientServerId: Int, items: [[String: Any]], taxRate: Double = 20) async throws -> String {
-        let json = try await request(path: "create-invoice", body: [
-            "clientId": clientServerId, "items": items, "taxRate": taxRate,
-        ])
+    public func createInvoice(clientServerId: Int, items: [[String: Any]], taxRate: Double = 20,
+                              projectServerId: Int? = nil) async throws -> String {
+        var body: [String: Any] = ["clientId": clientServerId, "items": items, "taxRate": taxRate]
+        if let projectServerId { body["projectId"] = projectServerId }
+        let json = try await request(path: "create-invoice", body: body)
         guard let number = json["invoiceNumber"] as? String else { throw APIError.decoding("missing invoiceNumber") }
         return number
     }

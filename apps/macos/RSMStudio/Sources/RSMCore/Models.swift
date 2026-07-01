@@ -597,6 +597,15 @@ public struct StudioDocument: RowBacked {
     public var notes: String? { string("notes") }
 }
 
+public struct SessionTalentEntry: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var sessionId: Int? { int("session_id") }
+    public var musicianId: Int? { int("musician_id") }
+    public var role: String? { string("role") }
+    public var status: String { string("status") ?? "booked" }
+}
+
 // MARK: - Repository helpers
 
 public extension LocalStore {
@@ -611,6 +620,10 @@ public extension LocalStore {
     func documents() -> [StudioDocument] {
         ((try? rows(table: "documents")) ?? []).map(StudioDocument.init(raw:))
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+    func sessionTalents(sessionServerId: Int) -> [SessionTalentEntry] {
+        ((try? rows(table: "session_talents")) ?? []).map(SessionTalentEntry.init(raw:))
+            .filter { $0.sessionId == sessionServerId }
     }
     func shares(trackServerId: Int) -> [Share] {
         ((try? rows(table: "shares")) ?? []).map(Share.init(raw:))

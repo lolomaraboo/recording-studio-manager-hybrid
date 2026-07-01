@@ -72,8 +72,20 @@ struct SessionsView: View {
                                     .contentShape(Rectangle())
                                     .onTapGesture { sheet = .detail(session) }
                                     .contextMenu {
-                                        if session.int("id") != nil {
+                                        if let sid = session.int("id") {
                                             Button("Staff…") { sheet = .staff(session) }
+                                            Menu("Réserver un talent") {
+                                                ForEach(model.store.talents().filter { $0.int("id") != nil }) { talent in
+                                                    Button(talent.displayName) {
+                                                        _ = try? model.store.localInsert(table: "session_talents", payload: [
+                                                            "session_id": sid,
+                                                            "musician_id": talent.int("id") ?? 0,
+                                                            "status": "booked",
+                                                        ])
+                                                        Task { await model.syncNow() }
+                                                    }
+                                                }
+                                            }
                                         }
                                         if session.status != "cancelled" {
                                             Button("Annuler la session") {
@@ -130,6 +142,11 @@ struct SessionDetailSheet: View {
     let onClose: () -> Void
 
     private var members: [Member] { model.store.cachedMembers() }
+
+    private func talentName(_ id: Int?) -> String {
+        guard let id else { return "Talent" }
+        return model.store.talents().first { $0.int("id") == id }?.displayName ?? "Talent #\(id)"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -188,6 +205,30 @@ struct SessionDetailSheet: View {
                                     .buttonStyle(.borderless).font(.caption)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        let talents = model.store.sessionTalents(sessionServerId: serverId)
+                        if !talents.isEmpty {
+                            GroupBox("Talents réservés (\(talents.count))") {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    ForEach(talents) { entry in
+                                        HStack {
+                                            Image(systemName: "music.mic").foregroundStyle(.tint)
+                                            Text(talentName(entry.musicianId))
+                                            if let role = entry.role, !role.isEmpty {
+                                                Text(role).font(.caption).foregroundStyle(.secondary)
+                                            }
+                                            Spacer()
+                                            Button(role: .destructive) {
+                                                try? model.store.localDelete(table: "session_talents", uuid: entry.id)
+                                                Task { await model.syncNow() }
+                                            } label: { Image(systemName: "minus.circle") }
+                                            .buttonStyle(.borderless)
+                                        }
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
 
                         RelatedSection("Matériel réservé", items: model.store.equipment(sessionServerId: serverId)) { item in

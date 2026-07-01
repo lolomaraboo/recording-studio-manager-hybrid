@@ -482,6 +482,8 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
     const db = await getTenantDb(req.syncOrgId!);
     const clientId = Number(req.body?.clientId);
     const taxRate = Number(req.body?.taxRate ?? 20);
+    const projectIdRaw = Number(req.body?.projectId);
+    const projectId = Number.isInteger(projectIdRaw) && projectIdRaw > 0 ? projectIdRaw : null;
     const items: Array<{ description?: string; quantity?: number; unitPrice?: number }> =
       Array.isArray(req.body?.items) ? req.body.items : [];
 
@@ -516,8 +518,8 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
     const invoiceNumber = `${prefix}${String(lastSeq + 1).padStart(4, '0')}`;
 
     const inserted = (await db.execute(sql`
-      INSERT INTO invoices (invoice_number, client_id, due_date, status, subtotal, tax_rate, tax_amount, total)
-      VALUES (${invoiceNumber}, ${clientId}, NOW() + INTERVAL '30 days', 'draft',
+      INSERT INTO invoices (invoice_number, client_id, project_id, due_date, status, subtotal, tax_rate, tax_amount, total)
+      VALUES (${invoiceNumber}, ${clientId}, ${projectId}, NOW() + INTERVAL '30 days', 'draft',
               ${subtotal.toFixed(2)}, ${taxRate.toFixed(2)}, ${taxAmount.toFixed(2)}, ${total.toFixed(2)})
       RETURNING id, invoice_number
     `)) as unknown as Array<{ id: number; invoice_number: string }>;

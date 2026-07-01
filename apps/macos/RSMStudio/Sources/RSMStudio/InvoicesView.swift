@@ -68,12 +68,17 @@ struct InvoiceCreateSheet: View {
     }
 
     @State private var clientServerId: Int?
+    @State private var projectServerId: Int?
     @State private var lines: [Line] = [Line()]
     @State private var isCreating = false
     @State private var errorMessage: String?
 
     private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
     private var subtotal: Double { lines.reduce(0) { $0 + $1.quantity * $1.unitPrice } }
+    private var projectsForClient: [Project] {
+        if let cid = clientServerId { return model.store.projects(clientServerId: cid) }
+        return model.store.projects().filter { $0.serverId != nil }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -83,6 +88,12 @@ struct InvoiceCreateSheet: View {
                     Text("Choisir…").tag(nil as Int?)
                     ForEach(clients) { client in
                         Text(client.displayName).tag(client.serverId)
+                    }
+                }
+                Picker("Projet (optionnel)", selection: $projectServerId) {
+                    Text("Aucun").tag(nil as Int?)
+                    ForEach(projectsForClient) { project in
+                        Text(project.name).tag(project.serverId)
                     }
                 }
                 Section("Lignes") {
@@ -140,7 +151,7 @@ struct InvoiceCreateSheet: View {
             .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice] }
         do {
             let api = APIClient(config: model.config)
-            _ = try await api.createInvoice(clientServerId: clientId, items: items)
+            _ = try await api.createInvoice(clientServerId: clientId, items: items, projectServerId: projectServerId)
             await model.syncNow() // pulls the new invoice + items
             dismiss()
         } catch {
