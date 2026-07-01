@@ -211,9 +211,11 @@ export type InsertRoom = typeof rooms.$inferInsert;
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   ...syncColumns,
-  clientId: integer("client_id").notNull().references(() => clients.id),
-  roomId: integer("room_id").notNull().references(() => rooms.id),
+  clientId: integer("client_id").references(() => clients.id), // optional: in-house / label / spec sessions
+  roomId: integer("room_id").references(() => rooms.id), // optional: mastering-only / on-location / remote sessions
   projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  kind: varchar("kind", { length: 50 }).notNull().default("studio"), // studio | location | remote | visit | mixing | mastering
+  location: varchar("location", { length: 255 }), // free-text place for on-location / remote sessions
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   startTime: timestamp("start_time").notNull(),
@@ -251,6 +253,7 @@ export const invoices = pgTable("invoices", {
   ...syncColumns,
   invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
   clientId: integer("client_id").notNull().references(() => clients.id),
+  projectId: integer("project_id").references(() => projects.id), // optional: ties invoice to a project (profitability)
   issueDate: timestamp("issue_date").notNull().defaultNow(),
   dueDate: timestamp("due_date").notNull(),
   status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "sent" | "paid" | "overdue" | "cancelled"
@@ -466,6 +469,7 @@ export const tracks = pgTable("tracks", {
   id: serial("id").primaryKey(),
   ...syncColumns,
   projectId: integer("project_id").notNull().references(() => projects.id),
+  sessionId: integer("session_id").references(() => sessions.id, { onDelete: "set null" }), // optional: which session recorded it
 
   // Basic Info
   title: varchar("title", { length: 255 }).notNull(),
@@ -1478,3 +1482,21 @@ export const shares = pgTable("shares", {
 
 export type Share = typeof shares.$inferSelect;
 export type InsertShare = typeof shares.$inferInsert;
+
+/**
+ * Session Talents table (Tenant DB)
+ * Booking of session musicians/talents on a session (mirror of session_equipment
+ * / session_staff). Talents are later credited on tracks via track_credits.
+ */
+export const sessionTalents = pgTable("session_talents", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  sessionId: integer("session_id").notNull().references(() => sessions.id, { onDelete: "cascade" }),
+  musicianId: integer("musician_id").notNull().references(() => musicians.id),
+  role: varchar("role", { length: 100 }), // e.g. "guitare", "voix", "arrangeur"
+  status: varchar("status", { length: 50 }).notNull().default("booked"), // booked | confirmed | declined
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type SessionTalent = typeof sessionTalents.$inferSelect;
+export type InsertSessionTalent = typeof sessionTalents.$inferInsert;

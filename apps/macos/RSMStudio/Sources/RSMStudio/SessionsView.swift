@@ -367,6 +367,8 @@ struct SessionCreateSheet: View {
     @State private var title = ""
     @State private var clientServerId: Int?
     @State private var roomServerId: Int?
+    @State private var kind = "studio"
+    @State private var location = ""
     @State private var bookingType = "hourly"
     @State private var start = Calendar.current.date(bySettingHour: 14, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var durationHours = 3.0
@@ -384,39 +386,53 @@ struct SessionCreateSheet: View {
     var body: some View {
         StudioFormSheet(
             title: "Nouvelle session", confirmLabel: "Créer",
-            confirmDisabled: title.isEmpty || clientServerId == nil || roomServerId == nil,
-            height: 480,
+            confirmDisabled: title.trimmingCharacters(in: .whitespaces).isEmpty,
+            height: 560,
             onConfirm: {
                 let end: Date = bookingType == "hourly"
                     ? start.addingTimeInterval(durationHours * 3600)
                     : Calendar.current.date(bySettingHour: 23, minute: 59, second: 0, of: start) ?? start
                 var payload: [String: Any] = [
                     "title": title,
-                    "client_id": clientServerId ?? 0,
-                    "room_id": roomServerId ?? 0,
+                    "kind": kind,
                     "booking_type": bookingType,
                     "start_time": Self.isoFormatter.string(from: start),
                     "end_time": Self.isoFormatter.string(from: end),
                     "status": "scheduled",
+                    "client_id": clientServerId.map { $0 as Any } ?? NSNull(),
+                    "room_id": roomServerId.map { $0 as Any } ?? NSNull(),
                 ]
+                if !location.isEmpty { payload["location"] = location }
                 if !notes.isEmpty { payload["notes"] = notes }
                 onCreate(payload)
             }
         ) {
             TextField("Titre", text: $title, prompt: Text("Enregistrement voix — EP"))
-            Picker("Client", selection: $clientServerId) {
-                Text("Choisir…").tag(nil as Int?)
+            Picker("Type de session", selection: $kind) {
+                Text("Studio").tag("studio")
+                Text("Sur place / mobile").tag("location")
+                Text("À distance").tag("remote")
+                Text("Visite / RDV").tag("visit")
+                Text("Mixage").tag("mixing")
+                Text("Mastering").tag("mastering")
+            }
+            Picker("Client (optionnel)", selection: $clientServerId) {
+                Text("Aucun").tag(nil as Int?)
                 ForEach(clients) { client in
                     Text(client.displayName).tag(client.serverId)
                 }
             }
-            Picker("Salle", selection: $roomServerId) {
-                Text("Choisir…").tag(nil as Int?)
-                ForEach(rooms) { room in
-                    Text(room.name).tag(room.serverId)
+            if kind == "studio" {
+                Picker("Salle", selection: $roomServerId) {
+                    Text("Aucune").tag(nil as Int?)
+                    ForEach(rooms) { room in
+                        Text(room.name).tag(room.serverId)
+                    }
                 }
+            } else {
+                TextField("Lieu", text: $location, prompt: Text("Adresse, ville, ou « à distance »"))
             }
-            Picker("Type", selection: $bookingType) {
+            Picker("Tarification", selection: $bookingType) {
                 Text("Horaire").tag("hourly")
                 Text("Journée").tag("daily")
                 Text("Lockout").tag("lockout")
@@ -429,10 +445,6 @@ struct SessionCreateSheet: View {
                 }
             }
             TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...4)
-            if rooms.isEmpty {
-                Text("Aucune salle synchronisée — crée les salles côté web d'abord.")
-                    .font(.caption).foregroundStyle(.orange)
-            }
         }
     }
 }

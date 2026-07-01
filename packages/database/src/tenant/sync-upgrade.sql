@@ -147,6 +147,27 @@ CREATE TABLE IF NOT EXISTS shares (
   CONSTRAINT shares_share_token_unique UNIQUE (share_token)
 );
 
+-- Universal-studio workflow (2026-06): sessions without room/client, session
+-- kind/location, invoice↔project, track↔session, talent booking on sessions.
+ALTER TABLE sessions ALTER COLUMN client_id DROP NOT NULL;
+ALTER TABLE sessions ALTER COLUMN room_id DROP NOT NULL;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS kind varchar(50) NOT NULL DEFAULT 'studio';
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS location varchar(255);
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS project_id integer REFERENCES projects(id);
+ALTER TABLE tracks ADD COLUMN IF NOT EXISTS session_id integer REFERENCES sessions(id);
+
+CREATE TABLE IF NOT EXISTS session_talents (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  session_id integer NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+  musician_id integer NOT NULL REFERENCES musicians(id),
+  role varchar(100),
+  status varchar(50) NOT NULL DEFAULT 'booked',
+  created_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT session_talents_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
 -- ----------------------------------------------------------------------------
 -- 3b. Schema catch-up for legacy tenants (created before the quotes FSM
 -- refactor) — additive, aligns the DB with the current schema.ts.
@@ -236,7 +257,7 @@ DECLARE
     'quotes', 'quote_items', 'invoices', 'invoice_items', 'vat_rates', 'payments',
     'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
     'user_preferences',
-    'session_staff', 'session_equipment', 'track_revisions', 'shares'
+    'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents'
   ];
 BEGIN
   FOREACH t IN ARRAY synced_tables LOOP

@@ -69,7 +69,7 @@ const SYNCED_TABLES = new Set([
   'quotes', 'quote_items', 'invoices', 'invoice_items', 'vat_rates', 'payments',
   'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
   'user_preferences',
-  'session_staff', 'session_equipment', 'track_revisions', 'shares',
+  'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
 ]);
 
 /** Columns clients may never write directly */
@@ -417,6 +417,7 @@ router.post('/push', async (req: SyncRequest, res: Response) => {
           UPDATE sessions SET status = 'conflict'
           WHERE sync_uuid = ${uuid}
             AND status = 'scheduled'
+            AND room_id IS NOT NULL
             AND EXISTS (
               SELECT 1 FROM sessions other
               WHERE other.room_id = sessions.room_id

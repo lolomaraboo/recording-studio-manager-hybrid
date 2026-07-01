@@ -181,6 +181,8 @@ public struct StudioSession: RowBacked {
     public var title: String { string("title") ?? "Session" }
     public var status: String { string("status") ?? "scheduled" }
     public var bookingType: String { string("booking_type") ?? "hourly" }
+    public var kind: String { string("kind") ?? "studio" }   // studio | location | remote | visit | mixing | mastering
+    public var location: String? { string("location") }
 
 
     public var startTime: Date? { RSMDate.parse(string("start_time")) }
