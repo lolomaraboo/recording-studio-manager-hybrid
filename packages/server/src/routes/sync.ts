@@ -436,6 +436,31 @@ router.post('/push', async (req: SyncRequest, res: Response) => {
       }
     }
 
+    // Staff/talent availability conflicts: a scheduled session collides with a
+    // booked person's declared unavailability window → flip to 'conflict'.
+    for (const uuid of sessionUuids) {
+      try {
+        await db.execute(sql`
+          UPDATE sessions SET status = 'conflict'
+          WHERE sync_uuid = ${uuid}
+            AND status = 'scheduled'
+            AND EXISTS (
+              SELECT 1 FROM session_staff ss
+              JOIN availability av ON av.subject_type = 'staff' AND av.subject_id = ss.user_id
+              WHERE ss.session_id = sessions.id
+                AND av.start_time < sessions.end_time AND sessions.start_time < av.end_time
+              UNION ALL
+              SELECT 1 FROM session_talents st
+              JOIN availability av ON av.subject_type = 'talent' AND av.subject_id = st.musician_id
+              WHERE st.session_id = sessions.id
+                AND av.start_time < sessions.end_time AND sessions.start_time < av.end_time
+            )
+        `);
+      } catch (error) {
+        console.error(`[Sync] availability conflict check failed for ${uuid}:`, error);
+      }
+    }
+
     // Notify the other devices of this organization (web + Macs)
     if (touchedTables.size > 0) {
       const io = req.app.get('io');
