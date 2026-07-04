@@ -960,7 +960,9 @@ function StripeConnectSection() {
         </CardTitle>
         <CardDescription className="text-sm">
           Connecte le compte Stripe de ton studio pour recevoir les paiements de tes clients
-          directement sur ton compte. Indépendant de ton abonnement RSM.
+          directement sur ton compte, sans commission. Tes clients paient avec tous les moyens
+          que tu actives dans ton tableau de bord Stripe : carte, Apple&nbsp;Pay, Google&nbsp;Pay,
+          SEPA, Bancontact, Link… Indépendant de ton abonnement RSM.
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">

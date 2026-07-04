@@ -532,6 +532,9 @@ export const invoicesRouter = router({
         {
           amount: formatStripeAmount(input.depositAmount), // Convert major units to minor
           currency: (invoice.currency || 'EUR').toLowerCase(),
+          // Accept EVERY payment method the studio enabled in its Stripe Dashboard
+          // (cards, Apple Pay, Google Pay, SEPA, Bancontact, Link, etc.) — no commission.
+          automatic_payment_methods: { enabled: true },
           metadata: {
             type: 'invoice_deposit',
             invoiceId: invoice.id.toString(),
