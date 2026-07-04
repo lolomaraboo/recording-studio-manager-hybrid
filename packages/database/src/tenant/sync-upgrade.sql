@@ -232,6 +232,23 @@ CREATE TABLE IF NOT EXISTS availability (
   CONSTRAINT availability_sync_uuid_unique UNIQUE (sync_uuid)
 );
 
+CREATE TABLE IF NOT EXISTS client_packages (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  client_id integer NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  name varchar(255) NOT NULL,
+  total_hours numeric(10,2),
+  used_hours numeric(10,2) NOT NULL DEFAULT 0,
+  price numeric(10,2),
+  status varchar(20) NOT NULL DEFAULT 'active',
+  valid_until timestamp,
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT client_packages_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
 -- ----------------------------------------------------------------------------
 -- 3b. Schema catch-up for legacy tenants (created before the quotes FSM
 -- refactor) — additive, aligns the DB with the current schema.ts.
@@ -322,7 +339,7 @@ DECLARE
     'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
     'user_preferences',
     'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
-    'leads', 'tasks', 'documents', 'availability'
+    'leads', 'tasks', 'documents', 'availability', 'client_packages'
   ];
 BEGIN
   FOREACH t IN ARRAY synced_tables LOOP

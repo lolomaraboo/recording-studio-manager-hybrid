@@ -617,6 +617,19 @@ public struct Availability: RowBacked {
     public var notes: String? { string("notes") }
 }
 
+public struct ClientPackage: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var name: String { string("name") ?? "Forfait" }
+    public var clientId: Int? { int("client_id") }
+    public var totalHours: Double? { double("total_hours") }
+    public var usedHours: Double { double("used_hours") ?? 0 }
+    public var price: String? { string("price") }
+    public var status: String { string("status") ?? "active" }
+    public var notes: String? { string("notes") }
+    public var remaining: Double? { totalHours.map { $0 - usedHours } }
+}
+
 // MARK: - Repository helpers
 
 public extension LocalStore {
@@ -639,6 +652,10 @@ public extension LocalStore {
     func availabilityList() -> [Availability] {
         ((try? rows(table: "availability")) ?? []).map(Availability.init(raw:))
             .sorted { ($0.start ?? .distantFuture) < ($1.start ?? .distantFuture) }
+    }
+    func packages() -> [ClientPackage] {
+        ((try? rows(table: "client_packages")) ?? []).map(ClientPackage.init(raw:))
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
     func shares(trackServerId: Int) -> [Share] {
         ((try? rows(table: "shares")) ?? []).map(Share.init(raw:))

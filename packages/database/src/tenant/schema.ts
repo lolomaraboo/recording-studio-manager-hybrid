@@ -1572,3 +1572,21 @@ export const availability = pgTable("availability", {
 });
 export type Availability = typeof availability.$inferSelect;
 export type InsertAvailability = typeof availability.$inferInsert;
+
+/** Prepaid packages / retainers: a balance of hours or credit per client. */
+export const clientPackages = pgTable("client_packages", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  clientId: integer("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  totalHours: decimal("total_hours", { precision: 10, scale: 2 }),
+  usedHours: decimal("used_hours", { precision: 10, scale: 2 }).notNull().default("0"),
+  price: decimal("price", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 20 }).notNull().default("active"), // active | expired | consumed
+  validUntil: timestamp("valid_until"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export type ClientPackage = typeof clientPackages.$inferSelect;
+export type InsertClientPackage = typeof clientPackages.$inferInsert;

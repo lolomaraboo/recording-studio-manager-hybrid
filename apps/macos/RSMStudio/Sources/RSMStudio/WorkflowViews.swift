@@ -366,6 +366,111 @@ struct AvailabilityView: View {
     }
 }
 
+// MARK: - Forfaits / packs prépayés
+
+struct PackagesView: View {
+    @Environment(AppModel.self) private var model
+    @State private var showingCreate = false
+
+    private var packages: [ClientPackage] {
+        _ = model.dataVersion
+        return model.store.packages()
+    }
+
+    private func clientName(_ id: Int?) -> String? {
+        id.flatMap { model.store.clientsByServerId()[$0]?.displayName }
+    }
+
+    var body: some View {
+        Group {
+            if packages.isEmpty {
+                StudioEmptyState(title: "Aucun forfait", systemImage: "creditcard",
+                                 message: "Packs d'heures prépayées / abonnements par client.")
+            } else {
+                List(packages) { pack in
+                    StudioRow(icon: "creditcard", title: pack.name,
+                              subtitle: [clientName(pack.clientId), pack.price.map { "\($0) €" }].compactMap { $0 }.joined(separator: " · ")) {
+                        if let total = pack.totalHours {
+                            Text("\(pack.usedHours.formatted()) / \(total.formatted()) h")
+                                .font(.caption).monospacedDigit()
+                                .foregroundStyle((pack.remaining ?? 0) <= 0 ? .red : .secondary)
+                        }
+                    }
+                    .contextMenu {
+                        Button("Consommer 1 h") { consume(pack, 1) }
+                        Button("Consommer 0,5 h") { consume(pack, 0.5) }
+                        Button("Supprimer", role: .destructive) {
+                            try? model.store.localDelete(table: "client_packages", uuid: pack.id)
+                            Task { await model.syncNow() }
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Forfaits")
+        .toolbar {
+            ToolbarItem {
+                Button { showingCreate = true } label: { Label("Nouveau forfait", systemImage: "plus") }
+            }
+        }
+        .modalCard(isPresented: $showingCreate) {
+            PackageCreateSheet { payload in
+                _ = try? model.store.localInsert(table: "client_packages", payload: payload)
+                Task { await model.syncNow() }
+            }
+        }
+    }
+
+    private func consume(_ pack: ClientPackage, _ hours: Double) {
+        let used = pack.usedHours + hours
+        try? model.store.localUpdate(table: "client_packages", uuid: pack.id,
+                                     changes: ["used_hours": String(format: "%.2f", used)])
+        Task { await model.syncNow() }
+    }
+}
+
+struct PackageCreateSheet: View {
+    @Environment(AppModel.self) private var model
+    let onCreate: ([String: Any]) -> Void
+
+    @State private var clientServerId: Int?
+    @State private var name = ""
+    @State private var totalHours = 10.0
+    @State private var price = 0.0
+    @State private var notes = ""
+
+    var body: some View {
+        StudioFormSheet(
+            title: "Nouveau forfait", confirmLabel: "Créer",
+            confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty || clientServerId == nil,
+            height: 420,
+            onConfirm: {
+                var payload: [String: Any] = [
+                    "name": name,
+                    "total_hours": String(format: "%.2f", totalHours),
+                    "used_hours": "0",
+                    "status": "active",
+                ]
+                if let clientServerId { payload["client_id"] = clientServerId }
+                if price > 0 { payload["price"] = String(format: "%.2f", price) }
+                if !notes.isEmpty { payload["notes"] = notes }
+                onCreate(payload)
+            }
+        ) {
+            Picker("Client", selection: $clientServerId) {
+                Text("Choisir…").tag(nil as Int?)
+                ForEach(model.store.clients().filter { $0.serverId != nil }) { client in
+                    Text(client.displayName).tag(client.serverId)
+                }
+            }
+            TextField("Nom du forfait", text: $name, prompt: Text("Pack 10 h — mensuel"))
+            TextField("Heures incluses", value: $totalHours, format: .number)
+            TextField("Prix €", value: $price, format: .number)
+            TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...4)
+        }
+    }
+}
+
 struct AvailabilityCreateSheet: View {
     @Environment(AppModel.self) private var model
     let onCreate: ([String: Any]) -> Void

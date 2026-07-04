@@ -11,6 +11,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case tracks = "Tracks"
     case quotes = "Devis"
     case invoices = "Factures"
+    case packages = "Forfaits"
     case analytics = "Analyses"
     case services = "Services"
     case contracts = "Contrats"
@@ -38,6 +39,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .tracks: return "waveform"
         case .quotes: return "doc.plaintext"
         case .invoices: return "doc.text"
+        case .packages: return "creditcard"
         case .analytics: return "chart.line.uptrend.xyaxis"
         case .services: return "list.star"
         case .contracts: return "signature"
@@ -70,7 +72,7 @@ struct ContentView: View {
     private let groups: [(String?, [SidebarItem])] = [
         (nil, [.assistant, .dashboard]),
         ("Activité", [.clients, .calendar, .sessions, .projects, .tracks]),
-        ("Ventes", [.quotes, .invoices, .analytics, .services, .contracts, .expenses]),
+        ("Ventes", [.quotes, .invoices, .packages, .analytics, .services, .contracts, .expenses]),
         ("Ressources", [.equipment, .talents, .rooms, .time, .team, .availability]),
         ("Pilotage", [.leads, .tasks, .documents]),
         ("Mon Mac", [.system]),
@@ -137,6 +139,7 @@ struct ContentView: View {
                     case .tracks: TracksView()
                     case .quotes: QuotesView()
                     case .invoices: InvoicesView()
+                    case .packages: PackagesView()
                     case .analytics: AnalyticsView()
                     case .services: ServicesView()
                     case .contracts: ContractsView()
