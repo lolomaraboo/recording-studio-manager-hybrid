@@ -72,9 +72,18 @@ struct InvoiceCreateSheet: View {
     @State private var lines: [Line] = [Line()]
     @State private var isCreating = false
     @State private var errorMessage: String?
+    @State private var packageHours = 0.0
 
     private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
     private var subtotal: Double { lines.reduce(0) { $0 + $1.quantity * $1.unitPrice } }
+
+    /// Active prepaid package (with remaining hours) for the selected client.
+    private var activePackage: ClientPackage? {
+        guard let cid = clientServerId else { return nil }
+        return model.store.packages().first {
+            $0.clientId == cid && $0.status == "active" && ($0.remaining ?? 0) > 0
+        }
+    }
     private var projectsForClient: [Project] {
         if let cid = clientServerId { return model.store.projects(clientServerId: cid) }
         return model.store.projects().filter { $0.serverId != nil }
@@ -112,9 +121,22 @@ struct InvoiceCreateSheet: View {
                     Button { lines.append(Line()) } label: { Label("Ajouter une ligne", systemImage: "plus.circle") }
                         .buttonStyle(.borderless)
                 }
+                if let pkg = activePackage, let remaining = pkg.remaining {
+                    Section("Forfait prépayé") {
+                        Text("« \(pkg.name) » — \(remaining.formatted()) h restantes sur \((pkg.totalHours ?? 0).formatted())")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Stepper(value: $packageHours, in: 0...remaining, step: 0.5) {
+                            Text("Déduire \(packageHours.formatted()) h du forfait")
+                        }
+                        if packageHours > 0 {
+                            Text("Une ligne négative sera ajoutée pour ne pas facturer deux fois les heures prépayées.")
+                                .font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                }
                 Section {
-                    LabeledContent("Sous-total", value: subtotal.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR"))))
-                    LabeledContent("Total TTC (TVA 20 %)", value: (subtotal * 1.2).formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR"))))
+                    LabeledContent("Sous-total", value: subtotal.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR"))))
+                    LabeledContent("Total TTC (TVA 20 %)", value: (subtotal * 1.2).formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR"))))
                     Text("Le numéro de facture est attribué par le serveur — création en ligne uniquement.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
@@ -151,7 +173,8 @@ struct InvoiceCreateSheet: View {
             .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice] }
         do {
             let api = APIClient(config: model.config)
-            _ = try await api.createInvoice(clientServerId: clientId, items: items, projectServerId: projectServerId)
+            _ = try await api.createInvoice(clientServerId: clientId, items: items, projectServerId: projectServerId,
+                                            packageHours: packageHours > 0 ? packageHours : nil)
             await model.syncNow() // pulls the new invoice + items
             dismiss()
         } catch {
@@ -291,7 +314,7 @@ struct InvoiceDetailView: View {
 
 func euro(_ amount: String) -> String {
     if let value = Double(amount) {
-        return value.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")))
+        return value.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")))
     }
     return amount + " €"
 }

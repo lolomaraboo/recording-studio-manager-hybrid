@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var newTaskName = ""
     @State private var newTaskRate = ""
     @State private var newTaskCategory = "billable"
+    @State private var currencyCode = Money.defaultCode
 
     private var vatRows: [[String: Any]] {
         _ = model.dataVersion
@@ -80,6 +81,17 @@ struct SettingsView: View {
                 Button("Synchroniser maintenant") {
                     Task { await model.syncNow() }
                 }
+            }
+
+            Section("Devise") {
+                Picker("Devise du studio", selection: $currencyCode) {
+                    ForEach(Money.supported, id: \.code) { c in
+                        Text(c.label).tag(c.code)
+                    }
+                }
+                .onChange(of: currencyCode) { Money.defaultCode = currencyCode; model.dataVersion += 1 }
+                Text("Utilisée pour l'affichage des montants dans toute l'application.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
 
             Section("TVA") {

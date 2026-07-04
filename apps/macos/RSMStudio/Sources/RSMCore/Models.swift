@@ -465,14 +465,17 @@ public struct TaskType: RowBacked {
 
 // MARK: - Track credits (cross-entity graph)
 
-public struct TrackCredit: RowBacked {
+public struct TrackCredit: RowBacked, Identifiable {
     public let raw: [String: Any]
     public init(raw: [String: Any]) { self.raw = raw }
 
+    public var id: String { string("sync_uuid") ?? string("id") ?? UUID().uuidString }
     public var trackId: Int? { int("track_id") }
     public var musicianId: Int? { int("musician_id") }
     public var role: String? { string("role") }
     public var creditName: String? { string("credit_name") }
+    public var isPrimary: Bool { bool("is_primary") }
+    public var splitPercent: Double? { double("split_percent") }
 }
 
 /// Timestamped track comment (SoundCloud-style): `timestamp` is seconds into

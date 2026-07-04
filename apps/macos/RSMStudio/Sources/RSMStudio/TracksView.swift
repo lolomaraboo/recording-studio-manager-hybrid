@@ -94,6 +94,7 @@ struct TrackDetailView: View {
     @State private var uploading = false
     @State private var uploadError: String?
     @State private var shareNotice: String?
+    @State private var showingCredits = false
 
     private var project: Project? {
         track.projectId.flatMap { id in model.store.projects().first { $0.serverId == id } }
@@ -282,15 +283,48 @@ struct TrackDetailView: View {
                     }
                 }
 
-                // Credits → talents
+                // Credits & royalty splits (editable)
                 if let serverId = track.int("id") {
-                    let credits = model.store.credits(trackServerId: serverId)
-                    RelatedSection("Crédits", items: credits.map(\.talent),
-                                   emptyText: "Aucun talent crédité.") { talent in
-                        let role = credits.first { $0.talent.id == talent.id }?.role
-                        return RelatedRowContent(icon: "music.mic", title: talent.displayName, subtitle: role)
-                    } onTap: { _ in
-                        model.open(.talents)
+                    let credits = model.store.trackCredits().filter { $0.trackId == serverId }
+                    let splitTotal = credits.compactMap(\.splitPercent).reduce(0, +)
+                    GroupBox {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Crédits & splits").font(.headline)
+                                Spacer()
+                                Button { showingCredits = true } label: {
+                                    Label("Gérer", systemImage: "slider.horizontal.3")
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                            if credits.isEmpty {
+                                Text("Aucun crédit. Ajoute les contributeurs et leur répartition de droits.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            } else {
+                                ForEach(credits) { credit in
+                                    HStack {
+                                        Image(systemName: "music.mic").foregroundStyle(.tint)
+                                        VStack(alignment: .leading, spacing: 1) {
+                                            Text(credit.creditName ?? "—").fontWeight(.medium)
+                                            if let role = credit.role { Text(role).font(.caption2).foregroundStyle(.secondary) }
+                                        }
+                                        Spacer()
+                                        if let s = credit.splitPercent {
+                                            Text("\(s.formatted()) %").monospacedDigit().foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                                Divider()
+                                HStack {
+                                    Text("Total des splits").font(.caption)
+                                    Spacer()
+                                    Text("\(splitTotal.formatted()) %")
+                                        .font(.caption).monospacedDigit()
+                                        .foregroundStyle(abs(splitTotal - 100) < 0.01 ? .green : .orange)
+                                }
+                            }
+                        }
                     }
 
                     // Revisions cycle (same component as in project view)
@@ -313,6 +347,9 @@ struct TrackDetailView: View {
                 }
             }
             .padding()
+        }
+        .sheet(isPresented: $showingCredits) {
+            TrackCreditsEditorSheet(trackServerId: track.int("id") ?? 0, trackTitle: track.title)
         }
     }
 
@@ -393,5 +430,134 @@ struct TrackCreateSheet: View {
             }
         }
         .onAppear { projectServerId = projectServerId ?? defaultProjectServerId }
+    }
+}
+
+// MARK: - Credits & royalty splits editor
+
+struct TrackCreditsEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AppModel.self) private var model
+    let trackServerId: Int
+    let trackTitle: String
+
+    // New-credit form
+    @State private var newTalentId: Int?
+    @State private var newRole = "producer"
+    @State private var newName = ""
+    @State private var newSplit = 0.0
+
+    private let roles = ["producer", "engineer", "mixing", "mastering", "vocals", "guitar", "bass", "drums", "keys", "songwriter", "featuring", "other"]
+
+    private var credits: [TrackCredit] {
+        _ = model.dataVersion
+        return model.store.trackCredits().filter { $0.trackId == trackServerId }
+    }
+    private var talents: [Talent] { model.store.talents().filter { $0.int("id") != nil } }
+    private var splitTotal: Double { credits.compactMap(\.splitPercent).reduce(0, +) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Crédits & splits — \(trackTitle)").font(.title3).bold().padding()
+            Form {
+                Section("Contributeurs") {
+                    if credits.isEmpty {
+                        Text("Aucun crédit pour l'instant.").font(.caption).foregroundStyle(.secondary)
+                    }
+                    ForEach(credits) { credit in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(credit.creditName ?? "—").fontWeight(.medium)
+                                if let role = credit.role { Text(role).font(.caption2).foregroundStyle(.secondary) }
+                            }
+                            Spacer()
+                            TextField("%", value: Binding(
+                                get: { credit.splitPercent ?? 0 },
+                                set: { setSplit(credit, $0) }
+                            ), format: .number).frame(width: 60).multilineTextAlignment(.trailing)
+                            Text("%").foregroundStyle(.secondary)
+                            Button(role: .destructive) {
+                                try? model.store.localDelete(table: "track_credits", uuid: credit.id)
+                                Task { await model.syncNow() }
+                            } label: { Image(systemName: "minus.circle") }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    HStack {
+                        Text("Total").font(.caption)
+                        Spacer()
+                        Text("\(splitTotal.formatted()) %").font(.caption).monospacedDigit()
+                            .foregroundStyle(abs(splitTotal - 100) < 0.01 ? .green : .orange)
+                        if abs(splitTotal - 100) >= 0.01, !credits.isEmpty {
+                            Button("Équilibrer") { equalize() }.font(.caption).buttonStyle(.borderless)
+                        }
+                    }
+                }
+                Section("Ajouter un crédit") {
+                    Picker("Talent (optionnel)", selection: $newTalentId) {
+                        Text("Aucun / externe").tag(nil as Int?)
+                        ForEach(talents) { t in Text(t.displayName).tag(t.int("id")) }
+                    }
+                    .onChange(of: newTalentId) {
+                        if let tid = newTalentId, newName.isEmpty,
+                           let t = talents.first(where: { $0.int("id") == tid }) { newName = t.displayName }
+                    }
+                    TextField("Nom au générique", text: $newName, prompt: Text("Ex : Jean Dupont"))
+                    Picker("Rôle", selection: $newRole) {
+                        ForEach(roles, id: \.self) { Text($0).tag($0) }
+                    }
+                    HStack {
+                        Text("Split")
+                        Spacer()
+                        TextField("%", value: $newSplit, format: .number).frame(width: 60).multilineTextAlignment(.trailing)
+                        Text("%").foregroundStyle(.secondary)
+                    }
+                    Button {
+                        addCredit()
+                    } label: { Label("Ajouter", systemImage: "plus.circle") }
+                    .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+            .formStyle(.grouped)
+
+            HStack {
+                Spacer()
+                Button("Fermer") { dismiss() }.keyboardShortcut(.escape).buttonStyle(.borderedProminent)
+            }
+            .padding()
+        }
+        .frame(width: 520, height: 560)
+    }
+
+    private func setSplit(_ credit: TrackCredit, _ value: Double) {
+        try? model.store.localUpdate(table: "track_credits", uuid: credit.id,
+                                     changes: ["split_percent": String(format: "%.2f", max(0, value))])
+        Task { await model.syncNow() }
+    }
+
+    private func addCredit() {
+        var payload: [String: Any] = [
+            "track_id": trackServerId,
+            "role": newRole,
+            "credit_name": newName,
+            "is_primary": false,
+        ]
+        if let newTalentId { payload["musician_id"] = newTalentId }
+        if newSplit > 0 { payload["split_percent"] = String(format: "%.2f", newSplit) }
+        _ = try? model.store.localInsert(table: "track_credits", payload: payload)
+        newName = ""; newSplit = 0; newTalentId = nil; newRole = "producer"
+        Task { await model.syncNow() }
+    }
+
+    /// Distribute 100% evenly across all current credits.
+    private func equalize() {
+        let list = credits
+        guard !list.isEmpty else { return }
+        let each = (100.0 / Double(list.count) * 100).rounded() / 100
+        for credit in list {
+            try? model.store.localUpdate(table: "track_credits", uuid: credit.id,
+                                         changes: ["split_percent": String(format: "%.2f", each)])
+        }
+        Task { await model.syncNow() }
     }
 }

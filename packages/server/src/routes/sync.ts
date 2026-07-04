@@ -528,6 +528,40 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
       return res.status(400).json({ error: 'No valid items' });
     }
 
+    // --- Forfait (prepaid package) auto-deduction ---------------------------
+    // Opt-in: when the caller passes `packageHours`, draw those hours from the
+    // client's active prepaid package and add a negative line so the prepaid
+    // portion is not billed twice. Package usage & status are updated below.
+    const packageHoursRequested = Number(req.body?.packageHours) || 0;
+    let packageDeduction: { packageId: number; hoursUsed: number; newUsed: number; total: number } | null = null;
+    if (packageHoursRequested > 0) {
+      const pkgRows = (await db.execute(sql`
+        SELECT id, total_hours, used_hours, price
+        FROM client_packages
+        WHERE client_id = ${clientId} AND status = 'active'
+        ORDER BY created_at ASC LIMIT 1
+      `)) as unknown as Array<{ id: number; total_hours: string | null; used_hours: string; price: string | null }>;
+      const pkg = pkgRows[0];
+      if (pkg && pkg.total_hours != null) {
+        const totalHours = Number(pkg.total_hours);
+        const usedHours = Number(pkg.used_hours) || 0;
+        const remaining = Math.max(0, totalHours - usedHours);
+        const hoursUsed = Math.min(packageHoursRequested, remaining);
+        if (hoursUsed > 0) {
+          const rate = pkg.price != null && totalHours > 0 ? Number(pkg.price) / totalHours : 0;
+          const discount = Math.round(hoursUsed * rate * 100) / 100;
+          if (discount > 0) {
+            cleanItems.push({
+              description: `Forfait prépayé (${hoursUsed} h)`,
+              quantity: 1,
+              unitPrice: -discount,
+            });
+          }
+          packageDeduction = { packageId: pkg.id, hoursUsed, newUsed: usedHours + hoursUsed, total: totalHours };
+        }
+      }
+    }
+
     const subtotal = cleanItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     const taxAmount = Math.round(subtotal * taxRate) / 100;
     const total = subtotal + taxAmount;
@@ -559,7 +593,25 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
       `);
     }
 
-    res.json({ invoiceId, invoiceNumber });
+    // Apply the prepaid-package draw-down now that the invoice exists.
+    if (packageDeduction) {
+      const consumed = packageDeduction.newUsed >= packageDeduction.total;
+      await db.execute(sql`
+        UPDATE client_packages
+        SET used_hours = ${packageDeduction.newUsed.toFixed(2)},
+            status = ${consumed ? 'consumed' : 'active'},
+            updated_at = NOW()
+        WHERE id = ${packageDeduction.packageId}
+      `);
+    }
+
+    res.json({
+      invoiceId,
+      invoiceNumber,
+      packageDeduction: packageDeduction
+        ? { hoursUsed: packageDeduction.hoursUsed, remaining: packageDeduction.total - packageDeduction.newUsed }
+        : null,
+    });
   } catch (error) {
     console.error('[Sync] create-invoice failed:', error);
     res.status(500).json({ error: 'Invoice creation failed' });
