@@ -606,6 +606,17 @@ public struct SessionTalentEntry: RowBacked {
     public var status: String { string("status") ?? "booked" }
 }
 
+public struct Availability: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var subjectType: String { string("subject_type") ?? "staff" }  // staff | talent
+    public var subjectId: Int? { int("subject_id") }
+    public var start: Date? { RSMDate.parse(string("start_time")) }
+    public var end: Date? { RSMDate.parse(string("end_time")) }
+    public var kind: String { string("kind") ?? "unavailable" }  // unavailable | vacation
+    public var notes: String? { string("notes") }
+}
+
 // MARK: - Repository helpers
 
 public extension LocalStore {
@@ -624,6 +635,10 @@ public extension LocalStore {
     func sessionTalents(sessionServerId: Int) -> [SessionTalentEntry] {
         ((try? rows(table: "session_talents")) ?? []).map(SessionTalentEntry.init(raw:))
             .filter { $0.sessionId == sessionServerId }
+    }
+    func availabilityList() -> [Availability] {
+        ((try? rows(table: "availability")) ?? []).map(Availability.init(raw:))
+            .sorted { ($0.start ?? .distantFuture) < ($1.start ?? .distantFuture) }
     }
     func shares(trackServerId: Int) -> [Share] {
         ((try? rows(table: "shares")) ?? []).map(Share.init(raw:))

@@ -1552,3 +1552,23 @@ export const documents = pgTable("documents", {
 });
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = typeof documents.$inferInsert;
+
+/**
+ * Availability windows for staff (master users) or talents (musicians).
+ * Polymorphic subject (no FK): subjectType + subjectId. Used to declare
+ * unavailability / vacation for scheduling & conflict awareness.
+ */
+export const availability = pgTable("availability", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  subjectType: varchar("subject_type", { length: 20 }).notNull(), // "staff" | "talent"
+  subjectId: integer("subject_id").notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  kind: varchar("kind", { length: 20 }).notNull().default("unavailable"), // unavailable | vacation
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export type Availability = typeof availability.$inferSelect;
+export type InsertAvailability = typeof availability.$inferInsert;

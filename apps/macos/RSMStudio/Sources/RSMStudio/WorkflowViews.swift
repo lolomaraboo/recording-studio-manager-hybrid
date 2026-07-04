@@ -301,6 +301,135 @@ func docTypeLabel(_ t: String) -> String {
     }
 }
 
+// MARK: - Disponibilités (staff & talents)
+
+struct AvailabilityView: View {
+    @Environment(AppModel.self) private var model
+    @State private var showingCreate = false
+
+    private var items: [Availability] {
+        _ = model.dataVersion
+        return model.store.availabilityList()
+    }
+
+    private static let df: DateFormatter = {
+        let f = DateFormatter(); f.locale = Locale(identifier: "fr_FR"); f.dateFormat = "EEE d MMM, HH:mm"; return f
+    }()
+
+    private func subjectName(_ a: Availability) -> String {
+        guard let id = a.subjectId else { return "?" }
+        if a.subjectType == "talent" {
+            return model.store.talents().first { $0.int("id") == id }?.displayName ?? "Talent #\(id)"
+        }
+        return model.store.cachedMembers().first { $0.id == id }?.name ?? "Membre #\(id)"
+    }
+
+    private func rangeLabel(_ a: Availability) -> String? {
+        guard let s = a.start, let e = a.end else { return nil }
+        return "\(Self.df.string(from: s)) → \(Self.df.string(from: e))"
+    }
+
+    var body: some View {
+        Group {
+            if items.isEmpty {
+                StudioEmptyState(title: "Aucune indisponibilité", systemImage: "calendar.badge.minus",
+                                 message: "Déclare les absences / congés du staff et des talents.")
+            } else {
+                List(items) { a in
+                    StudioRow(icon: a.kind == "vacation" ? "beach.umbrella" : "calendar.badge.minus",
+                              title: subjectName(a),
+                              subtitle: [rangeLabel(a), a.notes].compactMap { $0 }.joined(separator: " · ")) {
+                        Text(a.subjectType == "talent" ? "Talent" : "Staff")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    .contextMenu {
+                        Button("Supprimer", role: .destructive) {
+                            try? model.store.localDelete(table: "availability", uuid: a.id)
+                            Task { await model.syncNow() }
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Disponibilités")
+        .toolbar {
+            ToolbarItem {
+                Button { showingCreate = true } label: { Label("Nouvelle indisponibilité", systemImage: "plus") }
+            }
+        }
+        .modalCard(isPresented: $showingCreate) {
+            AvailabilityCreateSheet { payload in
+                _ = try? model.store.localInsert(table: "availability", payload: payload)
+                Task { await model.syncNow() }
+            }
+        }
+    }
+}
+
+struct AvailabilityCreateSheet: View {
+    @Environment(AppModel.self) private var model
+    let onCreate: ([String: Any]) -> Void
+
+    @State private var subjectType = "staff"
+    @State private var staffId: Int?
+    @State private var talentId: Int?
+    @State private var kind = "unavailable"
+    @State private var start = Date()
+    @State private var end = Date().addingTimeInterval(3600)
+    @State private var notes = ""
+
+    private static let iso: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter(); f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]; return f
+    }()
+
+    var body: some View {
+        StudioFormSheet(
+            title: "Indisponibilité", confirmLabel: "Créer",
+            confirmDisabled: subjectType == "staff" ? staffId == nil : talentId == nil,
+            height: 460,
+            onConfirm: {
+                let subjectId = subjectType == "staff" ? staffId : talentId
+                var payload: [String: Any] = [
+                    "subject_type": subjectType,
+                    "kind": kind,
+                    "start_time": Self.iso.string(from: start),
+                    "end_time": Self.iso.string(from: end),
+                ]
+                if let subjectId { payload["subject_id"] = subjectId }
+                if !notes.isEmpty { payload["notes"] = notes }
+                onCreate(payload)
+            }
+        ) {
+            Picker("Qui", selection: $subjectType) {
+                Text("Membre de l'équipe").tag("staff")
+                Text("Talent").tag("talent")
+            }
+            if subjectType == "staff" {
+                Picker("Membre", selection: $staffId) {
+                    Text("Choisir…").tag(nil as Int?)
+                    ForEach(model.store.cachedMembers()) { m in
+                        Text(m.name).tag(m.id as Int?)
+                    }
+                }
+            } else {
+                Picker("Talent", selection: $talentId) {
+                    Text("Choisir…").tag(nil as Int?)
+                    ForEach(model.store.talents().filter { $0.int("id") != nil }) { t in
+                        Text(t.displayName).tag(t.int("id"))
+                    }
+                }
+            }
+            Picker("Type", selection: $kind) {
+                Text("Indisponible").tag("unavailable")
+                Text("Congé").tag("vacation")
+            }
+            DatePicker("Début", selection: $start)
+            DatePicker("Fin", selection: $end)
+            TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...4)
+        }
+    }
+}
+
 struct DocumentCreateSheet: View {
     @Environment(AppModel.self) private var model
     let onCreate: ([String: Any]) -> Void

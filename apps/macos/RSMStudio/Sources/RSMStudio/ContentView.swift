@@ -20,6 +20,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case rooms = "Salles"
     case team = "Équipe"
     case time = "Temps"
+    case availability = "Disponibilités"
     case leads = "Prospects"
     case tasks = "Tâches"
     case documents = "Documents"
@@ -46,6 +47,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .rooms: return "door.left.hand.open"
         case .team: return "person.3"
         case .time: return "timer"
+        case .availability: return "calendar.badge.minus"
         case .leads: return "person.crop.circle.badge.questionmark"
         case .tasks: return "checklist"
         case .documents: return "folder"
@@ -69,7 +71,7 @@ struct ContentView: View {
         (nil, [.assistant, .dashboard]),
         ("Activité", [.clients, .calendar, .sessions, .projects, .tracks]),
         ("Ventes", [.quotes, .invoices, .analytics, .services, .contracts, .expenses]),
-        ("Ressources", [.equipment, .talents, .rooms, .time, .team]),
+        ("Ressources", [.equipment, .talents, .rooms, .time, .team, .availability]),
         ("Pilotage", [.leads, .tasks, .documents]),
         ("Mon Mac", [.system]),
         (nil, [.settings]),
@@ -144,6 +146,7 @@ struct ContentView: View {
                     case .rooms: RoomsView()
                     case .team: TeamView()
                     case .time: TimeTrackingView()
+                    case .availability: AvailabilityView()
                     case .leads: LeadsView()
                     case .tasks: TasksView()
                     case .documents: DocumentsView()

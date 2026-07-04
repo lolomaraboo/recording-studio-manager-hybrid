@@ -217,6 +217,21 @@ CREATE TABLE IF NOT EXISTS documents (
   CONSTRAINT documents_sync_uuid_unique UNIQUE (sync_uuid)
 );
 
+CREATE TABLE IF NOT EXISTS availability (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  subject_type varchar(20) NOT NULL,
+  subject_id integer NOT NULL,
+  start_time timestamp NOT NULL,
+  end_time timestamp NOT NULL,
+  kind varchar(20) NOT NULL DEFAULT 'unavailable',
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT availability_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
 -- ----------------------------------------------------------------------------
 -- 3b. Schema catch-up for legacy tenants (created before the quotes FSM
 -- refactor) — additive, aligns the DB with the current schema.ts.
@@ -307,7 +322,7 @@ DECLARE
     'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
     'user_preferences',
     'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
-    'leads', 'tasks', 'documents'
+    'leads', 'tasks', 'documents', 'availability'
   ];
 BEGIN
   FOREACH t IN ARRAY synced_tables LOOP
