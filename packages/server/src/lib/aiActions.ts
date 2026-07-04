@@ -15,6 +15,7 @@ import {
   projects,
   musicians,
   tracks,
+  trackCredits,
   timeEntries,
   taskTypes,
   expenses,
@@ -78,6 +79,12 @@ export class AIActionExecutor {
         // Sessions
         case "get_upcoming_sessions":
           result = await this.get_upcoming_sessions(params as any);
+          break;
+        case "get_sessions":
+          result = await this.get_sessions(params as any);
+          break;
+        case "count_sessions":
+          result = await this.count_sessions(params as any);
           break;
         case "get_session_details":
           result = await this.get_session_details(params as any);
@@ -229,6 +236,27 @@ export class AIActionExecutor {
         case "create_track":
           result = await this.create_track(params as any);
           break;
+        case "update_track":
+          result = await this.update_track(params as any);
+          break;
+        case "delete_track":
+          result = await this.delete_track(params as any);
+          break;
+        case "get_track_credits":
+          result = await this.get_track_credits(params as any);
+          break;
+        case "add_track_credit":
+          result = await this.add_track_credit(params as any);
+          break;
+        case "update_musician":
+          result = await this.update_musician(params as any);
+          break;
+        case "delete_musician":
+          result = await this.delete_musician(params as any);
+          break;
+        case "get_all_vat_rates":
+          result = await this.get_all_vat_rates(params as any);
+          break;
         case "get_all_time_entries":
           result = await this.get_all_time_entries(params as any);
           break;
@@ -362,11 +390,9 @@ export class AIActionExecutor {
   }) {
     const { start_date, end_date, room_id } = params;
 
-    // Build filters
+    // Build filters — "upcoming" means from now on unless an explicit start is given.
     const filters = [];
-    if (start_date) {
-      filters.push(gte(sessions.startTime, new Date(start_date)));
-    }
+    filters.push(gte(sessions.startTime, start_date ? new Date(start_date) : new Date()));
     if (end_date) {
       filters.push(lte(sessions.startTime, new Date(end_date)));
     }
@@ -395,6 +421,80 @@ export class AIActionExecutor {
     return {
       sessions: result,
       count: result.length,
+    };
+  }
+
+  /**
+   * List sessions over a period (past and/or future), with date/status/client filters.
+   */
+  async get_sessions(params: {
+    start_date?: string;
+    end_date?: string;
+    status?: string;
+    client_id?: number;
+    limit?: number;
+  }) {
+    const { start_date, end_date, status, client_id, limit = 100 } = params;
+    const filters = [];
+    if (start_date) filters.push(gte(sessions.startTime, new Date(start_date)));
+    if (end_date) filters.push(lte(sessions.startTime, new Date(end_date)));
+    if (status) filters.push(eq(sessions.status, status));
+    if (client_id) filters.push(eq(sessions.clientId, client_id));
+
+    const baseQuery = this.db
+      .select({
+        id: sessions.id,
+        title: sessions.title,
+        clientId: sessions.clientId,
+        roomId: sessions.roomId,
+        startTime: sessions.startTime,
+        endTime: sessions.endTime,
+        status: sessions.status,
+        totalAmount: sessions.totalAmount,
+      })
+      .from(sessions);
+
+    const result = await (filters.length > 0
+      ? baseQuery.where(and(...filters)).orderBy(desc(sessions.startTime)).limit(limit)
+      : baseQuery.orderBy(desc(sessions.startTime)).limit(limit));
+
+    return { sessions: result, count: result.length };
+  }
+
+  /**
+   * Count sessions over a period, broken down by status.
+   */
+  async count_sessions(params: {
+    start_date?: string;
+    end_date?: string;
+    client_id?: number;
+  }) {
+    const { start_date, end_date, client_id } = params;
+    const filters = [];
+    if (start_date) filters.push(gte(sessions.startTime, new Date(start_date)));
+    if (end_date) filters.push(lte(sessions.startTime, new Date(end_date)));
+    if (client_id) filters.push(eq(sessions.clientId, client_id));
+
+    const baseQuery = this.db
+      .select({ status: sessions.status, count: sql<number>`count(*)::int` })
+      .from(sessions)
+      .groupBy(sessions.status);
+
+    const rows = await (filters.length > 0
+      ? baseQuery.where(and(...filters))
+      : baseQuery);
+
+    const by_status: Record<string, number> = {};
+    let total = 0;
+    for (const r of rows as Array<{ status: string; count: number }>) {
+      by_status[r.status] = r.count;
+      total += r.count;
+    }
+
+    return {
+      total,
+      by_status,
+      period: { start_date: start_date ?? null, end_date: end_date ?? null },
     };
   }
 
@@ -2090,6 +2190,151 @@ export class AIActionExecutor {
       .values({ projectId: project_id, title, trackNumber: track_number, bpm, key, status: "recording" })
       .returning();
     return { track, message: `Track "${title}" créée` };
+  }
+
+  /** Resolve a track id from an explicit id or a partial title match. */
+  private async resolveTrackId(track_id?: number, track_title?: string): Promise<number> {
+    if (track_id) return track_id;
+    if (track_title) {
+      const [t] = await this.db
+        .select({ id: tracks.id })
+        .from(tracks)
+        .where(ilike(tracks.title, `%${track_title}%`))
+        .limit(1);
+      if (t) return t.id;
+      throw new Error(`Aucune track ne correspond à "${track_title}"`);
+    }
+    throw new Error("track_id ou track_title requis");
+  }
+
+  async update_track(params: {
+    track_id?: number;
+    track_title?: string;
+    title?: string;
+    track_number?: number;
+    bpm?: number;
+    key?: string;
+    status?: string;
+  }) {
+    const id = await this.resolveTrackId(params.track_id, params.track_title);
+    const updateData: any = { updatedAt: new Date() };
+    if (params.title !== undefined) updateData.title = params.title;
+    if (params.track_number !== undefined) updateData.trackNumber = params.track_number;
+    if (params.bpm !== undefined) updateData.bpm = params.bpm;
+    if (params.key !== undefined) updateData.key = params.key;
+    if (params.status !== undefined) updateData.status = params.status;
+
+    const [updated] = await this.db
+      .update(tracks)
+      .set(updateData)
+      .where(eq(tracks.id, id))
+      .returning();
+    return { track: updated, message: `Track #${id} mise à jour` };
+  }
+
+  async delete_track(params: { track_id?: number; track_title?: string }) {
+    const id = await this.resolveTrackId(params.track_id, params.track_title);
+    // Remove dependent credits first to avoid FK violations.
+    await this.db.delete(trackCredits).where(eq(trackCredits.trackId, id));
+    await this.db.delete(tracks).where(eq(tracks.id, id));
+    return { deleted_track_id: id, message: `Track #${id} supprimée` };
+  }
+
+  async get_track_credits(params: { track_id?: number; track_title?: string }) {
+    const id = await this.resolveTrackId(params.track_id, params.track_title);
+    const result = await this.db
+      .select()
+      .from(trackCredits)
+      .where(eq(trackCredits.trackId, id));
+    const totalSplit = result.reduce(
+      (sum, c: any) => sum + (c.splitPercent ? parseFloat(c.splitPercent) : 0),
+      0
+    );
+    return { track_id: id, credits: result, count: result.length, total_split_percent: totalSplit };
+  }
+
+  async add_track_credit(params: {
+    track_id?: number;
+    track_title?: string;
+    credit_name: string;
+    role: string;
+    split_percent?: number;
+    musician_id?: number;
+    is_primary?: boolean;
+  }) {
+    const id = await this.resolveTrackId(params.track_id, params.track_title);
+    const [credit] = await this.db
+      .insert(trackCredits)
+      .values({
+        trackId: id,
+        musicianId: params.musician_id,
+        role: params.role,
+        creditName: params.credit_name,
+        isPrimary: params.is_primary ?? false,
+        splitPercent: params.split_percent !== undefined ? params.split_percent.toString() : null,
+      })
+      .returning();
+    return { credit, message: `Crédit "${params.credit_name}" (${params.role}) ajouté à la track #${id}` };
+  }
+
+  async update_musician(params: {
+    musician_id?: number;
+    musician_name?: string;
+    name?: string;
+    stage_name?: string;
+    email?: string;
+    phone?: string;
+    bio?: string;
+  }) {
+    let id = params.musician_id;
+    if (!id && params.musician_name) {
+      const [m] = await this.db
+        .select({ id: musicians.id })
+        .from(musicians)
+        .where(ilike(musicians.name, `%${params.musician_name}%`))
+        .limit(1);
+      if (!m) throw new Error(`Aucun talent ne correspond à "${params.musician_name}"`);
+      id = m.id;
+    }
+    if (!id) throw new Error("musician_id ou musician_name requis");
+
+    const updateData: any = { updatedAt: new Date() };
+    if (params.name !== undefined) updateData.name = params.name;
+    if (params.stage_name !== undefined) updateData.stageName = params.stage_name;
+    if (params.email !== undefined) updateData.email = params.email;
+    if (params.phone !== undefined) updateData.phone = params.phone;
+    if (params.bio !== undefined) updateData.bio = params.bio;
+
+    const [updated] = await this.db
+      .update(musicians)
+      .set(updateData)
+      .where(eq(musicians.id, id))
+      .returning();
+    return { musician: updated, message: `Talent #${id} mis à jour` };
+  }
+
+  async delete_musician(params: { musician_id?: number; musician_name?: string }) {
+    let id = params.musician_id;
+    if (!id && params.musician_name) {
+      const [m] = await this.db
+        .select({ id: musicians.id })
+        .from(musicians)
+        .where(ilike(musicians.name, `%${params.musician_name}%`))
+        .limit(1);
+      if (!m) throw new Error(`Aucun talent ne correspond à "${params.musician_name}"`);
+      id = m.id;
+    }
+    if (!id) throw new Error("musician_id ou musician_name requis");
+    await this.db
+      .update(musicians)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(musicians.id, id));
+    return { deactivated_musician_id: id, message: `Talent #${id} désactivé` };
+  }
+
+  async get_all_vat_rates(_params: {} = {}) {
+    const result = await this.db.select().from(vatRates);
+    return { vat_rates: result, count: result.length };
   }
 
   async get_all_time_entries(params: { limit?: number } = {}) {

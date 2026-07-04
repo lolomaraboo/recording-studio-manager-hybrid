@@ -16,7 +16,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   {
     name: "get_upcoming_sessions",
     description:
-      "Récupère les sessions d'enregistrement à venir. Peut filtrer par plage de dates et par salle spécifique.",
+      "Récupère UNIQUEMENT les sessions d'enregistrement À VENIR (à partir d'aujourd'hui). Peut filtrer par plage de dates et par salle. NE PAS utiliser pour compter les sessions passées ou le total d'une année : utiliser count_sessions ou get_sessions pour cela.",
     input_schema: {
       type: "object",
       properties: {
@@ -32,6 +32,37 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "number",
           description: "ID de la salle pour filtrer (optionnel)",
         },
+      },
+    },
+  },
+  {
+    name: "get_sessions",
+    description:
+      "Récupère les sessions sur une période (PASSÉES et/ou futures), avec filtres date, statut et client. À utiliser pour lister ou compter des sessions déjà réalisées (ex: 'quelles sessions en juin', 'mes sessions cette année'). Différent de get_upcoming_sessions qui privilégie les sessions à venir.",
+    input_schema: {
+      type: "object",
+      properties: {
+        start_date: { type: "string", description: "Date de début YYYY-MM-DD (optionnel)" },
+        end_date: { type: "string", description: "Date de fin YYYY-MM-DD (optionnel)" },
+        status: {
+          type: "string",
+          description: "Filtre statut: scheduled, in_progress, completed, cancelled (optionnel)",
+        },
+        client_id: { type: "number", description: "Filtrer par client (optionnel)" },
+        limit: { type: "number", description: "Nombre max de résultats (défaut 100)" },
+      },
+    },
+  },
+  {
+    name: "count_sessions",
+    description:
+      "Compte les sessions sur une période donnée, avec ventilation par statut. À utiliser pour répondre aux questions du type 'combien de sessions ai-je faites cette année / ce mois / au total'.",
+    input_schema: {
+      type: "object",
+      properties: {
+        start_date: { type: "string", description: "Date de début YYYY-MM-DD (optionnel)" },
+        end_date: { type: "string", description: "Date de fin YYYY-MM-DD (optionnel)" },
+        client_id: { type: "number", description: "Filtrer par client (optionnel)" },
       },
     },
   },
@@ -1186,6 +1217,104 @@ export const AI_TOOLS: ToolDefinition[] = [
       },
       required: ["project_id", "title"],
     },
+  },
+  {
+    name: "update_track",
+    description:
+      "Met à jour une track existante (titre, numéro, BPM, tonalité, statut). Ex: marquer une track comme terminée.",
+    input_schema: {
+      type: "object",
+      properties: {
+        track_id: { type: "number", description: "ID de la track (optionnel si track_title fourni)" },
+        track_title: { type: "string", description: "Titre de la track (recherche partielle). Alternative à track_id." },
+        title: { type: "string", description: "Nouveau titre (optionnel)" },
+        track_number: { type: "number", description: "Nouveau numéro de piste (optionnel)" },
+        bpm: { type: "number", description: "Nouveau tempo BPM (optionnel)" },
+        key: { type: "string", description: "Nouvelle tonalité (optionnel)" },
+        status: {
+          type: "string",
+          description: "Nouveau statut: recording, editing, mixing, mastering, completed (optionnel)",
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "delete_track",
+    description: "Supprime une track. Peut résoudre la track par son titre.",
+    input_schema: {
+      type: "object",
+      properties: {
+        track_id: { type: "number", description: "ID de la track (optionnel si track_title fourni)" },
+        track_title: { type: "string", description: "Titre de la track (recherche partielle). Alternative à track_id." },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "get_track_credits",
+    description:
+      "Liste les crédits / splits (répartition des droits) d'une track: rôle, nom crédité, pourcentage de split, musicien lié.",
+    input_schema: {
+      type: "object",
+      properties: {
+        track_id: { type: "number", description: "ID de la track (optionnel si track_title fourni)" },
+        track_title: { type: "string", description: "Titre de la track (recherche partielle). Alternative à track_id." },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "add_track_credit",
+    description:
+      "Ajoute un crédit / split à une track (ex: 'crédite Sarah Petit à la guitare avec 20% de split').",
+    input_schema: {
+      type: "object",
+      properties: {
+        track_id: { type: "number", description: "ID de la track (optionnel si track_title fourni)" },
+        track_title: { type: "string", description: "Titre de la track (recherche partielle). Alternative à track_id." },
+        credit_name: { type: "string", description: "Nom tel qu'il doit apparaître dans les crédits" },
+        role: { type: "string", description: "Rôle: producer, engineer, mixing, mastering, vocals, guitar, drums, bass, etc." },
+        split_percent: { type: "number", description: "Pourcentage de split royalties (optionnel)" },
+        musician_id: { type: "number", description: "ID du musicien/talent lié (optionnel)" },
+        is_primary: { type: "boolean", description: "Crédit principal (optionnel)" },
+      },
+      required: ["credit_name", "role"],
+    },
+  },
+  {
+    name: "update_musician",
+    description: "Met à jour un talent/musicien (nom, nom de scène, email, téléphone, bio). Peut résoudre par nom.",
+    input_schema: {
+      type: "object",
+      properties: {
+        musician_id: { type: "number", description: "ID du musicien (optionnel si musician_name fourni)" },
+        musician_name: { type: "string", description: "Nom du musicien (recherche partielle). Alternative à musician_id." },
+        name: { type: "string", description: "Nouveau nom (optionnel)" },
+        stage_name: { type: "string", description: "Nouveau nom de scène (optionnel)" },
+        email: { type: "string", description: "Nouvel email (optionnel)" },
+        phone: { type: "string", description: "Nouveau téléphone (optionnel)" },
+        bio: { type: "string", description: "Nouvelle bio (optionnel)" },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "delete_musician",
+    description: "Désactive un talent/musicien (soft delete). Peut résoudre par nom.",
+    input_schema: {
+      type: "object",
+      properties: {
+        musician_id: { type: "number", description: "ID du musicien (optionnel si musician_name fourni)" },
+        musician_name: { type: "string", description: "Nom du musicien (recherche partielle). Alternative à musician_id." },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "get_all_vat_rates",
+    description: "Récupère les taux de TVA configurés dans le studio (nom, taux %, défaut).",
+    input_schema: { type: "object", properties: {} },
   },
   {
     name: "get_all_time_entries",

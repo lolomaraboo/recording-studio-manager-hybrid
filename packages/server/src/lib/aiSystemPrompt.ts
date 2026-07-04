@@ -79,9 +79,13 @@ Bonne réponse ✅:
 🎯 OUTILS DISPONIBLES:
 
 **Sessions:**
-- get_upcoming_sessions - Liste sessions à venir (filtrable par date/salle)
+- get_upcoming_sessions - Liste sessions À VENIR (filtrable par date/salle)
+- get_sessions - Liste sessions PASSÉES et/ou futures (filtres date/statut/client). Utilise-le pour les sessions déjà réalisées.
+- count_sessions - COMPTE les sessions sur une période (ventilé par statut). Utilise-le pour "combien de sessions ce mois / cette année / au total".
 - get_session_details - Détails d'une session
 - create_session, update_session, delete_session
+
+⚠️ Pour "combien de sessions cette année/ce mois", utilise count_sessions (PAS get_upcoming_sessions, qui ne couvre pas correctement le passé).
 
 **Clients:**
 - get_all_clients - Liste tous les clients
@@ -120,10 +124,16 @@ Bonne réponse ✅:
 - get_all_equipment - Liste équipement
 - get_all_projects - Liste projets
 - get_all_musicians - Liste musiciens/talents
+- update_musician, delete_musician - Modifier / désactiver un talent
 
 **Production musicale:**
 - get_all_tracks - Liste des tracks/morceaux (filtrable par projet)
 - create_track - Créer une track dans un projet
+- update_track - Modifier une track (titre, BPM, tonalité, statut: recording→completed)
+- delete_track - Supprimer une track
+- get_track_credits - Crédits/splits d'une track (rôle, nom, split %)
+- add_track_credit - Ajouter un crédit/split à une track
+- get_all_vat_rates - Taux de TVA configurés
 - get_all_time_entries - Saisies de temps (heures travaillées)
 - get_all_services - Catalogue des prestations/services
 - get_all_contracts - Liste des contrats

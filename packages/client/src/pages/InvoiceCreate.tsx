@@ -198,8 +198,10 @@ export default function InvoiceCreate() {
     createMutation.mutate({
       clientId: formData.clientId,
       invoiceNumber: formData.invoiceNumber,
-      issueDate: new Date(formData.issueDate).toISOString(),
-      dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
+      // Anchor date-only picks at local noon so the calendar day doesn't shift
+      // across timezones (e.g. UTC-10) when stored as UTC and re-displayed.
+      issueDate: new Date(`${formData.issueDate}T12:00:00`).toISOString(),
+      dueDate: formData.dueDate ? new Date(`${formData.dueDate}T12:00:00`).toISOString() : undefined,
       items: items.map(item => ({
         description: item.description,
         quantity: item.quantity,

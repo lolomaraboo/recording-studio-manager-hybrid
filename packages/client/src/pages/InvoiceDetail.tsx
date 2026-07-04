@@ -216,8 +216,9 @@ export default function InvoiceDetail() {
       data: {
         invoiceNumber: formData.invoiceNumber,
         clientId: formData.clientId,
-        issueDate: new Date(formData.issueDate).toISOString(),
-        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
+        // Anchor date-only picks at local noon to avoid a ±1 day shift across timezones.
+        issueDate: new Date(`${formData.issueDate}T12:00:00`).toISOString(),
+        dueDate: formData.dueDate ? new Date(`${formData.dueDate}T12:00:00`).toISOString() : undefined,
         status: formData.status as any,
         notes: formData.notes,
         items: editItems.filter(item => item.description.trim() !== "").map(item => ({
