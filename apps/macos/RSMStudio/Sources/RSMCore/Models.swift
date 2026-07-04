@@ -87,6 +87,7 @@ public struct Client: RowBacked {
     public var isVip: Bool { bool("is_vip") }
     public var isActive: Bool { bool("is_active") }
     public var isCompany: Bool { type == "company" }
+    public var currency: String { (string("currency") ?? "EUR").uppercased() }
 
     // Artist profile
     public var biography: String? { string("biography") }
@@ -272,6 +273,7 @@ public struct Invoice: RowBacked {
     public var subtotal: String { string("subtotal") ?? "0" }
     public var taxAmount: String { string("tax_amount") ?? "0" }
     public var total: String { string("total") ?? "0" }
+    public var currency: String { (string("currency") ?? "EUR").uppercased() }
     public var issueDate: String? { string("issue_date") }
     public var dueDate: String? { string("due_date") }
     public var notes: String? { string("notes") }
@@ -416,6 +418,7 @@ public struct Expense: RowBacked {
     public var category: String? { string("category") }
     public var vendor: String? { string("vendor") }
     public var amount: String { string("amount") ?? "0" }
+    public var currency: String { (string("currency") ?? "EUR").uppercased() }
     public var status: String { string("status") ?? "pending" }
     public var projectId: Int? { int("project_id") }
     public var expenseDate: String? { string("expense_date") }

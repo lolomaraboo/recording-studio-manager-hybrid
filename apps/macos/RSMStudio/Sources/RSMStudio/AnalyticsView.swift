@@ -19,28 +19,56 @@ struct AnalyticsView: View {
         return calendar.component(.year, from: d)
     }
 
-    // MARK: KPIs (année courante)
+    // MARK: Conversion multi-devises (vers la devise de référence)
+
+    /// Convert an amount to the reference currency using the configured FX rate.
+    /// Falls back to the raw amount when no rate is set (approximation flagged
+    /// to the user via `missingRateCurrencies`).
+    private func ref(_ amount: Double, _ code: String) -> Double {
+        Money.convertToReference(amount, from: code) ?? amount
+    }
+
+    /// Currencies present in this year's paid invoices that have no FX rate and
+    /// aren't the reference — their totals are approximated in converted KPIs.
+    private var missingRateCurrencies: [String] {
+        let codes = Set(invoices
+            .filter { $0.status == "paid" && year(of: $0.issueDate) == currentYear }
+            .map { $0.currency })
+        return codes.filter { Money.rate(for: $0) == nil }.sorted()
+    }
+
+    /// Exact paid revenue grouped by currency (no conversion) — the truthful view.
+    private var paidByCurrency: [(code: String, amount: Double)] {
+        var b: [String: Double] = [:]
+        for inv in invoices where inv.status == "paid" && year(of: inv.issueDate) == currentYear {
+            guard let a = Double(inv.total) else { continue }
+            b[inv.currency, default: 0] += a
+        }
+        return b.map { (code: $0.key, amount: $0.value) }.sorted { $0.amount > $1.amount }
+    }
+
+    // MARK: KPIs (année courante) — convertis vers la devise de référence
 
     private var paidThisYear: Double {
         invoices
             .filter { $0.status == "paid" && year(of: $0.issueDate) == currentYear }
-            .compactMap { Double($0.total) }.reduce(0, +)
+            .compactMap { inv in Double(inv.total).map { ref($0, inv.currency) } }.reduce(0, +)
     }
     private var outstanding: Double {
         invoices
             .filter { $0.status == "sent" || $0.status == "overdue" }
-            .compactMap { Double($0.total) }.reduce(0, +)
+            .compactMap { inv in Double(inv.total).map { ref($0, inv.currency) } }.reduce(0, +)
     }
     private var expensesThisYear: Double {
         expenses
             .filter { year(of: $0.expenseDate) == currentYear }
-            .compactMap { Double($0.amount) }.reduce(0, +)
+            .compactMap { exp in Double(exp.amount).map { ref($0, exp.currency) } }.reduce(0, +)
     }
     private var margin: Double { paidThisYear - expensesThisYear }
     private var billedThisYear: Double {
         invoices
             .filter { $0.status != "draft" && $0.status != "cancelled" && year(of: $0.issueDate) == currentYear }
-            .compactMap { Double($0.total) }.reduce(0, +)
+            .compactMap { inv in Double(inv.total).map { ref($0, inv.currency) } }.reduce(0, +)
     }
     private var collectionRate: Double {
         billedThisYear > 0 ? (paidThisYear / billedThisYear) * 100 : 0
@@ -69,11 +97,11 @@ struct AnalyticsView: View {
         var spend: [Date: Double] = [:]
         for inv in invoices where inv.status == "paid" {
             guard let d = RSMDate.parse(inv.issueDate), let a = Double(inv.total) else { continue }
-            revenue[monthStart(d), default: 0] += a
+            revenue[monthStart(d), default: 0] += ref(a, inv.currency)
         }
         for exp in expenses {
             guard let d = RSMDate.parse(exp.expenseDate), let a = Double(exp.amount) else { continue }
-            spend[monthStart(d), default: 0] += a
+            spend[monthStart(d), default: 0] += ref(a, exp.currency)
         }
         let months = Set(revenue.keys).union(spend.keys).sorted().suffix(6)
         var points: [FlowPoint] = []
@@ -93,7 +121,7 @@ struct AnalyticsView: View {
         var buckets: [String: Double] = [:]
         for exp in expenses where year(of: exp.expenseDate) == currentYear {
             guard let a = Double(exp.amount) else { continue }
-            buckets[exp.category ?? "Autre", default: 0] += a
+            buckets[exp.category ?? "Autre", default: 0] += ref(a, exp.currency)
         }
         return buckets.map { CategoryTotal(category: $0.key, amount: $0.value) }
             .sorted { $0.amount > $1.amount }
@@ -108,7 +136,7 @@ struct AnalyticsView: View {
         var buckets: [Int: Double] = [:]
         for inv in invoices where inv.status == "paid" && year(of: inv.issueDate) == currentYear {
             guard let cid = inv.clientId, let a = Double(inv.total) else { continue }
-            buckets[cid, default: 0] += a
+            buckets[cid, default: 0] += ref(a, inv.currency)
         }
         return buckets.map { ClientTotal(name: byId[$0.key]?.displayName ?? "Client #\($0.key)", amount: $0.value) }
             .sorted { $0.amount > $1.amount }
@@ -124,6 +152,37 @@ struct AnalyticsView: View {
                     KPICard(title: "Dépenses \(currentYear)", value: euroD(expensesThisYear), icon: "cart.circle.fill", color: .red)
                     KPICard(title: "Marge", value: euroD(margin), icon: "chart.line.uptrend.xyaxis.circle.fill", color: margin >= 0 ? .blue : .orange)
                     KPICard(title: "Taux d'encaissement", value: "\(Int(collectionRate)) %", icon: "percent", color: .purple)
+                }
+
+                if paidByCurrency.count > 1 || (paidByCurrency.first.map { $0.code != Money.defaultCode } ?? false) {
+                    GroupBox("CA encaissé par devise (\(currentYear))") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            ForEach(paidByCurrency, id: \.code) { row in
+                                HStack {
+                                    Text(row.code).monospaced()
+                                    Spacer()
+                                    Text(Money.format(row.amount, code: row.code)).monospacedDigit()
+                                    if row.code != Money.defaultCode, let c = Money.convertToReference(row.amount, from: row.code) {
+                                        Text("≈ \(euroD(c))").font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
+                                .font(.callout)
+                            }
+                            Divider()
+                            HStack {
+                                Text("Total converti").bold()
+                                Spacer()
+                                Text(euroD(paidThisYear)).bold().monospacedDigit()
+                            }
+                            if !missingRateCurrencies.isEmpty {
+                                Text("⚠︎ Taux manquant pour \(missingRateCurrencies.joined(separator: ", ")) — comptées à valeur faciale dans le total. Renseigne les taux dans Réglages.")
+                                    .font(.caption).foregroundStyle(.orange)
+                            } else {
+                                Text("Total converti vers \(Money.defaultCode) selon les taux configurés dans Réglages.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 }
 
                 if !flowByMonth.isEmpty {
@@ -194,7 +253,7 @@ struct AnalyticsView: View {
     }
 
     private func euroD(_ value: Double) -> String {
-        value.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))
+        value.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))
     }
 
     private func categoryLabel(_ raw: String) -> String {

@@ -283,6 +283,7 @@ struct ClientEditSheet: View {
     @State private var f: [String: String] = [:]
     @State private var isVip = false
     @State private var portalAccess = false
+    @State private var currency = "EUR"
     @State private var customFields: [ClientCustomField] = []
 
     /// Scalar (text/varchar) columns edited through the shared string dictionary.
@@ -356,6 +357,9 @@ struct ClientEditSheet: View {
                 }
                 Section("Commercial") {
                     TextField("Acompte par défaut (%)", text: b("default_deposit_percent"))
+                    Picker("Devise de facturation", selection: $currency) {
+                        ForEach(Money.supported, id: \.code) { c in Text(c.label).tag(c.code) }
+                    }
                     Toggle("Accès portail client", isOn: $portalAccess)
                 }
                 Section("Champs personnalisés") {
@@ -386,11 +390,12 @@ struct ClientEditSheet: View {
         if let p = client.defaultDepositPercent { f["default_deposit_percent"] = String(Int(p)) }
         isVip = client.isVip
         portalAccess = client.portalAccess
+        currency = client.currency
         customFields = client.customFields.map { ClientCustomField(label: $0.label, value: $0.value) }
     }
 
     private func save() {
-        var c: [String: Any] = ["is_vip": isVip, "portal_access": portalAccess]
+        var c: [String: Any] = ["is_vip": isVip, "portal_access": portalAccess, "currency": currency]
         for k in textKeys where k != "default_deposit_percent" {
             let v = (f[k] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             if k == "name" { c[k] = v } else { c[k] = v.isEmpty ? NSNull() : v }
@@ -485,17 +490,19 @@ struct ClientCreateSheet: View {
     @State private var spotifyUrl = ""
     @State private var isCompany = false
     @State private var isVip = false
+    @State private var currency = Money.defaultCode
 
     var body: some View {
         StudioFormSheet(
             title: "Nouveau client", confirmLabel: "Créer",
             confirmDisabled: name.trimmingCharacters(in: .whitespaces).isEmpty,
-            height: 560,
+            height: 600,
             onConfirm: {
                 var payload: [String: Any] = [
                     "name": name,
                     "type": isCompany ? "company" : "individual",
                     "is_vip": isVip,
+                    "currency": currency,
                 ]
                 if !artistName.isEmpty { payload["artist_name"] = artistName }
                 if !email.isEmpty { payload["email"] = email }
@@ -526,6 +533,13 @@ struct ClientCreateSheet: View {
                 TextField("Téléphone", text: $phone)
                 TextField("Ville", text: $city)
                 TextField("Pays", text: $country)
+            }
+            Section("Facturation") {
+                Picker("Devise", selection: $currency) {
+                    ForEach(Money.supported, id: \.code) { c in Text(c.label).tag(c.code) }
+                }
+                Text("Les factures de ce client seront émises dans cette devise.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Section("Profil artiste") {
                 TextField("Genres (séparés par des virgules)", text: $genres)

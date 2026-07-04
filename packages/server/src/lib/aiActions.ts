@@ -1014,6 +1014,14 @@ export class AIActionExecutor {
       finalTotal = finalSubtotal + finalTaxAmount;
     }
 
+    // Inherit the client's currency (multi-currency invoicing)
+    const [clientRow] = await this.db
+      .select({ currency: clients.currency })
+      .from(clients)
+      .where(eq(clients.id, client_id))
+      .limit(1);
+    const invoiceCurrency = (clientRow?.currency || "EUR").toUpperCase();
+
     // Create invoice
     const [invoice] = await this.db
       .insert(invoices)
@@ -1027,6 +1035,7 @@ export class AIActionExecutor {
         taxRate: finalTaxRate.toFixed(2),
         taxAmount: finalTaxAmount.toFixed(2),
         total: finalTotal.toFixed(2),
+        currency: invoiceCurrency,
         notes,
       })
       .returning();

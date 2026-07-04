@@ -77,6 +77,13 @@ struct InvoiceCreateSheet: View {
     private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
     private var subtotal: Double { lines.reduce(0) { $0 + $1.quantity * $1.unitPrice } }
 
+    /// Currency inherited from the selected client (multi-currency invoicing).
+    private var invoiceCurrency: String {
+        guard let cid = clientServerId,
+              let c = clients.first(where: { $0.serverId == cid }) else { return Money.defaultCode }
+        return c.currency
+    }
+
     /// Active prepaid package (with remaining hours) for the selected client.
     private var activePackage: ClientPackage? {
         guard let cid = clientServerId else { return nil }
@@ -135,9 +142,10 @@ struct InvoiceCreateSheet: View {
                     }
                 }
                 Section {
-                    LabeledContent("Sous-total", value: subtotal.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR"))))
-                    LabeledContent("Total TTC (TVA 20 %)", value: (subtotal * 1.2).formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR"))))
-                    Text("Le numéro de facture est attribué par le serveur — création en ligne uniquement.")
+                    LabeledContent("Devise", value: invoiceCurrency)
+                    LabeledContent("Sous-total", value: Money.format(subtotal, code: invoiceCurrency))
+                    LabeledContent("Total TTC (TVA 20 %)", value: Money.format(subtotal * 1.2, code: invoiceCurrency))
+                    Text("Devise héritée du client. Le numéro de facture est attribué par le serveur — création en ligne uniquement.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let errorMessage {
@@ -174,7 +182,8 @@ struct InvoiceCreateSheet: View {
         do {
             let api = APIClient(config: model.config)
             _ = try await api.createInvoice(clientServerId: clientId, items: items, projectServerId: projectServerId,
-                                            packageHours: packageHours > 0 ? packageHours : nil)
+                                            packageHours: packageHours > 0 ? packageHours : nil,
+                                            currency: invoiceCurrency)
             await model.syncNow() // pulls the new invoice + items
             dismiss()
         } catch {
@@ -199,7 +208,7 @@ struct InvoiceRow: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
-                Text(euro(invoice.total)).fontWeight(.medium)
+                Text(euro(invoice.total, invoice.currency)).fontWeight(.medium)
                 InvoiceStatusBadge(status: invoice.status)
             }
         }
@@ -270,9 +279,9 @@ struct InvoiceDetailView: View {
                             HStack {
                                 Text(item.description)
                                 Spacer()
-                                Text("\(item.quantity) × \(euro(item.unitPrice))")
+                                Text("\(item.quantity) × \(euro(item.unitPrice, invoice.currency))")
                                     .font(.caption).foregroundStyle(.secondary)
-                                Text(euro(item.amount)).monospacedDigit()
+                                Text(euro(item.amount, invoice.currency)).monospacedDigit()
                             }
                             .padding(.vertical, 3)
                             if item.id != items.last?.id { Divider() }
@@ -282,10 +291,10 @@ struct InvoiceDetailView: View {
 
                 GroupBox {
                     VStack(spacing: 6) {
-                        HStack { Text("Sous-total"); Spacer(); Text(euro(invoice.subtotal)).monospacedDigit() }
-                        HStack { Text("TVA"); Spacer(); Text(euro(invoice.taxAmount)).monospacedDigit() }
+                        HStack { Text("Sous-total"); Spacer(); Text(euro(invoice.subtotal, invoice.currency)).monospacedDigit() }
+                        HStack { Text("TVA"); Spacer(); Text(euro(invoice.taxAmount, invoice.currency)).monospacedDigit() }
                         Divider()
-                        HStack { Text("Total").bold(); Spacer(); Text(euro(invoice.total)).bold().monospacedDigit() }
+                        HStack { Text("Total").bold(); Spacer(); Text(euro(invoice.total, invoice.currency)).bold().monospacedDigit() }
                     }
                 }
 
@@ -312,11 +321,11 @@ struct InvoiceDetailView: View {
     }
 }
 
-func euro(_ amount: String) -> String {
+func euro(_ amount: String, _ code: String? = nil) -> String {
     if let value = Double(amount) {
-        return value.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")))
+        return Money.format(value, code: code)
     }
-    return amount + " €"
+    return amount + " " + (code ?? Money.defaultCode)
 }
 
 // MARK: - PDF rendering (Core Graphics, A4)
@@ -372,8 +381,8 @@ enum InvoicePDF {
         for item in items {
             y -= 20
             draw(String(item.description.prefix(60)), x: 50, y: y)
-            draw("\(item.quantity) × \(euro(item.unitPrice))", x: 0, y: y, size: 10, gray: true, rightAlignedTo: 460)
-            draw(euro(item.amount), x: 0, y: y, rightAlignedTo: 545)
+            draw("\(item.quantity) × \(euro(item.unitPrice, invoice.currency))", x: 0, y: y, size: 10, gray: true, rightAlignedTo: 460)
+            draw(euro(item.amount, invoice.currency), x: 0, y: y, rightAlignedTo: 545)
         }
 
         // Totals
@@ -381,13 +390,13 @@ enum InvoicePDF {
         context.move(to: CGPoint(x: 50, y: y)); context.addLine(to: CGPoint(x: 545, y: y)); context.strokePath()
         y -= 22
         draw("Sous-total", x: 0, y: y, gray: true, rightAlignedTo: 460)
-        draw(euro(invoice.subtotal), x: 0, y: y, rightAlignedTo: 545)
+        draw(euro(invoice.subtotal, invoice.currency), x: 0, y: y, rightAlignedTo: 545)
         y -= 18
         draw("TVA", x: 0, y: y, gray: true, rightAlignedTo: 460)
-        draw(euro(invoice.taxAmount), x: 0, y: y, rightAlignedTo: 545)
+        draw(euro(invoice.taxAmount, invoice.currency), x: 0, y: y, rightAlignedTo: 545)
         y -= 20
         draw("Total", x: 0, y: y, size: 13, bold: true, rightAlignedTo: 460)
-        draw(euro(invoice.total), x: 0, y: y, size: 13, bold: true, rightAlignedTo: 545)
+        draw(euro(invoice.total, invoice.currency), x: 0, y: y, size: 13, bold: true, rightAlignedTo: 545)
 
         draw("Généré par RSM Studio", x: 50, y: 40, size: 8, gray: true)
 

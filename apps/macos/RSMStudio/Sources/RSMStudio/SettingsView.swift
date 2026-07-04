@@ -17,6 +17,15 @@ struct SettingsView: View {
     @State private var newTaskRate = ""
     @State private var newTaskCategory = "billable"
     @State private var currencyCode = Money.defaultCode
+    @State private var fxRates: [String: String] = Money.rates.mapValues { String($0) }
+
+    private func saveRate(_ code: String, _ text: String) {
+        var r = Money.rates
+        let cleaned = text.replacingOccurrences(of: ",", with: ".")
+        if let v = Double(cleaned), v > 0 { r[code] = v } else { r[code] = nil }
+        Money.rates = r
+        model.dataVersion += 1
+    }
 
     private var vatRows: [[String: Any]] {
         _ = model.dataVersion
@@ -90,7 +99,25 @@ struct SettingsView: View {
                     }
                 }
                 .onChange(of: currencyCode) { Money.defaultCode = currencyCode; model.dataVersion += 1 }
-                Text("Utilisée pour l'affichage des montants dans toute l'application.")
+                Text("Devise de référence : affichage des montants et base des conversions.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Section("Taux de change (vers \(currencyCode))") {
+                ForEach(Money.supported.filter { $0.code != currencyCode }, id: \.code) { c in
+                    HStack {
+                        Text(c.label)
+                        Spacer()
+                        Text("1 \(c.code) =").font(.caption).foregroundStyle(.secondary)
+                        TextField("taux", text: Binding(
+                            get: { fxRates[c.code] ?? "" },
+                            set: { fxRates[c.code] = $0; saveRate(c.code, $0) }
+                        ))
+                        .frame(width: 70).multilineTextAlignment(.trailing)
+                        Text(currencyCode).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Text("Utilisés pour le total converti des rapports. Laisse vide une devise sans taux : elle restera comptée séparément.")
                     .font(.caption).foregroundStyle(.secondary)
             }
 

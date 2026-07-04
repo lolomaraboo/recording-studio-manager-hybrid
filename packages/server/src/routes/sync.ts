@@ -517,6 +517,17 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
       return res.status(400).json({ error: 'clientId and items are required' });
     }
 
+    // Invoice currency: explicit override, else inherit the client's currency.
+    let currency = typeof req.body?.currency === 'string'
+      ? req.body.currency.trim().toUpperCase().slice(0, 3)
+      : '';
+    if (!currency) {
+      const cRows = (await db.execute(sql`
+        SELECT currency FROM clients WHERE id = ${clientId} LIMIT 1
+      `)) as unknown as Array<{ currency: string | null }>;
+      currency = (cRows[0]?.currency || 'EUR').toUpperCase();
+    }
+
     const cleanItems = items
       .map((item) => ({
         description: String(item.description ?? '').slice(0, 500),
@@ -578,9 +589,9 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
     const invoiceNumber = `${prefix}${String(lastSeq + 1).padStart(4, '0')}`;
 
     const inserted = (await db.execute(sql`
-      INSERT INTO invoices (invoice_number, client_id, project_id, due_date, status, subtotal, tax_rate, tax_amount, total)
+      INSERT INTO invoices (invoice_number, client_id, project_id, due_date, status, subtotal, tax_rate, tax_amount, total, currency)
       VALUES (${invoiceNumber}, ${clientId}, ${projectId}, NOW() + INTERVAL '30 days', 'draft',
-              ${subtotal.toFixed(2)}, ${taxRate.toFixed(2)}, ${taxAmount.toFixed(2)}, ${total.toFixed(2)})
+              ${subtotal.toFixed(2)}, ${taxRate.toFixed(2)}, ${taxAmount.toFixed(2)}, ${total.toFixed(2)}, ${currency})
       RETURNING id, invoice_number
     `)) as unknown as Array<{ id: number; invoice_number: string }>;
     const invoiceId = inserted[0]!.id;
@@ -608,6 +619,7 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
     res.json({
       invoiceId,
       invoiceNumber,
+      currency,
       packageDeduction: packageDeduction
         ? { hoursUsed: packageDeduction.hoursUsed, remaining: packageDeduction.total - packageDeduction.newUsed }
         : null,
