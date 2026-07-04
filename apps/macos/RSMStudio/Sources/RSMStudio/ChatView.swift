@@ -63,6 +63,28 @@ struct ChatView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Compact side-panel header (the panel has no toolbar of its own).
+            if compact {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles").foregroundStyle(.tint)
+                    Text("Assistant").font(.headline)
+                    Spacer()
+                    Button { chat.reset() } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+                    .disabled(chat.thread.isEmpty)
+                    .help("Nouvelle conversation")
+                    Button { model.chatPanelOpen = false } label: {
+                        Image(systemName: "xmark")
+                    }
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+                    .help("Fermer le panneau")
+                }
+                .padding(.horizontal, 10).padding(.vertical, 8)
+                Divider()
+            }
+
             if chat.thread.isEmpty {
                 emptyState
             } else {
@@ -154,6 +176,9 @@ struct ChatView: View {
             }
             .padding(compact ? 8 : 10)
         }
+        // Opaque background so the main content doesn't bleed through the
+        // side panel (the panel is attached via safeAreaInset).
+        .background(compact ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor)) : AnyShapeStyle(.clear))
         .onChange(of: dictaphone.transcript) {
             if dictaphone.isRecording { input = dictaphone.transcript }
         }
@@ -178,11 +203,18 @@ struct ChatView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: compact ? 8 : 14) {
-            Spacer()
-            Image(systemName: "sparkles")
-                .font(.system(size: compact ? 26 : 40)).foregroundStyle(.tint)
-            if !compact {
+        VStack(spacing: compact ? 10 : 14) {
+            // Full-page centers vertically; the compact side panel top-aligns so
+            // the suggestions sit just under the header instead of floating in a
+            // large blank area.
+            if !compact { Spacer() }
+            if compact {
+                Text("Quelques idées pour démarrer")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 40)).foregroundStyle(.tint)
                 Text("Assistant du studio").font(.title3).bold()
                 Text("Il connaît tes clients, sessions, projets et factures,\net peut agir pour toi.")
                     .multilineTextAlignment(.center)
@@ -193,9 +225,11 @@ struct ChatView: View {
                 SuggestionButton(text: "Résume l'activité du studio") { ask($0) }
                 SuggestionButton(text: "Quelles factures sont impayées ?") { ask($0) }
             }
+            .frame(maxWidth: .infinity, alignment: compact ? .leading : .center)
             Spacer()
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: compact ? .top : .center)
+        .padding(compact ? 12 : 0)
     }
 
     private func ask(_ text: String) {
