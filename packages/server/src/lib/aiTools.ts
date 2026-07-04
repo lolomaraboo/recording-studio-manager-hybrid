@@ -261,6 +261,10 @@ export const AI_TOOLS: ToolDefinition[] = [
           type: "boolean",
           description: "Nouveau statut VIP (optionnel)",
         },
+        portal_access: {
+          type: "boolean",
+          description: "Activer/désactiver l'accès du client au portail client en ligne (optionnel)",
+        },
       },
       required: [],
     },

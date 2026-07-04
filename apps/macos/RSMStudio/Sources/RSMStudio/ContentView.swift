@@ -29,6 +29,9 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case leads = "Prospects"
     case tasks = "Tâches"
     case documents = "Documents"
+    case payments = "Paiements"
+    case clientPortal = "Portail"
+    case bookingRequests = "Réservations"
     case system = "Agenda Mac"
     case settings = "Réglages"
 
@@ -61,6 +64,9 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .leads: return "person.crop.circle.badge.questionmark"
         case .tasks: return "checklist"
         case .documents: return "folder"
+        case .payments: return "creditcard.circle"
+        case .clientPortal: return "person.badge.key"
+        case .bookingRequests: return "calendar.badge.plus"
         case .system: return "calendar.badge.clock"
         case .settings: return "gearshape"
         }
@@ -83,6 +89,7 @@ struct ContentView: View {
         ("Ventes", [.quotes, .invoices, .packages, .creditNotes, .coupons, .analytics, .services, .contracts, .expenses]),
         ("Ressources", [.equipment, .talents, .rooms, .time, .team, .availability, .consumables]),
         ("Pilotage", [.leads, .tasks, .documents, .deliverables]),
+        ("En ligne", [.payments, .clientPortal, .bookingRequests]),
         ("Mon Mac", [.system]),
         (nil, [.settings]),
     ]
@@ -165,6 +172,9 @@ struct ContentView: View {
                     case .leads: LeadsView()
                     case .tasks: TasksView()
                     case .documents: DocumentsView()
+                    case .payments: PaymentsView()
+                    case .clientPortal: ClientPortalView()
+                    case .bookingRequests: BookingRequestsView()
                     case .system: SystemView()
                     case .settings: SettingsView()
                     }

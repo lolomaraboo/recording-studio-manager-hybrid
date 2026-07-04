@@ -750,6 +750,7 @@ export class AIActionExecutor {
     email?: string;
     phone?: string;
     is_vip?: boolean;
+    portal_access?: boolean;
   }) {
     const { client_id, client_name, ...updates } = params;
 
@@ -781,6 +782,7 @@ export class AIActionExecutor {
     if (updates.email) updateData.email = updates.email;
     if (updates.phone) updateData.phone = updates.phone;
     if (updates.is_vip !== undefined) updateData.isVip = updates.is_vip;
+    if (updates.portal_access !== undefined) updateData.portalAccess = updates.portal_access;
 
     const result = await this.db
       .update(clients)
