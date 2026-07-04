@@ -662,6 +662,33 @@ export const invoicesRouter = router({
     }),
 
   /**
+   * Generate invoice PDF on the fly and return it as base64.
+   * No S3/email required — works directly for download from web or macOS.
+   */
+  generatePDF: protectedProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+
+      const invoice = await tenantDb.query.invoices.findFirst({
+        where: eq(invoices.id, input.invoiceId),
+        with: { client: true, items: true },
+      });
+
+      if (!invoice) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Invoice not found' });
+      }
+
+      const pdfBuffer = await generateInvoicePDF(invoice as any);
+
+      return {
+        base64: pdfBuffer.toString('base64'),
+        filename: `facture-${invoice.invoiceNumber}.pdf`,
+        mimeType: 'application/pdf',
+      };
+    }),
+
+  /**
    * Send invoice email manually
    * Generates PDF, uploads to S3, and sends email with attachment
    */

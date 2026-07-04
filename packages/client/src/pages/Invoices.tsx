@@ -77,9 +77,26 @@ export function Invoices() {
     };
   }, [invoices]);
 
-  const handleDownloadPDF = (_invoiceId: number, invoiceNumber: string) => {
-    // TODO: Implement PDF generation when backend supports it
-    toast.info(`Génération PDF facture ${invoiceNumber} - À implémenter`);
+  const utils = trpc.useUtils();
+
+  const handleDownloadPDF = async (invoiceId: number, invoiceNumber: string) => {
+    try {
+      toast.loading(`Génération du PDF ${invoiceNumber}…`, { id: `pdf-${invoiceId}` });
+      const { base64, filename, mimeType } = await utils.invoices.generatePDF.fetch({ invoiceId });
+      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`PDF ${invoiceNumber} téléchargé`, { id: `pdf-${invoiceId}` });
+    } catch (err: any) {
+      toast.error(`Échec du PDF : ${err?.message ?? "erreur inconnue"}`, { id: `pdf-${invoiceId}` });
+    }
   };
 
   const getStatusBadge = (status: string) => {
