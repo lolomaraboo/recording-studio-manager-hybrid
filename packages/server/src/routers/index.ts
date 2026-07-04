@@ -28,6 +28,11 @@ import { serviceCatalogRouter } from './serviceCatalog.js';
 import { timeTrackingRouter } from './time-tracking.js';
 import { preferencesRouter } from './preferences.js';
 import { vatRatesRouter } from './vatRates.js';
+import { creditNotesRouter } from './creditNotes.js';
+import { couponsRouter } from './coupons.js';
+import { consumablesRouter } from './consumables.js';
+import { deliverablesRouter } from './deliverables.js';
+import { clientPackagesRouter } from './clientPackages.js';
 
 /**
  * Main App Router
@@ -92,6 +97,11 @@ export const appRouter = router({
   timeTracking: timeTrackingRouter,
   preferences: preferencesRouter,
   vatRates: vatRatesRouter,
+  creditNotes: creditNotesRouter,
+  coupons: couponsRouter,
+  consumables: consumablesRouter,
+  deliverables: deliverablesRouter,
+  clientPackages: clientPackagesRouter,
 });
 
 /**

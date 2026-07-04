@@ -198,7 +198,7 @@ struct MenuBarContent: View {
             let billable = todayEntries.filter(\.billable).reduce(0.0) { $0 + $1.amount }
             let unbilled = todayEntries.filter { $0.billable && $0.invoiceId == nil && $0.endTime != nil }.count
             Divider()
-            Text("Aujourd'hui : \(durationLabel(total)) · \(billable.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))) facturable")
+            Text("Aujourd'hui : \(durationLabel(total)) · \(billable.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))) facturable")
             if unbilled > 0 {
                 Text("\(unbilled) entrée\(unbilled > 1 ? "s" : "") pas encore facturée\(unbilled > 1 ? "s" : "")")
             }

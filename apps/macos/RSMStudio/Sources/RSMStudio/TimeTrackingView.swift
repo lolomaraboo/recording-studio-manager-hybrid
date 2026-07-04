@@ -70,7 +70,7 @@ struct TimeTrackingView: View {
                 .disabled(isInvoicing || unbilledEntries.isEmpty)
                 .help(unbilledEntries.isEmpty
                       ? "Rien à facturer sur ce projet"
-                      : "Facturer \(unbilledEntries.count) entrée\(unbilledEntries.count > 1 ? "s" : "") (\(unbilledAmount.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))) HT)")
+                      : "Facturer \(unbilledEntries.count) entrée\(unbilledEntries.count > 1 ? "s" : "") (\(unbilledAmount.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))) HT)")
             }
         }
         .onReceive(ticker) { now = $0 }
@@ -355,7 +355,7 @@ struct TimeTrackingView: View {
                         Spacer()
                         Text(durationLabel(group.total)).monospacedDigit()
                         if group.billable > 0 {
-                            Text("· \(group.billable.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0))))")
+                            Text("· \(group.billable.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0))))")
                                 .foregroundStyle(.green)
                         }
                     }
@@ -410,7 +410,7 @@ struct TimeEntryRow: View {
                   : entry.billable ? "Facturable — clique pour exclure de la facturation"
                                    : "Non facturable — clique pour le rendre facturable")
             if entry.billable && entry.amount > 0 {
-                Text(entry.amount.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0))))
+                Text(entry.amount.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0))))
                     .font(.caption).foregroundStyle(.green)
             }
             Text(durationLabel(entry.durationMinutes ?? 0))
@@ -481,7 +481,7 @@ struct TimeEntryEditSheet: View {
                 if billable {
                     LabeledContent("Montant") {
                         Text((Double(durationMinutes) / 60.0 * hourlyRate)
-                            .formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(2))))
+                            .formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(2))))
                             .foregroundStyle(.green)
                     }
                 }

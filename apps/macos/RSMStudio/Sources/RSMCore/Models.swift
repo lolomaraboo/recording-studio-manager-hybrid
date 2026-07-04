@@ -398,6 +398,21 @@ public struct Contract: RowBacked {
     public var clientId: Int? { int("client_id") }
     public var projectId: Int? { int("project_id") }
     public var value: String? { string("value") }
+    public var description: String? { string("description") }
+    public var terms: String? { string("terms") }
+    public var notes: String? { string("notes") }
+}
+
+/// VAT rate from the `vat_rates` catalog (name + percentage rate).
+public struct VatRate: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+
+    public var name: String { string("name") ?? "TVA" }
+    /// Percentage value (e.g. 20 for 20 %). Stored as a decimal string on the server.
+    public var rate: Double { double("rate") ?? 0 }
+    public var isDefault: Bool { bool("is_default") }
+    public var isActive: Bool { raw["is_active"] == nil ? true : bool("is_active") }
 }
 
 public struct ServiceItem: RowBacked {
@@ -829,6 +844,22 @@ public extension LocalStore {
     func services() -> [ServiceItem] {
         ((try? rows(table: "service_catalog")) ?? []).map(ServiceItem.init(raw:))
             .sorted { $0.displayOrder < $1.displayOrder }
+    }
+
+    /// Active VAT rates from the catalog, sorted by rate. Used to pick a
+    /// per-line tax rate on invoices/quotes (parity with the web app).
+    func vatRates() -> [VatRate] {
+        ((try? rows(table: "vat_rates")) ?? []).map(VatRate.init(raw:))
+            .filter { $0.isActive }
+            .sorted { $0.rate < $1.rate }
+    }
+
+    /// The default VAT rate (percentage), falling back to the lowest active
+    /// rate, then to 20 % when the catalog is empty.
+    func defaultVatRate() -> Double {
+        let rates = vatRates()
+        if let def = rates.first(where: { $0.isDefault }) { return def.rate }
+        return rates.first?.rate ?? 20
     }
 
     func expenses() -> [Expense] {

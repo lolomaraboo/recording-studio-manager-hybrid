@@ -177,6 +177,7 @@ struct ServiceCreateSheet: View {
 
 struct ContractsView: View {
     @Environment(AppModel.self) private var model
+    @State private var showingCreate = false
 
     private var contracts: [Contract] {
         _ = model.dataVersion
@@ -187,7 +188,7 @@ struct ContractsView: View {
         Group {
             if contracts.isEmpty {
                 StudioEmptyState(title: "Aucun contrat", systemImage: "signature",
-                                 message: "Les contrats créés côté web apparaîtront ici.")
+                                 message: "Crée un contrat client ou retrouve ici ceux créés côté web.")
             } else {
                 List(contracts) { contract in
                     HStack {
@@ -210,6 +211,11 @@ struct ContractsView: View {
                     }
                     .padding(.vertical, 2)
                     .contextMenu {
+                        Section("Statut") {
+                            ForEach(ContractStatus.transitions(from: contract.status), id: \.self) { next in
+                                Button(ContractStatus.label(next)) { setStatus(contract, to: next) }
+                            }
+                        }
                         if let client = contract.clientId.flatMap({ model.store.clientsByServerId()[$0] }) {
                             Button("Voir le client : \(client.name)") {
                                 model.open(.clients, entity: client.id)
@@ -225,6 +231,184 @@ struct ContractsView: View {
             }
         }
         .navigationTitle("Contrats")
+        .toolbar {
+            ToolbarItem {
+                Button { showingCreate = true } label: { Label("Nouveau contrat", systemImage: "plus") }
+            }
+        }
+        .modalCard(isPresented: $showingCreate) { ContractCreateSheet() }
+    }
+
+    /// Status changes go through the offline-first sync pattern (contracts is a
+    /// synced table). `signed_at` is stamped when the contract is signed.
+    private func setStatus(_ contract: Contract, to status: String) {
+        var changes: [String: Any] = ["status": status]
+        if status == "signed" {
+            changes["signed_at"] = ISO8601DateFormatter().string(from: Date())
+        }
+        try? model.store.localUpdate(table: "contracts", uuid: contract.id, changes: changes)
+        Task { await model.syncNow() }
+    }
+}
+
+/// Contract type & status vocabulary (mirrors the server schema).
+enum ContractStatus {
+    static let all = ["draft", "sent", "pending_signature", "signed", "active", "expired", "terminated", "cancelled"]
+
+    static func label(_ status: String) -> String {
+        switch status {
+        case "sent": return "Envoyé"
+        case "pending_signature": return "En attente de signature"
+        case "signed": return "Signé"
+        case "active": return "Actif"
+        case "expired": return "Expiré"
+        case "terminated": return "Résilié"
+        case "cancelled": return "Annulé"
+        default: return "Brouillon"
+        }
+    }
+
+    /// Allowed next statuses from the current one (a simple forward FSM plus
+    /// cancel). Kept permissive so the studio can correct mistakes.
+    static func transitions(from status: String) -> [String] {
+        switch status {
+        case "draft": return ["sent", "cancelled"]
+        case "sent": return ["pending_signature", "signed", "cancelled"]
+        case "pending_signature": return ["signed", "cancelled"]
+        case "signed": return ["active", "terminated"]
+        case "active": return ["terminated", "expired"]
+        default: return []
+        }
+    }
+}
+
+enum ContractType {
+    static let all = ["recording", "mixing", "mastering", "production", "exclusivity",
+                      "distribution", "studio_rental", "services", "partnership", "other"]
+
+    static func label(_ type: String) -> String {
+        switch type {
+        case "recording": return "Enregistrement"
+        case "mixing": return "Mixage"
+        case "mastering": return "Mastering"
+        case "production": return "Production"
+        case "exclusivity": return "Exclusivité"
+        case "distribution": return "Distribution"
+        case "studio_rental": return "Location studio"
+        case "services": return "Prestations"
+        case "partnership": return "Partenariat"
+        default: return "Autre"
+        }
+    }
+}
+
+/// Contract creation — online-only (the server allocates CTR-YYYY-NNNN, the
+/// contract_number is unique). Follows the StudioFormSheet visual pattern but
+/// uses its own confirm flow because creation is async and can fail.
+struct ContractCreateSheet: View {
+    @Environment(\.modalDismiss) private var dismiss
+    @Environment(AppModel.self) private var model
+
+    @State private var clientServerId: Int?
+    @State private var projectServerId: Int?
+    @State private var type = "recording"
+    @State private var status = "draft"
+    @State private var title = ""
+    @State private var terms = ""
+    @State private var hasValue = false
+    @State private var value = 0.0
+    @State private var isCreating = false
+    @State private var errorMessage: String?
+
+    private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
+    private var projectsForClient: [Project] {
+        if let cid = clientServerId { return model.store.projects(clientServerId: cid) }
+        return model.store.projects().filter { $0.serverId != nil }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Nouveau contrat").font(.title3).bold().padding()
+            Form {
+                Picker("Client", selection: $clientServerId) {
+                    Text("Choisir…").tag(nil as Int?)
+                    ForEach(clients) { client in
+                        Text(client.displayName).tag(client.serverId)
+                    }
+                }
+                Picker("Projet (optionnel)", selection: $projectServerId) {
+                    Text("Aucun").tag(nil as Int?)
+                    ForEach(projectsForClient) { project in
+                        Text(project.name).tag(project.serverId)
+                    }
+                }
+                Picker("Type", selection: $type) {
+                    ForEach(ContractType.all, id: \.self) { t in
+                        Text(ContractType.label(t)).tag(t)
+                    }
+                }
+                Picker("Statut", selection: $status) {
+                    ForEach(["draft", "sent", "signed", "active"], id: \.self) { s in
+                        Text(ContractStatus.label(s)).tag(s)
+                    }
+                }
+                TextField("Titre", text: $title, prompt: Text("Contrat d'enregistrement — …"))
+                Section("Termes") {
+                    TextEditor(text: $terms)
+                        .frame(minHeight: 100)
+                        .font(.body)
+                }
+                Section {
+                    Toggle("Valeur du contrat", isOn: $hasValue)
+                    if hasValue {
+                        TextField("Montant €", value: $value, format: .number)
+                    }
+                }
+                if let errorMessage {
+                    Text(errorMessage).font(.caption).foregroundStyle(.red)
+                }
+            }
+            .formStyle(.grouped)
+
+            HStack {
+                Spacer()
+                Button("Annuler") { dismiss() }.keyboardShortcut(.escape)
+                Button {
+                    Task { await create() }
+                } label: {
+                    if isCreating { ProgressView().controlSize(.small) } else { Text("Créer le contrat") }
+                }
+                .keyboardShortcut(.return)
+                .buttonStyle(.borderedProminent)
+                .disabled(clientServerId == nil || title.trimmingCharacters(in: .whitespaces).isEmpty || isCreating)
+            }
+            .padding()
+        }
+        .frame(width: 540, height: 560)
+    }
+
+    private func create() async {
+        guard let clientId = clientServerId else { return }
+        isCreating = true
+        errorMessage = nil
+        defer { isCreating = false }
+        do {
+            let api = APIClient(config: model.config)
+            _ = try await api.createContract(
+                clientServerId: clientId,
+                type: type,
+                title: title.trimmingCharacters(in: .whitespaces),
+                terms: terms,
+                status: status,
+                projectServerId: projectServerId,
+                description: nil,
+                value: hasValue && value > 0 ? value : nil
+            )
+            await model.syncNow() // pulls the new contract
+            dismiss()
+        } catch {
+            errorMessage = "Création impossible (hors ligne ?) : \(error.localizedDescription)"
+        }
     }
 }
 
@@ -234,8 +418,11 @@ struct ContractStatusBadge: View {
     var body: some View {
         let (label, color): (String, Color) = switch status {
         case "sent": ("Envoyé", .blue)
+        case "pending_signature": ("Attente signature", .indigo)
         case "signed": ("Signé", .green)
+        case "active": ("Actif", .teal)
         case "expired": ("Expiré", .secondary)
+        case "terminated": ("Résilié", .secondary)
         case "cancelled": ("Annulé", .secondary)
         default: ("Brouillon", .orange)
         }
@@ -268,7 +455,7 @@ struct ExpensesView: View {
                                  message: "Suis les achats et frais du studio.")
             } else {
                 List {
-                    Section("Total : \(total.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR"))))") {
+                    Section("Total : \(total.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR"))))") {
                         ForEach(expenses) { expense in
                             HStack {
                                 Image(systemName: "cart").foregroundStyle(.tint)

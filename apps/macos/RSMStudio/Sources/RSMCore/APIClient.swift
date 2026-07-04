@@ -203,6 +203,22 @@ public struct APIClient: Sendable {
         return n
     }
 
+    /// Online-only contract creation: the SERVER allocates the number
+    /// (CTR-YYYY-NNNN, contract_number is unique).
+    public func createContract(clientServerId: Int, type: String, title: String, terms: String,
+                               status: String = "draft", projectServerId: Int? = nil,
+                               description: String? = nil, value: Double? = nil) async throws -> String {
+        var body: [String: Any] = [
+            "clientId": clientServerId, "type": type, "title": title, "terms": terms, "status": status,
+        ]
+        if let projectServerId { body["projectId"] = projectServerId }
+        if let description, !description.isEmpty { body["description"] = description }
+        if let value, value > 0 { body["value"] = value }
+        let json = try await request(path: "create-contract", body: body)
+        guard let number = json["contractNumber"] as? String else { throw APIError.decoding("missing contractNumber") }
+        return number
+    }
+
     /// Online-only quote creation: the SERVER allocates the quote number.
     public func createQuote(clientServerId: Int, items: [[String: Any]], taxRate: Double = 20, validityDays: Int = 30,
                             currency: String? = nil) async throws -> String {

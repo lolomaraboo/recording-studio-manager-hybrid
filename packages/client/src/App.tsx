@@ -33,6 +33,11 @@ import ContractCreate from './pages/ContractCreate';
 import { Expenses } from './pages/Expenses';
 import ExpenseCreate from './pages/ExpenseCreate';
 import ExpenseDetail from './pages/ExpenseDetail';
+import { CreditNotes } from './pages/CreditNotes';
+import { Coupons } from './pages/Coupons';
+import { Consumables } from './pages/Consumables';
+import { Deliverables } from './pages/Deliverables';
+import { ClientPackages } from './pages/ClientPackages';
 import QuoteDetail from './pages/QuoteDetail';
 import ContractDetail from './pages/ContractDetail';
 import TrackCreate from './pages/TrackCreate';
@@ -170,6 +175,11 @@ function App() {
             <Route path="expenses" element={<Expenses />} />
             <Route path="expenses/new" element={<ExpenseCreate />} />
             <Route path="expenses/:id" element={<ExpenseDetail />} />
+            <Route path="credit-notes" element={<CreditNotes />} />
+            <Route path="coupons" element={<Coupons />} />
+            <Route path="consumables" element={<Consumables />} />
+            <Route path="deliverables" element={<Deliverables />} />
+            <Route path="client-packages" element={<ClientPackages />} />
             <Route path="calendar" element={<Calendar />} />
             <Route path="audio-files" element={<AudioFiles />} />
             <Route path="financial-reports" element={<FinancialReports />} />

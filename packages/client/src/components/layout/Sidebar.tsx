@@ -23,6 +23,10 @@ import {
   MessageCircle,
   DoorOpen,
   Mic,
+  Receipt,
+  Ticket,
+  Boxes,
+  Package2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -143,6 +147,31 @@ const navSections: NavSection[] = [
         title: "Dépenses",
         href: "/expenses",
         icon: <DollarSign className="h-5 w-5" />,
+      },
+      {
+        title: "Avoirs",
+        href: "/credit-notes",
+        icon: <Receipt className="h-5 w-5" />,
+      },
+      {
+        title: "Coupons",
+        href: "/coupons",
+        icon: <Ticket className="h-5 w-5" />,
+      },
+      {
+        title: "Forfaits",
+        href: "/client-packages",
+        icon: <Package className="h-5 w-5" />,
+      },
+      {
+        title: "Consommables",
+        href: "/consumables",
+        icon: <Boxes className="h-5 w-5" />,
+      },
+      {
+        title: "Livrables",
+        href: "/deliverables",
+        icon: <Package2 className="h-5 w-5" />,
       },
       {
         title: "Rapports Financiers",

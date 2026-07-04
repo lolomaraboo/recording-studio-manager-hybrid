@@ -192,13 +192,23 @@ struct QuoteCreateSheet: View {
     @Environment(AppModel.self) private var model
 
     @State private var clientServerId: Int?
-    @State private var lines: [InvoiceCreateSheet.Line] = [.init()]
+    @State private var lines: [InvoiceCreateSheet.Line] = []
     @State private var validityDays = 30
     @State private var isCreating = false
     @State private var errorMessage: String?
 
     private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
+    private var vatRates: [VatRate] { model.store.vatRates() }
+    private var defaultVatRate: Double { model.store.defaultVatRate() }
     private var subtotal: Double { lines.reduce(0) { $0 + $1.quantity * $1.unitPrice } }
+    /// VAT summed per line: round(Σ(amount × rate)) / 100 (rate is a percentage).
+    private var taxAmount: Double {
+        let raw = lines.reduce(0.0) { $0 + $1.quantity * $1.unitPrice * $1.taxRate }
+        return raw.rounded() / 100
+    }
+    private var total: Double { subtotal + taxAmount }
+
+    private func newLine() -> InvoiceCreateSheet.Line { .init(taxRate: defaultVatRate) }
 
     /// Currency inherited from the selected client.
     private var quoteCurrency: String {
@@ -224,6 +234,7 @@ struct QuoteCreateSheet: View {
                             TextField("Description", text: $line.description)
                             TextField("Qté", value: $line.quantity, format: .number).frame(width: 50)
                             TextField("PU €", value: $line.unitPrice, format: .number).frame(width: 70)
+                            LineVatPicker(selection: $line.taxRate, rates: vatRates, fallback: defaultVatRate)
                             Button(role: .destructive) {
                                 lines.removeAll { $0.id == line.id }
                             } label: { Image(systemName: "minus.circle") }
@@ -231,16 +242,19 @@ struct QuoteCreateSheet: View {
                             .disabled(lines.count == 1)
                         }
                     }
-                    Button { lines.append(.init()) } label: { Label("Ajouter une ligne", systemImage: "plus.circle") }
+                    Button { lines.append(newLine()) } label: { Label("Ajouter une ligne", systemImage: "plus.circle") }
                         .buttonStyle(.borderless)
                 }
                 LabeledContent("Devise", value: quoteCurrency)
-                LabeledContent("Total TTC (TVA 20 %)", value: Money.format(subtotal * 1.2, code: quoteCurrency))
+                LabeledContent("Sous-total", value: Money.format(subtotal, code: quoteCurrency))
+                LabeledContent("TVA", value: Money.format(taxAmount, code: quoteCurrency))
+                LabeledContent("Total TTC", value: Money.format(total, code: quoteCurrency))
                 if let errorMessage {
                     Text(errorMessage).font(.caption).foregroundStyle(.red)
                 }
             }
             .formStyle(.grouped)
+            .onAppear { if lines.isEmpty { lines = [newLine()] } }
 
             HStack {
                 Spacer()
@@ -266,7 +280,7 @@ struct QuoteCreateSheet: View {
         defer { isCreating = false }
         let items: [[String: Any]] = lines
             .filter { !$0.description.isEmpty }
-            .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice] }
+            .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice, "taxRate": $0.taxRate] }
         do {
             let api = APIClient(config: model.config)
             _ = try await api.createQuote(clientServerId: clientId, items: items, validityDays: validityDays,

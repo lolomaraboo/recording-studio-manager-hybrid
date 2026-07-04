@@ -65,17 +65,31 @@ struct InvoiceCreateSheet: View {
         var description = ""
         var quantity = 1.0
         var unitPrice = 0.0
+        /// Per-line VAT rate in percent (parity with the web app). Defaults to
+        /// the catalog default when the line is created.
+        var taxRate = 20.0
     }
 
     @State private var clientServerId: Int?
     @State private var projectServerId: Int?
-    @State private var lines: [Line] = [Line()]
+    @State private var lines: [Line] = []
     @State private var isCreating = false
     @State private var errorMessage: String?
     @State private var packageHours = 0.0
 
     private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
+    private var vatRates: [VatRate] { model.store.vatRates() }
+    private var defaultVatRate: Double { model.store.defaultVatRate() }
     private var subtotal: Double { lines.reduce(0) { $0 + $1.quantity * $1.unitPrice } }
+    /// VAT summed per line: Σ(montant_ligne × taux_ligne / 100), rounded to cents.
+    /// Matches the server: round(Σ(amount × rate)) / 100 (rate is a percentage).
+    private var taxAmount: Double {
+        let raw = lines.reduce(0.0) { $0 + $1.quantity * $1.unitPrice * $1.taxRate }
+        return (raw).rounded() / 100
+    }
+    private var total: Double { subtotal + taxAmount }
+
+    private func newLine() -> Line { Line(taxRate: defaultVatRate) }
 
     /// Currency inherited from the selected client (multi-currency invoicing).
     private var invoiceCurrency: String {
@@ -118,6 +132,7 @@ struct InvoiceCreateSheet: View {
                             TextField("Description", text: $line.description)
                             TextField("Qté", value: $line.quantity, format: .number).frame(width: 50)
                             TextField("PU €", value: $line.unitPrice, format: .number).frame(width: 70)
+                            LineVatPicker(selection: $line.taxRate, rates: vatRates, fallback: defaultVatRate)
                             Button(role: .destructive) {
                                 lines.removeAll { $0.id == line.id }
                             } label: { Image(systemName: "minus.circle") }
@@ -125,7 +140,7 @@ struct InvoiceCreateSheet: View {
                             .disabled(lines.count == 1)
                         }
                     }
-                    Button { lines.append(Line()) } label: { Label("Ajouter une ligne", systemImage: "plus.circle") }
+                    Button { lines.append(newLine()) } label: { Label("Ajouter une ligne", systemImage: "plus.circle") }
                         .buttonStyle(.borderless)
                 }
                 if let pkg = activePackage, let remaining = pkg.remaining {
@@ -144,8 +159,9 @@ struct InvoiceCreateSheet: View {
                 Section {
                     LabeledContent("Devise", value: invoiceCurrency)
                     LabeledContent("Sous-total", value: Money.format(subtotal, code: invoiceCurrency))
-                    LabeledContent("Total TTC (TVA 20 %)", value: Money.format(subtotal * 1.2, code: invoiceCurrency))
-                    Text("Devise héritée du client. Le numéro de facture est attribué par le serveur — création en ligne uniquement.")
+                    LabeledContent("TVA", value: Money.format(taxAmount, code: invoiceCurrency))
+                    LabeledContent("Total TTC", value: Money.format(total, code: invoiceCurrency))
+                    Text("TVA calculée par ligne. Devise héritée du client. Le numéro de facture est attribué par le serveur — création en ligne uniquement.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let errorMessage {
@@ -153,6 +169,7 @@ struct InvoiceCreateSheet: View {
                 }
             }
             .formStyle(.grouped)
+            .onAppear { if lines.isEmpty { lines = [newLine()] } }
 
             HStack {
                 Spacer()
@@ -178,7 +195,7 @@ struct InvoiceCreateSheet: View {
         defer { isCreating = false }
         let items: [[String: Any]] = lines
             .filter { !$0.description.isEmpty }
-            .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice] }
+            .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice, "taxRate": $0.taxRate] }
         do {
             let api = APIClient(config: model.config)
             _ = try await api.createInvoice(clientServerId: clientId, items: items, projectServerId: projectServerId,
@@ -189,6 +206,40 @@ struct InvoiceCreateSheet: View {
         } catch {
             errorMessage = "Création impossible (hors ligne ?) : \(error.localizedDescription)"
         }
+    }
+}
+
+/// Compact per-line VAT rate picker used by invoice and quote creation sheets.
+/// Offers every active rate from the catalog; if the currently-selected rate is
+/// not in the catalog (e.g. legacy default) it is still shown so the value round-trips.
+struct LineVatPicker: View {
+    @Binding var selection: Double
+    let rates: [VatRate]
+    let fallback: Double
+
+    private var options: [Double] {
+        var values = rates.map(\.rate)
+        if !values.contains(selection) { values.append(selection) }
+        if values.isEmpty { values = [fallback] }
+        return values.sorted()
+    }
+
+    var body: some View {
+        Picker("TVA", selection: $selection) {
+            ForEach(options, id: \.self) { rate in
+                Text(label(for: rate)).tag(rate)
+            }
+        }
+        .labelsHidden()
+        .frame(width: 80)
+    }
+
+    private func label(for rate: Double) -> String {
+        "\(formatted(rate)) %"
+    }
+
+    private func formatted(_ rate: Double) -> String {
+        rate == rate.rounded() ? String(Int(rate)) : String(format: "%.1f", rate)
     }
 }
 
