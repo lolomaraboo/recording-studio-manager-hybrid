@@ -45,3 +45,24 @@ export function formatCurrency(
   });
   return `${formatted} ${getCurrencySymbol(currency)}`;
 }
+
+/**
+ * Sum a list of records that each carry their own currency, and format the
+ * result per currency (the web has no FX rates, so we don't convert). Returns a
+ * compact string like "600,00 $ · 200,00 €". Empty list → "0,00 €".
+ */
+export function formatCurrencyTotals(
+  items: Array<{ amount: number | string | null | undefined; currency?: string | null }>,
+): string {
+  const sums = new Map<string, number>();
+  for (const it of items) {
+    const code = (it.currency || "EUR").toUpperCase();
+    const num = typeof it.amount === "string" ? parseFloat(it.amount) : it.amount ?? 0;
+    sums.set(code, (sums.get(code) || 0) + (Number.isFinite(num as number) ? (num as number) : 0));
+  }
+  if (sums.size === 0) return formatCurrency(0, "EUR");
+  return Array.from(sums.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([code, val]) => formatCurrency(val, code))
+    .join(" · ");
+}

@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { ClientPopover } from "@/components/ClientPopover";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatCurrencyTotals } from "@/lib/currency";
 
 export function Invoices() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,21 +59,19 @@ export function Invoices() {
 
   // Calculate stats
   const stats = useMemo(() => {
-    if (!invoices) return { total: 0, paid: 0, pending: 0, paidCount: 0, pendingCount: 0 };
+    if (!invoices) return { total: "", paid: "", pending: "", paidCount: 0, pendingCount: 0 };
 
-    const total = invoices.reduce((sum, inv) => sum + parseFloat(inv.total || "0"), 0);
+    const toItems = (list: typeof invoices) =>
+      list.map((inv) => ({ amount: inv.total || "0", currency: (inv as any).currency }));
     const paidInvoices = invoices.filter((inv) => inv.status === "paid");
     const pendingInvoices = invoices.filter(
       (inv) => inv.status === "sent" || inv.status === "overdue"
     );
 
-    const paid = paidInvoices.reduce((sum, inv) => sum + parseFloat(inv.total || "0"), 0);
-    const pending = pendingInvoices.reduce((sum, inv) => sum + parseFloat(inv.total || "0"), 0);
-
     return {
-      total,
-      paid,
-      pending,
+      total: formatCurrencyTotals(toItems(invoices)),
+      paid: formatCurrencyTotals(toItems(paidInvoices)),
+      pending: formatCurrencyTotals(toItems(pendingInvoices)),
       paidCount: paidInvoices.length,
       pendingCount: pendingInvoices.length,
     };
@@ -134,13 +132,7 @@ export function Invoices() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>Total facturé</CardDescription>
-                  <CardTitle className="text-3xl">
-                    {stats.total.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </CardTitle>
+                  <CardTitle className="text-3xl">{stats.total}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground">Toutes périodes</p>
@@ -149,13 +141,7 @@ export function Invoices() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>Payé</CardDescription>
-                  <CardTitle className="text-3xl text-green-600">
-                    {stats.paid.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </CardTitle>
+                  <CardTitle className="text-3xl text-green-600">{stats.paid}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground">
@@ -166,13 +152,7 @@ export function Invoices() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>En attente</CardDescription>
-                  <CardTitle className="text-3xl text-orange-600">
-                    {stats.pending.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </CardTitle>
+                  <CardTitle className="text-3xl text-orange-600">{stats.pending}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground">

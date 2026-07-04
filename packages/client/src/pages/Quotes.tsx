@@ -12,7 +12,7 @@ import { FileText, Plus, Search, ArrowLeft, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ClientPopover } from "@/components/ClientPopover";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatCurrencyTotals } from "@/lib/currency";
 
 export function Quotes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,21 +57,20 @@ export function Quotes() {
     return result;
   }, [quotes, searchQuery, statusFilter, clientMap]);
 
-  // Calculate stats
+  // Calculate stats — per-currency totals (no FX conversion on the web)
   const stats = useMemo(() => {
-    if (!quotes) return { total: 0, pending: 0, accepted: 0, pendingCount: 0, acceptedCount: 0 };
+    const empty = { total: "", pending: "", accepted: "", pendingCount: 0, acceptedCount: 0 };
+    if (!quotes) return empty;
 
-    const total = quotes.reduce((sum, q) => sum + parseFloat(q.total || "0"), 0);
+    const toItems = (list: typeof quotes) =>
+      list.map((q) => ({ amount: q.total || "0", currency: (q as any).currency }));
     const pendingQuotes = quotes.filter((q) => q.status === "draft" || q.status === "sent");
     const acceptedQuotes = quotes.filter((q) => q.status === "accepted");
 
-    const pending = pendingQuotes.reduce((sum, q) => sum + parseFloat(q.total || "0"), 0);
-    const accepted = acceptedQuotes.reduce((sum, q) => sum + parseFloat(q.total || "0"), 0);
-
     return {
-      total,
-      pending,
-      accepted,
+      total: formatCurrencyTotals(toItems(quotes)),
+      pending: formatCurrencyTotals(toItems(pendingQuotes)),
+      accepted: formatCurrencyTotals(toItems(acceptedQuotes)),
       pendingCount: pendingQuotes.length,
       acceptedCount: acceptedQuotes.length,
     };
@@ -126,13 +125,7 @@ export function Quotes() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>Total devis</CardDescription>
-                  <CardTitle className="text-3xl">
-                    {stats.total.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </CardTitle>
+                  <CardTitle className="text-3xl">{stats.total}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground">Toutes périodes</p>
@@ -141,13 +134,7 @@ export function Quotes() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>En attente</CardDescription>
-                  <CardTitle className="text-3xl text-orange-600">
-                    {stats.pending.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </CardTitle>
+                  <CardTitle className="text-3xl text-orange-600">{stats.pending}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground">
@@ -158,13 +145,7 @@ export function Quotes() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>Acceptés</CardDescription>
-                  <CardTitle className="text-3xl text-green-600">
-                    {stats.accepted.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    €
-                  </CardTitle>
+                  <CardTitle className="text-3xl text-green-600">{stats.accepted}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground">
