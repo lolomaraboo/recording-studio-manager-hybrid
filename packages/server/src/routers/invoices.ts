@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import { router, protectedProcedure } from '../_core/trpc';
 import { invoices, timeEntries, clients, invoiceItems, vatRates, clientPackages } from '@rsm/database/tenant';
 import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
-import { getStripeClient, formatStripeAmount } from '../utils/stripe-client';
+import { getStripeClient, formatStripeAmount, getConnectedAccountId } from '../utils/stripe-client';
 import { getInvoicePDFUrl } from '../services/storage/s3-service';
 import { sendInvoiceEmail } from '../services/email/resend-service';
 import { generateInvoicePDF } from '../services/pdf/invoice-pdf-generator';
@@ -525,19 +525,23 @@ export const invoicesRouter = router({
         });
       }
 
-      // Create Stripe Payment Intent
+      // Create Stripe Payment Intent ON the studio's connected account.
       const stripe = getStripeClient();
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: formatStripeAmount(input.depositAmount), // Convert major units to minor
-        currency: (invoice.currency || 'EUR').toLowerCase(),
-        metadata: {
-          type: 'invoice_deposit',
-          invoiceId: invoice.id.toString(),
-          organizationId: ctx.organizationId.toString(),
-          clientId: invoice.clientId.toString(),
+      const connectedAccountId = await getConnectedAccountId(ctx.organizationId);
+      const paymentIntent = await stripe.paymentIntents.create(
+        {
+          amount: formatStripeAmount(input.depositAmount), // Convert major units to minor
+          currency: (invoice.currency || 'EUR').toLowerCase(),
+          metadata: {
+            type: 'invoice_deposit',
+            invoiceId: invoice.id.toString(),
+            organizationId: ctx.organizationId.toString(),
+            clientId: invoice.clientId.toString(),
+          },
+          description: `Acompte facture ${invoice.invoiceNumber} - ${invoice.client.name}`,
         },
-        description: `Acompte facture ${invoice.invoiceNumber} - ${invoice.client.name}`,
-      });
+        { stripeAccount: connectedAccountId }
+      );
 
       // Update invoice with deposit information
       const remainingBalance = parseFloat(invoice.total) - input.depositAmount;
@@ -584,6 +588,7 @@ export const invoicesRouter = router({
       }
 
       const stripe = getStripeClient();
+      const connectedAccountId = await getConnectedAccountId(ctx.organizationId);
       const appUrl = process.env.APP_URL || 'http://localhost:5174';
 
       // Determine payment amount: deposit or full
@@ -607,19 +612,22 @@ export const invoicesRouter = router({
         },
       ];
 
-      // Create Checkout Session
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        line_items: lineItems,
-        metadata: {
-          invoiceId: invoice.id.toString(),
-          organizationId: ctx.organizationId.toString(),
-          isDeposit: isDeposit ? 'true' : 'false',
+      // Create Checkout Session ON the studio's connected account (direct charge).
+      const session = await stripe.checkout.sessions.create(
+        {
+          mode: 'payment',
+          line_items: lineItems,
+          metadata: {
+            invoiceId: invoice.id.toString(),
+            organizationId: ctx.organizationId.toString(),
+            isDeposit: isDeposit ? 'true' : 'false',
+          },
+          invoice_creation: { enabled: true },
+          success_url: `${appUrl}/invoices/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${appUrl}/invoices?canceled=true`,
         },
-        invoice_creation: { enabled: true },
-        success_url: `${appUrl}/invoices/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/invoices?canceled=true`,
-      });
+        { stripeAccount: connectedAccountId }
+      );
 
       return {
         sessionId: session.id,

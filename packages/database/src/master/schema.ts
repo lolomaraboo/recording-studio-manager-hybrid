@@ -70,6 +70,12 @@ export const organizations = pgTable("organizations", {
   stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
   subscriptionStatus: varchar("subscription_status", { length: 50 }).default("trial"), // "trial" | "active" | "past_due" | "canceled" | "suspended"
   currentPeriodEnd: timestamp("current_period_end"),
+  // --- Stripe Connect (this studio's OWN connected account, to collect from ITS clients) ---
+  // Distinct from stripeCustomerId above (which is the studio's subscription to RSM).
+  stripeConnectAccountId: varchar("stripe_connect_account_id", { length: 255 }), // acct_xxx
+  stripeConnectStatus: varchar("stripe_connect_status", { length: 30 }).notNull().default("none"), // none | pending | active | restricted
+  stripeConnectChargesEnabled: boolean("stripe_connect_charges_enabled").notNull().default(false),
+  stripeConnectOnboardedAt: timestamp("stripe_connect_onboarded_at"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

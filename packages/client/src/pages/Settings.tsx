@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -919,11 +920,91 @@ export default function Settings() {
         </TabsContent>
 
         {/* Finance Tab */}
-        <TabsContent value="finance" className="space-y-2">
+        <TabsContent value="finance" className="space-y-2" id="stripe-connect-anchor">
+          <StripeConnectSection />
           <VatRatesSection />
         </TabsContent>
       </Tabs>
       </div>
     </div>
+  );
+}
+
+/**
+ * Stripe Connect — let this studio connect its OWN Stripe account so it collects
+ * payments from its clients directly. Separate from the RSM subscription billing.
+ */
+function StripeConnectSection() {
+  const { data: status, isLoading, refetch } = trpc.stripeConnect.getStatus.useQuery();
+  const onboarding = trpc.stripeConnect.createOnboardingLink.useMutation({
+    onSuccess: ({ url }) => {
+      window.open(url, "_blank", "noopener");
+      toast.info("Onboarding Stripe ouvert dans un nouvel onglet. Reviens ici puis clique « Rafraîchir » une fois terminé.");
+    },
+    onError: (e) => toast.error(e.message),
+  });
+  const refresh = trpc.stripeConnect.refreshStatus.useMutation({
+    onSuccess: () => { refetch(); toast.success("Statut Stripe mis à jour"); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const active = status?.chargesEnabled;
+  const started = status?.connected;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <CreditCard className="h-4 w-4" />
+          Encaisser mes clients (Stripe)
+        </CardTitle>
+        <CardDescription className="text-sm">
+          Connecte le compte Stripe de ton studio pour recevoir les paiements de tes clients
+          directement sur ton compte. Indépendant de ton abonnement RSM.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-3">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Statut :</span>
+          {isLoading ? (
+            <span>…</span>
+          ) : active ? (
+            <span className="inline-flex items-center rounded-full bg-green-100 text-green-700 px-2.5 py-0.5 text-xs font-medium">
+              Actif — tu peux encaisser
+            </span>
+          ) : started ? (
+            <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2.5 py-0.5 text-xs font-medium">
+              Onboarding à terminer
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-600 px-2.5 py-0.5 text-xs font-medium">
+              Non connecté
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            onClick={() => onboarding.mutate()}
+            disabled={onboarding.isPending || active}
+          >
+            {started ? "Continuer la connexion Stripe" : "Connecter mon compte Stripe"}
+          </Button>
+          {started && (
+            <Button size="sm" variant="outline" onClick={() => refresh.mutate()} disabled={refresh.isPending}>
+              Rafraîchir le statut
+            </Button>
+          )}
+        </div>
+
+        {!active && (
+          <p className="text-xs text-muted-foreground">
+            Tant que la connexion n'est pas active, la génération de liens de paiement pour tes
+            factures est désactivée.
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

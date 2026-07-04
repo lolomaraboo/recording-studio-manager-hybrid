@@ -37,6 +37,39 @@ export function getStripeClient(): Stripe {
 }
 
 /**
+ * Resolve the Stripe Connect account for a studio so payments are created on
+ * its own connected account (money goes to the studio, not the platform).
+ *
+ * @param organizationId - The calling studio's organization id
+ * @returns The connected account id (acct_xxx)
+ * @throws If the studio hasn't connected Stripe or charges aren't enabled yet
+ */
+export async function getConnectedAccountId(organizationId: number): Promise<string> {
+  const { getMasterDb } = await import("@rsm/database/connection");
+  const { organizations } = await import("@rsm/database/master/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const masterDb = await getMasterDb();
+  const [org] = await masterDb
+    .select()
+    .from(organizations)
+    .where(eq(organizations.id, organizationId))
+    .limit(1);
+
+  if (!org?.stripeConnectAccountId) {
+    throw new Error(
+      "Ce studio n'a pas encore connecté son compte Stripe. Va dans Réglages → Paiements pour le connecter."
+    );
+  }
+  if (!org.stripeConnectChargesEnabled) {
+    throw new Error(
+      "Le compte Stripe du studio n'est pas encore activé (onboarding incomplet). Termine la connexion dans Réglages → Paiements."
+    );
+  }
+  return org.stripeConnectAccountId;
+}
+
+/**
  * Verify Stripe webhook signature
  *
  * @param rawBody - Raw request body (Buffer or string)

@@ -38,6 +38,7 @@ import { tasksRouter } from './tasks.js';
 import { documentsRouter } from './documents.js';
 import { availabilityRouter } from './availability.js';
 import { trackCreditsRouter } from './trackCredits.js';
+import { stripeConnectRouter } from './stripeConnect.js';
 
 /**
  * Main App Router
@@ -112,6 +113,7 @@ export const appRouter = router({
   documents: documentsRouter,
   availability: availabilityRouter,
   trackCredits: trackCreditsRouter,
+  stripeConnect: stripeConnectRouter,
 });
 
 /**
