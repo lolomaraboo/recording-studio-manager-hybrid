@@ -1344,4 +1344,216 @@ export const AI_TOOLS: ToolDefinition[] = [
       properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
     },
   },
+
+  // ============================================================================
+  // ÉCRITURE ÉTENDUE — CRÉATION
+  // ============================================================================
+  {
+    name: "create_expense",
+    description: "Enregistre une dépense du studio.",
+    input_schema: {
+      type: "object",
+      properties: {
+        category: { type: "string", description: "Catégorie (rent, utilities, equipment, software, supplies, marketing, other…)" },
+        description: { type: "string", description: "Description de la dépense" },
+        amount: { type: "number", description: "Montant" },
+        vendor: { type: "string", description: "Fournisseur/bénéficiaire (optionnel)" },
+        currency: { type: "string", description: "Devise ISO, défaut EUR (optionnel)" },
+        expense_date: { type: "string", description: "Date YYYY-MM-DD (optionnel, défaut aujourd'hui)" },
+        payment_method: { type: "string", description: "cash|card|bank_transfer|check|other (optionnel)" },
+      },
+      required: ["category", "description", "amount"],
+    },
+  },
+  {
+    name: "create_service",
+    description: "Ajoute une prestation au catalogue de services.",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Nom du service" },
+        category: { type: "string", description: "Catégorie (Studio, Post-production, Location matériel, Autre)" },
+        unit_price: { type: "number", description: "Prix unitaire HT" },
+        description: { type: "string", description: "Description (optionnel)" },
+      },
+      required: ["name", "category", "unit_price"],
+    },
+  },
+  {
+    name: "create_contract",
+    description: "Crée un contrat client (le numéro est généré automatiquement).",
+    input_schema: {
+      type: "object",
+      properties: {
+        client_id: { type: "number", description: "ID du client" },
+        type: { type: "string", description: "recording|mixing|mastering|production|exclusivity|distribution|studio_rental|services|partnership|other" },
+        title: { type: "string", description: "Titre du contrat" },
+        terms: { type: "string", description: "Texte / termes du contrat" },
+        project_id: { type: "number", description: "ID projet lié (optionnel)" },
+        value: { type: "number", description: "Valeur totale (optionnel)" },
+        status: { type: "string", description: "draft|sent|signed|active… (optionnel, défaut draft)" },
+      },
+      required: ["client_id", "type", "title", "terms"],
+    },
+  },
+  {
+    name: "create_deliverable",
+    description: "Crée un livrable client (master, mix, export).",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Nom du livrable" },
+        project_id: { type: "number", description: "ID projet lié (optionnel)" },
+        url: { type: "string", description: "URL du fichier (optionnel)" },
+        status: { type: "string", description: "draft|delivered|approved (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["name"],
+    },
+  },
+  {
+    name: "create_consumable",
+    description: "Ajoute un article à l'inventaire des consommables.",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Nom de l'article" },
+        quantity: { type: "number", description: "Quantité en stock (optionnel)" },
+        unit: { type: "string", description: "Unité (ex: pièces, mètres) (optionnel)" },
+        threshold: { type: "number", description: "Seuil d'alerte de réappro (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["name"],
+    },
+  },
+  {
+    name: "create_coupon",
+    description: "Crée un coupon/code promo.",
+    input_schema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Code du coupon" },
+        value: { type: "number", description: "Valeur (pourcentage ou montant selon kind)" },
+        kind: { type: "string", description: "percent|amount|giftcard (optionnel, défaut percent)" },
+        valid_until: { type: "string", description: "Date d'expiration YYYY-MM-DD (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["code", "value"],
+    },
+  },
+  {
+    name: "create_package",
+    description: "Crée un forfait/formule d'heures prépayées pour un client.",
+    input_schema: {
+      type: "object",
+      properties: {
+        client_id: { type: "number", description: "ID du client" },
+        name: { type: "string", description: "Nom du forfait" },
+        total_hours: { type: "number", description: "Heures incluses (optionnel)" },
+        price: { type: "number", description: "Prix du forfait (optionnel)" },
+        valid_until: { type: "string", description: "Validité YYYY-MM-DD (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["client_id", "name"],
+    },
+  },
+  {
+    name: "create_availability",
+    description: "Déclare un créneau d'indisponibilité pour un membre du staff ou un talent.",
+    input_schema: {
+      type: "object",
+      properties: {
+        subject_type: { type: "string", description: "staff|talent" },
+        subject_id: { type: "number", description: "ID du staff ou du talent" },
+        start_time: { type: "string", description: "Début ISO (YYYY-MM-DDTHH:mm)" },
+        end_time: { type: "string", description: "Fin ISO (YYYY-MM-DDTHH:mm)" },
+        kind: { type: "string", description: "unavailable|vacation (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["subject_type", "subject_id", "start_time", "end_time"],
+    },
+  },
+  {
+    name: "create_credit_note",
+    description: "Émet un avoir (note de crédit). Le numéro est généré automatiquement.",
+    input_schema: {
+      type: "object",
+      properties: {
+        client_id: { type: "number", description: "ID du client" },
+        amount: { type: "number", description: "Montant de l'avoir" },
+        invoice_id: { type: "number", description: "ID facture liée (optionnel)" },
+        reason: { type: "string", description: "Motif (optionnel)" },
+      },
+      required: ["client_id", "amount"],
+    },
+  },
+  {
+    name: "create_time_entry",
+    description:
+      "Enregistre une saisie de temps (heures travaillées) sur un projet, une session ou une track.",
+    input_schema: {
+      type: "object",
+      properties: {
+        project_id: { type: "number", description: "ID projet (au moins un lien requis)" },
+        session_id: { type: "number", description: "ID session (au moins un lien requis)" },
+        track_id: { type: "number", description: "ID track (au moins un lien requis)" },
+        task_type_id: { type: "number", description: "ID type de tâche (optionnel, sinon défaut)" },
+        duration_minutes: { type: "number", description: "Durée en minutes (optionnel)" },
+        hourly_rate: { type: "number", description: "Taux horaire (optionnel, sinon celui du type de tâche)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+    },
+  },
+
+  // ============================================================================
+  // ÉCRITURE ÉTENDUE — MISE À JOUR DE STATUT
+  // ============================================================================
+  {
+    name: "update_lead_status",
+    description: "Met à jour le statut d'un prospect (new, contacted, quoted, won, lost).",
+    input_schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", description: "ID du prospect" },
+        status: { type: "string", description: "Nouveau statut" },
+      },
+      required: ["id", "status"],
+    },
+  },
+  {
+    name: "update_task_status",
+    description: "Met à jour le statut d'une tâche (todo, doing, done).",
+    input_schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", description: "ID de la tâche" },
+        status: { type: "string", description: "Nouveau statut" },
+      },
+      required: ["id", "status"],
+    },
+  },
+  {
+    name: "update_deliverable_status",
+    description: "Met à jour le statut d'un livrable (draft, delivered, approved).",
+    input_schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", description: "ID du livrable" },
+        status: { type: "string", description: "Nouveau statut" },
+      },
+      required: ["id", "status"],
+    },
+  },
+  {
+    name: "update_contract_status",
+    description: "Met à jour le statut d'un contrat (draft, sent, signed, active, expired…).",
+    input_schema: {
+      type: "object",
+      properties: {
+        id: { type: "number", description: "ID du contrat" },
+        status: { type: "string", description: "Nouveau statut" },
+      },
+      required: ["id", "status"],
+    },
+  },
 ];

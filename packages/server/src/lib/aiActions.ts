@@ -16,6 +16,7 @@ import {
   musicians,
   tracks,
   timeEntries,
+  taskTypes,
   expenses,
   contracts,
   serviceCatalog,
@@ -279,6 +280,52 @@ export class AIActionExecutor {
           break;
         case "get_all_deliverables":
           result = await this.get_all_deliverables(params as any);
+          break;
+
+        // Écriture étendue — création
+        case "create_expense":
+          result = await this.create_expense(params as any);
+          break;
+        case "create_service":
+          result = await this.create_service(params as any);
+          break;
+        case "create_contract":
+          result = await this.create_contract(params as any);
+          break;
+        case "create_deliverable":
+          result = await this.create_deliverable(params as any);
+          break;
+        case "create_consumable":
+          result = await this.create_consumable(params as any);
+          break;
+        case "create_coupon":
+          result = await this.create_coupon(params as any);
+          break;
+        case "create_package":
+          result = await this.create_package(params as any);
+          break;
+        case "create_availability":
+          result = await this.create_availability(params as any);
+          break;
+        case "create_credit_note":
+          result = await this.create_credit_note(params as any);
+          break;
+        case "create_time_entry":
+          result = await this.create_time_entry(params as any);
+          break;
+
+        // Écriture étendue — mise à jour de statut
+        case "update_lead_status":
+          result = await this.update_lead_status(params as any);
+          break;
+        case "update_task_status":
+          result = await this.update_task_status(params as any);
+          break;
+        case "update_deliverable_status":
+          result = await this.update_deliverable_status(params as any);
+          break;
+        case "update_contract_status":
+          result = await this.update_contract_status(params as any);
           break;
 
         default:
@@ -2129,5 +2176,178 @@ export class AIActionExecutor {
   async get_all_deliverables(params: { limit?: number } = {}) {
     const result = await this.db.select().from(deliverables).orderBy(desc(deliverables.createdAt)).limit(params.limit ?? 50);
     return { deliverables: result, count: result.length };
+  }
+
+  // ==========================================================================
+  // Écriture étendue — création & mise à jour de toutes les entités
+  // ==========================================================================
+
+  async create_expense(params: { category: string; description: string; amount: number; vendor?: string; currency?: string; expense_date?: string; payment_method?: string }) {
+    const { category, description, amount, vendor, currency = "EUR", expense_date, payment_method } = params;
+    const [expense] = await this.db
+      .insert(expenses)
+      .values({
+        category,
+        description,
+        amount: String(amount),
+        vendor,
+        currency,
+        expenseDate: expense_date ? new Date(expense_date) : new Date(),
+        paymentMethod: payment_method,
+      })
+      .returning();
+    return { expense, message: `Dépense "${description}" enregistrée` };
+  }
+
+  async create_service(params: { name: string; category: string; unit_price: number; description?: string }) {
+    const { name, category, unit_price, description } = params;
+    const [service] = await this.db
+      .insert(serviceCatalog)
+      .values({ name, category, unitPrice: String(unit_price), description })
+      .returning();
+    return { service, message: `Service "${name}" créé` };
+  }
+
+  async create_contract(params: { client_id: number; type: string; title: string; terms: string; project_id?: number; value?: number; status?: string }) {
+    const { client_id, type, title, terms, project_id, value, status = "draft" } = params;
+    const year = new Date().getFullYear();
+    const existing = await this.db.select().from(contracts);
+    const contractNumber = `CTR-${year}-${String(existing.length + 1).padStart(4, "0")}`;
+    const [contract] = await this.db
+      .insert(contracts)
+      .values({
+        contractNumber,
+        clientId: client_id,
+        projectId: project_id,
+        type,
+        title,
+        terms,
+        value: value != null ? String(value) : undefined,
+        status,
+      })
+      .returning();
+    return { contract, message: `Contrat "${title}" (${contractNumber}) créé` };
+  }
+
+  async create_deliverable(params: { name: string; project_id?: number; url?: string; status?: string; notes?: string }) {
+    const { name, project_id, url, status = "draft", notes } = params;
+    const [deliverable] = await this.db
+      .insert(deliverables)
+      .values({ name, projectId: project_id, url, status, notes })
+      .returning();
+    return { deliverable, message: `Livrable "${name}" créé` };
+  }
+
+  async create_consumable(params: { name: string; quantity?: number; unit?: string; threshold?: number; notes?: string }) {
+    const { name, quantity, unit, threshold, notes } = params;
+    const [consumable] = await this.db
+      .insert(consumables)
+      .values({
+        name,
+        quantity: quantity != null ? String(quantity) : undefined,
+        unit,
+        threshold: threshold != null ? String(threshold) : undefined,
+        notes,
+      })
+      .returning();
+    return { consumable, message: `Consommable "${name}" ajouté à l'inventaire` };
+  }
+
+  async create_coupon(params: { code: string; value: number; kind?: string; valid_until?: string; notes?: string }) {
+    const { code, value, kind = "percent", valid_until, notes } = params;
+    const [coupon] = await this.db
+      .insert(coupons)
+      .values({ code, value: String(value), kind, validUntil: valid_until ? new Date(valid_until) : undefined, notes })
+      .returning();
+    return { coupon, message: `Coupon "${code}" créé` };
+  }
+
+  async create_package(params: { client_id: number; name: string; total_hours?: number; price?: number; valid_until?: string; notes?: string }) {
+    const { client_id, name, total_hours, price, valid_until, notes } = params;
+    const [pkg] = await this.db
+      .insert(clientPackages)
+      .values({
+        clientId: client_id,
+        name,
+        totalHours: total_hours != null ? String(total_hours) : undefined,
+        price: price != null ? String(price) : undefined,
+        validUntil: valid_until ? new Date(valid_until) : undefined,
+        notes,
+      })
+      .returning();
+    return { package: pkg, message: `Forfait "${name}" créé` };
+  }
+
+  async create_availability(params: { subject_type: string; subject_id: number; start_time: string; end_time: string; kind?: string; notes?: string }) {
+    const { subject_type, subject_id, start_time, end_time, kind = "unavailable", notes } = params;
+    const [entry] = await this.db
+      .insert(availability)
+      .values({ subjectType: subject_type, subjectId: subject_id, startTime: new Date(start_time), endTime: new Date(end_time), kind, notes })
+      .returning();
+    return { availability: entry, message: "Indisponibilité enregistrée" };
+  }
+
+  async create_credit_note(params: { client_id: number; amount: number; invoice_id?: number; reason?: string }) {
+    const { client_id, amount, invoice_id, reason } = params;
+    const year = new Date().getFullYear();
+    const existing = await this.db.select().from(creditNotes);
+    const creditNoteNumber = `AV-${year}-${String(existing.length + 1).padStart(4, "0")}`;
+    const [note] = await this.db
+      .insert(creditNotes)
+      .values({ creditNoteNumber, clientId: client_id, invoiceId: invoice_id, amount: String(amount), reason })
+      .returning();
+    return { credit_note: note, message: `Avoir ${creditNoteNumber} créé` };
+  }
+
+  async create_time_entry(params: { project_id?: number; session_id?: number; track_id?: number; task_type_id?: number; duration_minutes?: number; hourly_rate?: number; notes?: string }) {
+    const { project_id, session_id, track_id, duration_minutes, notes } = params;
+    if (!project_id && !session_id && !track_id) {
+      throw new Error("Un lien (project_id, session_id ou track_id) est requis pour une saisie de temps");
+    }
+    let taskTypeId = params.task_type_id;
+    let rate = params.hourly_rate;
+    if (!taskTypeId || rate == null) {
+      const [tt] = await this.db.select().from(taskTypes).limit(1);
+      if (!tt) throw new Error("Aucun type de tâche configuré dans le studio");
+      taskTypeId = taskTypeId ?? tt.id;
+      rate = rate ?? Number(tt.hourlyRate);
+    }
+    const now = new Date();
+    const end = duration_minutes ? new Date(now.getTime() + duration_minutes * 60000) : null;
+    const [entry] = await this.db
+      .insert(timeEntries)
+      .values({
+        taskTypeId,
+        projectId: project_id,
+        sessionId: session_id,
+        trackId: track_id,
+        startTime: now,
+        endTime: end,
+        durationMinutes: duration_minutes,
+        hourlyRateSnapshot: String(rate),
+        notes,
+      })
+      .returning();
+    return { time_entry: entry, message: "Temps enregistré" };
+  }
+
+  async update_lead_status(params: { id: number; status: string }) {
+    const [lead] = await this.db.update(leads).set({ status: params.status, updatedAt: new Date() }).where(eq(leads.id, params.id)).returning();
+    return { lead, message: `Prospect #${params.id} → ${params.status}` };
+  }
+
+  async update_task_status(params: { id: number; status: string }) {
+    const [task] = await this.db.update(tasks).set({ status: params.status, updatedAt: new Date() }).where(eq(tasks.id, params.id)).returning();
+    return { task, message: `Tâche #${params.id} → ${params.status}` };
+  }
+
+  async update_deliverable_status(params: { id: number; status: string }) {
+    const [deliverable] = await this.db.update(deliverables).set({ status: params.status }).where(eq(deliverables.id, params.id)).returning();
+    return { deliverable, message: `Livrable #${params.id} → ${params.status}` };
+  }
+
+  async update_contract_status(params: { id: number; status: string }) {
+    const [contract] = await this.db.update(contracts).set({ status: params.status, updatedAt: new Date() }).where(eq(contracts.id, params.id)).returning();
+    return { contract, message: `Contrat #${params.id} → ${params.status}` };
   }
 }
