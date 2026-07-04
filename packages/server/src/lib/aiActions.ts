@@ -7,6 +7,7 @@ import {
   clientNotes,
   invoices,
   invoiceItems,
+  payments,
   quotes,
   quoteItems,
   vatRates,
@@ -391,6 +392,9 @@ export class AIActionExecutor {
         case "create_vat_rate": result = await this.create_vat_rate(params as any); break;
         case "update_vat_rate": result = await this.update_vat_rate(params as any); break;
         case "delete_vat_rate": result = await this.delete_vat_rate(params as any); break;
+        case "record_payment": result = await this.record_payment(params as any); break;
+        case "get_payments": result = await this.get_payments(params as any); break;
+        case "delete_payment": result = await this.delete_payment(params as any); break;
 
         default:
           throw new Error(`Unknown action: ${actionName}`);
@@ -2905,5 +2909,122 @@ export class AIActionExecutor {
   async delete_vat_rate(p: { vat_rate_id: number }) {
     await this.db.delete(vatRates).where(eq(vatRates.id, p.vat_rate_id));
     return { deleted_id: p.vat_rate_id, message: `Taux de TVA #${p.vat_rate_id} supprimé` };
+  }
+
+  // ==========================================================================
+  // PAIEMENTS — enregistrement multi-moyens (Stripe NON requis)
+  // Espèces, virement, chèque, carte (terminal), PayPal, Stripe, autre.
+  // ==========================================================================
+
+  private async resolveInvoice(invoice_id?: number, invoice_number?: string) {
+    let inv;
+    if (invoice_id) {
+      [inv] = await this.db.select().from(invoices).where(eq(invoices.id, invoice_id)).limit(1);
+    } else if (invoice_number) {
+      [inv] = await this.db
+        .select()
+        .from(invoices)
+        .where(ilike(invoices.invoiceNumber, `%${invoice_number}%`))
+        .limit(1);
+    }
+    if (!inv) throw new Error("Facture introuvable (invoice_id ou invoice_number requis)");
+    return inv;
+  }
+
+  /** Sum of non-refunded payments recorded against an invoice. */
+  private async paidTotalForInvoice(invoiceId: number): Promise<number> {
+    const rows = await this.db.select().from(payments).where(eq(payments.invoiceId, invoiceId));
+    return rows
+      .filter((p: any) => p.status !== "refunded")
+      .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+  }
+
+  async record_payment(p: {
+    invoice_id?: number;
+    invoice_number?: string;
+    amount: number;
+    method?: string; // cash | bank_transfer | check | card | paypal | stripe | other
+    payment_date?: string;
+    reference?: string;
+    notes?: string;
+  }) {
+    const inv = await this.resolveInvoice(p.invoice_id, p.invoice_number);
+    const method = p.method || "other";
+    const [payment] = await this.db
+      .insert(payments)
+      .values({
+        clientId: inv.clientId,
+        invoiceId: inv.id,
+        amount: String(p.amount),
+        currency: inv.currency || "EUR",
+        paymentDate: p.payment_date ? new Date(p.payment_date) : new Date(),
+        paymentMethod: method,
+        referenceNumber: p.reference,
+        status: "succeeded",
+        notes: p.notes,
+      })
+      .returning();
+
+    // Update invoice status from the total paid so far.
+    const paid = await this.paidTotalForInvoice(inv.id);
+    const total = parseFloat(inv.total) || 0;
+    const fullyPaid = paid + 1e-6 >= total && total > 0;
+    if (fullyPaid) {
+      await this.db
+        .update(invoices)
+        .set({ status: "paid", paidAt: new Date(), updatedAt: new Date() })
+        .where(eq(invoices.id, inv.id));
+    }
+
+    const methodLabels: Record<string, string> = {
+      cash: "espèces", bank_transfer: "virement", check: "chèque",
+      card: "carte", paypal: "PayPal", stripe: "Stripe", other: "autre",
+    };
+    return {
+      payment,
+      invoice_number: inv.invoiceNumber,
+      method: methodLabels[method] || method,
+      paid_total: paid,
+      invoice_total: total,
+      remaining: Math.max(0, total - paid),
+      status: fullyPaid ? "paid" : "partial",
+      message: fullyPaid
+        ? `Paiement de ${p.amount} enregistré (${methodLabels[method] || method}) — facture ${inv.invoiceNumber} soldée.`
+        : `Paiement de ${p.amount} enregistré (${methodLabels[method] || method}) — reste ${(total - paid).toFixed(2)} sur ${inv.invoiceNumber}.`,
+    };
+  }
+
+  async get_payments(p: { invoice_id?: number; invoice_number?: string; client_id?: number; limit?: number } = {}) {
+    const filters = [];
+    if (p.invoice_id) filters.push(eq(payments.invoiceId, p.invoice_id));
+    if (p.invoice_number) {
+      const inv = await this.resolveInvoice(undefined, p.invoice_number);
+      filters.push(eq(payments.invoiceId, inv.id));
+    }
+    if (p.client_id) filters.push(eq(payments.clientId, p.client_id));
+    const q = this.db.select().from(payments);
+    const rows = await (filters.length
+      ? q.where(and(...filters)).orderBy(desc(payments.paymentDate)).limit(p.limit ?? 100)
+      : q.orderBy(desc(payments.paymentDate)).limit(p.limit ?? 100));
+    return { payments: rows, count: rows.length };
+  }
+
+  async delete_payment(p: { payment_id: number }) {
+    const [row] = await this.db.select().from(payments).where(eq(payments.id, p.payment_id)).limit(1);
+    await this.db.delete(payments).where(eq(payments.id, p.payment_id));
+    // Re-open the invoice if it's no longer fully covered.
+    if (row?.invoiceId) {
+      const [inv] = await this.db.select().from(invoices).where(eq(invoices.id, row.invoiceId)).limit(1);
+      if (inv && inv.status === "paid") {
+        const paid = await this.paidTotalForInvoice(inv.id);
+        if (paid + 1e-6 < (parseFloat(inv.total) || 0)) {
+          await this.db
+            .update(invoices)
+            .set({ status: "sent", paidAt: null, updatedAt: new Date() })
+            .where(eq(invoices.id, inv.id));
+        }
+      }
+    }
+    return { deleted_id: p.payment_id, message: `Paiement #${p.payment_id} supprimé` };
   }
 }

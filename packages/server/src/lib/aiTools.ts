@@ -1800,4 +1800,44 @@ export const AI_TOOLS: ToolDefinition[] = [
     input_schema: { type: "object", properties: { vat_rate_id: { type: "number" }, name: { type: "string" }, rate: { type: "number" }, is_default: { type: "boolean" }, is_active: { type: "boolean" } }, required: ["vat_rate_id"] },
   },
   { name: "delete_vat_rate", description: "Supprime un taux de TVA.", input_schema: { type: "object", properties: { vat_rate_id: { type: "number" } }, required: ["vat_rate_id"] } },
+
+  // ============================================================================
+  // PAIEMENTS — encaissement par TOUS les moyens (Stripe optionnel)
+  // ============================================================================
+  {
+    name: "record_payment",
+    description:
+      "Enregistre un paiement reçu sur une facture, par N'IMPORTE QUEL moyen (espèces, virement, chèque, carte, PayPal, Stripe, autre). Met la facture à 'payée' si le total est atteint. Utilise-le quand un client règle hors Stripe (ex: « le client a payé 300€ en virement »).",
+    input_schema: {
+      type: "object",
+      properties: {
+        invoice_id: { type: "number", description: "ID de la facture (ou invoice_number)" },
+        invoice_number: { type: "string", description: "Numéro de facture (ex: FAC-2026-0042). Alternative à invoice_id." },
+        amount: { type: "number", description: "Montant reçu" },
+        method: { type: "string", description: "Moyen: cash | bank_transfer | check | card | paypal | stripe | other (défaut other)" },
+        payment_date: { type: "string", description: "Date du paiement YYYY-MM-DD (défaut aujourd'hui)" },
+        reference: { type: "string", description: "Référence (n° de chèque, réf. virement…) (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["amount"],
+    },
+  },
+  {
+    name: "get_payments",
+    description: "Liste les paiements enregistrés (tous moyens), filtrable par facture ou client.",
+    input_schema: {
+      type: "object",
+      properties: {
+        invoice_id: { type: "number" },
+        invoice_number: { type: "string" },
+        client_id: { type: "number" },
+        limit: { type: "number" },
+      },
+    },
+  },
+  {
+    name: "delete_payment",
+    description: "Supprime un paiement enregistré (et rouvre la facture si elle n'est plus soldée).",
+    input_schema: { type: "object", properties: { payment_id: { type: "number" } }, required: ["payment_id"] },
+  },
 ];

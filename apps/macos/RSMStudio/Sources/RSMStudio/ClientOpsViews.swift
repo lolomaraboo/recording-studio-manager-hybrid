@@ -49,6 +49,7 @@ private struct OpsBadge: View {
 
 struct PaymentsView: View {
     @Environment(AppModel.self) private var model
+    @State private var payingInvoice: Invoice?
 
     private var invoices: [Invoice] {
         _ = model.dataVersion
@@ -81,6 +82,8 @@ struct PaymentsView: View {
                                 paymentBadge(inv.status)
                             }
                             .contextMenu {
+                                Button("Enregistrer un paiement…") { payingInvoice = inv }
+                                Divider()
                                 Button("Marquer payée") { setStatus(inv, "paid", markPaid: true) }
                                 Button("Marquer envoyée") { setStatus(inv, "sent") }
                                 Button("Marquer en retard") { setStatus(inv, "overdue") }
@@ -93,6 +96,16 @@ struct PaymentsView: View {
             }
         }
         .navigationTitle("Paiements")
+        .modalCard(item: $payingInvoice) { inv in
+            RecordPaymentSheet(invoice: inv) { payload, fullyPaid in
+                _ = try? model.store.localInsert(table: "payments", payload: payload)
+                if fullyPaid {
+                    let iso = ISO8601DateFormatter().string(from: Date())
+                    try? model.store.localUpdate(table: "invoices", uuid: inv.id, changes: ["status": "paid", "paid_at": iso])
+                }
+                Task { await model.syncNow() }
+            }
+        }
     }
 
     private func clientName(_ id: Int?) -> String { id.flatMap { clientMap[$0] } ?? "Client" }
@@ -131,6 +144,62 @@ struct PaymentsView: View {
         }
         try? model.store.localUpdate(table: "invoices", uuid: inv.id, changes: changes)
         Task { await model.syncNow() }
+    }
+}
+
+/// Record a payment received by ANY method — Stripe is optional.
+struct RecordPaymentSheet: View {
+    let invoice: Invoice
+    let onRecord: (_ payload: [String: Any], _ fullyPaid: Bool) -> Void
+
+    @State private var amount: String
+    @State private var method = "bank_transfer"
+    @State private var reference = ""
+    @State private var notes = ""
+
+    init(invoice: Invoice, onRecord: @escaping (_ payload: [String: Any], _ fullyPaid: Bool) -> Void) {
+        self.invoice = invoice
+        self.onRecord = onRecord
+        _amount = State(initialValue: invoice.total)
+    }
+
+    var body: some View {
+        StudioFormSheet(
+            title: "Paiement — \(invoice.number)", confirmLabel: "Enregistrer",
+            confirmDisabled: (Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0) <= 0,
+            height: 420,
+            onConfirm: {
+                let value = Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+                var payload: [String: Any] = [
+                    "invoice_id": invoice.serverId as Any,
+                    "client_id": invoice.clientId as Any,
+                    "amount": String(value),
+                    "currency": invoice.currency,
+                    "payment_date": ISO8601DateFormatter().string(from: Date()),
+                    "payment_method": method,
+                    "status": "succeeded",
+                ]
+                if !reference.isEmpty { payload["reference_number"] = reference }
+                if !notes.isEmpty { payload["notes"] = notes }
+                let total = Double(invoice.total) ?? 0
+                onRecord(payload, value + 1e-6 >= total && total > 0)
+            }
+        ) {
+            LabeledContent("Montant (\(opsCurrencySymbol(invoice.currency)))") {
+                TextField("", text: $amount).multilineTextAlignment(.trailing).frame(width: 120)
+            }
+            Picker("Moyen de paiement", selection: $method) {
+                Text("Virement").tag("bank_transfer")
+                Text("Espèces").tag("cash")
+                Text("Chèque").tag("check")
+                Text("Carte (terminal)").tag("card")
+                Text("PayPal").tag("paypal")
+                Text("Stripe").tag("stripe")
+                Text("Autre").tag("other")
+            }
+            TextField("Référence (n° chèque, réf. virement…)", text: $reference)
+            TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...4)
+        }
     }
 }
 
