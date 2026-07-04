@@ -88,28 +88,28 @@ struct ContentView: View {
     ]
 
     var body: some View {
-        // Assistant/player panels use `.safeAreaInset` (NOT `.inspector`):
-        // `.inspector` conflicts with `.sheet` presentation on macOS 26, and
-        // wrapping NavigationSplitView in an HStack breaks dynamic side panels.
-        // safeAreaInset is the idiomatic way to attach persistent bars/panels.
-        splitView
-            .safeAreaInset(edge: .trailing, spacing: 0) {
-                HStack(spacing: 0) {
-                    if model.chatPanelOpen {
-                        Divider()
-                        ChatView(compact: true).frame(width: 360)
-                    }
-                    if model.playerMode == .panel {
-                        Divider()
-                        AudioPlayerView(compact: true).frame(width: 380)
+        // Assistant/player side panels live in a real `HStack` so they occupy
+        // actual layout width. A `.safeAreaInset(edge: .trailing)` overlay does
+        // NOT reduce the width seen by `HSplitView`-based detail views (Projets,
+        // Clients, Devis, Factures, Tracks): their content extends *under* the
+        // panel and gets clipped. Giving the panels their own column fixes that.
+        // (We avoid `.inspector`: it conflicts with `.sheet` on macOS 26.)
+        HStack(spacing: 0) {
+            splitView
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    if model.playerMode == .bar {
+                        VStack(spacing: 0) { Divider(); MiniPlayerBar() }
                     }
                 }
+            if model.chatPanelOpen {
+                Divider()
+                ChatView(compact: true).frame(width: 360)
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                if model.playerMode == .bar {
-                    VStack(spacing: 0) { Divider(); MiniPlayerBar() }
-                }
+            if model.playerMode == .panel {
+                Divider()
+                AudioPlayerView(compact: true).frame(width: 380)
             }
+        }
     }
 
     private var splitView: some View {
