@@ -19,7 +19,17 @@ import type { InvoiceWithLineItems } from '../email/resend-service';
  *
  * Performance: <100ms typical generation time, ~20MB RAM usage
  */
-export async function generateInvoicePDF(invoice: InvoiceWithLineItems): Promise<Buffer> {
+export interface InvoiceBankDetails {
+  name?: string | null;
+  iban?: string | null;
+  bic?: string | null;
+  holder?: string | null;
+}
+
+export async function generateInvoicePDF(
+  invoice: InvoiceWithLineItems,
+  bankDetails?: InvoiceBankDetails
+): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
@@ -187,6 +197,26 @@ export async function generateInvoicePDF(invoice: InvoiceWithLineItems): Promise
         doc.text('Notes:', margin, currentY);
         doc.font('Helvetica').fontSize(9);
         doc.text(invoice.notes, margin, doc.y + 5, { width: contentWidth - 100 });
+      }
+
+      // --- BANK TRANSFER DETAILS (if provided) ---
+      if (bankDetails && (bankDetails.iban || bankDetails.name)) {
+        const bankY = Math.max(doc.y + 20, 640);
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#111827');
+        doc.text('Paiement par virement', margin, bankY);
+        doc.font('Helvetica').fontSize(9).fillColor('#374151');
+        let by = doc.y + 4;
+        const line = (label: string, value?: string | null) => {
+          if (!value) return;
+          doc.font('Helvetica-Bold').text(`${label} : `, margin, by, { continued: true });
+          doc.font('Helvetica').text(value);
+          by = doc.y + 2;
+        };
+        line('Titulaire', bankDetails.holder);
+        line('Banque', bankDetails.name);
+        line('IBAN', bankDetails.iban);
+        line('BIC', bankDetails.bic);
+        doc.fillColor('#000000');
       }
 
       // --- FOOTER ---

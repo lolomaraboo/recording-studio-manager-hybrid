@@ -139,6 +139,10 @@ export const organizationsRouter = router({
           phone: z.string().optional(),
           timezone: z.string().optional(),
           currency: z.string().optional(),
+          bankName: z.string().max(200).nullable().optional(),
+          bankIban: z.string().max(60).nullable().optional(),
+          bankBic: z.string().max(20).nullable().optional(),
+          bankHolder: z.string().max(200).nullable().optional(),
         }),
       })
     )

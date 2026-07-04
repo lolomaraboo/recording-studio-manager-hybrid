@@ -236,9 +236,21 @@ export default function InvoiceDetail() {
     deleteMutation.mutate({ id: Number(id) });
   };
 
-  const handleDownloadPDF = () => {
-    // TODO: Implement PDF generation when backend supports it
-    toast.info(`Génération PDF facture ${invoice?.invoiceNumber} - À implémenter`);
+  const handleDownloadPDF = async () => {
+    try {
+      toast.loading("Génération du PDF…", { id: "pdf-dl" });
+      const { base64, filename, mimeType } = await utils.invoices.generatePDF.fetch({ invoiceId: Number(id) });
+      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("PDF téléchargé", { id: "pdf-dl" });
+    } catch (err: any) {
+      toast.error(`Échec du PDF : ${err?.message ?? "erreur"}`, { id: "pdf-dl" });
+    }
   };
 
   const handleSendEmail = () => {
@@ -246,12 +258,32 @@ export default function InvoiceDetail() {
     toast.info("Envoi email - À implémenter");
   };
 
-  const handleMarkAsPaid = () => {
-    updateMutation.mutate({
-      id: Number(id),
-      data: {
-        status: "paid",
-      },
+  // --- Record a payment received by any method (cash, transfer, cheque, card, PayPal, Stripe…) ---
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [payAmount, setPayAmount] = useState("");
+  const [payMethod, setPayMethod] = useState("bank_transfer");
+  const [payReference, setPayReference] = useState("");
+  const recordPaymentMutation = trpc.invoices.recordPayment.useMutation({
+    onSuccess: (res: any) => {
+      toast.success(res?.message ?? "Paiement enregistré");
+      setShowPaymentDialog(false);
+      setPayAmount(""); setPayReference("");
+      refetch();
+    },
+    onError: (e) => toast.error(`Erreur: ${e.message}`),
+  });
+  const openPaymentDialog = () => {
+    setPayAmount(invoice?.total ? String(invoice.total) : "");
+    setShowPaymentDialog(true);
+  };
+  const submitPayment = () => {
+    const amount = parseFloat(payAmount.replace(",", "."));
+    if (!amount || amount <= 0) { toast.error("Montant invalide"); return; }
+    recordPaymentMutation.mutate({
+      invoiceId: Number(id),
+      amount,
+      method: payMethod as any,
+      reference: payReference || undefined,
     });
   };
 
@@ -353,10 +385,10 @@ export default function InvoiceDetail() {
                     Envoyer
                   </Button>
                 )}
-                {(invoice.status === "sent" || invoice.status === "overdue") && (
-                  <Button variant="default" onClick={handleMarkAsPaid}>
+                {invoice.status !== "paid" && invoice.status !== "cancelled" && (
+                  <Button variant="default" onClick={openPaymentDialog}>
                     <CheckCircle className="mr-2 h-4 w-4" />
-                    Marquer payée
+                    Enregistrer un paiement
                   </Button>
                 )}
                 <Button variant="outline" onClick={startEditing}>
@@ -755,6 +787,48 @@ export default function InvoiceDetail() {
         </div>
       </div>
     </div>
+
+    {/* Record Payment Dialog — any method, Stripe optional */}
+    <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Enregistrer un paiement</DialogTitle>
+          <DialogDescription>
+            Enregistre un règlement reçu par n'importe quel moyen. La facture passe à « payée »
+            une fois le total atteint.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <div className="space-y-1">
+            <Label htmlFor="payAmount">Montant</Label>
+            <Input id="payAmount" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} placeholder="0.00" />
+          </div>
+          <div className="space-y-1">
+            <Label>Moyen de paiement</Label>
+            <Select value={payMethod} onValueChange={setPayMethod}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bank_transfer">Virement</SelectItem>
+                <SelectItem value="cash">Espèces</SelectItem>
+                <SelectItem value="check">Chèque</SelectItem>
+                <SelectItem value="card">Carte (terminal)</SelectItem>
+                <SelectItem value="paypal">PayPal</SelectItem>
+                <SelectItem value="stripe">Stripe</SelectItem>
+                <SelectItem value="other">Autre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="payRef">Référence (optionnel)</Label>
+            <Input id="payRef" value={payReference} onChange={(e) => setPayReference(e.target.value)} placeholder="N° de chèque, réf. virement…" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>Annuler</Button>
+          <Button onClick={submitPayment} disabled={recordPaymentMutation.isPending}>Enregistrer</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     {/* Delete Confirmation Dialog */}
     <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

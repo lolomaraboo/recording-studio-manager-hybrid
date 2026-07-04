@@ -76,6 +76,11 @@ export const organizations = pgTable("organizations", {
   stripeConnectStatus: varchar("stripe_connect_status", { length: 30 }).notNull().default("none"), // none | pending | active | restricted
   stripeConnectChargesEnabled: boolean("stripe_connect_charges_enabled").notNull().default(false),
   stripeConnectOnboardedAt: timestamp("stripe_connect_onboarded_at"),
+  // --- Bank details (for "pay by bank transfer" instructions on invoices/portal) ---
+  bankName: varchar("bank_name", { length: 200 }),
+  bankIban: varchar("bank_iban", { length: 60 }),
+  bankBic: varchar("bank_bic", { length: 20 }),
+  bankHolder: varchar("bank_holder", { length: 200 }),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

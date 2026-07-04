@@ -10,6 +10,7 @@ import { getInvoicePDFUrl } from '../services/storage/s3-service';
 import { sendInvoiceEmail } from '../services/email/resend-service';
 import { generateInvoicePDF } from '../services/pdf/invoice-pdf-generator';
 import { uploadInvoicePDF } from '../services/storage/s3-service';
+import { AIActionExecutor } from '../lib/aiActions';
 
 /**
  * Invoices Router
@@ -690,13 +691,67 @@ export const invoicesRouter = router({
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Invoice not found' });
       }
 
-      const pdfBuffer = await generateInvoicePDF(invoice as any);
+      // Include the studio's bank details for "pay by transfer" instructions.
+      let bankDetails;
+      if (ctx.organizationId) {
+        const { getMasterDb } = await import('@rsm/database/connection');
+        const { organizations } = await import('@rsm/database/master/schema');
+        const masterDb = await getMasterDb();
+        const [org] = await masterDb
+          .select()
+          .from(organizations)
+          .where(eq(organizations.id, ctx.organizationId))
+          .limit(1);
+        if (org) {
+          bankDetails = { name: org.bankName, iban: org.bankIban, bic: org.bankBic, holder: org.bankHolder };
+        }
+      }
+
+      const pdfBuffer = await generateInvoicePDF(invoice as any, bankDetails);
 
       return {
         base64: pdfBuffer.toString('base64'),
         filename: `facture-${invoice.invoiceNumber}.pdf`,
         mimeType: 'application/pdf',
       };
+    }),
+
+  /**
+   * Record a payment received by ANY method (cash, bank transfer, cheque, card,
+   * PayPal, Stripe, other). Marks the invoice paid once fully covered.
+   * Reuses the same logic as the AI assistant's record_payment.
+   */
+  recordPayment: protectedProcedure
+    .input(
+      z.object({
+        invoiceId: z.number(),
+        amount: z.number().positive(),
+        method: z.enum(['cash', 'bank_transfer', 'check', 'card', 'paypal', 'stripe', 'other']).default('other'),
+        paymentDate: z.string().optional(),
+        reference: z.string().optional(),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+      const executor = new AIActionExecutor(tenantDb as any);
+      return executor.record_payment({
+        invoice_id: input.invoiceId,
+        amount: input.amount,
+        method: input.method,
+        payment_date: input.paymentDate,
+        reference: input.reference,
+        notes: input.notes,
+      });
+    }),
+
+  /** List payments recorded against an invoice. */
+  listPayments: protectedProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const tenantDb = await ctx.getTenantDb();
+      const executor = new AIActionExecutor(tenantDb as any);
+      return executor.get_payments({ invoice_id: input.invoiceId });
     }),
 
   /**

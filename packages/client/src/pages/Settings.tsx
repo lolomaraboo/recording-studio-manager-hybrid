@@ -15,7 +15,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import {
   Settings as SettingsIcon,
@@ -922,11 +922,69 @@ export default function Settings() {
         {/* Finance Tab */}
         <TabsContent value="finance" className="space-y-2" id="stripe-connect-anchor">
           <StripeConnectSection />
+          <BankDetailsSection />
           <VatRatesSection />
         </TabsContent>
       </Tabs>
       </div>
     </div>
+  );
+}
+
+/**
+ * Studio bank details — shown on invoices so clients can pay by bank transfer.
+ */
+function BankDetailsSection() {
+  const { data: org } = trpc.organizations.get.useQuery();
+  const utils = trpc.useUtils();
+  const [holder, setHolder] = useState("");
+  const [bank, setBank] = useState("");
+  const [iban, setIban] = useState("");
+  const [bic, setBic] = useState("");
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    if (org && !dirty) {
+      setHolder((org as any).bankHolder ?? "");
+      setBank((org as any).bankName ?? "");
+      setIban((org as any).bankIban ?? "");
+      setBic((org as any).bankBic ?? "");
+    }
+  }, [org, dirty]);
+
+  const update = trpc.organizations.update.useMutation({
+    onSuccess: () => { toast.success("Coordonnées bancaires enregistrées"); setDirty(false); utils.organizations.get.invalidate(); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const save = () => {
+    if (!org?.id) return;
+    update.mutate({ id: org.id, data: { bankHolder: holder || null, bankName: bank || null, bankIban: iban || null, bankBic: bic || null } });
+  };
+
+  const field = (label: string, value: string, set: (v: string) => void, ph = "") => (
+    <div className="space-y-1">
+      <Label>{label}</Label>
+      <Input value={value} placeholder={ph} onChange={(e) => { set(e.target.value); setDirty(true); }} />
+    </div>
+  );
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Coordonnées bancaires (virement)</CardTitle>
+        <CardDescription className="text-sm">
+          Affichées sur tes factures PDF pour que tes clients puissent te régler par virement.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-3">
+        {field("Titulaire du compte", holder, setHolder, "Studio Maraboo")}
+        {field("Banque", bank, setBank, "Ma Banque")}
+        {field("IBAN", iban, setIban, "FR76 …")}
+        {field("BIC / SWIFT", bic, setBic, "XXXXXXXX")}
+        <Button size="sm" onClick={save} disabled={!dirty || update.isPending}>Enregistrer</Button>
+      </CardContent>
+    </Card>
   );
 }
 
