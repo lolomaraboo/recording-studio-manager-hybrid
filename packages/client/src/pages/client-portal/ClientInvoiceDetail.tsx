@@ -6,6 +6,7 @@ import { FileText, Download, CreditCard, ArrowLeft } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { useClientPortalAuth } from '@/contexts/ClientPortalAuthContext';
+import { formatCurrency } from '@/lib/currency';
 
 export default function ClientInvoiceDetail() {
   const params = useParams();
@@ -112,10 +113,10 @@ export default function ClientInvoiceDetail() {
                   <div>
                     <div className="font-medium">{item.description}</div>
                     <div className="text-sm text-muted-foreground">
-                      {item.quantity} × {item.unitPrice}€
+                      {item.quantity} × {formatCurrency(item.unitPrice, invoice.currency)}
                     </div>
                   </div>
-                  <span className="font-semibold">{item.amount}€</span>
+                  <span className="font-semibold">{formatCurrency(item.amount, invoice.currency)}</span>
                 </div>
               ))}
             </div>
@@ -123,15 +124,15 @@ export default function ClientInvoiceDetail() {
             <div className="mt-4 pt-4 border-t space-y-1">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>{invoice.subtotal}€</span>
+                <span>{formatCurrency(invoice.subtotal, invoice.currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax ({invoice.taxRate}%):</span>
-                <span>{invoice.taxAmount}€</span>
+                <span>{formatCurrency(invoice.taxAmount, invoice.currency)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold">
                 <span>Total:</span>
-                <span>{invoice.total}€</span>
+                <span>{formatCurrency(invoice.total, invoice.currency)}</span>
               </div>
             </div>
           </CardContent>

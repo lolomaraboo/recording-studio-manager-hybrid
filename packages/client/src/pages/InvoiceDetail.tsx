@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/currency";
 
 type InvoiceItem = {
   description: string;
@@ -659,15 +660,15 @@ export default function InvoiceDetail() {
                     <div className="border-t pt-4 space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Sous-total HT</span>
-                        <span className="font-medium">{editTotals.subtotal.toFixed(2)} €</span>
+                        <span className="font-medium">{formatCurrency(editTotals.subtotal, invoice.currency)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">TVA</span>
-                        <span className="font-medium">{editTotals.taxAmount.toFixed(2)} €</span>
+                        <span className="font-medium">{formatCurrency(editTotals.taxAmount, invoice.currency)}</span>
                       </div>
                       <div className="flex justify-between text-lg font-semibold border-t pt-2">
                         <span>Total TTC</span>
-                        <span className="text-primary">{editTotals.total.toFixed(2)} €</span>
+                        <span className="text-primary">{formatCurrency(editTotals.total, invoice.currency)}</span>
                       </div>
                     </div>
                   </>
@@ -691,9 +692,9 @@ export default function InvoiceDetail() {
                               <TableRow key={index}>
                                 <TableCell className="font-medium text-left">{item.description}</TableCell>
                                 <TableCell>{item.quantity}</TableCell>
-                                <TableCell>{parseFloat(item.unitPrice).toFixed(2)} €</TableCell>
+                                <TableCell>{formatCurrency(item.unitPrice, invoice.currency)}</TableCell>
                                 <TableCell>{vatRates?.find(r => r.id === item.vatRateId)?.rate || "20"}%</TableCell>
-                                <TableCell className="text-right">{parseFloat(item.amount).toFixed(2)} €</TableCell>
+                                <TableCell className="text-right">{formatCurrency(item.amount, invoice.currency)}</TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
@@ -708,10 +709,7 @@ export default function InvoiceDetail() {
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Sous-total HT</span>
                         <span className="font-medium">
-                          {parseFloat(invoice.subtotal).toLocaleString("fr-FR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}{" "}€
+                          {formatCurrency(invoice.subtotal, invoice.currency)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -719,19 +717,13 @@ export default function InvoiceDetail() {
                           TVA ({parseFloat(invoice.taxRate).toFixed(0)}%)
                         </span>
                         <span className="font-medium">
-                          {parseFloat(invoice.taxAmount).toLocaleString("fr-FR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}{" "}€
+                          {formatCurrency(invoice.taxAmount, invoice.currency)}
                         </span>
                       </div>
                       <div className="flex justify-between text-lg font-semibold border-t pt-2">
                         <span>Total TTC</span>
                         <span className="text-primary">
-                          {parseFloat(invoice.total).toLocaleString("fr-FR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}{" "}€
+                          {formatCurrency(invoice.total, invoice.currency)}
                         </span>
                       </div>
                     </div>

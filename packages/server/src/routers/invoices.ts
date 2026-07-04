@@ -94,10 +94,21 @@ export const invoicesRouter = router({
         })),
         status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).default('draft'),
         notes: z.string().optional(),
+        currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
+
+      // Invoice currency: explicit override, else inherit the client's currency.
+      let currency = input.currency;
+      if (!currency) {
+        const client = await tenantDb.query.clients.findFirst({
+          where: eq(clients.id, input.clientId),
+          columns: { currency: true },
+        });
+        currency = (client?.currency as any) || 'EUR';
+      }
 
       // Calculate totals from line items (including their individual VAT rates)
       let subtotal = 0;
@@ -141,6 +152,7 @@ export const invoicesRouter = router({
           total: total.toFixed(2),
           status: input.status,
           notes: input.notes,
+          currency,
         })
         .returning();
 
@@ -189,6 +201,7 @@ export const invoicesRouter = router({
             .transform((val) => (val === "" || val === undefined ? undefined : val)),
           status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).optional(),
           notes: z.string().optional(),
+          currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
         }),
       })
     )
@@ -234,6 +247,7 @@ export const invoicesRouter = router({
           dueDate: z.string().optional(),
           status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).optional(),
           notes: z.string().optional(),
+          currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
           items: z.array(z.object({
             description: z.string(),
             quantity: z.number(),
@@ -474,8 +488,8 @@ export const invoicesRouter = router({
       // Create Stripe Payment Intent
       const stripe = getStripeClient();
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: formatStripeAmount(input.depositAmount), // Convert euros to cents
-        currency: 'eur',
+        amount: formatStripeAmount(input.depositAmount), // Convert major units to minor
+        currency: (invoice.currency || 'EUR').toLowerCase(),
         metadata: {
           type: 'invoice_deposit',
           invoiceId: invoice.id.toString(),
@@ -542,7 +556,7 @@ export const invoicesRouter = router({
       const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
         {
           price_data: {
-            currency: 'eur',
+            currency: (invoice.currency || 'EUR').toLowerCase(),
             product_data: {
               name: `Facture ${invoice.invoiceNumber}`,
               description: invoice.notes || undefined,

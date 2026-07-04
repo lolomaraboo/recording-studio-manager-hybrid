@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Save, FileText, Plus, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
+import { formatCurrency, SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 type InvoiceItem = {
   description: string;
@@ -40,14 +41,32 @@ export default function InvoiceCreate() {
   });
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    clientId: number;
+    invoiceNumber: string;
+    issueDate: string;
+    dueDate: string;
+    status: "draft";
+    notes: string;
+    currency: string;
+  }>({
     clientId: 0,
     invoiceNumber: "",
     issueDate: "",
     dueDate: "",
-    status: "draft" as const,
+    status: "draft",
     notes: "",
+    currency: "EUR",
   });
+
+  // Inherit the selected client's currency
+  useEffect(() => {
+    if (!formData.clientId) return;
+    const selectedClient = clients?.find((c) => c.id === formData.clientId) as any;
+    if (selectedClient?.currency) {
+      setFormData((prev) => ({ ...prev, currency: selectedClient.currency }));
+    }
+  }, [formData.clientId, clients]);
 
   // Line items state
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -174,6 +193,7 @@ export default function InvoiceCreate() {
       })),
       status: formData.status,
       notes: formData.notes || undefined,
+      currency: formData.currency as any,
     });
   };
 
@@ -370,39 +390,60 @@ export default function InvoiceCreate() {
               <div className="w-64 space-y-2 border-t pt-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Sous-total:</span>
-                  <span className="font-medium">{totals.subtotal.toFixed(2)} €</span>
+                  <span className="font-medium">{formatCurrency(totals.subtotal, formData.currency)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">TVA:</span>
-                  <span className="font-medium">{totals.taxAmount.toFixed(2)} €</span>
+                  <span className="font-medium">{formatCurrency(totals.taxAmount, formData.currency)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold border-t pt-2">
                   <span>Total TTC:</span>
-                  <span>{totals.total.toFixed(2)} €</span>
+                  <span>{formatCurrency(totals.total, formData.currency)}</span>
                 </div>
               </div>
             </div>
 
-            {/* Row 3: Status */}
-            <div className="space-y-2">
-              <Label htmlFor="status">Statut</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value as typeof formData.status })
-                }
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-gray-400" />Brouillon</span></SelectItem>
-                  <SelectItem value="sent"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-blue-500" />Envoyée</span></SelectItem>
-                  <SelectItem value="paid"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" />Payée</span></SelectItem>
-                  <SelectItem value="overdue"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-amber-500" />En retard</span></SelectItem>
-                  <SelectItem value="cancelled"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-red-500" />Annulée</span></SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Row 3: Status & Currency */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="status">Statut</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, status: value as typeof formData.status })
+                  }
+                >
+                  <SelectTrigger id="status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-gray-400" />Brouillon</span></SelectItem>
+                    <SelectItem value="sent"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-blue-500" />Envoyée</span></SelectItem>
+                    <SelectItem value="paid"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" />Payée</span></SelectItem>
+                    <SelectItem value="overdue"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-amber-500" />En retard</span></SelectItem>
+                    <SelectItem value="cancelled"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-red-500" />Annulée</span></SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="currency">Devise</Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                >
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder="Sélectionner une devise" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SUPPORTED_CURRENCIES.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Row 4: Notes */}

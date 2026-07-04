@@ -14,6 +14,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SUPPORTED_CURRENCIES } from "@/lib/currency";
+import {
   User,
   Building2,
   Plus,
@@ -358,6 +366,26 @@ export function ClientEditForm({
                     </div>
                   </label>
                 </div>
+              </div>
+
+              {/* Devise de facturation */}
+              <div>
+                <label htmlFor="currency" className="text-sm font-medium">Devise de facturation</label>
+                <Select
+                  value={formData.currency || "EUR"}
+                  onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                >
+                  <SelectTrigger id="currency" className="mt-1">
+                    <SelectValue placeholder="Sélectionner une devise" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SUPPORTED_CURRENCIES.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </AccordionContent>

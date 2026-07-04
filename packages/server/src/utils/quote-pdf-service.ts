@@ -90,6 +90,12 @@ export const generateQuotePDF = async (quoteId: number, organizationId: number):
     let position = tableTop + 25;
     doc.font('Helvetica');
 
+    // Currency symbol for this quote (multi-currency support)
+    const CURRENCY_SYMBOLS: Record<string, string> = {
+      EUR: '€', USD: '$', GBP: '£', CHF: 'CHF', CAD: 'C$', JPY: '¥', AUD: 'A$',
+    };
+    const sym = CURRENCY_SYMBOLS[((quote as any).currency || 'EUR').toUpperCase()] || ((quote as any).currency || '€');
+
     quote.items.forEach((item) => {
       // Check if we need a new page
       if (position > 700) {
@@ -103,8 +109,8 @@ export const generateQuotePDF = async (quoteId: number, organizationId: number):
 
       // Align other columns to the top of the description
       doc.text(item.quantity.toString(), qtyX, position, { width: 40, align: 'right' });
-      doc.text(`€${parseFloat(item.unitPrice).toFixed(2)}`, priceX, position, { width: 80, align: 'right' });
-      doc.text(`€${parseFloat(item.amount).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
+      doc.text(`${sym}${parseFloat(item.unitPrice).toFixed(2)}`, priceX, position, { width: 80, align: 'right' });
+      doc.text(`${sym}${parseFloat(item.amount).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
 
       position += Math.max(descriptionHeight, 15) + 5;
     });
@@ -124,18 +130,18 @@ export const generateQuotePDF = async (quoteId: number, organizationId: number):
 
     // Subtotal
     doc.text('Subtotal:', priceX, position, { width: 80, align: 'right' });
-    doc.text(`€${parseFloat(quote.subtotal).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
+    doc.text(`${sym}${parseFloat(quote.subtotal).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
     position += 18;
 
     // Tax
     doc.text(`Tax (${parseFloat(quote.taxRate).toFixed(0)}%):`, priceX, position, { width: 80, align: 'right' });
-    doc.text(`€${parseFloat(quote.taxAmount).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
+    doc.text(`${sym}${parseFloat(quote.taxAmount).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
     position += 18;
 
     // Total (bold)
     doc.font('Helvetica-Bold').fontSize(12);
     doc.text('Total:', priceX, position, { width: 80, align: 'right' });
-    doc.text(`€${parseFloat(quote.total).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
+    doc.text(`${sym}${parseFloat(quote.total).toFixed(2)}`, amountX, position, { width: 95, align: 'right' });
 
     position += 30;
     doc.font('Helvetica').fontSize(10);

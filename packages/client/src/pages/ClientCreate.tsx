@@ -13,6 +13,7 @@ export default function ClientCreate() {
   // Form data state - initialized with default values
   const [formData, setFormData] = useState<any>({
     type: "individual",
+    currency: "EUR",
     name: "",
     firstName: "",
     lastName: "",

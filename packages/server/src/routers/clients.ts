@@ -316,6 +316,9 @@ export const clientsRouter = router({
         // File URLs (from upload endpoints)
         avatarUrl: z.string().optional(),
         logoUrl: z.string().optional(),
+
+        // Billing currency (ISO 4217) — inherited by this client's quotes/invoices
+        currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -362,6 +365,9 @@ export const clientsRouter = router({
       // Add file URLs
       if (input.avatarUrl) clientData.avatarUrl = input.avatarUrl;
       if (input.logoUrl) clientData.logoUrl = input.logoUrl;
+
+      // Billing currency
+      if (input.currency) clientData.currency = input.currency;
 
       const [client] = await tenantDb
         .insert(clients)
@@ -440,6 +446,9 @@ export const clientsRouter = router({
           notableWorks: z.string().optional(),
           awardsRecognition: z.string().optional(),
           biography: z.string().optional(),
+
+          // Billing currency (ISO 4217)
+          currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
         }),
       })
     )

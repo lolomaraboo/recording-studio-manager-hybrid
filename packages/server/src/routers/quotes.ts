@@ -156,6 +156,7 @@ export const quotesRouter = router({
         terms: z.string().optional(),
         notes: z.string().optional(),
         internalNotes: z.string().optional(),
+        currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -163,6 +164,16 @@ export const quotesRouter = router({
 
       // Use transaction for atomicity
       return await tenantDb.transaction(async (tx) => {
+        // Quote currency: explicit override, else inherit the client's currency.
+        let currency = input.currency;
+        if (!currency) {
+          const client = await tx.query.clients.findFirst({
+            where: eq(clients.id, input.clientId),
+            columns: { currency: true },
+          });
+          currency = (client?.currency as any) || 'EUR';
+        }
+
         // Calculate totals from line items (including their individual VAT rates)
         let subtotal = 0;
         let totalTax = 0;
@@ -210,6 +221,7 @@ export const quotesRouter = router({
             terms: input.terms,
             notes: input.notes,
             internalNotes: input.internalNotes,
+            currency,
           })
           .returning();
 

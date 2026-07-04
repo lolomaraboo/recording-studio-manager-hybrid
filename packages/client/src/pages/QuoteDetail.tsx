@@ -35,6 +35,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/currency";
 
 export default function QuoteDetail() {
   const { id } = useParams<{ id: string }>();
@@ -497,9 +498,9 @@ export default function QuoteDetail() {
                         <TableRow key={index}>
                           <TableCell className="font-medium text-left">{item.description}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
-                          <TableCell>{parseFloat(item.unitPrice).toFixed(2)} €</TableCell>
+                          <TableCell>{formatCurrency(item.unitPrice, quote.currency)}</TableCell>
                           <TableCell>{vatRates?.find((r: any) => r.id === item.vatRateId)?.rate || "20"}%</TableCell>
-                          <TableCell className="text-right">{parseFloat(item.amount).toFixed(2)} €</TableCell>
+                          <TableCell className="text-right">{formatCurrency(item.amount, quote.currency)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -514,10 +515,7 @@ export default function QuoteDetail() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Sous-total HT</span>
                   <span className="font-medium">
-                    {parseFloat(quote.subtotal || "0").toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}€
+                    {formatCurrency(quote.subtotal || "0", quote.currency)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -525,19 +523,13 @@ export default function QuoteDetail() {
                     TVA ({parseFloat(quote.taxRate || "20").toFixed(0)}%)
                   </span>
                   <span className="font-medium">
-                    {parseFloat(quote.taxAmount || "0").toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}€
+                    {formatCurrency(quote.taxAmount || "0", quote.currency)}
                   </span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold border-t pt-2">
                   <span>Total TTC</span>
                   <span className="text-primary">
-                    {parseFloat(quote.total || "0").toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}€
+                    {formatCurrency(quote.total || "0", quote.currency)}
                   </span>
                 </div>
               </div>

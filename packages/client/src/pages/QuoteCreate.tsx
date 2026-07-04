@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Save, Plus, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
+import { formatCurrency, SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 type LineItem = {
   description: string;
@@ -52,6 +53,7 @@ export default function QuoteCreate() {
     terms: string;
     notes: string;
     internalNotes: string;
+    currency: string;
   }>({
     clientId: undefined,
     projectId: undefined,
@@ -60,7 +62,17 @@ export default function QuoteCreate() {
     terms: "",
     notes: "",
     internalNotes: "",
+    currency: "EUR",
   });
+
+  // Inherit the selected client's currency
+  useEffect(() => {
+    if (!formData.clientId) return;
+    const selectedClient = clients?.find((c) => c.id === formData.clientId) as any;
+    if (selectedClient?.currency) {
+      setFormData((prev) => ({ ...prev, currency: selectedClient.currency }));
+    }
+  }, [formData.clientId, clients]);
 
   // Line items state
   const [items, setItems] = useState<LineItem[]>([
@@ -165,6 +177,7 @@ export default function QuoteCreate() {
       terms: formData.terms || undefined,
       notes: formData.notes || undefined,
       internalNotes: formData.internalNotes || undefined,
+      currency: formData.currency as any,
     });
   };
 
@@ -238,15 +251,36 @@ export default function QuoteCreate() {
                 </div>
               </div>
 
-              {/* Row 2: Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">Titre</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Ex: Enregistrement album"
-                />
+              {/* Row 2: Title & Currency */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Titre</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Ex: Enregistrement album"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="currency">Devise</Label>
+                  <Select
+                    value={formData.currency}
+                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                  >
+                    <SelectTrigger id="currency">
+                      <SelectValue placeholder="Sélectionner une devise" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPORTED_CURRENCIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* Line Items Builder */}
@@ -346,15 +380,15 @@ export default function QuoteCreate() {
                 <div className="w-64 space-y-2 border-t pt-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Sous-total:</span>
-                    <span className="font-medium">{subtotal.toFixed(2)} €</span>
+                    <span className="font-medium">{formatCurrency(subtotal, formData.currency)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">TVA:</span>
-                    <span className="font-medium">{taxAmount.toFixed(2)} €</span>
+                    <span className="font-medium">{formatCurrency(taxAmount, formData.currency)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t pt-2">
                     <span>Total TTC:</span>
-                    <span>{total.toFixed(2)} €</span>
+                    <span>{formatCurrency(total, formData.currency)}</span>
                   </div>
                 </div>
               </div>
