@@ -1685,4 +1685,115 @@ export const AI_TOOLS: ToolDefinition[] = [
       required: ["id", "status"],
     },
   },
+
+  // ============================================================================
+  // CRUD COMPLET — modification détaillée & suppression de toutes les entités
+  // ============================================================================
+  {
+    name: "update_expense",
+    description: "Modifie une dépense (catégorie, description, montant, fournisseur, devise, date, mode de paiement).",
+    input_schema: {
+      type: "object",
+      properties: {
+        expense_id: { type: "number", description: "ID de la dépense" },
+        category: { type: "string" }, description: { type: "string" }, amount: { type: "number" },
+        vendor: { type: "string" }, currency: { type: "string" },
+        expense_date: { type: "string", description: "YYYY-MM-DD" }, payment_method: { type: "string" },
+      },
+      required: ["expense_id"],
+    },
+  },
+  { name: "delete_expense", description: "Supprime une dépense.", input_schema: { type: "object", properties: { expense_id: { type: "number" } }, required: ["expense_id"] } },
+  {
+    name: "update_service",
+    description: "Modifie une prestation du catalogue (nom, catégorie, prix, description).",
+    input_schema: { type: "object", properties: { service_id: { type: "number" }, name: { type: "string" }, category: { type: "string" }, unit_price: { type: "number" }, description: { type: "string" } }, required: ["service_id"] },
+  },
+  { name: "delete_service", description: "Supprime une prestation du catalogue.", input_schema: { type: "object", properties: { service_id: { type: "number" } }, required: ["service_id"] } },
+  {
+    name: "update_contract",
+    description: "Modifie un contrat (titre, termes, type, valeur, statut).",
+    input_schema: { type: "object", properties: { contract_id: { type: "number" }, title: { type: "string" }, terms: { type: "string" }, type: { type: "string" }, value: { type: "number" }, status: { type: "string" } }, required: ["contract_id"] },
+  },
+  { name: "delete_contract", description: "Supprime un contrat.", input_schema: { type: "object", properties: { contract_id: { type: "number" } }, required: ["contract_id"] } },
+  {
+    name: "update_lead",
+    description: "Modifie un prospect (nom, email, téléphone, source, notes, statut).",
+    input_schema: { type: "object", properties: { lead_id: { type: "number" }, name: { type: "string" }, contact_email: { type: "string" }, contact_phone: { type: "string" }, source: { type: "string" }, notes: { type: "string" }, status: { type: "string" } }, required: ["lead_id"] },
+  },
+  { name: "delete_lead", description: "Supprime un prospect.", input_schema: { type: "object", properties: { lead_id: { type: "number" } }, required: ["lead_id"] } },
+  {
+    name: "update_task",
+    description: "Modifie une tâche (titre, assigné, notes, statut, projet).",
+    input_schema: { type: "object", properties: { task_id: { type: "number" }, title: { type: "string" }, assignee: { type: "string" }, notes: { type: "string" }, status: { type: "string" }, project_id: { type: "number" } }, required: ["task_id"] },
+  },
+  { name: "delete_task", description: "Supprime une tâche.", input_schema: { type: "object", properties: { task_id: { type: "number" } }, required: ["task_id"] } },
+  {
+    name: "update_document",
+    description: "Modifie un document (nom, URL, type, notes).",
+    input_schema: { type: "object", properties: { document_id: { type: "number" }, name: { type: "string" }, url: { type: "string" }, doc_type: { type: "string" }, notes: { type: "string" } }, required: ["document_id"] },
+  },
+  { name: "delete_document", description: "Supprime un document.", input_schema: { type: "object", properties: { document_id: { type: "number" } }, required: ["document_id"] } },
+  {
+    name: "update_availability",
+    description: "Modifie un créneau de disponibilité/indisponibilité (horaires, type, notes).",
+    input_schema: { type: "object", properties: { availability_id: { type: "number" }, start_time: { type: "string" }, end_time: { type: "string" }, kind: { type: "string" }, notes: { type: "string" } }, required: ["availability_id"] },
+  },
+  { name: "delete_availability", description: "Supprime un créneau de disponibilité.", input_schema: { type: "object", properties: { availability_id: { type: "number" } }, required: ["availability_id"] } },
+  {
+    name: "update_package",
+    description: "Modifie un forfait (nom, heures, prix, validité, notes, statut).",
+    input_schema: { type: "object", properties: { package_id: { type: "number" }, name: { type: "string" }, total_hours: { type: "number" }, price: { type: "number" }, valid_until: { type: "string" }, notes: { type: "string" }, status: { type: "string" } }, required: ["package_id"] },
+  },
+  { name: "delete_package", description: "Supprime un forfait.", input_schema: { type: "object", properties: { package_id: { type: "number" } }, required: ["package_id"] } },
+  {
+    name: "update_credit_note",
+    description: "Modifie un avoir (montant, motif, statut).",
+    input_schema: { type: "object", properties: { credit_note_id: { type: "number" }, amount: { type: "number" }, reason: { type: "string" }, status: { type: "string" } }, required: ["credit_note_id"] },
+  },
+  { name: "delete_credit_note", description: "Supprime un avoir.", input_schema: { type: "object", properties: { credit_note_id: { type: "number" } }, required: ["credit_note_id"] } },
+  {
+    name: "update_coupon",
+    description: "Modifie un coupon (code, valeur, type, validité, notes, actif).",
+    input_schema: { type: "object", properties: { coupon_id: { type: "number" }, code: { type: "string" }, value: { type: "number" }, kind: { type: "string" }, valid_until: { type: "string" }, notes: { type: "string" }, is_active: { type: "boolean" } }, required: ["coupon_id"] },
+  },
+  { name: "delete_coupon", description: "Supprime un coupon.", input_schema: { type: "object", properties: { coupon_id: { type: "number" } }, required: ["coupon_id"] } },
+  {
+    name: "update_consumable",
+    description: "Modifie un consommable (nom, quantité, unité, seuil, notes).",
+    input_schema: { type: "object", properties: { consumable_id: { type: "number" }, name: { type: "string" }, quantity: { type: "number" }, unit: { type: "string" }, threshold: { type: "number" }, notes: { type: "string" } }, required: ["consumable_id"] },
+  },
+  { name: "delete_consumable", description: "Supprime un consommable.", input_schema: { type: "object", properties: { consumable_id: { type: "number" } }, required: ["consumable_id"] } },
+  {
+    name: "update_deliverable",
+    description: "Modifie un livrable (nom, URL, statut, notes, projet).",
+    input_schema: { type: "object", properties: { deliverable_id: { type: "number" }, name: { type: "string" }, url: { type: "string" }, status: { type: "string" }, notes: { type: "string" }, project_id: { type: "number" } }, required: ["deliverable_id"] },
+  },
+  { name: "delete_deliverable", description: "Supprime un livrable.", input_schema: { type: "object", properties: { deliverable_id: { type: "number" } }, required: ["deliverable_id"] } },
+  {
+    name: "update_time_entry",
+    description: "Modifie une saisie de temps (durée en minutes, taux horaire, notes).",
+    input_schema: { type: "object", properties: { time_entry_id: { type: "number" }, duration_minutes: { type: "number" }, hourly_rate: { type: "number" }, notes: { type: "string" } }, required: ["time_entry_id"] },
+  },
+  { name: "delete_time_entry", description: "Supprime une saisie de temps.", input_schema: { type: "object", properties: { time_entry_id: { type: "number" } }, required: ["time_entry_id"] } },
+  {
+    name: "update_track_credit",
+    description: "Modifie un crédit/split de track (rôle, nom crédité, split %, principal).",
+    input_schema: { type: "object", properties: { credit_id: { type: "number" }, role: { type: "string" }, credit_name: { type: "string" }, split_percent: { type: "number" }, is_primary: { type: "boolean" } }, required: ["credit_id"] },
+  },
+  { name: "delete_track_credit", description: "Supprime un crédit/split de track.", input_schema: { type: "object", properties: { credit_id: { type: "number" } }, required: ["credit_id"] } },
+  { name: "delete_room", description: "Supprime une salle.", input_schema: { type: "object", properties: { room_id: { type: "number" } }, required: ["room_id"] } },
+  { name: "delete_equipment", description: "Supprime un équipement.", input_schema: { type: "object", properties: { equipment_id: { type: "number" } }, required: ["equipment_id"] } },
+  { name: "delete_project", description: "Supprime un projet (échoue s'il a des éléments liés non supprimés).", input_schema: { type: "object", properties: { project_id: { type: "number" } }, required: ["project_id"] } },
+  {
+    name: "create_vat_rate",
+    description: "Crée un taux de TVA.",
+    input_schema: { type: "object", properties: { name: { type: "string" }, rate: { type: "number", description: "Taux en %" }, is_default: { type: "boolean" } }, required: ["name", "rate"] },
+  },
+  {
+    name: "update_vat_rate",
+    description: "Modifie un taux de TVA (nom, taux, défaut, actif).",
+    input_schema: { type: "object", properties: { vat_rate_id: { type: "number" }, name: { type: "string" }, rate: { type: "number" }, is_default: { type: "boolean" }, is_active: { type: "boolean" } }, required: ["vat_rate_id"] },
+  },
+  { name: "delete_vat_rate", description: "Supprime un taux de TVA.", input_schema: { type: "object", properties: { vat_rate_id: { type: "number" } }, required: ["vat_rate_id"] } },
 ];

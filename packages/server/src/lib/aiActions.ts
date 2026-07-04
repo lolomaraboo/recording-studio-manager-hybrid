@@ -356,6 +356,42 @@ export class AIActionExecutor {
           result = await this.update_contract_status(params as any);
           break;
 
+        // CRUD complet — updates détaillés & suppressions
+        case "update_expense": result = await this.update_expense(params as any); break;
+        case "delete_expense": result = await this.delete_expense(params as any); break;
+        case "update_service": result = await this.update_service(params as any); break;
+        case "delete_service": result = await this.delete_service(params as any); break;
+        case "update_contract": result = await this.update_contract(params as any); break;
+        case "delete_contract": result = await this.delete_contract(params as any); break;
+        case "update_lead": result = await this.update_lead(params as any); break;
+        case "delete_lead": result = await this.delete_lead(params as any); break;
+        case "update_task": result = await this.update_task(params as any); break;
+        case "delete_task": result = await this.delete_task(params as any); break;
+        case "update_document": result = await this.update_document(params as any); break;
+        case "delete_document": result = await this.delete_document(params as any); break;
+        case "update_availability": result = await this.update_availability(params as any); break;
+        case "delete_availability": result = await this.delete_availability(params as any); break;
+        case "update_package": result = await this.update_package(params as any); break;
+        case "delete_package": result = await this.delete_package(params as any); break;
+        case "update_credit_note": result = await this.update_credit_note(params as any); break;
+        case "delete_credit_note": result = await this.delete_credit_note(params as any); break;
+        case "update_coupon": result = await this.update_coupon(params as any); break;
+        case "delete_coupon": result = await this.delete_coupon(params as any); break;
+        case "update_consumable": result = await this.update_consumable(params as any); break;
+        case "delete_consumable": result = await this.delete_consumable(params as any); break;
+        case "update_deliverable": result = await this.update_deliverable(params as any); break;
+        case "delete_deliverable": result = await this.delete_deliverable(params as any); break;
+        case "update_time_entry": result = await this.update_time_entry(params as any); break;
+        case "delete_time_entry": result = await this.delete_time_entry(params as any); break;
+        case "update_track_credit": result = await this.update_track_credit(params as any); break;
+        case "delete_track_credit": result = await this.delete_track_credit(params as any); break;
+        case "delete_room": result = await this.delete_room(params as any); break;
+        case "delete_equipment": result = await this.delete_equipment(params as any); break;
+        case "delete_project": result = await this.delete_project(params as any); break;
+        case "create_vat_rate": result = await this.create_vat_rate(params as any); break;
+        case "update_vat_rate": result = await this.update_vat_rate(params as any); break;
+        case "delete_vat_rate": result = await this.delete_vat_rate(params as any); break;
+
         default:
           throw new Error(`Unknown action: ${actionName}`);
       }
@@ -2604,5 +2640,268 @@ export class AIActionExecutor {
   async update_contract_status(params: { id: number; status: string }) {
     const [contract] = await this.db.update(contracts).set({ status: params.status, updatedAt: new Date() }).where(eq(contracts.id, params.id)).returning();
     return { contract, message: `Contrat #${params.id} → ${params.status}` };
+  }
+
+  // ==========================================================================
+  // CRUD COMPLET — mises à jour détaillées & suppressions de toutes les entités
+  // ==========================================================================
+
+  async update_expense(p: { expense_id: number; category?: string; description?: string; amount?: number; vendor?: string; currency?: string; expense_date?: string; payment_method?: string }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.category !== undefined) d.category = p.category;
+    if (p.description !== undefined) d.description = p.description;
+    if (p.amount !== undefined) d.amount = String(p.amount);
+    if (p.vendor !== undefined) d.vendor = p.vendor;
+    if (p.currency !== undefined) d.currency = p.currency;
+    if (p.expense_date !== undefined) d.expenseDate = new Date(p.expense_date);
+    if (p.payment_method !== undefined) d.paymentMethod = p.payment_method;
+    const [row] = await this.db.update(expenses).set(d).where(eq(expenses.id, p.expense_id)).returning();
+    return { expense: row, message: `Dépense #${p.expense_id} mise à jour` };
+  }
+
+  async delete_expense(p: { expense_id: number }) {
+    await this.db.delete(expenses).where(eq(expenses.id, p.expense_id));
+    return { deleted_id: p.expense_id, message: `Dépense #${p.expense_id} supprimée` };
+  }
+
+  async update_service(p: { service_id: number; name?: string; category?: string; unit_price?: number; description?: string }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.name !== undefined) d.name = p.name;
+    if (p.category !== undefined) d.category = p.category;
+    if (p.unit_price !== undefined) d.unitPrice = String(p.unit_price);
+    if (p.description !== undefined) d.description = p.description;
+    const [row] = await this.db.update(serviceCatalog).set(d).where(eq(serviceCatalog.id, p.service_id)).returning();
+    return { service: row, message: `Service #${p.service_id} mis à jour` };
+  }
+
+  async delete_service(p: { service_id: number }) {
+    await this.db.delete(serviceCatalog).where(eq(serviceCatalog.id, p.service_id));
+    return { deleted_id: p.service_id, message: `Service #${p.service_id} supprimé` };
+  }
+
+  async update_contract(p: { contract_id: number; title?: string; terms?: string; type?: string; value?: number; status?: string }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.title !== undefined) d.title = p.title;
+    if (p.terms !== undefined) d.terms = p.terms;
+    if (p.type !== undefined) d.type = p.type;
+    if (p.value !== undefined) d.value = String(p.value);
+    if (p.status !== undefined) d.status = p.status;
+    const [row] = await this.db.update(contracts).set(d).where(eq(contracts.id, p.contract_id)).returning();
+    return { contract: row, message: `Contrat #${p.contract_id} mis à jour` };
+  }
+
+  async delete_contract(p: { contract_id: number }) {
+    await this.db.delete(contracts).where(eq(contracts.id, p.contract_id));
+    return { deleted_id: p.contract_id, message: `Contrat #${p.contract_id} supprimé` };
+  }
+
+  async update_lead(p: { lead_id: number; name?: string; contact_email?: string; contact_phone?: string; source?: string; notes?: string; status?: string }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.name !== undefined) d.name = p.name;
+    if (p.contact_email !== undefined) d.contactEmail = p.contact_email;
+    if (p.contact_phone !== undefined) d.contactPhone = p.contact_phone;
+    if (p.source !== undefined) d.source = p.source;
+    if (p.notes !== undefined) d.notes = p.notes;
+    if (p.status !== undefined) d.status = p.status;
+    const [row] = await this.db.update(leads).set(d).where(eq(leads.id, p.lead_id)).returning();
+    return { lead: row, message: `Prospect #${p.lead_id} mis à jour` };
+  }
+
+  async delete_lead(p: { lead_id: number }) {
+    await this.db.delete(leads).where(eq(leads.id, p.lead_id));
+    return { deleted_id: p.lead_id, message: `Prospect #${p.lead_id} supprimé` };
+  }
+
+  async update_task(p: { task_id: number; title?: string; assignee?: string; notes?: string; status?: string; project_id?: number }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.title !== undefined) d.title = p.title;
+    if (p.assignee !== undefined) d.assignee = p.assignee;
+    if (p.notes !== undefined) d.notes = p.notes;
+    if (p.status !== undefined) d.status = p.status;
+    if (p.project_id !== undefined) d.projectId = p.project_id;
+    const [row] = await this.db.update(tasks).set(d).where(eq(tasks.id, p.task_id)).returning();
+    return { task: row, message: `Tâche #${p.task_id} mise à jour` };
+  }
+
+  async delete_task(p: { task_id: number }) {
+    await this.db.delete(tasks).where(eq(tasks.id, p.task_id));
+    return { deleted_id: p.task_id, message: `Tâche #${p.task_id} supprimée` };
+  }
+
+  async update_document(p: { document_id: number; name?: string; url?: string; doc_type?: string; notes?: string }) {
+    const d: any = {};
+    if (p.name !== undefined) d.name = p.name;
+    if (p.url !== undefined) d.url = p.url;
+    if (p.doc_type !== undefined) d.docType = p.doc_type;
+    if (p.notes !== undefined) d.notes = p.notes;
+    const [row] = await this.db.update(documents).set(d).where(eq(documents.id, p.document_id)).returning();
+    return { document: row, message: `Document #${p.document_id} mis à jour` };
+  }
+
+  async delete_document(p: { document_id: number }) {
+    await this.db.delete(documents).where(eq(documents.id, p.document_id));
+    return { deleted_id: p.document_id, message: `Document #${p.document_id} supprimé` };
+  }
+
+  async update_availability(p: { availability_id: number; start_time?: string; end_time?: string; kind?: string; notes?: string }) {
+    const d: any = {};
+    if (p.start_time !== undefined) d.startTime = new Date(p.start_time);
+    if (p.end_time !== undefined) d.endTime = new Date(p.end_time);
+    if (p.kind !== undefined) d.kind = p.kind;
+    if (p.notes !== undefined) d.notes = p.notes;
+    const [row] = await this.db.update(availability).set(d).where(eq(availability.id, p.availability_id)).returning();
+    return { availability: row, message: `Créneau #${p.availability_id} mis à jour` };
+  }
+
+  async delete_availability(p: { availability_id: number }) {
+    await this.db.delete(availability).where(eq(availability.id, p.availability_id));
+    return { deleted_id: p.availability_id, message: `Créneau #${p.availability_id} supprimé` };
+  }
+
+  async update_package(p: { package_id: number; name?: string; total_hours?: number; price?: number; valid_until?: string; notes?: string; status?: string }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.name !== undefined) d.name = p.name;
+    if (p.total_hours !== undefined) d.totalHours = String(p.total_hours);
+    if (p.price !== undefined) d.price = String(p.price);
+    if (p.valid_until !== undefined) d.validUntil = new Date(p.valid_until);
+    if (p.notes !== undefined) d.notes = p.notes;
+    if (p.status !== undefined) d.status = p.status;
+    const [row] = await this.db.update(clientPackages).set(d).where(eq(clientPackages.id, p.package_id)).returning();
+    return { package: row, message: `Forfait #${p.package_id} mis à jour` };
+  }
+
+  async delete_package(p: { package_id: number }) {
+    await this.db.delete(clientPackages).where(eq(clientPackages.id, p.package_id));
+    return { deleted_id: p.package_id, message: `Forfait #${p.package_id} supprimé` };
+  }
+
+  async update_credit_note(p: { credit_note_id: number; amount?: number; reason?: string; status?: string }) {
+    const d: any = {};
+    if (p.amount !== undefined) d.amount = String(p.amount);
+    if (p.reason !== undefined) d.reason = p.reason;
+    if (p.status !== undefined) d.status = p.status;
+    const [row] = await this.db.update(creditNotes).set(d).where(eq(creditNotes.id, p.credit_note_id)).returning();
+    return { credit_note: row, message: `Avoir #${p.credit_note_id} mis à jour` };
+  }
+
+  async delete_credit_note(p: { credit_note_id: number }) {
+    await this.db.delete(creditNotes).where(eq(creditNotes.id, p.credit_note_id));
+    return { deleted_id: p.credit_note_id, message: `Avoir #${p.credit_note_id} supprimé` };
+  }
+
+  async update_coupon(p: { coupon_id: number; code?: string; value?: number; kind?: string; valid_until?: string; notes?: string; is_active?: boolean }) {
+    const d: any = {};
+    if (p.code !== undefined) d.code = p.code;
+    if (p.value !== undefined) d.value = String(p.value);
+    if (p.kind !== undefined) d.kind = p.kind;
+    if (p.valid_until !== undefined) d.validUntil = new Date(p.valid_until);
+    if (p.notes !== undefined) d.notes = p.notes;
+    if (p.is_active !== undefined) d.isActive = p.is_active;
+    const [row] = await this.db.update(coupons).set(d).where(eq(coupons.id, p.coupon_id)).returning();
+    return { coupon: row, message: `Coupon #${p.coupon_id} mis à jour` };
+  }
+
+  async delete_coupon(p: { coupon_id: number }) {
+    await this.db.delete(coupons).where(eq(coupons.id, p.coupon_id));
+    return { deleted_id: p.coupon_id, message: `Coupon #${p.coupon_id} supprimé` };
+  }
+
+  async update_consumable(p: { consumable_id: number; name?: string; quantity?: number; unit?: string; threshold?: number; notes?: string }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.name !== undefined) d.name = p.name;
+    if (p.quantity !== undefined) d.quantity = String(p.quantity);
+    if (p.unit !== undefined) d.unit = p.unit;
+    if (p.threshold !== undefined) d.threshold = String(p.threshold);
+    if (p.notes !== undefined) d.notes = p.notes;
+    const [row] = await this.db.update(consumables).set(d).where(eq(consumables.id, p.consumable_id)).returning();
+    return { consumable: row, message: `Consommable #${p.consumable_id} mis à jour` };
+  }
+
+  async delete_consumable(p: { consumable_id: number }) {
+    await this.db.delete(consumables).where(eq(consumables.id, p.consumable_id));
+    return { deleted_id: p.consumable_id, message: `Consommable #${p.consumable_id} supprimé` };
+  }
+
+  async update_deliverable(p: { deliverable_id: number; name?: string; url?: string; status?: string; notes?: string; project_id?: number }) {
+    const d: any = {};
+    if (p.name !== undefined) d.name = p.name;
+    if (p.url !== undefined) d.url = p.url;
+    if (p.status !== undefined) d.status = p.status;
+    if (p.notes !== undefined) d.notes = p.notes;
+    if (p.project_id !== undefined) d.projectId = p.project_id;
+    const [row] = await this.db.update(deliverables).set(d).where(eq(deliverables.id, p.deliverable_id)).returning();
+    return { deliverable: row, message: `Livrable #${p.deliverable_id} mis à jour` };
+  }
+
+  async delete_deliverable(p: { deliverable_id: number }) {
+    await this.db.delete(deliverables).where(eq(deliverables.id, p.deliverable_id));
+    return { deleted_id: p.deliverable_id, message: `Livrable #${p.deliverable_id} supprimé` };
+  }
+
+  async update_time_entry(p: { time_entry_id: number; duration_minutes?: number; hourly_rate?: number; notes?: string }) {
+    const d: any = {};
+    if (p.duration_minutes !== undefined) d.durationMinutes = p.duration_minutes;
+    if (p.hourly_rate !== undefined) d.hourlyRateSnapshot = String(p.hourly_rate);
+    if (p.notes !== undefined) d.notes = p.notes;
+    const [row] = await this.db.update(timeEntries).set(d).where(eq(timeEntries.id, p.time_entry_id)).returning();
+    return { time_entry: row, message: `Saisie de temps #${p.time_entry_id} mise à jour` };
+  }
+
+  async delete_time_entry(p: { time_entry_id: number }) {
+    await this.db.delete(timeEntries).where(eq(timeEntries.id, p.time_entry_id));
+    return { deleted_id: p.time_entry_id, message: `Saisie de temps #${p.time_entry_id} supprimée` };
+  }
+
+  async update_track_credit(p: { credit_id: number; role?: string; credit_name?: string; split_percent?: number; is_primary?: boolean }) {
+    const d: any = {};
+    if (p.role !== undefined) d.role = p.role;
+    if (p.credit_name !== undefined) d.creditName = p.credit_name;
+    if (p.split_percent !== undefined) d.splitPercent = String(p.split_percent);
+    if (p.is_primary !== undefined) d.isPrimary = p.is_primary;
+    const [row] = await this.db.update(trackCredits).set(d).where(eq(trackCredits.id, p.credit_id)).returning();
+    return { credit: row, message: `Crédit #${p.credit_id} mis à jour` };
+  }
+
+  async delete_track_credit(p: { credit_id: number }) {
+    await this.db.delete(trackCredits).where(eq(trackCredits.id, p.credit_id));
+    return { deleted_id: p.credit_id, message: `Crédit #${p.credit_id} supprimé` };
+  }
+
+  async delete_room(p: { room_id: number }) {
+    await this.db.delete(rooms).where(eq(rooms.id, p.room_id));
+    return { deleted_id: p.room_id, message: `Salle #${p.room_id} supprimée` };
+  }
+
+  async delete_equipment(p: { equipment_id: number }) {
+    await this.db.delete(equipment).where(eq(equipment.id, p.equipment_id));
+    return { deleted_id: p.equipment_id, message: `Équipement #${p.equipment_id} supprimé` };
+  }
+
+  async delete_project(p: { project_id: number }) {
+    await this.db.delete(projects).where(eq(projects.id, p.project_id));
+    return { deleted_id: p.project_id, message: `Projet #${p.project_id} supprimé` };
+  }
+
+  async create_vat_rate(p: { name: string; rate: number; is_default?: boolean }) {
+    const [row] = await this.db
+      .insert(vatRates)
+      .values({ name: p.name, rate: String(p.rate), isDefault: p.is_default ?? false, isActive: true })
+      .returning();
+    return { vat_rate: row, message: `Taux de TVA "${p.name}" (${p.rate}%) créé` };
+  }
+
+  async update_vat_rate(p: { vat_rate_id: number; name?: string; rate?: number; is_default?: boolean; is_active?: boolean }) {
+    const d: any = { updatedAt: new Date() };
+    if (p.name !== undefined) d.name = p.name;
+    if (p.rate !== undefined) d.rate = String(p.rate);
+    if (p.is_default !== undefined) d.isDefault = p.is_default;
+    if (p.is_active !== undefined) d.isActive = p.is_active;
+    const [row] = await this.db.update(vatRates).set(d).where(eq(vatRates.id, p.vat_rate_id)).returning();
+    return { vat_rate: row, message: `Taux de TVA #${p.vat_rate_id} mis à jour` };
+  }
+
+  async delete_vat_rate(p: { vat_rate_id: number }) {
+    await this.db.delete(vatRates).where(eq(vatRates.id, p.vat_rate_id));
+    return { deleted_id: p.vat_rate_id, message: `Taux de TVA #${p.vat_rate_id} supprimé` };
   }
 }
