@@ -14,6 +14,20 @@ import {
   equipment,
   projects,
   musicians,
+  tracks,
+  timeEntries,
+  expenses,
+  contracts,
+  serviceCatalog,
+  leads,
+  tasks,
+  documents,
+  availability,
+  clientPackages,
+  creditNotes,
+  coupons,
+  consumables,
+  deliverables,
 } from "@rsm/database/tenant";
 
 /**
@@ -205,6 +219,66 @@ export class AIActionExecutor {
           break;
         case "create_musician":
           result = await this.create_musician(params as any);
+          break;
+
+        // Tracks, temps, dépenses, contrats, services (accès étendu)
+        case "get_all_tracks":
+          result = await this.get_all_tracks(params as any);
+          break;
+        case "create_track":
+          result = await this.create_track(params as any);
+          break;
+        case "get_all_time_entries":
+          result = await this.get_all_time_entries(params as any);
+          break;
+        case "get_all_expenses":
+          result = await this.get_all_expenses(params as any);
+          break;
+        case "get_all_contracts":
+          result = await this.get_all_contracts(params as any);
+          break;
+        case "get_all_services":
+          result = await this.get_all_services(params as any);
+          break;
+
+        // Pipeline & pilotage
+        case "get_all_leads":
+          result = await this.get_all_leads(params as any);
+          break;
+        case "create_lead":
+          result = await this.create_lead(params as any);
+          break;
+        case "get_all_tasks":
+          result = await this.get_all_tasks(params as any);
+          break;
+        case "create_task":
+          result = await this.create_task(params as any);
+          break;
+        case "get_all_documents":
+          result = await this.get_all_documents(params as any);
+          break;
+        case "create_document":
+          result = await this.create_document(params as any);
+          break;
+        case "get_all_availability":
+          result = await this.get_all_availability(params as any);
+          break;
+
+        // Finance étendue
+        case "get_all_packages":
+          result = await this.get_all_packages(params as any);
+          break;
+        case "get_all_credit_notes":
+          result = await this.get_all_credit_notes(params as any);
+          break;
+        case "get_all_coupons":
+          result = await this.get_all_coupons(params as any);
+          break;
+        case "get_all_consumables":
+          result = await this.get_all_consumables(params as any);
+          break;
+        case "get_all_deliverables":
+          result = await this.get_all_deliverables(params as any);
           break;
 
         default:
@@ -1937,5 +2011,123 @@ export class AIActionExecutor {
       musician,
       message: `Talent "${name}" créé avec succès`,
     };
+  }
+
+  // ==========================================================================
+  // Accès étendu — tracks, temps, dépenses, contrats, services, pilotage, finance
+  // ==========================================================================
+
+  async get_all_tracks(params: { project_id?: number; limit?: number } = {}) {
+    const { project_id, limit = 50 } = params;
+    const q = this.db.select().from(tracks);
+    const result = await (project_id
+      ? q.where(eq(tracks.projectId, project_id)).limit(limit)
+      : q.orderBy(desc(tracks.createdAt)).limit(limit));
+    return { tracks: result, count: result.length };
+  }
+
+  async create_track(params: { project_id: number; title: string; track_number?: number; bpm?: number; key?: string }) {
+    const { project_id, title, track_number, bpm, key } = params;
+    const [track] = await this.db
+      .insert(tracks)
+      .values({ projectId: project_id, title, trackNumber: track_number, bpm, key, status: "recording" })
+      .returning();
+    return { track, message: `Track "${title}" créée` };
+  }
+
+  async get_all_time_entries(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(timeEntries).orderBy(desc(timeEntries.createdAt)).limit(params.limit ?? 50);
+    return { time_entries: result, count: result.length };
+  }
+
+  async get_all_expenses(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(expenses).orderBy(desc(expenses.createdAt)).limit(params.limit ?? 50);
+    return { expenses: result, count: result.length };
+  }
+
+  async get_all_contracts(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(contracts).orderBy(desc(contracts.createdAt)).limit(params.limit ?? 50);
+    return { contracts: result, count: result.length };
+  }
+
+  async get_all_services(_params: {} = {}) {
+    const result = await this.db.select().from(serviceCatalog).limit(100);
+    return { services: result, count: result.length };
+  }
+
+  async get_all_leads(params: { status?: string; limit?: number } = {}) {
+    const { status, limit = 50 } = params;
+    const q = this.db.select().from(leads);
+    const result = await (status ? q.where(eq(leads.status, status)).limit(limit) : q.orderBy(desc(leads.createdAt)).limit(limit));
+    return { leads: result, count: result.length };
+  }
+
+  async create_lead(params: { name: string; contact_email?: string; contact_phone?: string; source?: string; notes?: string }) {
+    const { name, contact_email, contact_phone, source, notes } = params;
+    const [lead] = await this.db
+      .insert(leads)
+      .values({ name, contactEmail: contact_email, contactPhone: contact_phone, source, notes, status: "new" })
+      .returning();
+    return { lead, message: `Prospect "${name}" créé` };
+  }
+
+  async get_all_tasks(params: { status?: string; limit?: number } = {}) {
+    const { status, limit = 50 } = params;
+    const q = this.db.select().from(tasks);
+    const result = await (status ? q.where(eq(tasks.status, status)).limit(limit) : q.orderBy(desc(tasks.createdAt)).limit(limit));
+    return { tasks: result, count: result.length };
+  }
+
+  async create_task(params: { title: string; project_id?: number; assignee?: string; notes?: string }) {
+    const { title, project_id, assignee, notes } = params;
+    const [task] = await this.db
+      .insert(tasks)
+      .values({ title, projectId: project_id, assignee, notes, status: "todo" })
+      .returning();
+    return { task, message: `Tâche "${title}" créée` };
+  }
+
+  async get_all_documents(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(documents).orderBy(desc(documents.createdAt)).limit(params.limit ?? 50);
+    return { documents: result, count: result.length };
+  }
+
+  async create_document(params: { name: string; url: string; doc_type?: string; project_id?: number; notes?: string }) {
+    const { name, url, doc_type, project_id, notes } = params;
+    const [doc] = await this.db
+      .insert(documents)
+      .values({ name, url, docType: doc_type, projectId: project_id, notes })
+      .returning();
+    return { document: doc, message: `Document "${name}" ajouté` };
+  }
+
+  async get_all_availability(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(availability).orderBy(desc(availability.startTime)).limit(params.limit ?? 100);
+    return { availability: result, count: result.length };
+  }
+
+  async get_all_packages(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(clientPackages).limit(params.limit ?? 50);
+    return { packages: result, count: result.length };
+  }
+
+  async get_all_credit_notes(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(creditNotes).orderBy(desc(creditNotes.createdAt)).limit(params.limit ?? 50);
+    return { credit_notes: result, count: result.length };
+  }
+
+  async get_all_coupons(_params: {} = {}) {
+    const result = await this.db.select().from(coupons).limit(100);
+    return { coupons: result, count: result.length };
+  }
+
+  async get_all_consumables(_params: {} = {}) {
+    const result = await this.db.select().from(consumables).limit(200);
+    return { consumables: result, count: result.length };
+  }
+
+  async get_all_deliverables(params: { limit?: number } = {}) {
+    const result = await this.db.select().from(deliverables).orderBy(desc(deliverables.createdAt)).limit(params.limit ?? 50);
+    return { deliverables: result, count: result.length };
   }
 }

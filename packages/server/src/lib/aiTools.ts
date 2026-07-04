@@ -1156,4 +1156,192 @@ export const AI_TOOLS: ToolDefinition[] = [
       required: ["name"],
     },
   },
+
+  // ============================================================================
+  // ACCÈS ÉTENDU — TRACKS, TEMPS, DÉPENSES, CONTRATS, SERVICES
+  // ============================================================================
+  {
+    name: "get_all_tracks",
+    description:
+      "Récupère les tracks (morceaux) du studio, optionnellement filtrés par projet. Retourne titre, numéro, BPM, tonalité, statut.",
+    input_schema: {
+      type: "object",
+      properties: {
+        project_id: { type: "number", description: "ID du projet pour filtrer (optionnel)" },
+        limit: { type: "number", description: "Nombre max de résultats (défaut 50)" },
+      },
+    },
+  },
+  {
+    name: "create_track",
+    description: "Crée une nouvelle track (morceau) rattachée à un projet.",
+    input_schema: {
+      type: "object",
+      properties: {
+        project_id: { type: "number", description: "ID du projet parent" },
+        title: { type: "string", description: "Titre de la track" },
+        track_number: { type: "number", description: "Numéro de piste (optionnel)" },
+        bpm: { type: "number", description: "Tempo en BPM (optionnel)" },
+        key: { type: "string", description: "Tonalité, ex: 'Am' (optionnel)" },
+      },
+      required: ["project_id", "title"],
+    },
+  },
+  {
+    name: "get_all_time_entries",
+    description: "Récupère les saisies de temps (heures travaillées) enregistrées.",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
+  {
+    name: "get_all_expenses",
+    description: "Récupère les dépenses du studio (coûts, achats, frais).",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
+  {
+    name: "get_all_contracts",
+    description: "Récupère les contrats du studio (accords clients, cessions de droits, etc.).",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
+  {
+    name: "get_all_services",
+    description:
+      "Récupère le catalogue de services/prestations du studio (nom, prix, unité).",
+    input_schema: { type: "object", properties: {} },
+  },
+
+  // ============================================================================
+  // PILOTAGE — PROSPECTS, TÂCHES, DOCUMENTS, DISPONIBILITÉS
+  // ============================================================================
+  {
+    name: "get_all_leads",
+    description: "Récupère les prospects (leads) du pipeline commercial.",
+    input_schema: {
+      type: "object",
+      properties: {
+        status: { type: "string", description: "Filtre par statut (ex: 'new', 'contacted', 'won', 'lost')" },
+        limit: { type: "number", description: "Nombre max (défaut 50)" },
+      },
+    },
+  },
+  {
+    name: "create_lead",
+    description: "Crée un nouveau prospect (lead) dans le pipeline.",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Nom du prospect ou de l'entreprise" },
+        contact_email: { type: "string", description: "Email de contact (optionnel)" },
+        contact_phone: { type: "string", description: "Téléphone de contact (optionnel)" },
+        source: { type: "string", description: "Origine du prospect (optionnel)" },
+        notes: { type: "string", description: "Notes libres (optionnel)" },
+      },
+      required: ["name"],
+    },
+  },
+  {
+    name: "get_all_tasks",
+    description: "Récupère les tâches (to-do) du studio, optionnellement filtrées par statut.",
+    input_schema: {
+      type: "object",
+      properties: {
+        status: { type: "string", description: "Filtre par statut (ex: 'todo', 'doing', 'done')" },
+        limit: { type: "number", description: "Nombre max (défaut 50)" },
+      },
+    },
+  },
+  {
+    name: "create_task",
+    description: "Crée une nouvelle tâche, optionnellement rattachée à un projet.",
+    input_schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Intitulé de la tâche" },
+        project_id: { type: "number", description: "ID du projet lié (optionnel)" },
+        assignee: { type: "string", description: "Personne assignée (optionnel)" },
+        notes: { type: "string", description: "Détails (optionnel)" },
+      },
+      required: ["title"],
+    },
+  },
+  {
+    name: "get_all_documents",
+    description: "Récupère les documents du studio (fichiers, liens, pièces jointes).",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
+  {
+    name: "create_document",
+    description: "Ajoute un document (référence par URL) au studio.",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Nom du document" },
+        url: { type: "string", description: "URL du document" },
+        doc_type: { type: "string", description: "Type de document (optionnel)" },
+        project_id: { type: "number", description: "ID du projet lié (optionnel)" },
+        notes: { type: "string", description: "Notes (optionnel)" },
+      },
+      required: ["name", "url"],
+    },
+  },
+  {
+    name: "get_all_availability",
+    description:
+      "Récupère les créneaux de disponibilité/indisponibilité (salles, staff, talents).",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 100)" } },
+    },
+  },
+
+  // ============================================================================
+  // FINANCE ÉTENDUE — FORFAITS, AVOIRS, COUPONS, INVENTAIRE, LIVRABLES
+  // ============================================================================
+  {
+    name: "get_all_packages",
+    description: "Récupère les forfaits/packages clients (heures prépayées, formules).",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
+  {
+    name: "get_all_credit_notes",
+    description: "Récupère les avoirs (notes de crédit) émis.",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
+  {
+    name: "get_all_coupons",
+    description: "Récupère les coupons/codes promo du studio.",
+    input_schema: { type: "object", properties: {} },
+  },
+  {
+    name: "get_all_consumables",
+    description:
+      "Récupère l'inventaire des consommables (bandes, câbles, fournitures) avec stocks.",
+    input_schema: { type: "object", properties: {} },
+  },
+  {
+    name: "get_all_deliverables",
+    description:
+      "Récupère les livrables clients (masters, mixs, exports) et leur statut de livraison.",
+    input_schema: {
+      type: "object",
+      properties: { limit: { type: "number", description: "Nombre max (défaut 50)" } },
+    },
+  },
 ];

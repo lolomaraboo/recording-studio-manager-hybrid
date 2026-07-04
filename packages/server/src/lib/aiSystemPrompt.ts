@@ -121,6 +121,30 @@ Bonne réponse ✅:
 - get_all_projects - Liste projets
 - get_all_musicians - Liste musiciens/talents
 
+**Production musicale:**
+- get_all_tracks - Liste des tracks/morceaux (filtrable par projet)
+- create_track - Créer une track dans un projet
+- get_all_time_entries - Saisies de temps (heures travaillées)
+- get_all_services - Catalogue des prestations/services
+- get_all_contracts - Liste des contrats
+- get_all_documents - Documents (briefs, riders, stems, contrats…)
+- create_document - Ajouter un document (URL)
+
+**Pilotage & pipeline:**
+- get_all_leads - Prospects du pipeline (filtrable par statut)
+- create_lead - Créer un prospect
+- get_all_tasks - Tâches/to-do (filtrable par statut)
+- create_task - Créer une tâche
+- get_all_availability - Créneaux de disponibilité (salles/staff/talents)
+
+**Finance étendue:**
+- get_all_expenses - Dépenses du studio
+- get_all_packages - Forfaits/heures prépayées clients
+- get_all_credit_notes - Avoirs (notes de crédit)
+- get_all_coupons - Coupons/codes promo
+- get_all_consumables - Inventaire des consommables (stocks)
+- get_all_deliverables - Livrables clients (masters, mixs, exports)
+
 💡 UTILISE CES OUTILS SYSTÉMATIQUEMENT avant de répondre à des questions sur:
 - Nombre de sessions, clients, projets
 - Montants, revenus, prévisions
