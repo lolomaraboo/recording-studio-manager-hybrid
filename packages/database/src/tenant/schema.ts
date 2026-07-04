@@ -97,6 +97,7 @@ export const clients = pgTable("clients", {
   notableWorks: text("notable_works"),
   awardsRecognition: text("awards_recognition"),
   biography: text("biography"),
+  currency: varchar("currency", { length: 3 }).notNull().default("EUR"),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -254,6 +255,7 @@ export const invoices = pgTable("invoices", {
   invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
   clientId: integer("client_id").notNull().references(() => clients.id),
   projectId: integer("project_id").references(() => projects.id), // optional: ties invoice to a project (profitability)
+  currency: varchar("currency", { length: 3 }).notNull().default("EUR"),
   issueDate: timestamp("issue_date").notNull().defaultNow(),
   dueDate: timestamp("due_date").notNull(),
   status: varchar("status", { length: 50 }).notNull().default("draft"), // "draft" | "sent" | "paid" | "overdue" | "cancelled"
@@ -624,6 +626,7 @@ export const trackCredits = pgTable("track_credits", {
   role: varchar("role", { length: 100 }).notNull(), // "producer" | "engineer" | "mixing" | "mastering" | "vocals" | "guitar" | "drums" | "bass" | etc.
   creditName: varchar("credit_name", { length: 255 }).notNull(), // Name as it should appear in credits
   isPrimary: boolean("is_primary").notNull().default(false),
+  splitPercent: decimal("split_percent", { precision: 5, scale: 2 }), // optional songwriting/royalty split %
 
   // Details
   description: text("description"),
@@ -1590,3 +1593,62 @@ export const clientPackages = pgTable("client_packages", {
 });
 export type ClientPackage = typeof clientPackages.$inferSelect;
 export type InsertClientPackage = typeof clientPackages.$inferInsert;
+
+/** Credit notes (avoirs) — formal negative invoice document. */
+export const creditNotes = pgTable("credit_notes", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  creditNoteNumber: varchar("credit_note_number", { length: 100 }).notNull().unique(),
+  clientId: integer("client_id").notNull().references(() => clients.id),
+  invoiceId: integer("invoice_id").references(() => invoices.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  reason: text("reason"),
+  status: varchar("status", { length: 20 }).notNull().default("issued"), // issued | applied | cancelled
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+export type CreditNote = typeof creditNotes.$inferSelect;
+export type InsertCreditNote = typeof creditNotes.$inferInsert;
+
+/** Discount coupons / gift cards. */
+export const coupons = pgTable("coupons", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  code: varchar("code", { length: 100 }).notNull().unique(),
+  kind: varchar("kind", { length: 20 }).notNull().default("percent"), // percent | amount | giftcard
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  validUntil: timestamp("valid_until"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+export type Coupon = typeof coupons.$inferSelect;
+export type InsertCoupon = typeof coupons.$inferInsert;
+
+/** Consumables / inventory (cables, media, supplies). */
+export const consumables = pgTable("consumables", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  name: varchar("name", { length: 255 }).notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("0"),
+  unit: varchar("unit", { length: 50 }),
+  threshold: decimal("threshold", { precision: 10, scale: 2 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export type Consumable = typeof consumables.$inferSelect;
+export type InsertConsumable = typeof consumables.$inferInsert;
+
+/** Deliverables / export bundles handed to the client. */
+export const deliverables = pgTable("deliverables", {
+  id: serial("id").primaryKey(),
+  ...syncColumns,
+  name: varchar("name", { length: 255 }).notNull(),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "cascade" }),
+  url: varchar("url", { length: 1000 }),
+  status: varchar("status", { length: 20 }).notNull().default("draft"), // draft | delivered | approved
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+export type Deliverable = typeof deliverables.$inferSelect;
+export type InsertDeliverable = typeof deliverables.$inferInsert;

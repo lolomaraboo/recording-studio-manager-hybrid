@@ -189,6 +189,17 @@ public struct APIClient: Sendable {
         return (number, (json["total"] as? String) ?? "", (json["itemCount"] as? Int) ?? 0)
     }
 
+    /// Online-only credit note (avoir): the SERVER allocates the number.
+    public func createCreditNote(clientServerId: Int, amount: Double,
+                                 invoiceServerId: Int? = nil, reason: String? = nil) async throws -> String {
+        var body: [String: Any] = ["clientId": clientServerId, "amount": amount]
+        if let invoiceServerId { body["invoiceId"] = invoiceServerId }
+        if let reason { body["reason"] = reason }
+        let json = try await request(path: "create-credit-note", body: body)
+        guard let n = json["creditNoteNumber"] as? String else { throw APIError.decoding("missing creditNoteNumber") }
+        return n
+    }
+
     /// Online-only quote creation: the SERVER allocates the quote number.
     public func createQuote(clientServerId: Int, items: [[String: Any]], taxRate: Double = 20, validityDays: Int = 30) async throws -> String {
         let json = try await request(path: "create-quote", body: [

@@ -71,6 +71,7 @@ const SYNCED_TABLES = new Set([
   'user_preferences',
   'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
   'leads', 'tasks', 'documents', 'availability', 'client_packages',
+  'credit_notes', 'coupons', 'consumables', 'deliverables',
 ]);
 
 /** Columns clients may never write directly */
@@ -537,6 +538,41 @@ router.post('/create-invoice', async (req: SyncRequest, res: Response) => {
   } catch (error) {
     console.error('[Sync] create-invoice failed:', error);
     res.status(500).json({ error: 'Invoice creation failed' });
+  }
+});
+
+// ----------------------------------------------------------------------------
+// POST /api/sync/create-credit-note — online-only credit note (avoir) with
+// server-side numbering AV-YYYY-NNNN.
+// ----------------------------------------------------------------------------
+router.post('/create-credit-note', async (req: SyncRequest, res: Response) => {
+  try {
+    const db = await getTenantDb(req.syncOrgId!);
+    const clientId = Number(req.body?.clientId);
+    const amount = Number(req.body?.amount);
+    const invoiceIdRaw = Number(req.body?.invoiceId);
+    const invoiceId = Number.isInteger(invoiceIdRaw) && invoiceIdRaw > 0 ? invoiceIdRaw : null;
+    const reason = typeof req.body?.reason === 'string' ? req.body.reason.slice(0, 500) : null;
+    if (!Number.isInteger(clientId) || !(amount > 0)) {
+      return res.status(400).json({ error: 'clientId and positive amount are required' });
+    }
+    const year = new Date().getFullYear();
+    const prefix = `AV-${year}-`;
+    const last = (await db.execute(sql`
+      SELECT credit_note_number FROM credit_notes
+      WHERE credit_note_number LIKE ${prefix + '%'}
+      ORDER BY credit_note_number DESC LIMIT 1
+    `)) as unknown as Array<{ credit_note_number: string }>;
+    const lastSeq = last[0] ? parseInt(last[0].credit_note_number.slice(prefix.length), 10) || 0 : 0;
+    const number = `${prefix}${String(lastSeq + 1).padStart(4, '0')}`;
+    await db.execute(sql`
+      INSERT INTO credit_notes (credit_note_number, client_id, invoice_id, amount, reason, status)
+      VALUES (${number}, ${clientId}, ${invoiceId}, ${amount.toFixed(2)}, ${reason}, 'issued')
+    `);
+    res.json({ creditNoteNumber: number });
+  } catch (error) {
+    console.error('[Sync] create-credit-note failed:', error);
+    res.status(500).json({ error: 'Credit note creation failed' });
   }
 });
 

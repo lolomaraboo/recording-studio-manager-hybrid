@@ -630,6 +630,47 @@ public struct ClientPackage: RowBacked {
     public var remaining: Double? { totalHours.map { $0 - usedHours } }
 }
 
+public struct CreditNote: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var number: String { string("credit_note_number") ?? "—" }
+    public var clientId: Int? { int("client_id") }
+    public var amount: String { string("amount") ?? "0" }
+    public var reason: String? { string("reason") }
+    public var status: String { string("status") ?? "issued" }
+}
+
+public struct Coupon: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var code: String { string("code") ?? "" }
+    public var kind: String { string("kind") ?? "percent" }  // percent | amount | giftcard
+    public var value: String { string("value") ?? "0" }
+    public var isActive: Bool { bool("is_active") }
+    public var notes: String? { string("notes") }
+}
+
+public struct Consumable: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var name: String { string("name") ?? "Article" }
+    public var quantity: Double { double("quantity") ?? 0 }
+    public var unit: String? { string("unit") }
+    public var threshold: Double? { double("threshold") }
+    public var notes: String? { string("notes") }
+    public var lowStock: Bool { threshold.map { quantity <= $0 } ?? false }
+}
+
+public struct Deliverable: RowBacked {
+    public let raw: [String: Any]
+    public init(raw: [String: Any]) { self.raw = raw }
+    public var name: String { string("name") ?? "Livrable" }
+    public var projectId: Int? { int("project_id") }
+    public var url: String? { string("url") }
+    public var status: String { string("status") ?? "draft" }
+    public var notes: String? { string("notes") }
+}
+
 // MARK: - Repository helpers
 
 public extension LocalStore {
@@ -655,6 +696,22 @@ public extension LocalStore {
     }
     func packages() -> [ClientPackage] {
         ((try? rows(table: "client_packages")) ?? []).map(ClientPackage.init(raw:))
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+    func creditNotes() -> [CreditNote] {
+        ((try? rows(table: "credit_notes")) ?? []).map(CreditNote.init(raw:))
+            .sorted { $0.number > $1.number }
+    }
+    func coupons() -> [Coupon] {
+        ((try? rows(table: "coupons")) ?? []).map(Coupon.init(raw:))
+            .sorted { $0.code.localizedCaseInsensitiveCompare($1.code) == .orderedAscending }
+    }
+    func consumables() -> [Consumable] {
+        ((try? rows(table: "consumables")) ?? []).map(Consumable.init(raw:))
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+    func deliverables() -> [Deliverable] {
+        ((try? rows(table: "deliverables")) ?? []).map(Deliverable.init(raw:))
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
     func shares(trackServerId: Int) -> [Share] {

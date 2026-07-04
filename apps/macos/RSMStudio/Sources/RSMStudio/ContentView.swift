@@ -12,6 +12,10 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case quotes = "Devis"
     case invoices = "Factures"
     case packages = "Forfaits"
+    case creditNotes = "Avoirs"
+    case coupons = "Coupons"
+    case consumables = "Inventaire"
+    case deliverables = "Livrables"
     case analytics = "Analyses"
     case services = "Services"
     case contracts = "Contrats"
@@ -40,6 +44,10 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .quotes: return "doc.plaintext"
         case .invoices: return "doc.text"
         case .packages: return "creditcard"
+        case .creditNotes: return "arrow.uturn.left.circle"
+        case .coupons: return "ticket"
+        case .consumables: return "shippingbox"
+        case .deliverables: return "shippingbox.and.arrow.backward"
         case .analytics: return "chart.line.uptrend.xyaxis"
         case .services: return "list.star"
         case .contracts: return "signature"
@@ -72,9 +80,9 @@ struct ContentView: View {
     private let groups: [(String?, [SidebarItem])] = [
         (nil, [.assistant, .dashboard]),
         ("Activité", [.clients, .calendar, .sessions, .projects, .tracks]),
-        ("Ventes", [.quotes, .invoices, .packages, .analytics, .services, .contracts, .expenses]),
-        ("Ressources", [.equipment, .talents, .rooms, .time, .team, .availability]),
-        ("Pilotage", [.leads, .tasks, .documents]),
+        ("Ventes", [.quotes, .invoices, .packages, .creditNotes, .coupons, .analytics, .services, .contracts, .expenses]),
+        ("Ressources", [.equipment, .talents, .rooms, .time, .team, .availability, .consumables]),
+        ("Pilotage", [.leads, .tasks, .documents, .deliverables]),
         ("Mon Mac", [.system]),
         (nil, [.settings]),
     ]
@@ -140,6 +148,10 @@ struct ContentView: View {
                     case .quotes: QuotesView()
                     case .invoices: InvoicesView()
                     case .packages: PackagesView()
+                    case .creditNotes: CreditNotesView()
+                    case .coupons: CouponsView()
+                    case .consumables: ConsumablesView()
+                    case .deliverables: DeliverablesView()
                     case .analytics: AnalyticsView()
                     case .services: ServicesView()
                     case .contracts: ContractsView()

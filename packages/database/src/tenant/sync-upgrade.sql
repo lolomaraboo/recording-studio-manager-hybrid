@@ -249,6 +249,66 @@ CREATE TABLE IF NOT EXISTS client_packages (
   CONSTRAINT client_packages_sync_uuid_unique UNIQUE (sync_uuid)
 );
 
+-- P3 finance / inventory
+ALTER TABLE track_credits ADD COLUMN IF NOT EXISTS split_percent numeric(5,2);
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
+
+CREATE TABLE IF NOT EXISTS credit_notes (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  credit_note_number varchar(100) NOT NULL UNIQUE,
+  client_id integer NOT NULL REFERENCES clients(id),
+  invoice_id integer REFERENCES invoices(id),
+  amount numeric(10,2) NOT NULL,
+  reason text,
+  status varchar(20) NOT NULL DEFAULT 'issued',
+  created_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT credit_notes_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
+CREATE TABLE IF NOT EXISTS coupons (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  code varchar(100) NOT NULL UNIQUE,
+  kind varchar(20) NOT NULL DEFAULT 'percent',
+  value numeric(10,2) NOT NULL,
+  is_active boolean NOT NULL DEFAULT true,
+  valid_until timestamp,
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT coupons_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
+CREATE TABLE IF NOT EXISTS consumables (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  name varchar(255) NOT NULL,
+  quantity numeric(10,2) NOT NULL DEFAULT 0,
+  unit varchar(50),
+  threshold numeric(10,2),
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT consumables_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
+CREATE TABLE IF NOT EXISTS deliverables (
+  id serial PRIMARY KEY,
+  sync_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+  sync_version integer NOT NULL DEFAULT 1,
+  name varchar(255) NOT NULL,
+  project_id integer REFERENCES projects(id) ON DELETE CASCADE,
+  url varchar(1000),
+  status varchar(20) NOT NULL DEFAULT 'draft',
+  notes text,
+  created_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT deliverables_sync_uuid_unique UNIQUE (sync_uuid)
+);
+
 -- ----------------------------------------------------------------------------
 -- 3b. Schema catch-up for legacy tenants (created before the quotes FSM
 -- refactor) — additive, aligns the DB with the current schema.ts.
@@ -339,7 +399,8 @@ DECLARE
     'service_catalog', 'contracts', 'expenses', 'task_types', 'time_entries',
     'user_preferences',
     'session_staff', 'session_equipment', 'track_revisions', 'shares', 'session_talents',
-    'leads', 'tasks', 'documents', 'availability', 'client_packages'
+    'leads', 'tasks', 'documents', 'availability', 'client_packages',
+    'credit_notes', 'coupons', 'consumables', 'deliverables'
   ];
 BEGIN
   FOREACH t IN ARRAY synced_tables LOOP
