@@ -3,33 +3,41 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, ChevronDown, Star, Plus } from "lucide-react";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import {
-  Home,
+  LayoutDashboard,
   Calendar,
+  CalendarMinus,
   Users,
+  UsersRound,
+  UserSearch,
   DollarSign,
-  BarChart3,
+  LineChart,
   FileText,
-  Music,
+  FileSignature,
+  FileAudio,
+  Receipt,
+  Undo2,
+  CreditCard,
+  ShoppingCart,
+  Ticket,
   Package,
+  PackageCheck,
+  ListMusic,
+  ListChecks,
+  ListTodo,
+  AudioWaveform,
+  Folder,
   LogOut,
   MessageSquare,
   Search,
   Bell,
   TrendingUp,
-  FolderOpen,
   Share2,
-  UserPlus,
   Wrench,
+  Settings,
   MessageCircle,
   DoorOpen,
+  Speaker,
   Mic,
-  Receipt,
-  Ticket,
-  Boxes,
-  Package2,
-  CheckSquare,
-  CalendarOff,
-  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -67,6 +75,7 @@ interface NavSection {
   badgeKey?: "communication" | "finance"; // Clé pour récupérer le compteur de badge
 }
 
+// Icons mirror the macOS app's sidebar (SF Symbols → closest lucide equivalents).
 const navSections: NavSection[] = [
   {
     title: "Planning",
@@ -75,12 +84,12 @@ const navSections: NavSection[] = [
       {
         title: "Sessions",
         href: "/sessions",
-        icon: <Mic className="h-5 w-5" />,
+        icon: <ListChecks className="h-5 w-5" />, // list.bullet.rectangle
       },
       {
         title: "Calendrier",
         href: "/calendar",
-        icon: <Calendar className="h-5 w-5" />,
+        icon: <Calendar className="h-5 w-5" />, // calendar
       },
     ],
   },
@@ -91,38 +100,38 @@ const navSections: NavSection[] = [
       {
         title: "Clients",
         href: "/clients",
-        icon: <Users className="h-5 w-5" />,
+        icon: <Users className="h-5 w-5" />, // person.2
       },
       {
         title: "Talents",
         href: "/talents",
-        icon: <Users className="h-5 w-5" />,
+        icon: <Mic className="h-5 w-5" />, // music.mic
       },
     ],
   },
   {
     title: "Pilotage",
-    icon: <ClipboardList className="h-4 w-4" />,
+    icon: <ListChecks className="h-4 w-4" />,
     items: [
       {
         title: "Prospects",
         href: "/leads",
-        icon: <UserPlus className="h-5 w-5" />,
+        icon: <UserSearch className="h-5 w-5" />, // person.crop.circle.badge.questionmark
       },
       {
         title: "Tâches",
         href: "/tasks",
-        icon: <CheckSquare className="h-5 w-5" />,
+        icon: <ListTodo className="h-5 w-5" />, // checklist
       },
       {
         title: "Documents",
         href: "/documents",
-        icon: <FileText className="h-5 w-5" />,
+        icon: <Folder className="h-5 w-5" />, // folder
       },
       {
         title: "Disponibilités",
         href: "/availability",
-        icon: <CalendarOff className="h-5 w-5" />,
+        icon: <CalendarMinus className="h-5 w-5" />, // calendar.badge.minus
       },
     ],
   },
@@ -133,17 +142,17 @@ const navSections: NavSection[] = [
       {
         title: "Salles",
         href: "/rooms",
-        icon: <DoorOpen className="h-5 w-5" />,
+        icon: <DoorOpen className="h-5 w-5" />, // door.left.hand.open
       },
       {
         title: "Équipement",
         href: "/equipment",
-        icon: <Package className="h-5 w-5" />,
+        icon: <Speaker className="h-5 w-5" />, // hifispeaker
       },
       {
         title: "Équipe",
         href: "/team",
-        icon: <UserPlus className="h-5 w-5" />,
+        icon: <UsersRound className="h-5 w-5" />, // person.3
       },
     ],
   },
@@ -155,52 +164,52 @@ const navSections: NavSection[] = [
       {
         title: "Services",
         href: "/services",
-        icon: <Package className="h-5 w-5" />,
+        icon: <ListChecks className="h-5 w-5" />, // list.star
       },
       {
         title: "Factures",
         href: "/invoices",
-        icon: <FileText className="h-5 w-5" />,
+        icon: <Receipt className="h-5 w-5" />, // doc.text
       },
       {
         title: "Devis",
         href: "/quotes",
-        icon: <FileText className="h-5 w-5" />,
+        icon: <FileText className="h-5 w-5" />, // doc.plaintext
       },
       {
         title: "Contrats",
         href: "/contracts",
-        icon: <FileText className="h-5 w-5" />,
+        icon: <FileSignature className="h-5 w-5" />, // signature
       },
       {
         title: "Dépenses",
         href: "/expenses",
-        icon: <DollarSign className="h-5 w-5" />,
+        icon: <ShoppingCart className="h-5 w-5" />, // cart
       },
       {
         title: "Avoirs",
         href: "/credit-notes",
-        icon: <Receipt className="h-5 w-5" />,
+        icon: <Undo2 className="h-5 w-5" />, // arrow.uturn.left.circle
       },
       {
         title: "Coupons",
         href: "/coupons",
-        icon: <Ticket className="h-5 w-5" />,
+        icon: <Ticket className="h-5 w-5" />, // ticket
       },
       {
         title: "Forfaits",
         href: "/client-packages",
-        icon: <Package className="h-5 w-5" />,
+        icon: <CreditCard className="h-5 w-5" />, // creditcard
       },
       {
         title: "Consommables",
         href: "/consumables",
-        icon: <Boxes className="h-5 w-5" />,
+        icon: <Package className="h-5 w-5" />, // shippingbox
       },
       {
         title: "Livrables",
         href: "/deliverables",
-        icon: <Package2 className="h-5 w-5" />,
+        icon: <PackageCheck className="h-5 w-5" />, // shippingbox.and.arrow.backward
       },
       {
         title: "Rapports Financiers",
@@ -216,7 +225,7 @@ const navSections: NavSection[] = [
       {
         title: "Analytics",
         href: "/analytics",
-        icon: <BarChart3 className="h-5 w-5" />,
+        icon: <LineChart className="h-5 w-5" />, // chart.line.uptrend.xyaxis
       },
       {
         title: "Rapports",
@@ -227,22 +236,22 @@ const navSections: NavSection[] = [
   },
   {
     title: "Projets",
-    icon: <FolderOpen className="h-4 w-4" />,
+    icon: <ListMusic className="h-4 w-4" />,
     items: [
       {
         title: "Projets",
         href: "/projects",
-        icon: <FolderOpen className="h-5 w-5" />,
+        icon: <ListMusic className="h-5 w-5" />, // music.note.list
       },
       {
         title: "Tracks",
         href: "/tracks",
-        icon: <Music className="h-5 w-5" />,
+        icon: <AudioWaveform className="h-5 w-5" />, // waveform
       },
       {
         title: "Fichiers Audio",
         href: "/audio-files",
-        icon: <Music className="h-5 w-5" />,
+        icon: <FileAudio className="h-5 w-5" />,
       },
       {
         title: "Partages",
@@ -555,7 +564,7 @@ export function Sidebar() {
 
   // Récupérer tous les items de navigation
   const allNavItems = [
-    { title: "Dashboard", href: "/dashboard", icon: <Home className="h-5 w-5" /> },
+    { title: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
     ...sectionsOrder.flatMap(section => section.items)
   ];
 
@@ -637,7 +646,7 @@ export function Sidebar() {
               )}
               title={isCollapsed ? "Dashboard" : undefined}
             >
-              <Home className="h-5 w-5" />
+              <LayoutDashboard className="h-5 w-5" />
               {!isCollapsed && <span className="flex-1">Dashboard</span>}
               {!isCollapsed && (
                 <button
@@ -761,7 +770,7 @@ export function Sidebar() {
               variant="ghost"
               className="w-full justify-start gap-3 text-muted-foreground"
             >
-              <Wrench className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
               <span>Paramètres</span>
             </Button>
           ) : (
@@ -771,7 +780,7 @@ export function Sidebar() {
               className="w-full text-muted-foreground"
               title="Paramètres"
             >
-              <Wrench className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
             </Button>
           )}
         </Link>
