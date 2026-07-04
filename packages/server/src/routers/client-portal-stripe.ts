@@ -15,6 +15,7 @@ import {
   formatStripeAmount,
   parseStripeAmount,
   calculateStripeFee,
+  getConnectedAccountId,
 } from "../utils/stripe-client";
 
 /**
@@ -154,36 +155,13 @@ export const clientPortalStripeRouter = router({
       // Calculate Stripe fee
       const stripeFee = calculateStripeFee(depositAmount);
 
-      // Create or retrieve Stripe customer
-      let stripeCustomerId: string | null = null;
+      // Money goes to the STUDIO's connected account (direct charge). No platform
+      // customer object (customers are per-account) — we use customer_email only.
+      const connectedAccountId = await getConnectedAccountId(organizationId);
 
-      // TODO: Store stripeCustomerId in clients table
-      // For now, create a new customer each time or search by email
-      if (client.email) {
-        const existingCustomers = await stripe.customers.list({
-          email: client.email,
-          limit: 1,
-        });
-
-        if (existingCustomers.data.length > 0) {
-          stripeCustomerId = existingCustomers.data[0].id;
-        } else {
-          const customer = await stripe.customers.create({
-            email: client.email,
-            name: client.name,
-            metadata: {
-              client_id: client.id.toString(),
-              organization_id: organizationId.toString(),
-            },
-          });
-          stripeCustomerId = customer.id;
-        }
-      }
-
-      // Create Checkout Session
+      // Create Checkout Session on the connected account
       const checkoutSession = await stripe.checkout.sessions.create({
-        customer: stripeCustomerId || undefined,
-        customer_email: !stripeCustomerId && client.email ? client.email : undefined,
+        customer_email: client.email || undefined,
         mode: "payment",
         line_items: [
           {
@@ -220,7 +198,7 @@ export const clientPortalStripeRouter = router({
             organization_id: organizationId.toString(),
           },
         },
-      });
+      }, { stripeAccount: connectedAccountId });
 
       // Log activity
       await tenantDb.insert(clientPortalActivityLogs).values({
@@ -320,24 +298,12 @@ export const clientPortalStripeRouter = router({
       // Calculate Stripe fee
       const stripeFee = calculateStripeFee(balanceAmount);
 
-      // Get or create Stripe customer
-      let stripeCustomerId: string | null = null;
+      // Balance goes to the STUDIO's connected account (direct charge).
+      const connectedAccountId = await getConnectedAccountId(organizationId);
 
-      if (client.email) {
-        const existingCustomers = await stripe.customers.list({
-          email: client.email,
-          limit: 1,
-        });
-
-        if (existingCustomers.data.length > 0) {
-          stripeCustomerId = existingCustomers.data[0].id;
-        }
-      }
-
-      // Create Checkout Session
+      // Create Checkout Session on the connected account
       const checkoutSession = await stripe.checkout.sessions.create({
-        customer: stripeCustomerId || undefined,
-        customer_email: !stripeCustomerId && client.email ? client.email : undefined,
+        customer_email: client.email || undefined,
         mode: "payment",
         line_items: [
           {
@@ -374,7 +340,7 @@ export const clientPortalStripeRouter = router({
             organization_id: organizationId.toString(),
           },
         },
-      });
+      }, { stripeAccount: connectedAccountId });
 
       // Log activity
       await tenantDb.insert(clientPortalActivityLogs).values({
