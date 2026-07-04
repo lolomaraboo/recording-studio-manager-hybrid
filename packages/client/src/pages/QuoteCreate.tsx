@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Save, Plus, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
-import { formatCurrency, SUPPORTED_CURRENCIES } from "@/lib/currency";
+import { formatCurrency, getCurrencySymbol, SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 type LineItem = {
   description: string;
@@ -324,7 +324,7 @@ export default function QuoteCreate() {
 
                     {/* Unit Price - 2 cols */}
                     <div className="col-span-2 space-y-1">
-                      <Label className="text-xs">Prix unit. (€)</Label>
+                      <Label className="text-xs">Prix unit. ({getCurrencySymbol(formData.currency)})</Label>
                       <Input
                         type="number"
                         step="0.01"
@@ -355,7 +355,7 @@ export default function QuoteCreate() {
 
                     {/* Amount - 2 cols (read-only calculated) */}
                     <div className="col-span-2 space-y-1">
-                      <Label className="text-xs">Montant (€)</Label>
+                      <Label className="text-xs">Montant ({getCurrencySymbol(formData.currency)})</Label>
                       <Input value={item.amount} readOnly className="bg-muted" />
                     </div>
 

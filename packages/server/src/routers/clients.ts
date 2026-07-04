@@ -63,6 +63,7 @@ export const clientsRouter = router({
           portalAccess: clients.portalAccess,
           avatarUrl: clients.avatarUrl,
           logoUrl: clients.logoUrl,
+          currency: clients.currency,
           createdAt: clients.createdAt,
           updatedAt: clients.updatedAt,
           notesCount: sql<number>`CAST(COUNT(DISTINCT ${clientNotes.id}) AS INTEGER)`,

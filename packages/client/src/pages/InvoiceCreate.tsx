@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Save, FileText, Plus, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
-import { formatCurrency, SUPPORTED_CURRENCIES } from "@/lib/currency";
+import { formatCurrency, getCurrencySymbol, SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 type InvoiceItem = {
   description: string;
@@ -311,9 +311,9 @@ export default function InvoiceCreate() {
                     <TableRow>
                       <TableHead>Description</TableHead>
                       <TableHead className="w-24">Quantité</TableHead>
-                      <TableHead className="w-32">Prix unit. (€)</TableHead>
+                      <TableHead className="w-32">Prix unit. ({getCurrencySymbol(formData.currency)})</TableHead>
                       <TableHead className="w-32">TVA</TableHead>
-                      <TableHead className="w-32">Montant (€)</TableHead>
+                      <TableHead className="w-32">Montant ({getCurrencySymbol(formData.currency)})</TableHead>
                       <TableHead className="w-16"></TableHead>
                     </TableRow>
                   </TableHeader>
