@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { ClientPopover } from "@/components/ClientPopover";
+import { formatCurrency } from "@/lib/currency";
 
 export function Invoices() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -243,11 +244,7 @@ export function Invoices() {
                           </TableCell>
                           <TableCell className="font-semibold">
                             <div className="flex items-center gap-1">
-                              {parseFloat(invoice.total || "0").toLocaleString("fr-FR", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                              €
+                              {formatCurrency(invoice.total || "0", (invoice as any).currency)}
                             </div>
                           </TableCell>
                           <TableCell>

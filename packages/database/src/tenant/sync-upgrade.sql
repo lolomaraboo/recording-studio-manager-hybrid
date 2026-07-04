@@ -254,6 +254,9 @@ ALTER TABLE track_credits ADD COLUMN IF NOT EXISTS split_percent numeric(5,2);
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
+-- quote_items.service_template_id: present in the Drizzle schema but missing on
+-- older tenant DBs → quote creation fails without it (schema drift fix).
+ALTER TABLE quote_items ADD COLUMN IF NOT EXISTS service_template_id integer;
 
 CREATE TABLE IF NOT EXISTS credit_notes (
   id serial PRIMARY KEY,

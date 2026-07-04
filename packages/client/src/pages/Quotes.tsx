@@ -12,6 +12,7 @@ import { FileText, Plus, Search, ArrowLeft, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ClientPopover } from "@/components/ClientPopover";
+import { formatCurrency } from "@/lib/currency";
 
 export function Quotes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -238,11 +239,7 @@ export function Quotes() {
                           </TableCell>
                           <TableCell className="font-semibold">
                             <div className="flex items-center gap-1">
-                              {parseFloat(quote.total || "0").toLocaleString("fr-FR", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                              €
+                              {formatCurrency(quote.total || "0", (quote as any).currency)}
                             </div>
                           </TableCell>
                           <TableCell>
