@@ -38,6 +38,10 @@ import { Coupons } from './pages/Coupons';
 import { Consumables } from './pages/Consumables';
 import { Deliverables } from './pages/Deliverables';
 import { ClientPackages } from './pages/ClientPackages';
+import { Leads } from './pages/Leads';
+import { Tasks } from './pages/Tasks';
+import { Documents } from './pages/Documents';
+import { Availability } from './pages/Availability';
 import QuoteDetail from './pages/QuoteDetail';
 import ContractDetail from './pages/ContractDetail';
 import TrackCreate from './pages/TrackCreate';
@@ -180,6 +184,10 @@ function App() {
             <Route path="consumables" element={<Consumables />} />
             <Route path="deliverables" element={<Deliverables />} />
             <Route path="client-packages" element={<ClientPackages />} />
+            <Route path="leads" element={<Leads />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="documents" element={<Documents />} />
+            <Route path="availability" element={<Availability />} />
             <Route path="calendar" element={<Calendar />} />
             <Route path="audio-files" element={<AudioFiles />} />
             <Route path="financial-reports" element={<FinancialReports />} />

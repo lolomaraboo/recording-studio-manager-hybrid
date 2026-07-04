@@ -244,6 +244,21 @@ export function AIAssistant() {
           if (action.includes('musician')) {
             utils.musicians.invalidate();
           }
+          // Extended entities (parity with the native app's assistant tools)
+          if (action.includes('expense')) utils.expenses.invalidate();
+          if (action.includes('contract')) utils.contracts.invalidate();
+          if (action.includes('service')) utils.serviceCatalog.invalidate();
+          if (action.includes('credit_note')) utils.creditNotes.invalidate();
+          if (action.includes('coupon')) utils.coupons.invalidate();
+          if (action.includes('consumable')) utils.consumables.invalidate();
+          if (action.includes('deliverable')) utils.deliverables.invalidate();
+          if (action.includes('package')) utils.clientPackages.invalidate();
+          if (action.includes('lead')) utils.leads.invalidate();
+          if (action.includes('task')) utils.tasks.invalidate();
+          if (action.includes('document')) utils.documents.invalidate();
+          if (action.includes('availability')) utils.availability.invalidate();
+          if (action.includes('time_entry') || action.includes('time')) utils.timeTracking.invalidate();
+          if (action.includes('credit') || action.includes('split')) utils.trackCredits.invalidate();
         }
       }
     } catch (error) {

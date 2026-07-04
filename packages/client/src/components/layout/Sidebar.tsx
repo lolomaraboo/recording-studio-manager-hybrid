@@ -27,6 +27,9 @@ import {
   Ticket,
   Boxes,
   Package2,
+  CheckSquare,
+  CalendarOff,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -94,6 +97,32 @@ const navSections: NavSection[] = [
         title: "Talents",
         href: "/talents",
         icon: <Users className="h-5 w-5" />,
+      },
+    ],
+  },
+  {
+    title: "Pilotage",
+    icon: <ClipboardList className="h-4 w-4" />,
+    items: [
+      {
+        title: "Prospects",
+        href: "/leads",
+        icon: <UserPlus className="h-5 w-5" />,
+      },
+      {
+        title: "Tâches",
+        href: "/tasks",
+        icon: <CheckSquare className="h-5 w-5" />,
+      },
+      {
+        title: "Documents",
+        href: "/documents",
+        icon: <FileText className="h-5 w-5" />,
+      },
+      {
+        title: "Disponibilités",
+        href: "/availability",
+        icon: <CalendarOff className="h-5 w-5" />,
       },
     ],
   },

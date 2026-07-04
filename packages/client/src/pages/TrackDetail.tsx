@@ -25,6 +25,7 @@ import { FileUploadButton } from "@/components/FileUploadButton";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { WaveformPlayer } from "@/components/WaveformPlayer";
 import { TrackComments } from "@/components/TrackComments";
+import { TrackCredits } from "@/components/TrackCredits";
 import { UpgradeModal } from "@/components/UpgradeModal";
 
 const statusLabels: Record<string, { label: string; variant: any }> = {
@@ -593,6 +594,9 @@ export default function TrackDetail() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Crédits & splits */}
+            <TrackCredits trackId={track.id} />
 
             {/* Copyright Metadata Card - Phase 5 */}
             {(track.composer || track.lyricist || track.copyrightHolder || track.copyrightYear || track.genreTags || track.mood || track.language || track.explicitContent) && (

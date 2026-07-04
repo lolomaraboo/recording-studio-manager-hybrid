@@ -33,6 +33,11 @@ import { couponsRouter } from './coupons.js';
 import { consumablesRouter } from './consumables.js';
 import { deliverablesRouter } from './deliverables.js';
 import { clientPackagesRouter } from './clientPackages.js';
+import { leadsRouter } from './leads.js';
+import { tasksRouter } from './tasks.js';
+import { documentsRouter } from './documents.js';
+import { availabilityRouter } from './availability.js';
+import { trackCreditsRouter } from './trackCredits.js';
 
 /**
  * Main App Router
@@ -102,6 +107,11 @@ export const appRouter = router({
   consumables: consumablesRouter,
   deliverables: deliverablesRouter,
   clientPackages: clientPackagesRouter,
+  leads: leadsRouter,
+  tasks: tasksRouter,
+  documents: documentsRouter,
+  availability: availabilityRouter,
+  trackCredits: trackCreditsRouter,
 });
 
 /**
