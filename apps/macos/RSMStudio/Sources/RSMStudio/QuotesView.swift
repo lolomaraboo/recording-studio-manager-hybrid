@@ -66,7 +66,7 @@ struct QuoteRow: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
-                Text(euro(quote.total)).fontWeight(.medium)
+                Text(euro(quote.total, quote.currency)).fontWeight(.medium)
                 QuoteStatusBadge(status: quote.status)
             }
         }
@@ -136,9 +136,9 @@ struct QuoteDetailView: View {
                             HStack {
                                 Text(item.description)
                                 Spacer()
-                                Text("\(item.quantity) × \(euro(item.unitPrice))")
+                                Text("\(item.quantity) × \(euro(item.unitPrice, quote.currency))")
                                     .font(.caption).foregroundStyle(.secondary)
-                                Text(euro(item.amount)).monospacedDigit()
+                                Text(euro(item.amount, quote.currency)).monospacedDigit()
                             }
                             .padding(.vertical, 3)
                             if item.id != items.last?.id { Divider() }
@@ -148,10 +148,10 @@ struct QuoteDetailView: View {
 
                 GroupBox {
                     VStack(spacing: 6) {
-                        HStack { Text("Sous-total"); Spacer(); Text(euro(quote.subtotal)).monospacedDigit() }
-                        HStack { Text("TVA"); Spacer(); Text(euro(quote.taxAmount)).monospacedDigit() }
+                        HStack { Text("Sous-total"); Spacer(); Text(euro(quote.subtotal, quote.currency)).monospacedDigit() }
+                        HStack { Text("TVA"); Spacer(); Text(euro(quote.taxAmount, quote.currency)).monospacedDigit() }
                         Divider()
-                        HStack { Text("Total").bold(); Spacer(); Text(euro(quote.total)).bold().monospacedDigit() }
+                        HStack { Text("Total").bold(); Spacer(); Text(euro(quote.total, quote.currency)).bold().monospacedDigit() }
                     }
                 }
 
@@ -200,6 +200,13 @@ struct QuoteCreateSheet: View {
     private var clients: [Client] { model.store.clients().filter { $0.serverId != nil } }
     private var subtotal: Double { lines.reduce(0) { $0 + $1.quantity * $1.unitPrice } }
 
+    /// Currency inherited from the selected client.
+    private var quoteCurrency: String {
+        guard let cid = clientServerId,
+              let c = clients.first(where: { $0.serverId == cid }) else { return Money.defaultCode }
+        return c.currency
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Nouveau devis").font(.title3).bold().padding()
@@ -227,7 +234,8 @@ struct QuoteCreateSheet: View {
                     Button { lines.append(.init()) } label: { Label("Ajouter une ligne", systemImage: "plus.circle") }
                         .buttonStyle(.borderless)
                 }
-                LabeledContent("Total TTC (TVA 20 %)", value: (subtotal * 1.2).formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR"))))
+                LabeledContent("Devise", value: quoteCurrency)
+                LabeledContent("Total TTC (TVA 20 %)", value: Money.format(subtotal * 1.2, code: quoteCurrency))
                 if let errorMessage {
                     Text(errorMessage).font(.caption).foregroundStyle(.red)
                 }
@@ -261,7 +269,8 @@ struct QuoteCreateSheet: View {
             .map { ["description": $0.description, "quantity": $0.quantity, "unitPrice": $0.unitPrice] }
         do {
             let api = APIClient(config: model.config)
-            _ = try await api.createQuote(clientServerId: clientId, items: items, validityDays: validityDays)
+            _ = try await api.createQuote(clientServerId: clientId, items: items, validityDays: validityDays,
+                                          currency: quoteCurrency)
             await model.syncNow()
             dismiss()
         } catch {

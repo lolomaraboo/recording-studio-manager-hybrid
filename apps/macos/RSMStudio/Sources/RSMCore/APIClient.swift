@@ -204,10 +204,13 @@ public struct APIClient: Sendable {
     }
 
     /// Online-only quote creation: the SERVER allocates the quote number.
-    public func createQuote(clientServerId: Int, items: [[String: Any]], taxRate: Double = 20, validityDays: Int = 30) async throws -> String {
-        let json = try await request(path: "create-quote", body: [
+    public func createQuote(clientServerId: Int, items: [[String: Any]], taxRate: Double = 20, validityDays: Int = 30,
+                            currency: String? = nil) async throws -> String {
+        var body: [String: Any] = [
             "clientId": clientServerId, "items": items, "taxRate": taxRate, "validityDays": validityDays,
-        ])
+        ]
+        if let currency, !currency.isEmpty { body["currency"] = currency }
+        let json = try await request(path: "create-quote", body: body)
         guard let number = json["quoteNumber"] as? String else { throw APIError.decoding("missing quoteNumber") }
         return number
     }

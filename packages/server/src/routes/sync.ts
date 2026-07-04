@@ -693,6 +693,17 @@ router.post('/create-quote', async (req: SyncRequest, res: Response) => {
       return res.status(400).json({ error: 'No valid items' });
     }
 
+    // Quote currency: explicit override, else inherit the client's currency.
+    let currency = typeof req.body?.currency === 'string'
+      ? req.body.currency.trim().toUpperCase().slice(0, 3)
+      : '';
+    if (!currency) {
+      const cRows = (await db.execute(sql`
+        SELECT currency FROM clients WHERE id = ${clientId} LIMIT 1
+      `)) as unknown as Array<{ currency: string | null }>;
+      currency = (cRows[0]?.currency || 'EUR').toUpperCase();
+    }
+
     const subtotal = cleanItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     const taxAmount = Math.round(subtotal * taxRate) / 100;
     const total = subtotal + taxAmount;
@@ -708,9 +719,9 @@ router.post('/create-quote', async (req: SyncRequest, res: Response) => {
     const quoteNumber = `${prefix}${String(lastSeq + 1).padStart(4, '0')}`;
 
     const inserted = (await db.execute(sql`
-      INSERT INTO quotes (quote_number, client_id, status, subtotal, tax_rate, tax_amount, total, validity_days)
+      INSERT INTO quotes (quote_number, client_id, status, subtotal, tax_rate, tax_amount, total, validity_days, currency)
       VALUES (${quoteNumber}, ${clientId}, 'draft', ${subtotal.toFixed(2)}, ${taxRate.toFixed(2)},
-              ${taxAmount.toFixed(2)}, ${total.toFixed(2)}, ${validityDays})
+              ${taxAmount.toFixed(2)}, ${total.toFixed(2)}, ${validityDays}, ${currency})
       RETURNING id, quote_number
     `)) as unknown as Array<{ id: number; quote_number: string }>;
     const quoteId = inserted[0]!.id;
@@ -724,7 +735,7 @@ router.post('/create-quote', async (req: SyncRequest, res: Response) => {
       `);
     }
 
-    res.json({ quoteId, quoteNumber });
+    res.json({ quoteId, quoteNumber, currency });
   } catch (error) {
     console.error('[Sync] create-quote failed:', error);
     res.status(500).json({ error: 'Quote creation failed' });

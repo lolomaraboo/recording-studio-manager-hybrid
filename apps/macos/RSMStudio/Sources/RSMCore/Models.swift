@@ -303,6 +303,7 @@ public struct Quote: RowBacked {
     public var subtotal: String { string("subtotal") ?? "0" }
     public var taxAmount: String { string("tax_amount") ?? "0" }
     public var total: String { string("total") ?? "0" }
+    public var currency: String { (string("currency") ?? "EUR").uppercased() }
     public var validityDays: Int { int("validity_days") ?? 30 }
     public var notes: String? { string("notes") }
     public var convertedToProjectId: Int? { int("converted_to_project_id") }

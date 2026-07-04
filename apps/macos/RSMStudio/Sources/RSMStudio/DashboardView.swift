@@ -10,12 +10,22 @@ struct DashboardView: View {
     private var invoices: [Invoice] { model.store.invoices() }
     private var sessions: [StudioSession] { model.store.studioSessions() }
 
+    /// Convert to the reference currency (falls back to raw when no rate set).
+    private func ref(_ amount: Double, _ code: String) -> Double {
+        Money.convertToReference(amount, from: code) ?? amount
+    }
+
     private var paidTotal: Double {
-        invoices.filter { $0.status == "paid" }.compactMap { Double($0.total) }.reduce(0, +)
+        invoices.filter { $0.status == "paid" }
+            .compactMap { inv in Double(inv.total).map { ref($0, inv.currency) } }.reduce(0, +)
     }
     private var outstandingTotal: Double {
         invoices.filter { $0.status == "sent" || $0.status == "overdue" }
-            .compactMap { Double($0.total) }.reduce(0, +)
+            .compactMap { inv in Double(inv.total).map { ref($0, inv.currency) } }.reduce(0, +)
+    }
+    /// Distinct currencies used by non-EUR invoices (to flag conversion in the UI).
+    private var usesMultipleCurrencies: Bool {
+        Set(invoices.filter { $0.status != "draft" && $0.status != "cancelled" }.map { $0.currency }).count > 1
     }
     private var upcomingSessions: [StudioSession] {
         let now = Date()
@@ -55,7 +65,8 @@ struct DashboardView: View {
                   let month = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
                   let amount = Double(invoice.total) else { continue }
             var bucket = buckets[month] ?? (0, 0)
-            if invoice.status == "paid" { bucket.paid += amount } else { bucket.pending += amount }
+            let converted = ref(amount, invoice.currency)
+            if invoice.status == "paid" { bucket.paid += converted } else { bucket.pending += converted }
             buckets[month] = bucket
         }
 
@@ -81,6 +92,11 @@ struct DashboardView: View {
                     KPICard(title: "En attente", value: euroD(outstandingTotal), icon: "hourglass.circle.fill", color: .orange)
                     KPICard(title: "Sessions à 7 jours", value: "\(upcomingSessions.count)", icon: "calendar.circle.fill", color: .blue)
                     KPICard(title: "Clients actifs", value: "\(model.store.clients().filter(\.isActive).count)", icon: "person.crop.circle.fill", color: .purple)
+                }
+
+                if usesMultipleCurrencies {
+                    Text("Montants convertis en \(Money.defaultCode) selon les taux configurés. Détail par devise dans Analyses.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
 
                 if !revenueByMonth.isEmpty {
@@ -136,7 +152,7 @@ struct DashboardView: View {
                                             Text(client.name).font(.caption).foregroundStyle(.secondary)
                                         }
                                         Spacer()
-                                        Text(euro(invoice.total)).font(.callout).monospacedDigit()
+                                        Text(euro(invoice.total, invoice.currency)).font(.callout).monospacedDigit()
                                     }
                                 }
                             }
@@ -151,7 +167,7 @@ struct DashboardView: View {
     }
 
     private func euroD(_ value: Double) -> String {
-        value.formatted(.currency(code: "EUR").locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))
+        value.formatted(.currency(code: Money.defaultCode).locale(Locale(identifier: "fr_FR")).precision(.fractionLength(0)))
     }
 }
 

@@ -62,4 +62,38 @@ public enum Money {
         guard let r = rate(for: code) else { return nil }
         return amount * r
     }
+
+    /// Timestamp of the last successful automatic rates refresh.
+    public static var lastRatesRefresh: Date? {
+        get { UserDefaults.standard.object(forKey: "rsm.fxRatesRefreshedAt") as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: "rsm.fxRatesRefreshedAt") }
+    }
+
+    /// Fetch live FX rates from a free public API (no key) and store them as
+    /// rates-to-reference for every supported currency. Returns true on success.
+    @discardableResult
+    public static func refreshRates(base: String? = nil) async -> Bool {
+        let ref = (base ?? defaultCode).uppercased()
+        guard let url = URL(string: "https://open.er-api.com/v6/latest/\(ref)") else { return false }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  (json["result"] as? String) == "success",
+                  let apiRates = json["rates"] as? [String: NSNumber] else { return false }
+            var newRates: [String: Double] = [:]
+            for entry in supported where entry.code != ref {
+                if let perRef = apiRates[entry.code]?.doubleValue, perRef > 0 {
+                    // API gives units of `code` per 1 reference unit → invert to
+                    // get reference units per 1 unit of `code`.
+                    newRates[entry.code] = 1.0 / perRef
+                }
+            }
+            guard !newRates.isEmpty else { return false }
+            rates = newRates
+            lastRatesRefresh = Date()
+            return true
+        } catch {
+            return false
+        }
+    }
 }

@@ -18,6 +18,8 @@ struct SettingsView: View {
     @State private var newTaskCategory = "billable"
     @State private var currencyCode = Money.defaultCode
     @State private var fxRates: [String: String] = Money.rates.mapValues { String($0) }
+    @State private var isRefreshingRates = false
+    @State private var ratesError: String?
 
     private func saveRate(_ code: String, _ text: String) {
         var r = Money.rates
@@ -25,6 +27,20 @@ struct SettingsView: View {
         if let v = Double(cleaned), v > 0 { r[code] = v } else { r[code] = nil }
         Money.rates = r
         model.dataVersion += 1
+    }
+
+    @MainActor
+    private func refreshRates() async {
+        isRefreshingRates = true
+        ratesError = nil
+        defer { isRefreshingRates = false }
+        let ok = await Money.refreshRates(base: currencyCode)
+        if ok {
+            fxRates = Money.rates.mapValues { String(format: "%.4f", $0) }
+            model.dataVersion += 1
+        } else {
+            ratesError = "Impossible de récupérer les taux (hors ligne ?). Saisie manuelle possible."
+        }
     }
 
     private var vatRows: [[String: Any]] {
@@ -104,6 +120,22 @@ struct SettingsView: View {
             }
 
             Section("Taux de change (vers \(currencyCode))") {
+                HStack {
+                    Button {
+                        Task { await refreshRates() }
+                    } label: {
+                        Label(isRefreshingRates ? "Actualisation…" : "Actualiser automatiquement",
+                              systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .disabled(isRefreshingRates)
+                    if isRefreshingRates { ProgressView().controlSize(.small) }
+                    Spacer()
+                    if let d = Money.lastRatesRefresh {
+                        Text("Maj : \(d.formatted(date: .abbreviated, time: .shortened))")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+                if let ratesError { Text(ratesError).font(.caption).foregroundStyle(.red) }
                 ForEach(Money.supported.filter { $0.code != currencyCode }, id: \.code) { c in
                     HStack {
                         Text(c.label)
@@ -117,7 +149,7 @@ struct SettingsView: View {
                         Text(currencyCode).font(.caption).foregroundStyle(.secondary)
                     }
                 }
-                Text("Utilisés pour le total converti des rapports. Laisse vide une devise sans taux : elle restera comptée séparément.")
+                Text("« Actualiser » récupère les taux du jour en ligne. Tu peux aussi les saisir à la main. Une devise sans taux reste comptée séparément dans les rapports.")
                     .font(.caption).foregroundStyle(.secondary)
             }
 

@@ -253,6 +253,7 @@ CREATE TABLE IF NOT EXISTS client_packages (
 ALTER TABLE track_credits ADD COLUMN IF NOT EXISTS split_percent numeric(5,2);
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS currency varchar(3) NOT NULL DEFAULT 'EUR';
 
 CREATE TABLE IF NOT EXISTS credit_notes (
   id serial PRIMARY KEY,

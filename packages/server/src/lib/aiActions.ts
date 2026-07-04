@@ -1671,6 +1671,7 @@ export class AIActionExecutor {
         taxRate: quote.taxRate,
         taxAmount: quote.taxAmount,
         total: quote.total,
+        currency: (quote as any).currency || "EUR",
         notes: `Converti du devis ${quote.quoteNumber}`,
       })
       .returning();

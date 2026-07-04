@@ -664,6 +664,7 @@ export const quotes = pgTable("quotes", {
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20.00"),
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).notNull().default("EUR"),
 
   // Quote-specific fields
   validityDays: integer("validity_days").notNull().default(30), // Quote valid for N days
