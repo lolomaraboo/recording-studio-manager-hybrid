@@ -27,6 +27,7 @@ export default function InvoiceCreate() {
   // Fetch related data
   const { data: clients } = trpc.clients.list.useQuery({ limit: 100 });
   const { data: vatRates } = trpc.vatRates.list.useQuery();
+  const { data: packages } = trpc.clientPackages.list.useQuery();
   const defaultVatRate = vatRates?.find(r => r.isDefault);
 
   // Create mutation
@@ -67,6 +68,21 @@ export default function InvoiceCreate() {
       setFormData((prev) => ({ ...prev, currency: selectedClient.currency }));
     }
   }, [formData.clientId, clients]);
+
+  // Prepaid package (forfait) draw-down for the selected client
+  const [packageHours, setPackageHours] = useState(0);
+  const activePackage = (packages as any[] | undefined)?.find(
+    (p) =>
+      p.clientId === formData.clientId &&
+      p.status === "active" &&
+      parseFloat(p.totalHours || "0") - parseFloat(p.usedHours || "0") > 0,
+  );
+  const packageRemaining = activePackage
+    ? parseFloat(activePackage.totalHours || "0") - parseFloat(activePackage.usedHours || "0")
+    : 0;
+  useEffect(() => {
+    setPackageHours(0);
+  }, [formData.clientId]);
 
   // Line items state
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -194,6 +210,7 @@ export default function InvoiceCreate() {
       status: formData.status,
       notes: formData.notes || undefined,
       currency: formData.currency as any,
+      packageHours: packageHours > 0 ? packageHours : undefined,
     });
   };
 
@@ -384,6 +401,39 @@ export default function InvoiceCreate() {
                 </Table>
               </div>
             </div>
+
+            {/* Prepaid package (forfait) deduction */}
+            {activePackage && (
+              <div className="rounded-md border p-4 space-y-2 bg-muted/30">
+                <Label className="text-sm font-medium">Forfait prépayé</Label>
+                <p className="text-xs text-muted-foreground">
+                  « {activePackage.name} » — {packageRemaining} h restantes sur{" "}
+                  {parseFloat(activePackage.totalHours || "0")}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Déduire</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={packageRemaining}
+                    step="0.5"
+                    value={packageHours}
+                    onChange={(e) =>
+                      setPackageHours(
+                        Math.min(packageRemaining, Math.max(0, parseFloat(e.target.value) || 0)),
+                      )
+                    }
+                    className="w-24"
+                  />
+                  <span className="text-sm">h du forfait</span>
+                </div>
+                {packageHours > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Une ligne négative sera ajoutée pour ne pas facturer deux fois les heures prépayées.
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Totals Display */}
             <div className="flex justify-end">

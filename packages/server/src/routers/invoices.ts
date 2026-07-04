@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import Stripe from 'stripe';
 import { router, protectedProcedure } from '../_core/trpc';
-import { invoices, timeEntries, clients, invoiceItems, vatRates } from '@rsm/database/tenant';
+import { invoices, timeEntries, clients, invoiceItems, vatRates, clientPackages } from '@rsm/database/tenant';
 import { generateInvoiceFromTimeEntries } from '../utils/invoice-generator';
 import { getStripeClient, formatStripeAmount } from '../utils/stripe-client';
 import { getInvoicePDFUrl } from '../services/storage/s3-service';
@@ -95,10 +95,41 @@ export const invoicesRouter = router({
         status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).default('draft'),
         notes: z.string().optional(),
         currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'JPY', 'AUD']).optional(),
+        // Prepaid package (forfait) draw-down: hours to deduct from the client's
+        // active package. Adds a negative line so prepaid hours aren't billed twice.
+        packageHours: z.number().positive().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const tenantDb = await ctx.getTenantDb();
+
+      // Prepaid package deduction: if requested, draw hours from the client's
+      // active package and inject a negative line item (same VAT as line 1).
+      const lineItems = [...input.items];
+      let packageDrawdown: { packageId: number; newUsed: number; total: number } | null = null;
+      if (input.packageHours && input.packageHours > 0) {
+        const pkg = await tenantDb.query.clientPackages.findFirst({
+          where: and(eq(clientPackages.clientId, input.clientId), eq(clientPackages.status, 'active')),
+        });
+        if (pkg && pkg.totalHours != null) {
+          const totalHours = parseFloat(pkg.totalHours);
+          const usedHours = parseFloat(pkg.usedHours || '0');
+          const remaining = Math.max(0, totalHours - usedHours);
+          const hoursUsed = Math.min(input.packageHours, remaining);
+          const rate = pkg.price != null && totalHours > 0 ? parseFloat(pkg.price) / totalHours : 0;
+          const discount = Math.round(hoursUsed * rate * 100) / 100;
+          if (discount > 0) {
+            lineItems.push({
+              description: `Forfait prépayé (${hoursUsed} h)`,
+              quantity: 1,
+              unitPrice: -discount,
+              amount: -discount,
+              vatRateId: input.items[0]?.vatRateId ?? 0,
+            });
+            packageDrawdown = { packageId: pkg.id, newUsed: usedHours + hoursUsed, total: totalHours };
+          }
+        }
+      }
 
       // Invoice currency: explicit override, else inherit the client's currency.
       let currency = input.currency;
@@ -114,7 +145,7 @@ export const invoicesRouter = router({
       let subtotal = 0;
       let totalTax = 0;
 
-      for (const item of input.items) {
+      for (const item of lineItems) {
         subtotal += item.amount;
 
         // Fetch VAT rate for this item
@@ -157,7 +188,7 @@ export const invoicesRouter = router({
         .returning();
 
       // Insert invoice items with vatRateId
-      for (const item of input.items) {
+      for (const item of lineItems) {
         await tenantDb.insert(invoiceItems).values({
           invoiceId: invoice.id,
           description: item.description,
@@ -166,6 +197,15 @@ export const invoicesRouter = router({
           amount: item.amount.toString(),
           vatRateId: item.vatRateId,
         });
+      }
+
+      // Apply the prepaid-package draw-down now that the invoice exists.
+      if (packageDrawdown) {
+        const consumed = packageDrawdown.newUsed >= packageDrawdown.total;
+        await tenantDb
+          .update(clientPackages)
+          .set({ usedHours: packageDrawdown.newUsed.toFixed(2), status: consumed ? 'consumed' : 'active', updatedAt: new Date() })
+          .where(eq(clientPackages.id, packageDrawdown.packageId));
       }
 
       return invoice;
