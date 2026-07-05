@@ -122,17 +122,22 @@ struct DashboardView: View {
                         } else {
                             VStack(alignment: .leading, spacing: 6) {
                                 ForEach(upcomingSessions.prefix(5)) { session in
-                                    HStack {
-                                        Image(systemName: "clock").font(.caption).foregroundStyle(.blue)
-                                        VStack(alignment: .leading, spacing: 1) {
-                                            Text(session.title).font(.callout)
-                                            if let start = session.startTime {
-                                                Text(start.formatted(.dateTime.weekday(.wide).day().hour().minute()))
-                                                    .font(.caption).foregroundStyle(.secondary)
+                                    Button { model.open(.sessions) } label: {
+                                        HStack {
+                                            Image(systemName: "clock").font(.caption).foregroundStyle(.blue)
+                                            VStack(alignment: .leading, spacing: 1) {
+                                                Text(session.title).font(.callout)
+                                                if let start = session.startTime {
+                                                    Text(start.formatted(.dateTime.weekday(.wide).day().hour().minute()))
+                                                        .font(.caption).foregroundStyle(.secondary)
+                                                }
                                             }
+                                            Spacer()
+                                            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
                                         }
-                                        Spacer()
+                                        .contentShape(Rectangle())
                                     }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -146,14 +151,19 @@ struct DashboardView: View {
                         } else {
                             VStack(alignment: .leading, spacing: 6) {
                                 ForEach(unpaidInvoices.prefix(5)) { invoice in
-                                    HStack {
-                                        Text(invoice.number).font(.callout.monospaced())
-                                        if let client = invoice.clientId.flatMap({ model.store.clientsByServerId()[$0] }) {
-                                            Text(client.name).font(.caption).foregroundStyle(.secondary)
+                                    Button { model.open(.invoices, entity: invoice.id) } label: {
+                                        HStack {
+                                            Text(invoice.number).font(.callout.monospaced())
+                                            if let client = invoice.clientId.flatMap({ model.store.clientsByServerId()[$0] }) {
+                                                Text(client.name).font(.caption).foregroundStyle(.secondary)
+                                            }
+                                            Spacer()
+                                            Text(euro(invoice.total, invoice.currency)).font(.callout).monospacedDigit()
+                                            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
                                         }
-                                        Spacer()
-                                        Text(euro(invoice.total, invoice.currency)).font(.callout).monospacedDigit()
+                                        .contentShape(Rectangle())
                                     }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }

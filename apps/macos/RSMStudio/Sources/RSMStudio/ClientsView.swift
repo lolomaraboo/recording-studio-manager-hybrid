@@ -161,6 +161,11 @@ struct ClientDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
+    private func togglePortal() {
+        try? model.store.localUpdate(table: "clients", uuid: client.id, changes: ["portal_access": !client.portalAccess])
+        Task { await model.syncNow() }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -178,6 +183,12 @@ struct ClientDetailView: View {
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
+                    Button { togglePortal() } label: {
+                        Label(client.portalAccess ? "Portail activé" : "Activer portail",
+                              systemImage: client.portalAccess ? "person.badge.key.fill" : "person.badge.key")
+                    }
+                    .help(client.portalAccess ? "Le client peut accéder à son espace en ligne. Cliquer pour désactiver."
+                                              : "Donner au client l'accès à son espace en ligne.")
                     Button { showingEdit = true } label: {
                         Label("Modifier", systemImage: "pencil")
                     }
