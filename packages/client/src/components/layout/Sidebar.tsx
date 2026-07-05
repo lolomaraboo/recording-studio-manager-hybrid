@@ -76,188 +76,64 @@ interface NavSection {
 }
 
 // Icons mirror the macOS app's sidebar (SF Symbols → closest lucide equivalents).
+// Aligned with the macOS information architecture (audit 2026): the same
+// 5 studio spaces + Configuration, so the mental model matches everywhere.
+// Web-only surfaces (audio files, shares, messages, notifications, reports)
+// live inside the closest matching space.
 const navSections: NavSection[] = [
   {
-    title: "Planning",
-    icon: <Calendar className="h-4 w-4" />,
+    title: "Studio",
+    icon: <Mic className="h-4 w-4" />,
     items: [
-      {
-        title: "Sessions",
-        href: "/sessions",
-        icon: <ListChecks className="h-5 w-5" />, // list.bullet.rectangle
-      },
-      {
-        title: "Calendrier",
-        href: "/calendar",
-        icon: <Calendar className="h-5 w-5" />, // calendar
-      },
+      { title: "Clients", href: "/clients", icon: <Users className="h-5 w-5" /> },
+      { title: "Calendrier", href: "/calendar", icon: <Calendar className="h-5 w-5" /> },
+      { title: "Sessions", href: "/sessions", icon: <ListChecks className="h-5 w-5" /> },
+      { title: "Projets", href: "/projects", icon: <ListMusic className="h-5 w-5" /> },
+      { title: "Tracks", href: "/tracks", icon: <AudioWaveform className="h-5 w-5" /> },
+      { title: "Fichiers Audio", href: "/audio-files", icon: <FileAudio className="h-5 w-5" /> },
+      { title: "Partages", href: "/shares", icon: <Share2 className="h-5 w-5" /> },
     ],
   },
   {
-    title: "Contacts",
-    icon: <Users className="h-4 w-4" />,
+    title: "Argent",
+    icon: <DollarSign className="h-4 w-4" />,
+    badgeKey: "finance",
     items: [
-      {
-        title: "Clients",
-        href: "/clients",
-        icon: <Users className="h-5 w-5" />, // person.2
-      },
-      {
-        title: "Talents",
-        href: "/talents",
-        icon: <Mic className="h-5 w-5" />, // music.mic
-      },
-    ],
-  },
-  {
-    title: "Pilotage",
-    icon: <ListChecks className="h-4 w-4" />,
-    items: [
-      {
-        title: "Prospects",
-        href: "/leads",
-        icon: <UserSearch className="h-5 w-5" />, // person.crop.circle.badge.questionmark
-      },
-      {
-        title: "Tâches",
-        href: "/tasks",
-        icon: <ListTodo className="h-5 w-5" />, // checklist
-      },
-      {
-        title: "Documents",
-        href: "/documents",
-        icon: <Folder className="h-5 w-5" />, // folder
-      },
-      {
-        title: "Disponibilités",
-        href: "/availability",
-        icon: <CalendarMinus className="h-5 w-5" />, // calendar.badge.minus
-      },
+      { title: "Devis", href: "/quotes", icon: <FileText className="h-5 w-5" /> },
+      { title: "Factures", href: "/invoices", icon: <Receipt className="h-5 w-5" /> },
+      { title: "Dépenses", href: "/expenses", icon: <ShoppingCart className="h-5 w-5" /> },
+      { title: "Avoirs", href: "/credit-notes", icon: <Undo2 className="h-5 w-5" /> },
+      { title: "Rapports Financiers", href: "/financial-reports", icon: <DollarSign className="h-5 w-5" /> },
     ],
   },
   {
     title: "Ressources",
     icon: <Wrench className="h-4 w-4" />,
     items: [
-      {
-        title: "Salles",
-        href: "/rooms",
-        icon: <DoorOpen className="h-5 w-5" />, // door.left.hand.open
-      },
-      {
-        title: "Équipement",
-        href: "/equipment",
-        icon: <Speaker className="h-5 w-5" />, // hifispeaker
-      },
-      {
-        title: "Équipe",
-        href: "/team",
-        icon: <UsersRound className="h-5 w-5" />, // person.3
-      },
+      { title: "Salles", href: "/rooms", icon: <DoorOpen className="h-5 w-5" /> },
+      { title: "Équipement", href: "/equipment", icon: <Speaker className="h-5 w-5" /> },
+      { title: "Talents", href: "/talents", icon: <Mic className="h-5 w-5" /> },
+      { title: "Équipe", href: "/team", icon: <UsersRound className="h-5 w-5" /> },
+      { title: "Consommables", href: "/consumables", icon: <Package className="h-5 w-5" /> },
     ],
   },
   {
-    title: "Finance",
-    icon: <DollarSign className="h-4 w-4" />,
-    badgeKey: "finance",
+    title: "Développement",
+    icon: <TrendingUp className="h-4 w-4" />,
     items: [
-      {
-        title: "Services",
-        href: "/services",
-        icon: <ListChecks className="h-5 w-5" />, // list.star
-      },
-      {
-        title: "Factures",
-        href: "/invoices",
-        icon: <Receipt className="h-5 w-5" />, // doc.text
-      },
-      {
-        title: "Devis",
-        href: "/quotes",
-        icon: <FileText className="h-5 w-5" />, // doc.plaintext
-      },
-      {
-        title: "Contrats",
-        href: "/contracts",
-        icon: <FileSignature className="h-5 w-5" />, // signature
-      },
-      {
-        title: "Dépenses",
-        href: "/expenses",
-        icon: <ShoppingCart className="h-5 w-5" />, // cart
-      },
-      {
-        title: "Avoirs",
-        href: "/credit-notes",
-        icon: <Undo2 className="h-5 w-5" />, // arrow.uturn.left.circle
-      },
-      {
-        title: "Coupons",
-        href: "/coupons",
-        icon: <Ticket className="h-5 w-5" />, // ticket
-      },
-      {
-        title: "Forfaits",
-        href: "/client-packages",
-        icon: <CreditCard className="h-5 w-5" />, // creditcard
-      },
-      {
-        title: "Consommables",
-        href: "/consumables",
-        icon: <Package className="h-5 w-5" />, // shippingbox
-      },
-      {
-        title: "Livrables",
-        href: "/deliverables",
-        icon: <PackageCheck className="h-5 w-5" />, // shippingbox.and.arrow.backward
-      },
-      {
-        title: "Rapports Financiers",
-        href: "/financial-reports",
-        icon: <DollarSign className="h-5 w-5" />,
-      },
+      { title: "Prospects", href: "/leads", icon: <UserSearch className="h-5 w-5" /> },
+      { title: "Tâches", href: "/tasks", icon: <ListTodo className="h-5 w-5" /> },
+      { title: "Documents", href: "/documents", icon: <Folder className="h-5 w-5" /> },
+      { title: "Livrables", href: "/deliverables", icon: <PackageCheck className="h-5 w-5" /> },
+      { title: "Contrats", href: "/contracts", icon: <FileSignature className="h-5 w-5" /> },
     ],
   },
   {
     title: "Analyse",
-    icon: <TrendingUp className="h-4 w-4" />,
+    icon: <LineChart className="h-4 w-4" />,
     items: [
-      {
-        title: "Analytics",
-        href: "/analytics",
-        icon: <LineChart className="h-5 w-5" />, // chart.line.uptrend.xyaxis
-      },
-      {
-        title: "Rapports",
-        href: "/reports",
-        icon: <TrendingUp className="h-5 w-5" />,
-      },
-    ],
-  },
-  {
-    title: "Projets",
-    icon: <ListMusic className="h-4 w-4" />,
-    items: [
-      {
-        title: "Projets",
-        href: "/projects",
-        icon: <ListMusic className="h-5 w-5" />, // music.note.list
-      },
-      {
-        title: "Tracks",
-        href: "/tracks",
-        icon: <AudioWaveform className="h-5 w-5" />, // waveform
-      },
-      {
-        title: "Fichiers Audio",
-        href: "/audio-files",
-        icon: <FileAudio className="h-5 w-5" />,
-      },
-      {
-        title: "Partages",
-        href: "/shares",
-        icon: <Share2 className="h-5 w-5" />,
-      },
+      { title: "Analytics", href: "/analytics", icon: <LineChart className="h-5 w-5" /> },
+      { title: "Rapports", href: "/reports", icon: <TrendingUp className="h-5 w-5" /> },
     ],
   },
   {
@@ -265,16 +141,18 @@ const navSections: NavSection[] = [
     icon: <MessageCircle className="h-4 w-4" />,
     badgeKey: "communication",
     items: [
-      {
-        title: "Messages",
-        href: "/chat",
-        icon: <MessageSquare className="h-5 w-5" />,
-      },
-      {
-        title: "Notifications",
-        href: "/notifications",
-        icon: <Bell className="h-5 w-5" />,
-      },
+      { title: "Messages", href: "/chat", icon: <MessageSquare className="h-5 w-5" /> },
+      { title: "Notifications", href: "/notifications", icon: <Bell className="h-5 w-5" /> },
+    ],
+  },
+  {
+    title: "Configuration",
+    icon: <Settings className="h-4 w-4" />,
+    items: [
+      { title: "Services", href: "/services", icon: <ListChecks className="h-5 w-5" /> },
+      { title: "Forfaits", href: "/client-packages", icon: <CreditCard className="h-5 w-5" /> },
+      { title: "Coupons", href: "/coupons", icon: <Ticket className="h-5 w-5" /> },
+      { title: "Disponibilités", href: "/availability", icon: <CalendarMinus className="h-5 w-5" /> },
     ],
   },
 ];
@@ -473,11 +351,15 @@ export function Sidebar() {
     // Charger l'ordre personnalisé des sections
     const storedOrder = localStorage.getItem("sidebarSectionsOrder");
     if (storedOrder) {
-      const orderTitles = JSON.parse(storedOrder);
-      const orderedSections = orderTitles
-        .map((title: string) => navSections.find(s => s.title === title))
-        .filter(Boolean);
-      setSectionsOrder(orderedSections);
+      const orderTitles: string[] = JSON.parse(storedOrder);
+      // Keep only titles that still exist, then append any new/renamed sections
+      // so a stale saved order (old group names) never hides current sections.
+      const ordered = orderTitles
+        .map((title) => navSections.find(s => s.title === title))
+        .filter((s): s is NavSection => Boolean(s));
+      const present = new Set(ordered.map(s => s.title));
+      const merged = [...ordered, ...navSections.filter(s => !present.has(s.title))];
+      setSectionsOrder(merged);
     }
   }, []);
 
