@@ -405,6 +405,11 @@ struct SessionCreateSheet: View {
     @Environment(AppModel.self) private var model
     let onCreate: ([String: Any]) -> Void
 
+    init(defaultClientServerId: Int? = nil, onCreate: @escaping ([String: Any]) -> Void) {
+        self.onCreate = onCreate
+        _clientServerId = State(initialValue: defaultClientServerId)
+    }
+
     @State private var title = ""
     @State private var clientServerId: Int?
     @State private var roomServerId: Int?

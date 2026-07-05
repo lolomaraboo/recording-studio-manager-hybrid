@@ -116,6 +116,7 @@ struct ClientDetailView: View {
     @Environment(AppModel.self) private var model
     @State private var confirmDelete = false
     @State private var showingEdit = false
+    @State private var showingNewSession = false
 
     private var hasArtistProfile: Bool {
         !(client.biography ?? "").isEmpty || !client.genres.isEmpty || !client.instruments.isEmpty
@@ -183,6 +184,10 @@ struct ClientDetailView: View {
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
+                    Button { showingNewSession = true } label: {
+                        Label("Nouvelle session", systemImage: "calendar.badge.plus")
+                    }
+                    .help("Créer une session déjà rattachée à ce client.")
                     Button { togglePortal() } label: {
                         Label(client.portalAccess ? "Portail activé" : "Activer portail",
                               systemImage: client.portalAccess ? "person.badge.key.fill" : "person.badge.key")
@@ -320,6 +325,12 @@ struct ClientDetailView: View {
         .modalCard(isPresented: $showingEdit) {
             ClientEditSheet(client: client) { changes in
                 try? model.store.localUpdate(table: "clients", uuid: client.id, changes: changes)
+                Task { await model.syncNow() }
+            }
+        }
+        .modalCard(isPresented: $showingNewSession) {
+            SessionCreateSheet(defaultClientServerId: client.serverId) { payload in
+                _ = try? model.store.localInsert(table: "sessions", payload: payload)
                 Task { await model.syncNow() }
             }
         }

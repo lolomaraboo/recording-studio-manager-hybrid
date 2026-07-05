@@ -100,6 +100,7 @@ struct ProjectDetailView: View {
     @Environment(AppModel.self) private var model
     let project: Project
     @State private var showingEdit = false
+    @State private var showingNewTrack = false
 
     private var tracks: [Track] {
         _ = model.dataVersion
@@ -158,7 +159,14 @@ struct ProjectDetailView: View {
                         }
                     }
                     Spacer()
+                    Button { showingNewTrack = true } label: { Label("Nouvelle track", systemImage: "waveform.badge.plus") }
+                        .labelStyle(.iconOnly).help("Ajouter une track à ce projet.")
+                    if project.status != "delivered" {
+                        Button { markDelivered() } label: { Label("Marquer livré", systemImage: "checkmark.seal") }
+                            .labelStyle(.iconOnly).help("Marquer le projet comme livré.")
+                    }
                     Button { showingEdit = true } label: { Label("Modifier", systemImage: "pencil") }
+                        .labelStyle(.iconOnly).help("Modifier le projet.")
                     ProjectStatusBadge(status: project.status)
                 }
 
@@ -256,6 +264,17 @@ struct ProjectDetailView: View {
                 Task { await model.syncNow() }
             }
         }
+        .modalCard(isPresented: $showingNewTrack) {
+            TrackCreateSheet(defaultProjectServerId: project.serverId) { payload in
+                _ = try? model.store.localInsert(table: "tracks", payload: payload)
+                Task { await model.syncNow() }
+            }
+        }
+    }
+
+    private func markDelivered() {
+        try? model.store.localUpdate(table: "projects", uuid: project.id, changes: ["status": "delivered"])
+        Task { await model.syncNow() }
     }
 }
 
