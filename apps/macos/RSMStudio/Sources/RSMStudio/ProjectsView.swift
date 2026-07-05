@@ -122,6 +122,26 @@ struct ProjectDetailView: View {
     }()
     private func d(_ date: Date?) -> String? { date.map { Self.dateFmt.string(from: $0) } }
 
+    // Projet 360 metrics (at-a-glance).
+    private var spent: Double {
+        guard let sid = project.serverId else { return 0 }
+        return model.store.expenses(projectServerId: sid).reduce(0.0) { $0 + (Double($1.amount) ?? 0) }
+    }
+    private var talentCount: Int {
+        guard let sid = project.serverId else { return 0 }
+        return model.store.talents(projectServerId: sid).count
+    }
+    @ViewBuilder private func kpi(_ label: String, _ value: String, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.caption).foregroundStyle(.secondary)
+            Text(value).font(.title3).bold().foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -140,6 +160,14 @@ struct ProjectDetailView: View {
                     Spacer()
                     Button { showingEdit = true } label: { Label("Modifier", systemImage: "pencil") }
                     ProjectStatusBadge(status: project.status)
+                }
+
+                // ---- Projet 360 : coup d'œil ----
+                HStack(spacing: 12) {
+                    kpi("Budget", project.budget.flatMap { Double($0) }.map { "\(Int($0)) €" } ?? "—", .primary)
+                    kpi("Dépensé", "\(Int(spent)) €", spent > 0 ? .orange : .gray)
+                    kpi("Tracks", "\(tracks.count)", .primary)
+                    kpi("Talents", "\(talentCount)", .primary)
                 }
 
                 if let desc = project.description, !desc.isEmpty {
