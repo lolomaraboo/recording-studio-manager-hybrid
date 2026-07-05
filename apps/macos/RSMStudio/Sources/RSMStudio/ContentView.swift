@@ -83,15 +83,16 @@ struct ContentView: View {
         nonmutating set { model.currentSection = newValue }
     }
 
+    // Information architecture (audit 2026): 5 operational spaces + a demoted
+    // Configuration drawer. Tracks are nested inside Projets and Réservations
+    // inside Sessions (segmented control), so they are NOT top-level items.
     private let groups: [(String?, [SidebarItem])] = [
-        (nil, [.assistant, .dashboard]),
-        ("Activité", [.clients, .calendar, .sessions, .projects, .tracks]),
-        ("Ventes", [.quotes, .invoices, .packages, .creditNotes, .coupons, .analytics, .services, .contracts, .expenses]),
-        ("Ressources", [.equipment, .talents, .rooms, .time, .team, .availability, .consumables]),
-        ("Pilotage", [.leads, .tasks, .documents, .deliverables]),
-        ("En ligne", [.payments, .clientPortal, .bookingRequests]),
-        ("Mon Mac", [.system]),
-        (nil, [.settings]),
+        (nil, [.assistant, .dashboard, .analytics]),
+        ("Studio", [.clients, .calendar, .sessions, .projects]),
+        ("Argent", [.quotes, .invoices, .payments, .creditNotes, .expenses]),
+        ("Ressources", [.rooms, .equipment, .talents, .team, .time, .consumables]),
+        ("Développement", [.leads, .tasks, .documents, .deliverables, .contracts, .clientPortal]),
+        ("Configuration", [.services, .packages, .coupons, .availability, .system, .settings]),
     ]
 
     var body: some View {
@@ -149,8 +150,8 @@ struct ContentView: View {
                     case .dashboard: DashboardView()
                     case .clients: ClientsView()
                     case .calendar: CalendarView()
-                    case .sessions: SessionsView()
-                    case .projects: ProjectsView()
+                    case .sessions: SessionsHub()
+                    case .projects: ProjectsHub()
                     case .tracks: TracksView()
                     case .quotes: QuotesView()
                     case .invoices: InvoicesView()
