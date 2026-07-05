@@ -145,7 +145,7 @@ struct ContentView: View {
         } detail: {
             ZStack(alignment: .bottomTrailing) {
                 Group {
-                    switch selection ?? .assistant {
+                    switch selection ?? .dashboard {
                     case .assistant: ChatView()
                     case .dashboard: DashboardView()
                     case .clients: ClientsView()

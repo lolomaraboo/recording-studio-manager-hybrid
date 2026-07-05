@@ -320,7 +320,7 @@ final class AppModel {
 
     /// Cross-entity navigation: which section is shown, and (optionally)
     /// which entity each section should select on next display.
-    var currentSection: SidebarItem? = .assistant
+    var currentSection: SidebarItem? = .dashboard   // land on the actionable home, not the empty assistant
     var focusedEntity: [SidebarItem: String] = [:]
 
     /// Jump to an entity anywhere in the app (e.g. project → its client).

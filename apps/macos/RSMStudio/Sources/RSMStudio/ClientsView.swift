@@ -128,6 +128,39 @@ struct ClientDetailView: View {
             || !(client.performanceRightsSociety ?? "").isEmpty
     }
 
+    // Client 360 metrics (at-a-glance), computed from the local cache.
+    private struct Client360 { let due: Double; let revenue: Double; let upcoming: Int; let activeProjects: Int }
+    private var metrics: Client360 {
+        _ = model.dataVersion
+        guard let sid = client.serverId else { return .init(due: 0, revenue: 0, upcoming: 0, activeProjects: 0) }
+        let invs = model.store.invoices(clientServerId: sid)
+        let due = invs.filter { $0.status == "sent" || $0.status == "overdue" }.reduce(0.0) { $0 + (Double($1.total) ?? 0) }
+        let rev = invs.filter { $0.status == "paid" }.reduce(0.0) { $0 + (Double($1.total) ?? 0) }
+        let now = Date()
+        let upcoming = model.store.sessions(clientServerId: sid).filter { ($0.startTime ?? .distantPast) >= now && $0.status != "cancelled" }.count
+        let active = model.store.projects(clientServerId: sid).filter { !["completed", "delivered", "archived"].contains($0.status) }.count
+        return .init(due: due, revenue: rev, upcoming: upcoming, activeProjects: active)
+    }
+
+    private func curSym(_ c: String) -> String {
+        switch c.uppercased() {
+        case "EUR": return "€"; case "USD", "CAD", "AUD": return "$"; case "GBP": return "£"
+        case "CHF": return "CHF"; case "JPY": return "¥"; default: return c.uppercased()
+        }
+    }
+    private func money(_ v: Double) -> String { "\(String(format: "%.0f", v)) \(curSym(client.currency))" }
+
+    @ViewBuilder private func kpi(_ label: String, _ value: String, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.caption).foregroundStyle(.secondary)
+            Text(value).font(.title3).bold().foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -151,6 +184,14 @@ struct ClientDetailView: View {
                     Button(role: .destructive) { confirmDelete = true } label: {
                         Label("Supprimer", systemImage: "trash")
                     }
+                }
+
+                // ---- Client 360 : coup d'œil ----
+                HStack(spacing: 12) {
+                    kpi("Solde dû", money(metrics.due), metrics.due > 0 ? .orange : .gray)
+                    kpi("CA total", money(metrics.revenue), .primary)
+                    kpi("Sessions à venir", "\(metrics.upcoming)", .primary)
+                    kpi("Projets actifs", "\(metrics.activeProjects)", .primary)
                 }
 
                 GroupBox("Contact") {
