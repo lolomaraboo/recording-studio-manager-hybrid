@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Calendar, Users, FileText, TrendingUp, Home,
   TrendingDown, DollarSign, Clock, Settings, AlertTriangle,
-  Wrench, CheckCircle2, AlertCircle, RotateCcw, MessageSquare
+  Wrench, CheckCircle2, AlertCircle, RotateCcw, MessageSquare, Music
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
